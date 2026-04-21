@@ -2,15 +2,15 @@
 
 > Fresh Claude sessions read this **after CLAUDE.md**. Update atomically with every commit.
 
-**Last updated**: 2026-04-21 (MQTT bus + 7 sensor emitters green)
+**Last updated**: 2026-04-21 (5-agent mesh green — 109 new tests, ruff clean)
 **Plan**: v5.1 at `/home/george/.claude/plans/update-ur-memory-project-context-splendid-swan.md`
 **Submission**: due 2026-04-26 8pm EST
 **External blockers**: see [GitHub Issues](https://github.com/george11642/skyherd-engine/issues)
 
 ## Summary
 
-- Green / Total: **45 / 79**
-- Tier MVP status: 🔴 not started
+- Green / Total: **52 / 79**
+- Tier MVP status: 🟡 agents layer complete
 - Sim Completeness Gate: 🔴 not passed (target Fri Apr 24 noon)
 - Hardware tiers: 🔴 blocked on Gate
 
@@ -29,7 +29,7 @@
 
 ## Sim Completeness Gate (10 — target Fri Apr 24 noon)
 
-- [ ] All 5 Managed Agents live and cross-talking via shared MQTT
+- [x] All 5 Managed Agents live and cross-talking via shared MQTT
 - [x] All 7+ sim sensor emitters on Mosquitto MQTT (water / trough cam / thermal / fence motion / collar GPS+IMU / acoustic emitter / weather)
 - [x] Disease-detection heads running on synthetic frames (all 7 target conditions)
 - [x] ArduPilot SITL drone executing real MAVLink missions from agent tool calls
@@ -38,7 +38,7 @@
 - [ ] 5 demo scenarios play back-to-back without intervention
 - [ ] Deterministic replay (`make sim SEED=42`)
 - [ ] Fresh-clone boot test green on second machine
-- [ ] Cost ticker visibly pauses during idle stretches
+- [x] Cost ticker visibly pauses during idle stretches
 
 ## Demo scenarios (5 — MVP must-have)
 
@@ -50,11 +50,11 @@
 
 ## Managed Agents (5 — MVP must-have)
 
-- [ ] **FenceLineDispatcher** — LoRaWAN breach webhook → classify → dispatch drone
-- [ ] **HerdHealthWatcher** — Camera motion / schedule → per-animal anomaly
-- [ ] **PredatorPatternLearner** — Nightly + thermal clips → multi-day patterns
-- [ ] **GrazingOptimizer** — Weekly scheduled → paddock rotation
-- [ ] **CalvingWatch** — Seasonal Mar-Apr → labor behavior / dystocia
+- [x] **FenceLineDispatcher** — LoRaWAN breach webhook → classify → dispatch drone
+- [x] **HerdHealthWatcher** — Camera motion / schedule → per-animal anomaly
+- [x] **PredatorPatternLearner** — Nightly + thermal clips → multi-day patterns
+- [x] **GrazingOptimizer** — Weekly scheduled → paddock rotation
+- [x] **CalvingWatch** — Seasonal Mar-Apr → labor behavior / dystocia
 
 ## Disease-detection heads (7 — synthetic-frame classifiers)
 
