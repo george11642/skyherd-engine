@@ -7,13 +7,22 @@ setup:
 	uv sync --all-extras
 
 sim:
-	uv run python -m skyherd.world.clock
+	uv run python -m skyherd.world.cli --seed $(SEED) --duration 300
 
 demo:
-	SEED=$(SEED) SCENARIO=$(SCENARIO) uv run python -m skyherd.world.demo
+	@if [ "$(SCENARIO)" = "all" ]; then \
+		uv run skyherd-demo play all --seed $(SEED); \
+	else \
+		uv run skyherd-demo play $(SCENARIO) --seed $(SEED); \
+	fi
 
 dashboard:
-	uv run uvicorn skyherd.dashboard.app:app --reload --port 8000
+	(cd web && (pnpm install --frozen-lockfile || pnpm install) && pnpm run build) && \
+	SKYHERD_MOCK=1 uv run uvicorn skyherd.server.app:app --port 8000
+
+web-dev:
+	(cd web && pnpm install && pnpm run dev) &
+	SKYHERD_MOCK=1 uv run uvicorn skyherd.server.app:app --port 8000 --reload
 
 test:
 	uv run pytest --cov=src/skyherd --cov-report=term-missing -q
