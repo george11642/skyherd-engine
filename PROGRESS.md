@@ -2,14 +2,14 @@
 
 > Fresh Claude sessions read this **after CLAUDE.md**. Update atomically with every commit.
 
-**Last updated**: 2026-04-21 (Skills library green)
+**Last updated**: 2026-04-21 (Vision layer green — 7 disease-detection heads)
 **Plan**: v5.1 at `/home/george/.claude/plans/update-ur-memory-project-context-splendid-swan.md`
 **Submission**: due 2026-04-26 8pm EST
 **External blockers**: see [GitHub Issues](https://github.com/george11642/skyherd-engine/issues)
 
 ## Summary
 
-- Green / Total: **35 / 78**
+- Green / Total: **44 / 79**
 - Tier MVP status: 🔴 not started
 - Sim Completeness Gate: 🔴 not passed (target Fri Apr 24 noon)
 - Hardware tiers: 🔴 blocked on Gate
@@ -25,12 +25,13 @@
 - [x] `.pre-commit-config.yaml` with ruff + pyright hooks
 - [x] GitHub Actions CI passing on push
 - [x] World sim core green (48 tests, 97% coverage, 0 pyright errors)
+- [x] MCP servers (drone/sensor/rancher/galileo) — 75 tests, ruff+pyright clean
 
 ## Sim Completeness Gate (10 — target Fri Apr 24 noon)
 
 - [ ] All 5 Managed Agents live and cross-talking via shared MQTT
 - [ ] All 7+ sim sensor emitters on Mosquitto MQTT (water / trough cam / thermal / fence motion / collar GPS+IMU / acoustic emitter / weather)
-- [ ] Disease-detection heads running on synthetic frames (all 7 target conditions)
+- [x] Disease-detection heads running on synthetic frames (all 7 target conditions)
 - [x] ArduPilot SITL drone executing real MAVLink missions from agent tool calls
 - [ ] Dashboard live-updating (ranch map + 5 agent lanes + cost ticker + attestation + rancher phone PWA)
 - [ ] Wes voice end-to-end (Twilio → ElevenLabs → cowboy persona → rancher phone rings)
@@ -57,13 +58,13 @@
 
 ## Disease-detection heads (7 — synthetic-frame classifiers)
 
-- [ ] Pinkeye / IBK
-- [ ] New World Screwworm (2026-timely)
-- [ ] Foot rot / lameness
-- [ ] Bovine Respiratory Disease (BRD)
-- [ ] Lumpy Skin Disease (LSD)
-- [ ] Heat stress
-- [ ] Body Condition Score (BCS 1–9)
+- [x] Pinkeye / IBK
+- [x] New World Screwworm (2026-timely)
+- [x] Foot rot / lameness
+- [x] Bovine Respiratory Disease (BRD)
+- [x] Lumpy Skin Disease (LSD)
+- [x] Heat stress
+- [x] Body Condition Score (BCS 1–9)
 
 ## Skills library (26 — CrossBeam pattern)
 
