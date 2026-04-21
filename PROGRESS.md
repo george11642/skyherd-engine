@@ -2,14 +2,14 @@
 
 > Fresh Claude sessions read this **after CLAUDE.md**. Update atomically with every commit.
 
-**Last updated**: 2026-04-21 (Dashboard green — FastAPI+SSE server + Vite React 19 Tailwind v4 + /rancher PWA, 57 new tests)
+**Last updated**: 2026-04-21 (5 demo scenarios green — coyote/sick-cow/water/calving/storm, 76 new tests, skyherd-demo CLI)
 **Plan**: v5.1 at `/home/george/.claude/plans/update-ur-memory-project-context-splendid-swan.md`
 **Submission**: due 2026-04-26 8pm EST
 **External blockers**: see [GitHub Issues](https://github.com/george11642/skyherd-engine/issues)
 
 ## Summary
 
-- Green / Total: **55 / 79**
+- Green / Total: **62 / 79**
 - Tier MVP status: 🟡 agents layer complete
 - Sim Completeness Gate: 🔴 not passed (target Fri Apr 24 noon)
 - Hardware tiers: 🔴 blocked on Gate
@@ -36,18 +36,18 @@
 - [x] ArduPilot SITL drone executing real MAVLink missions from agent tool calls
 - [x] Dashboard live-updating (ranch map + 5 agent lanes + cost ticker + attestation + rancher phone PWA)
 - [x] Wes voice end-to-end (Twilio → ElevenLabs → cowboy persona → rancher phone rings)
-- [ ] 5 demo scenarios play back-to-back without intervention
-- [ ] Deterministic replay (`make sim SEED=42`)
+- [x] 5 demo scenarios play back-to-back without intervention
+- [x] Deterministic replay (`make sim SEED=42`)
 - [ ] Fresh-clone boot test green on second machine
 - [x] Cost ticker visibly pauses during idle stretches
 
 ## Demo scenarios (5 — MVP must-have)
 
-- [ ] **1. Coyote at fence** — FenceLineDispatcher → SITL drone → deterrent → Wes call
-- [ ] **2. Sick cow flagged** — HerdHealthWatcher → Doc escalation → vet-intake packet
-- [ ] **3. Water tank pressure drop** — LoRaWAN alert → drone flyover → attestation logged
-- [ ] **4. Calving detected** — CalvingWatch labor behavior → priority rancher page
-- [ ] **5. Storm incoming** — Weather-Redirect → GrazingOptimizer herd-move → acoustic nudge
+- [x] **1. Coyote at fence** — FenceLineDispatcher → SITL drone → deterrent → Wes call
+- [x] **2. Sick cow flagged** — HerdHealthWatcher → Doc escalation → vet-intake packet
+- [x] **3. Water tank pressure drop** — LoRaWAN alert → drone flyover → attestation logged
+- [x] **4. Calving detected** — CalvingWatch labor behavior → priority rancher page
+- [x] **5. Storm incoming** — Weather-Redirect → GrazingOptimizer herd-move → acoustic nudge
 
 ## Managed Agents (5 — MVP must-have)
 
