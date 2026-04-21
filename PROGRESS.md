@@ -2,14 +2,14 @@
 
 > Fresh Claude sessions read this **after CLAUDE.md**. Update atomically with every commit.
 
-**Last updated**: 2026-04-21 (world sim core)
+**Last updated**: 2026-04-21 (attestation chain)
 **Plan**: v5.1 at `/home/george/.claude/plans/update-ur-memory-project-context-splendid-swan.md`
 **Submission**: due 2026-04-26 8pm EST
 **External blockers**: see [GitHub Issues](https://github.com/george11642/skyherd-engine/issues)
 
 ## Summary
 
-- Green / Total: **5 / 78**
+- Green / Total: **6 / 78**
 - Tier MVP status: 🔴 not started
 - Sim Completeness Gate: 🔴 not passed (target Fri Apr 24 noon)
 - Hardware tiers: 🔴 blocked on Gate
@@ -108,7 +108,7 @@
 ## Extended Vision (7 — MVP-eligible if slack, else Tier 5)
 
 - [ ] Cross-Ranch Mesh Network (2 sim ranches + agent-to-agent mesh)
-- [ ] Insurance Attestation Chain (SQLite + Ed25519 Merkle log + dashboard panel)
+- [x] Insurance Attestation Chain (SQLite + Ed25519 Merkle log + dashboard panel)
 - [ ] Wildfire Thermal Early-Warning
 - [ ] Rustling / Theft Detection
 - [ ] Rancher Digital Twin "Wes Memory"
