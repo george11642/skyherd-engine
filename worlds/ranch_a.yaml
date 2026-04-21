@@ -1,0 +1,193 @@
+# Ranch A — "Mesa Verde Ranch"
+# 2km × 2km, 4 paddocks, 3 water tanks, 6 troughs, 8 fence segments, barn NE corner
+# All positions in metres from SW origin (0,0)
+
+name: ranch_a
+bounds_m: [2000.0, 2000.0]
+
+# ---------------------------------------------------------------------------
+# Paddocks — 4 quadrant paddocks (each ~1km × 1km with slight insets)
+# ---------------------------------------------------------------------------
+paddocks:
+  - id: p_sw
+    polygon:
+      - [10.0, 10.0]
+      - [990.0, 10.0]
+      - [990.0, 990.0]
+      - [10.0, 990.0]
+
+  - id: p_se
+    polygon:
+      - [1010.0, 10.0]
+      - [1990.0, 10.0]
+      - [1990.0, 990.0]
+      - [1010.0, 990.0]
+
+  - id: p_nw
+    polygon:
+      - [10.0, 1010.0]
+      - [990.0, 1010.0]
+      - [990.0, 1990.0]
+      - [10.0, 1990.0]
+
+  - id: p_ne
+    polygon:
+      - [1010.0, 1010.0]
+      - [1990.0, 1010.0]
+      - [1990.0, 1990.0]
+      - [1010.0, 1990.0]
+
+# ---------------------------------------------------------------------------
+# Water tanks — 3 tanks at strategic locations
+# ---------------------------------------------------------------------------
+water_tanks:
+  - id: wt_sw
+    pos: [300.0, 300.0]
+    capacity_l: 5000.0
+    level_pct: 82.0
+    pressure_psi: 48.0
+
+  - id: wt_se
+    pos: [1700.0, 250.0]
+    capacity_l: 5000.0
+    level_pct: 91.0
+    pressure_psi: 47.0
+
+  - id: wt_n
+    pos: [1000.0, 1600.0]
+    capacity_l: 8000.0
+    level_pct: 15.0      # intentionally low to trigger water.low events
+    pressure_psi: 22.0
+
+# ---------------------------------------------------------------------------
+# Troughs — 6 troughs (1-2 per paddock, fed from water tanks)
+# ---------------------------------------------------------------------------
+troughs:
+  - id: tr_sw_1
+    pos: [250.0, 500.0]
+    paddock: p_sw
+
+  - id: tr_sw_2
+    pos: [700.0, 200.0]
+    paddock: p_sw
+
+  - id: tr_se_1
+    pos: [1300.0, 400.0]
+    paddock: p_se
+
+  - id: tr_se_2
+    pos: [1800.0, 700.0]
+    paddock: p_se
+
+  - id: tr_nw_1
+    pos: [400.0, 1500.0]
+    paddock: p_nw
+
+  - id: tr_ne_1
+    pos: [1600.0, 1400.0]
+    paddock: p_ne
+
+# ---------------------------------------------------------------------------
+# Fence lines — 8 segments (perimeter N/E/S/W + 2 internal dividers crossing at centre)
+# ---------------------------------------------------------------------------
+fence_lines:
+  - id: fence_south
+    segment: [[0.0, 0.0], [2000.0, 0.0]]
+    tag: perimeter
+
+  - id: fence_north
+    segment: [[0.0, 2000.0], [2000.0, 2000.0]]
+    tag: perimeter
+
+  - id: fence_west
+    segment: [[0.0, 0.0], [0.0, 2000.0]]
+    tag: perimeter
+
+  - id: fence_east
+    segment: [[2000.0, 0.0], [2000.0, 2000.0]]
+    tag: perimeter
+
+  - id: fence_internal_h
+    segment: [[0.0, 1000.0], [2000.0, 1000.0]]
+    tag: internal
+
+  - id: fence_internal_v
+    segment: [[1000.0, 0.0], [1000.0, 2000.0]]
+    tag: internal
+
+  - id: fence_gate_sw_se
+    segment: [[995.0, 0.0], [1005.0, 0.0]]
+    tag: gate
+
+  - id: fence_gate_nw_ne
+    segment: [[995.0, 2000.0], [1005.0, 2000.0]]
+    tag: gate
+
+# ---------------------------------------------------------------------------
+# Barn — NE corner
+# ---------------------------------------------------------------------------
+barn:
+  pos: [1850.0, 1850.0]
+
+# ---------------------------------------------------------------------------
+# Cattle spawn — 50 cows distributed across paddocks
+# BCS range 3.5–6.5, several pregnant
+# ---------------------------------------------------------------------------
+cattle_spawn:
+  # SW paddock — 15 cows
+  - {tag: "A001", pos: [150.0, 150.0], paddock: p_sw, bcs: 5.2}
+  - {tag: "A002", pos: [200.0, 300.0], paddock: p_sw, bcs: 4.8}
+  - {tag: "A003", pos: [350.0, 150.0], paddock: p_sw, bcs: 6.0, pregnant: true, pregnancy_days_remaining: 45}
+  - {tag: "A004", pos: [450.0, 400.0], paddock: p_sw, bcs: 5.5}
+  - {tag: "A005", pos: [550.0, 250.0], paddock: p_sw, bcs: 4.2}
+  - {tag: "A006", pos: [600.0, 600.0], paddock: p_sw, bcs: 3.8}
+  - {tag: "A007", pos: [700.0, 400.0], paddock: p_sw, bcs: 5.0}
+  - {tag: "A008", pos: [800.0, 200.0], paddock: p_sw, bcs: 5.7, pregnant: true, pregnancy_days_remaining: 120}
+  - {tag: "A009", pos: [850.0, 500.0], paddock: p_sw, bcs: 4.5}
+  - {tag: "A010", pos: [200.0, 700.0], paddock: p_sw, bcs: 6.1}
+  - {tag: "A011", pos: [300.0, 800.0], paddock: p_sw, bcs: 5.3}
+  - {tag: "A012", pos: [500.0, 750.0], paddock: p_sw, bcs: 3.5}
+  - {tag: "A013", pos: [650.0, 850.0], paddock: p_sw, bcs: 4.9}
+  - {tag: "A014", pos: [750.0, 750.0], paddock: p_sw, bcs: 5.4}
+  - {tag: "A015", pos: [900.0, 900.0], paddock: p_sw, bcs: 6.2, pregnant: true, pregnancy_days_remaining: 7}
+
+  # SE paddock — 13 cows
+  - {tag: "B001", pos: [1100.0, 150.0], paddock: p_se, bcs: 5.1}
+  - {tag: "B002", pos: [1250.0, 300.0], paddock: p_se, bcs: 4.7}
+  - {tag: "B003", pos: [1400.0, 200.0], paddock: p_se, bcs: 5.9}
+  - {tag: "B004", pos: [1550.0, 350.0], paddock: p_se, bcs: 4.3}
+  - {tag: "B005", pos: [1700.0, 150.0], paddock: p_se, bcs: 6.5}
+  - {tag: "B006", pos: [1850.0, 400.0], paddock: p_se, bcs: 5.2, pregnant: true, pregnancy_days_remaining: 200}
+  - {tag: "B007", pos: [1100.0, 500.0], paddock: p_se, bcs: 4.0}
+  - {tag: "B008", pos: [1300.0, 600.0], paddock: p_se, bcs: 5.6}
+  - {tag: "B009", pos: [1500.0, 700.0], paddock: p_se, bcs: 4.8}
+  - {tag: "B010", pos: [1700.0, 600.0], paddock: p_se, bcs: 5.3}
+  - {tag: "B011", pos: [1900.0, 700.0], paddock: p_se, bcs: 6.0}
+  - {tag: "B012", pos: [1200.0, 850.0], paddock: p_se, bcs: 3.9}
+  - {tag: "B013", pos: [1600.0, 900.0], paddock: p_se, bcs: 5.1}
+
+  # NW paddock — 12 cows
+  - {tag: "C001", pos: [100.0, 1100.0], paddock: p_nw, bcs: 4.6}
+  - {tag: "C002", pos: [300.0, 1200.0], paddock: p_nw, bcs: 5.8}
+  - {tag: "C003", pos: [500.0, 1100.0], paddock: p_nw, bcs: 5.0, pregnant: true, pregnancy_days_remaining: 60}
+  - {tag: "C004", pos: [700.0, 1300.0], paddock: p_nw, bcs: 4.4}
+  - {tag: "C005", pos: [850.0, 1150.0], paddock: p_nw, bcs: 6.3}
+  - {tag: "C006", pos: [150.0, 1500.0], paddock: p_nw, bcs: 5.5}
+  - {tag: "C007", pos: [400.0, 1600.0], paddock: p_nw, bcs: 4.1}
+  - {tag: "C008", pos: [600.0, 1700.0], paddock: p_nw, bcs: 5.7}
+  - {tag: "C009", pos: [800.0, 1600.0], paddock: p_nw, bcs: 3.6}
+  - {tag: "C010", pos: [200.0, 1850.0], paddock: p_nw, bcs: 4.9}
+  - {tag: "C011", pos: [500.0, 1900.0], paddock: p_nw, bcs: 5.2}
+  - {tag: "C012", pos: [750.0, 1800.0], paddock: p_nw, bcs: 6.0}
+
+  # NE paddock — 10 cows
+  - {tag: "D001", pos: [1100.0, 1100.0], paddock: p_ne, bcs: 5.4}
+  - {tag: "D002", pos: [1300.0, 1200.0], paddock: p_ne, bcs: 4.7, pregnant: true, pregnancy_days_remaining: 15}
+  - {tag: "D003", pos: [1500.0, 1100.0], paddock: p_ne, bcs: 5.9}
+  - {tag: "D004", pos: [1700.0, 1200.0], paddock: p_ne, bcs: 4.2}
+  - {tag: "D005", pos: [1900.0, 1100.0], paddock: p_ne, bcs: 5.6}
+  - {tag: "D006", pos: [1150.0, 1500.0], paddock: p_ne, bcs: 3.7}
+  - {tag: "D007", pos: [1400.0, 1600.0], paddock: p_ne, bcs: 4.8}
+  - {tag: "D008", pos: [1600.0, 1700.0], paddock: p_ne, bcs: 5.3}
+  - {tag: "D009", pos: [1800.0, 1500.0], paddock: p_ne, bcs: 6.4}
+  - {tag: "D010", pos: [1200.0, 1900.0], paddock: p_ne, bcs: 5.0}
