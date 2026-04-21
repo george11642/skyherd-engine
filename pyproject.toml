@@ -38,6 +38,7 @@ dependencies = [
     "python-dotenv",
     "rich",
     "typer",
+    "twilio>=9.10.5",
 ]
 
 [project.optional-dependencies]
