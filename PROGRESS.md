@@ -2,14 +2,14 @@
 
 > Fresh Claude sessions read this **after CLAUDE.md**. Update atomically with every commit.
 
-**Last updated**: 2026-04-21 (attestation chain)
+**Last updated**: 2026-04-21 (infra scaffolding green)
 **Plan**: v5.1 at `/home/george/.claude/plans/update-ur-memory-project-context-splendid-swan.md`
 **Submission**: due 2026-04-26 8pm EST
 **External blockers**: see [GitHub Issues](https://github.com/george11642/skyherd-engine/issues)
 
 ## Summary
 
-- Green / Total: **6 / 78**
+- Green / Total: **9 / 78**
 - Tier MVP status: 🔴 not started
 - Sim Completeness Gate: 🔴 not passed (target Fri Apr 24 noon)
 - Hardware tiers: 🔴 blocked on Gate
@@ -19,11 +19,11 @@
 ## Infrastructure scaffolding (7)
 
 - [x] `pyproject.toml` with `uv` + deps declared
-- [ ] `Makefile` with targets (sim, test, lint, typecheck, format, clean)
+- [x] `Makefile` with targets (sim, test, lint, typecheck, format, clean)
 - [x] `pytest` + `pytest-asyncio` running; first passing test
 - [x] `ruff` + `pyright` configured and clean
-- [ ] `.pre-commit-config.yaml` with ruff + pyright hooks
-- [ ] GitHub Actions CI passing on push
+- [x] `.pre-commit-config.yaml` with ruff + pyright hooks
+- [x] GitHub Actions CI passing on push
 - [x] World sim core green (48 tests, 97% coverage, 0 pyright errors)
 
 ## Sim Completeness Gate (10 — target Fri Apr 24 noon)
