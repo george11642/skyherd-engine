@@ -2,14 +2,14 @@
 
 > Fresh Claude sessions read this **after CLAUDE.md**. Update atomically with every commit.
 
-**Last updated**: 2026-04-21 (5-agent mesh green — 109 new tests, ruff clean)
+**Last updated**: 2026-04-21 (Wes voice green — ElevenLabs/piper/espeak/silent chain + Twilio dashboard-ring fallback, 67 new tests)
 **Plan**: v5.1 at `/home/george/.claude/plans/update-ur-memory-project-context-splendid-swan.md`
 **Submission**: due 2026-04-26 8pm EST
 **External blockers**: see [GitHub Issues](https://github.com/george11642/skyherd-engine/issues)
 
 ## Summary
 
-- Green / Total: **52 / 79**
+- Green / Total: **53 / 79**
 - Tier MVP status: 🟡 agents layer complete
 - Sim Completeness Gate: 🔴 not passed (target Fri Apr 24 noon)
 - Hardware tiers: 🔴 blocked on Gate
@@ -34,7 +34,7 @@
 - [x] Disease-detection heads running on synthetic frames (all 7 target conditions)
 - [x] ArduPilot SITL drone executing real MAVLink missions from agent tool calls
 - [ ] Dashboard live-updating (ranch map + 5 agent lanes + cost ticker + attestation + rancher phone PWA)
-- [ ] Wes voice end-to-end (Twilio → ElevenLabs → cowboy persona → rancher phone rings)
+- [x] Wes voice end-to-end (Twilio → ElevenLabs → cowboy persona → rancher phone rings)
 - [ ] 5 demo scenarios play back-to-back without intervention
 - [ ] Deterministic replay (`make sim SEED=42`)
 - [ ] Fresh-clone boot test green on second machine

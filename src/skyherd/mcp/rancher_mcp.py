@@ -83,12 +83,14 @@ def _try_send_sms(to: str, body: str) -> bool:
 
 
 def _try_voice_call(to: str, script: str) -> bool:
-    """Attempt a voice call via skyherd.voice.wes if the module exists."""
+    """Attempt a voice call via skyherd.voice if the module is importable."""
     try:
-        from skyherd.voice.wes import place_call  # type: ignore[import]
+        from skyherd.voice.call import render_urgency_call
+        from skyherd.voice.wes import WesMessage
 
-        place_call(to=to, script=script)
-        return True
+        msg = WesMessage(urgency="call", subject=script, scripted_text=script)
+        result = render_urgency_call(msg)
+        return result.get("delivered_to") in ("twilio", "dashboard-ring")
     except (ImportError, AttributeError, Exception):  # noqa: BLE001
         return False
 
