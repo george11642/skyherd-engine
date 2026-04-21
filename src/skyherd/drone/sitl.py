@@ -20,7 +20,7 @@ from skyherd.drone.interface import DroneBackend, DroneState, DroneUnavailable, 
 
 logger = logging.getLogger(__name__)
 
-_SITL_ADDRESS = "udp://:14540"
+_SITL_ADDRESS = "udpin://0.0.0.0:14540"
 _CONNECT_TIMEOUT_S = 30.0
 _EVENTS_PATH = Path("runtime/drone_events.jsonl")
 _THERMAL_DIR = Path("runtime/thermal")
