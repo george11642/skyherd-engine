@@ -1,4 +1,4 @@
-.PHONY: setup sim demo dashboard test lint format typecheck clean ci sitl-up sitl-down
+.PHONY: setup sim demo dashboard test lint format typecheck clean ci sitl-up sitl-down bus-up bus-down
 
 SEED ?= 42
 SCENARIO ?= all
@@ -39,3 +39,10 @@ sitl-up:
 
 sitl-down:
 	docker compose -f docker-compose.sitl.yml down
+
+bus-up:
+	docker run -d --name skyherd-mosquitto -p 1883:1883 eclipse-mosquitto:2 \
+		sh -c 'echo "listener 1883\nallow_anonymous true" > /mosquitto/config/mosquitto.conf && mosquitto -c /mosquitto/config/mosquitto.conf'
+
+bus-down:
+	docker stop skyherd-mosquitto && docker rm skyherd-mosquitto
