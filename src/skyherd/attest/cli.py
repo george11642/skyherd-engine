@@ -53,9 +53,7 @@ def init(
 ) -> None:
     """Create a new Ed25519 signer and initialise the ledger."""
     if key_path.exists() and not force:
-        err_console.print(
-            f"[red]Key already exists at {key_path}. Use --force to overwrite.[/red]"
-        )
+        err_console.print(f"[red]Key already exists at {key_path}. Use --force to overwrite.[/red]")
         raise typer.Exit(1)
 
     signer = Signer.generate()
@@ -124,9 +122,7 @@ def verify(
         result = ledger.verify()
 
     if result.valid:
-        console.print(
-            f"[bold green]CHAIN VALID[/bold green] — {result.total} event(s) verified."
-        )
+        console.print(f"[bold green]CHAIN VALID[/bold green] — {result.total} event(s) verified.")
     else:
         err_console.print(
             f"[bold red]CHAIN INVALID[/bold red] — "

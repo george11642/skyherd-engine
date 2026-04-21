@@ -40,8 +40,10 @@ def _init_defaults(tmp_path: Path) -> tuple[Path, Path]:
         app,
         [
             "init",
-            "--key", str(key_path),
-            "--db", str(db_path),
+            "--key",
+            str(key_path),
+            "--db",
+            str(db_path),
         ],
     )
     assert result.exit_code == 0, result.output
@@ -104,9 +106,13 @@ class TestCliAppend:
         result = runner.invoke(
             app,
             [
-                "append", "sensor.water.1", "water.low",
-                "--key", str(key_path),
-                "--db", str(db_path),
+                "append",
+                "sensor.water.1",
+                "water.low",
+                "--key",
+                str(key_path),
+                "--db",
+                str(db_path),
             ],
             input=json.dumps({"psi": 0.2, "tank": 3}),
         )
@@ -119,9 +125,13 @@ class TestCliAppend:
             result = runner.invoke(
                 app,
                 [
-                    "append", "s", "k",
-                    "--key", str(key_path),
-                    "--db", str(db_path),
+                    "append",
+                    "s",
+                    "k",
+                    "--key",
+                    str(key_path),
+                    "--db",
+                    str(db_path),
                 ],
                 input=json.dumps({"i": i}),
             )
@@ -135,9 +145,13 @@ class TestCliAppend:
         result = runner.invoke(
             app,
             [
-                "append", "s", "k",
-                "--key", str(key_path),
-                "--db", str(db_path),
+                "append",
+                "s",
+                "k",
+                "--key",
+                str(key_path),
+                "--db",
+                str(db_path),
             ],
             input="",
         )
@@ -148,9 +162,13 @@ class TestCliAppend:
         result = runner.invoke(
             app,
             [
-                "append", "s", "k",
-                "--key", str(key_path),
-                "--db", str(db_path),
+                "append",
+                "s",
+                "k",
+                "--key",
+                str(key_path),
+                "--db",
+                str(db_path),
             ],
             input="not json at all",
         )
@@ -161,9 +179,13 @@ class TestCliAppend:
         result = runner.invoke(
             app,
             [
-                "append", "s", "k",
-                "--key", str(key_path),
-                "--db", str(db_path),
+                "append",
+                "s",
+                "k",
+                "--key",
+                str(key_path),
+                "--db",
+                str(db_path),
             ],
             input="[1, 2, 3]",
         )
@@ -182,9 +204,13 @@ class TestCliVerify:
             runner.invoke(
                 app,
                 [
-                    "append", "s", "k",
-                    "--key", str(key_path),
-                    "--db", str(db_path),
+                    "append",
+                    "s",
+                    "k",
+                    "--key",
+                    str(key_path),
+                    "--db",
+                    str(db_path),
                 ],
                 input=json.dumps({"i": i}),
             )
@@ -208,9 +234,13 @@ class TestCliVerify:
         runner.invoke(
             app,
             [
-                "append", "s", "k",
-                "--key", str(key_path),
-                "--db", str(db_path),
+                "append",
+                "s",
+                "k",
+                "--key",
+                str(key_path),
+                "--db",
+                str(db_path),
             ],
             input=json.dumps({"v": 1}),
         )
@@ -247,9 +277,13 @@ class TestCliList:
         runner.invoke(
             app,
             [
-                "append", "sensor.water.1", "water.low",
-                "--key", str(key_path),
-                "--db", str(db_path),
+                "append",
+                "sensor.water.1",
+                "water.low",
+                "--key",
+                str(key_path),
+                "--db",
+                str(db_path),
             ],
             input=json.dumps({"psi": 0.1}),
         )
@@ -267,9 +301,13 @@ class TestCliList:
             runner.invoke(
                 app,
                 [
-                    "append", "s", "k",
-                    "--key", str(key_path),
-                    "--db", str(db_path),
+                    "append",
+                    "s",
+                    "k",
+                    "--key",
+                    str(key_path),
+                    "--db",
+                    str(db_path),
                 ],
                 input=json.dumps({"i": i}),
             )
@@ -287,9 +325,13 @@ class TestCliList:
             runner.invoke(
                 app,
                 [
-                    "append", "s", "k",
-                    "--key", str(key_path),
-                    "--db", str(db_path),
+                    "append",
+                    "s",
+                    "k",
+                    "--key",
+                    str(key_path),
+                    "--db",
+                    str(db_path),
                 ],
                 input=json.dumps({"i": i}),
             )

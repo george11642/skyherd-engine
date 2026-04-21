@@ -166,9 +166,7 @@ class TestSignatureMutationDetected:
             ledger.append("s", "k", {"i": i})
 
         # Flip one byte in the stored signature for seq=2
-        row = ledger._conn.execute(
-            "SELECT signature FROM events WHERE seq = 2"
-        ).fetchone()
+        row = ledger._conn.execute("SELECT signature FROM events WHERE seq = 2").fetchone()
         sig_bytes = bytes.fromhex(row[0])
         bad_bytes = bytes([sig_bytes[0] ^ 0xFF]) + sig_bytes[1:]
         ledger._conn.execute(
@@ -184,9 +182,7 @@ class TestSignatureMutationDetected:
 
     def test_garbage_signature_hex_flagged(self, ledger: Ledger) -> None:
         ledger.append("s", "k", {"x": 1})
-        ledger._conn.execute(
-            "UPDATE events SET signature = 'NOTVALIDHEX' WHERE seq = 1"
-        )
+        ledger._conn.execute("UPDATE events SET signature = 'NOTVALIDHEX' WHERE seq = 1")
         ledger._conn.commit()
 
         result = ledger.verify()
