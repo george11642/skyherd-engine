@@ -2,14 +2,14 @@
 
 > Fresh Claude sessions read this **after CLAUDE.md**. Update atomically with every commit.
 
-**Last updated**: 2026-04-21 (infra scaffolding green)
+**Last updated**: 2026-04-21 (Skills library green)
 **Plan**: v5.1 at `/home/george/.claude/plans/update-ur-memory-project-context-splendid-swan.md`
 **Submission**: due 2026-04-26 8pm EST
 **External blockers**: see [GitHub Issues](https://github.com/george11642/skyherd-engine/issues)
 
 ## Summary
 
-- Green / Total: **9 / 78**
+- Green / Total: **35 / 78**
 - Tier MVP status: 🔴 not started
 - Sim Completeness Gate: 🔴 not passed (target Fri Apr 24 noon)
 - Hardware tiers: 🔴 blocked on Gate
@@ -68,42 +68,42 @@
 ## Skills library (26 — CrossBeam pattern)
 
 ### cattle-behavior/ (5)
-- [ ] feeding-patterns.md
-- [ ] lameness-indicators.md
-- [ ] calving-signs.md
-- [ ] heat-stress.md
-- [ ] herd-structure.md
+- [x] feeding-patterns.md
+- [x] lameness-indicators.md
+- [x] calving-signs.md
+- [x] heat-stress.md
+- [x] herd-structure.md
 
 ### predator-ids/ (5)
-- [ ] coyote.md
-- [ ] mountain-lion.md
-- [ ] wolf.md
-- [ ] livestock-guardian-dogs.md
-- [ ] thermal-signatures.md
+- [x] coyote.md
+- [x] mountain-lion.md
+- [x] wolf.md
+- [x] livestock-guardian-dogs.md
+- [x] thermal-signatures.md
 
 ### ranch-ops/ (5)
-- [ ] fence-line-protocols.md
-- [ ] water-tank-sops.md
-- [ ] paddock-rotation.md
-- [ ] part-107-rules.md
-- [ ] human-in-loop-etiquette.md
+- [x] fence-line-protocols.md
+- [x] water-tank-sops.md
+- [x] paddock-rotation.md
+- [x] part-107-rules.md
+- [x] human-in-loop-etiquette.md
 
 ### nm-ecology/ (4)
-- [ ] nm-predator-ranges.md
-- [ ] nm-forage.md
-- [ ] seasonal-calendar.md
-- [ ] weather-patterns.md
+- [x] nm-predator-ranges.md
+- [x] nm-forage.md
+- [x] seasonal-calendar.md
+- [x] weather-patterns.md
 
 ### drone-ops/ (4)
-- [ ] patrol-planning.md
-- [ ] deterrent-protocols.md
-- [ ] battery-economics.md
-- [ ] no-fly-zones.md
+- [x] patrol-planning.md
+- [x] deterrent-protocols.md
+- [x] battery-economics.md
+- [x] no-fly-zones.md
 
 ### voice-persona/ (3)
-- [ ] wes-register.md
-- [ ] urgency-tiers.md
-- [ ] never-panic.md
+- [x] wes-register.md
+- [x] urgency-tiers.md
+- [x] never-panic.md
 
 ## Extended Vision (7 — MVP-eligible if slack, else Tier 5)
 
