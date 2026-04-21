@@ -1,0 +1,458 @@
+"""Base classes for SkyHerd demo scenarios.
+
+A Scenario is a deterministic, seed-driven, end-to-end playback that
+demonstrates one complete nervous-system cascade.  Every scenario:
+
+* Seeds the world from a known integer seed (default 42).
+* Injects synthetic events at specific sim-time offsets.
+* Drives the AgentMesh simulation path (no real API key required).
+* Asserts expected outcomes on the resulting event stream + tool calls.
+* Writes a JSONL replay log to runtime/scenario_runs/.
+* Appends a human-readable summary to docs/REPLAY_LOG.md.
+"""
+
+from __future__ import annotations
+
+import asyncio
+import json
+import logging
+import time
+from abc import ABC, abstractmethod
+from dataclasses import dataclass, field
+from datetime import UTC, datetime
+from pathlib import Path
+from typing import Any
+
+from skyherd.attest.ledger import Ledger
+from skyherd.attest.signer import Signer
+from skyherd.world.world import World, make_world
+
+logger = logging.getLogger(__name__)
+
+# ---------------------------------------------------------------------------
+# Constants
+# ---------------------------------------------------------------------------
+
+_REPO_ROOT = Path(__file__).parent.parent.parent.parent  # src/skyherd/scenarios → skyherd-engine/
+_WORLD_CONFIG = _REPO_ROOT / "worlds" / "ranch_a.yaml"
+_RUNTIME_DIR = _REPO_ROOT / "runtime" / "scenario_runs"
+_DOCS_DIR = _REPO_ROOT / "docs"
+
+# Sim step size in seconds for scenario playback
+_STEP_DT = 5.0
+
+
+# ---------------------------------------------------------------------------
+# ScenarioResult
+# ---------------------------------------------------------------------------
+
+
+@dataclass
+class ScenarioResult:
+    """Captures the full output of one scenario run."""
+
+    name: str
+    seed: int
+    duration_s: float
+    event_stream: list[dict[str, Any]] = field(default_factory=list)
+    agent_tool_calls: dict[str, list[dict[str, Any]]] = field(default_factory=dict)
+    attestation_entries: list[dict[str, Any]] = field(default_factory=list)
+    outcome_passed: bool = False
+    outcome_error: str | None = None
+    wall_time_s: float = 0.0
+    jsonl_path: Path | None = None
+
+
+# ---------------------------------------------------------------------------
+# Scenario abstract base
+# ---------------------------------------------------------------------------
+
+
+class Scenario(ABC):
+    """Abstract base for all SkyHerd demo scenarios."""
+
+    #: Machine-readable name (used as dict key and CLI argument).
+    name: str
+
+    #: One-sentence description shown in ``skyherd-demo list``.
+    description: str
+
+    #: How many sim-seconds to play back.
+    duration_s: float = 600.0
+
+    # ------------------------------------------------------------------
+    # Abstract interface
+    # ------------------------------------------------------------------
+
+    @abstractmethod
+    def setup(self, world: World) -> None:
+        """Mutate the world state before the sim loop begins.
+
+        Use this to stamp pre-conditions (e.g. sick cow, low tank).
+        """
+
+    @abstractmethod
+    def inject_events(self, world: World, sim_time_s: float) -> list[dict[str, Any]]:
+        """Return synthetic events to inject at *sim_time_s*.
+
+        Called once per sim step.  Return an empty list when nothing should
+        be injected at this time.
+        """
+
+    @abstractmethod
+    def assert_outcome(
+        self,
+        event_stream: list[dict[str, Any]],
+        mesh: Any,  # _DemoMesh at runtime; AgentMesh-compatible interface
+    ) -> None:
+        """Raise AssertionError if the expected outcome was not observed.
+
+        Parameters
+        ----------
+        event_stream:
+            All events emitted by the world + injected events, chronologically.
+        mesh:
+            The mesh after playback — inspect ``mesh._tool_call_log``.
+        """
+
+    # ------------------------------------------------------------------
+    # Helpers available to subclasses
+    # ------------------------------------------------------------------
+
+    def _find_event(
+        self,
+        event_stream: list[dict[str, Any]],
+        event_type: str,
+    ) -> dict[str, Any] | None:
+        """Return the first event of *event_type*, or None."""
+        for ev in event_stream:
+            if ev.get("type") == event_type:
+                return ev
+        return None
+
+    def _find_tool_call(
+        self,
+        mesh: Any,  # _DemoMesh at runtime; AgentMesh in real usage
+        tool_name: str,
+    ) -> dict[str, Any] | None:
+        """Return the first tool call named *tool_name* across all agents."""
+        for calls in mesh._tool_call_log.values():
+            for call in calls:
+                if call.get("tool") == tool_name:
+                    return call
+        return None
+
+    def _all_tool_calls(self, mesh: Any) -> list[dict[str, Any]]:
+        """Flatten all tool calls from all agents into a single list."""
+        result: list[dict[str, Any]] = []
+        for calls in mesh._tool_call_log.values():
+            result.extend(calls)
+        return result
+
+
+# ---------------------------------------------------------------------------
+# Demo AgentMesh — simulation path only, no real API calls
+# ---------------------------------------------------------------------------
+
+
+class _DemoMesh:
+    """Lightweight scenario driver that replays agent responses without API keys.
+
+    Bridges world events → agent handler simulation paths and records tool
+    calls for assertion in assert_outcome().
+    """
+
+    def __init__(self, ledger: Ledger | None = None) -> None:
+        self._tool_call_log: dict[str, list[dict[str, Any]]] = {}
+        self._ledger = ledger
+
+    async def dispatch(
+        self,
+        agent_name: str,
+        wake_event: dict[str, Any],
+        spec: Any,
+        handler_fn: Any,
+    ) -> list[dict[str, Any]]:
+        """Invoke one agent handler simulation path; record and return tool calls."""
+        from skyherd.agents.session import SessionManager  # local import — avoids circular
+
+        manager = SessionManager()
+        session = manager.create_session(spec)
+        manager.wake(session.id, wake_event)
+        calls = await handler_fn(session, wake_event, sdk_client=None)
+        manager.sleep(session.id)
+
+        if agent_name not in self._tool_call_log:
+            self._tool_call_log[agent_name] = []
+        self._tool_call_log[agent_name].extend(calls)
+
+        if self._ledger is not None:
+            for call in calls:
+                self._ledger.append(
+                    source=agent_name,
+                    kind=f"tool_call.{call.get('tool', 'unknown')}",
+                    payload=call,
+                )
+        return calls
+
+
+# ---------------------------------------------------------------------------
+# run() — top-level scenario runner
+# ---------------------------------------------------------------------------
+
+
+async def _run_async(
+    scenario: Scenario,
+    seed: int = 42,
+    dry_run: bool = False,
+    world_config: Path | None = None,
+) -> ScenarioResult:
+    """Async inner implementation of run()."""
+    import tempfile
+
+    from skyherd.agents.calving_watch import CALVING_WATCH_SPEC
+    from skyherd.agents.calving_watch import handler as calving_handler
+    from skyherd.agents.fenceline_dispatcher import FENCELINE_DISPATCHER_SPEC
+    from skyherd.agents.fenceline_dispatcher import handler as fenceline_handler
+    from skyherd.agents.grazing_optimizer import GRAZING_OPTIMIZER_SPEC
+    from skyherd.agents.grazing_optimizer import handler as grazing_handler
+    from skyherd.agents.herd_health_watcher import HERD_HEALTH_WATCHER_SPEC
+    from skyherd.agents.herd_health_watcher import handler as herd_handler
+
+    config_path = world_config or _WORLD_CONFIG
+    world = make_world(seed=seed, config_path=config_path)
+
+    # Build an in-memory ledger
+    tmp = tempfile.NamedTemporaryFile(suffix=".db", delete=False)
+    tmp.close()
+    signer = Signer.generate()
+    ledger = Ledger.open(tmp.name, signer)
+
+    mesh = _DemoMesh(ledger=ledger)
+
+    # Agent registry for event routing
+    _registry = {
+        "FenceLineDispatcher": (FENCELINE_DISPATCHER_SPEC, fenceline_handler),
+        "HerdHealthWatcher": (HERD_HEALTH_WATCHER_SPEC, herd_handler),
+        "GrazingOptimizer": (GRAZING_OPTIMIZER_SPEC, grazing_handler),
+        "CalvingWatch": (CALVING_WATCH_SPEC, calving_handler),
+    }
+
+    # Setup pre-conditions
+    scenario.setup(world)
+
+    all_events: list[dict[str, Any]] = []
+    wall_start = time.monotonic()
+
+    if not dry_run:
+        elapsed = 0.0
+        while elapsed < scenario.duration_s:
+            step_events = world.step(_STEP_DT)
+            elapsed += _STEP_DT
+
+            # Record world events to ledger
+            for ev in step_events:
+                ledger.append(
+                    source="world",
+                    kind=ev.get("type", "unknown"),
+                    payload=ev,
+                )
+
+            # Inject scenario-specific synthetic events
+            injected = scenario.inject_events(world, elapsed)
+            all_events.extend(step_events)
+            all_events.extend(injected)
+
+            # Route events to agents
+            for ev in step_events + injected:
+                await _route_event(ev, mesh, _registry, ledger)
+
+    wall_time_s = time.monotonic() - wall_start
+
+    # Collect attestation entries
+    attest_entries = [e.model_dump() for e in ledger.iter_events()]
+
+    result = ScenarioResult(
+        name=scenario.name,
+        seed=seed,
+        duration_s=scenario.duration_s,
+        event_stream=all_events,
+        agent_tool_calls=dict(mesh._tool_call_log),
+        attestation_entries=attest_entries,
+        wall_time_s=wall_time_s,
+    )
+
+    # Assert outcome (skip in dry_run — no events were collected)
+    if dry_run:
+        result.outcome_passed = True
+    else:
+        try:
+            scenario.assert_outcome(all_events, mesh)  # type: ignore[arg-type]
+            result.outcome_passed = True
+        except AssertionError as exc:
+            result.outcome_error = str(exc)
+            logger.warning("Scenario %r assertion failed: %s", scenario.name, exc)
+
+    # Write JSONL replay log
+    _RUNTIME_DIR.mkdir(parents=True, exist_ok=True)
+    ts = datetime.now(tz=UTC).strftime("%Y%m%dT%H%M%S")
+    jsonl_path = _RUNTIME_DIR / f"{scenario.name}_{seed}_{ts}.jsonl"
+    _write_jsonl(jsonl_path, result)
+    result.jsonl_path = jsonl_path
+
+    # Append human-readable replay log
+    _append_replay_log(result)
+
+    ledger._conn.close()
+    import os as _os
+    try:
+        _os.unlink(tmp.name)
+    except OSError:
+        pass
+
+    return result
+
+
+async def _route_event(
+    event: dict[str, Any],
+    mesh: _DemoMesh,
+    registry: dict[str, tuple[Any, Any]],
+    ledger: Ledger,
+) -> None:
+    """Route one world/injected event to the appropriate agents."""
+    event_type = event.get("type", "")
+
+    routing: dict[str, list[str]] = {
+        "fence.breach": ["FenceLineDispatcher"],
+        "predator.spawned": ["FenceLineDispatcher"],
+        "camera.motion": ["HerdHealthWatcher"],
+        "health.check": ["HerdHealthWatcher"],
+        "collar.activity_spike": ["CalvingWatch"],
+        "calving.prelabor": ["CalvingWatch"],
+        "water.low": ["FenceLineDispatcher", "GrazingOptimizer"],
+        "weather.storm": ["GrazingOptimizer"],
+        "weekly.schedule": ["GrazingOptimizer"],
+        "storm.warning": ["GrazingOptimizer"],
+    }
+
+    targets = routing.get(event_type, [])
+    for agent_name in targets:
+        if agent_name in registry:
+            spec, handler_fn = registry[agent_name]
+            try:
+                await mesh.dispatch(agent_name, event, spec, handler_fn)
+            except Exception as exc:  # noqa: BLE001
+                logger.warning("Handler error for %s: %s", agent_name, exc)
+
+
+def _write_jsonl(path: Path, result: ScenarioResult) -> None:
+    """Write the scenario result as JSONL."""
+    with path.open("w", encoding="utf-8") as fh:
+        # Header record
+        fh.write(
+            json.dumps(
+                {
+                    "record": "scenario_header",
+                    "name": result.name,
+                    "seed": result.seed,
+                    "duration_s": result.duration_s,
+                    "outcome_passed": result.outcome_passed,
+                    "outcome_error": result.outcome_error,
+                    "wall_time_s": result.wall_time_s,
+                    "event_count": len(result.event_stream),
+                    "tool_call_count": sum(
+                        len(v) for v in result.agent_tool_calls.values()
+                    ),
+                    "attestation_count": len(result.attestation_entries),
+                }
+            )
+            + "\n"
+        )
+        # Events
+        for ev in result.event_stream:
+            fh.write(json.dumps({"record": "event", **ev}) + "\n")
+        # Tool calls
+        for agent_name, calls in result.agent_tool_calls.items():
+            for call in calls:
+                fh.write(
+                    json.dumps({"record": "tool_call", "agent": agent_name, **call}) + "\n"
+                )
+
+
+def _append_replay_log(result: ScenarioResult) -> None:
+    """Append a human-readable entry to docs/REPLAY_LOG.md."""
+    _DOCS_DIR.mkdir(parents=True, exist_ok=True)
+    replay_log = _DOCS_DIR / "REPLAY_LOG.md"
+    ts = datetime.now(tz=UTC).isoformat()
+    status = "PASS" if result.outcome_passed else f"FAIL: {result.outcome_error}"
+    tool_count = sum(len(v) for v in result.agent_tool_calls.items())
+    line = (
+        f"| {ts} | {result.name} | seed={result.seed} | "
+        f"events={len(result.event_stream)} | tools={tool_count} | "
+        f"attest={len(result.attestation_entries)} | {status} |\n"
+    )
+    if not replay_log.exists():
+        replay_log.write_text(
+            "# SkyHerd Demo Replay Log\n\n"
+            "| timestamp | scenario | params | events | tools | attest | status |\n"
+            "|-----------|----------|--------|--------|-------|--------|--------|\n"
+        )
+    with replay_log.open("a", encoding="utf-8") as fh:
+        fh.write(line)
+
+
+def run(
+    scenario_name: str,
+    seed: int = 42,
+    dry_run: bool = False,
+) -> ScenarioResult:
+    """Bootstrap world + sensors + mesh and play one named scenario.
+
+    Parameters
+    ----------
+    scenario_name:
+        Key in SCENARIOS dict (e.g. "coyote", "sick_cow").
+    seed:
+        RNG seed for deterministic replay.
+    dry_run:
+        If True, sets up the world and returns without running the sim loop.
+
+    Returns
+    -------
+    ScenarioResult
+        Full replay including event stream, tool calls, attestation entries.
+    """
+    from skyherd.scenarios import SCENARIOS
+
+    if scenario_name not in SCENARIOS:
+        raise KeyError(f"Unknown scenario: {scenario_name!r}. Available: {list(SCENARIOS)}")
+
+    scenario_cls = SCENARIOS[scenario_name]
+    scenario = scenario_cls()
+
+    return asyncio.run(_run_async(scenario, seed=seed, dry_run=dry_run))
+
+
+def run_all(seed: int = 42) -> list[ScenarioResult]:
+    """Run all 5 demo scenarios sequentially with the given seed.
+
+    Parameters
+    ----------
+    seed:
+        Common RNG seed applied to every scenario.
+
+    Returns
+    -------
+    list[ScenarioResult]
+        One result per scenario, in canonical order.
+    """
+    from skyherd.scenarios import SCENARIOS
+
+    results: list[ScenarioResult] = []
+    for name in SCENARIOS:
+        logger.info("Running scenario: %s (seed=%d)", name, seed)
+        result = run(name, seed=seed)
+        results.append(result)
+        status = "PASS" if result.outcome_passed else f"FAIL({result.outcome_error})"
+        logger.info("  %s -> %s (%.2fs wall)", name, status, result.wall_time_s)
+    return results
