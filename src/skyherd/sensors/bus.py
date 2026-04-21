@@ -58,9 +58,9 @@ class _EmbeddedBroker:
                     "bind": f"{_DEFAULT_BROKER_HOST}:{_DEFAULT_BROKER_PORT}",
                 }
             },
-            "sys_interval": 0,
-            "auth": {"allow-anonymous": True},
-            "topic-check": {"enabled": False},
+            "plugins": {
+                "amqtt.plugins.authentication.AnonymousAuthPlugin": {},
+            },
         }
         self._broker = Broker(config)
         await self._broker.start()
