@@ -2,14 +2,14 @@
 
 > Fresh Claude sessions read this **after CLAUDE.md**. Update atomically with every commit.
 
-**Last updated**: 2026-04-21 (bootstrap)
+**Last updated**: 2026-04-21 (drone backend)
 **Plan**: v5.1 at `/home/george/.claude/plans/update-ur-memory-project-context-splendid-swan.md`
 **Submission**: due 2026-04-26 8pm EST
 **External blockers**: see [GitHub Issues](https://github.com/george11642/skyherd-engine/issues)
 
 ## Summary
 
-- Green / Total: **0 / 77**
+- Green / Total: **1 / 77**
 - Tier MVP status: 🔴 not started
 - Sim Completeness Gate: 🔴 not passed (target Fri Apr 24 noon)
 - Hardware tiers: 🔴 blocked on Gate
@@ -30,7 +30,7 @@
 - [ ] All 5 Managed Agents live and cross-talking via shared MQTT
 - [ ] All 7+ sim sensor emitters on Mosquitto MQTT (water / trough cam / thermal / fence motion / collar GPS+IMU / acoustic emitter / weather)
 - [ ] Disease-detection heads running on synthetic frames (all 7 target conditions)
-- [ ] ArduPilot SITL drone executing real MAVLink missions from agent tool calls
+- [x] ArduPilot SITL drone executing real MAVLink missions from agent tool calls
 - [ ] Dashboard live-updating (ranch map + 5 agent lanes + cost ticker + attestation + rancher phone PWA)
 - [ ] Wes voice end-to-end (Twilio → ElevenLabs → cowboy persona → rancher phone rings)
 - [ ] 5 demo scenarios play back-to-back without intervention
