@@ -2,14 +2,14 @@
 
 > Fresh Claude sessions read this **after CLAUDE.md**. Update atomically with every commit.
 
-**Last updated**: 2026-04-21 (Wes voice green — ElevenLabs/piper/espeak/silent chain + Twilio dashboard-ring fallback, 67 new tests)
+**Last updated**: 2026-04-21 (Dashboard green — FastAPI+SSE server + Vite React 19 Tailwind v4 + /rancher PWA, 57 new tests)
 **Plan**: v5.1 at `/home/george/.claude/plans/update-ur-memory-project-context-splendid-swan.md`
 **Submission**: due 2026-04-26 8pm EST
 **External blockers**: see [GitHub Issues](https://github.com/george11642/skyherd-engine/issues)
 
 ## Summary
 
-- Green / Total: **53 / 79**
+- Green / Total: **55 / 79**
 - Tier MVP status: 🟡 agents layer complete
 - Sim Completeness Gate: 🔴 not passed (target Fri Apr 24 noon)
 - Hardware tiers: 🔴 blocked on Gate
@@ -26,6 +26,7 @@
 - [x] GitHub Actions CI passing on push
 - [x] World sim core green (48 tests, 97% coverage, 0 pyright errors)
 - [x] MCP servers (drone/sensor/rancher/galileo) — 75 tests, ruff+pyright clean
+- [x] Dashboard + /rancher PWA (FastAPI SSE server + Vite React 19 Tailwind v4, 57 new tests)
 
 ## Sim Completeness Gate (10 — target Fri Apr 24 noon)
 
@@ -33,7 +34,7 @@
 - [x] All 7+ sim sensor emitters on Mosquitto MQTT (water / trough cam / thermal / fence motion / collar GPS+IMU / acoustic emitter / weather)
 - [x] Disease-detection heads running on synthetic frames (all 7 target conditions)
 - [x] ArduPilot SITL drone executing real MAVLink missions from agent tool calls
-- [ ] Dashboard live-updating (ranch map + 5 agent lanes + cost ticker + attestation + rancher phone PWA)
+- [x] Dashboard live-updating (ranch map + 5 agent lanes + cost ticker + attestation + rancher phone PWA)
 - [x] Wes voice end-to-end (Twilio → ElevenLabs → cowboy persona → rancher phone rings)
 - [ ] 5 demo scenarios play back-to-back without intervention
 - [ ] Deterministic replay (`make sim SEED=42`)
