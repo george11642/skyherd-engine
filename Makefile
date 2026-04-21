@@ -1,4 +1,4 @@
-.PHONY: setup sim demo dashboard test lint format typecheck clean ci sitl-up sitl-down bus-up bus-down
+.PHONY: setup sim demo dashboard test lint format typecheck clean ci sitl-up sitl-down bus-up bus-down mesh-smoke
 
 SEED ?= 42
 SCENARIO ?= all
@@ -46,3 +46,6 @@ bus-up:
 
 bus-down:
 	docker stop skyherd-mosquitto && docker rm skyherd-mosquitto
+
+mesh-smoke:
+	uv run skyherd-mesh mesh smoke --verbose
