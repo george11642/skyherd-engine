@@ -1,0 +1,54 @@
+# docker-compose.sitl.yml — ArduPilot SITL stack for SkyHerd e2e testing
+#
+# FAST PATH (requires Docker Hub access):
+#   Set SITL_IMAGE=ardupilot/ardupilot-sitl:Copter-4.5.7 in your shell
+#   to skip the ~30 min source build and use a pre-built image.
+#
+# DEFAULT (offline / CI without cache):
+#   Builds from docker/sitl.Dockerfile using BuildKit ccache.
+#   First build: ~25-40 min.  Subsequent builds: ~3 min.
+#
+# Usage:
+#   make sitl-up       # start
+#   make sitl-down     # stop + remove containers
+#
+# After `make sitl-up`, SITL is reachable on UDP 14540 (localhost).
+# Run `uv run skyherd-sitl-e2e` to execute the full e2e mission.
+
+version: "3.9"
+
+services:
+  sitl:
+    # Use pre-built image when SITL_IMAGE is set, otherwise build from source.
+    image: ${SITL_IMAGE:-skyherd-sitl:local}
+    build:
+      context: .
+      dockerfile: docker/sitl.Dockerfile
+      args:
+        ARDUPILOT_TAG: ${ARDUPILOT_TAG:-Copter-4.5.7}
+      cache_from:
+        - type=local,src=/tmp/.buildx-cache
+      cache_to:
+        - type=local,dest=/tmp/.buildx-cache,mode=max
+    container_name: skyherd-sitl
+    restart: "no"
+    ports:
+      # MAVLink UDP — mavsdk_server and GCS tools connect here
+      - "14540:14540/udp"
+      # TCP (mavproxy / QGroundControl direct)
+      - "5760:5760/tcp"
+      # Secondary UDP output (QGC / Mission Planner)
+      - "14550:14550/udp"
+    environment:
+      # Zurich Airfield — matches e2e waypoints in src/skyherd/drone/e2e.py
+      SITL_HOME: "47.3977,8.5456,488,180"
+      SITL_OUT: "udpout:host-gateway:14540"
+    extra_hosts:
+      # Allow container → host UDP forwarding (Linux Docker)
+      - "host-gateway:host-gateway"
+    healthcheck:
+      test: ["CMD", "bash", "-c", "echo '' | nc -u -w1 localhost 14540 > /dev/null 2>&1 || exit 0"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 30s
