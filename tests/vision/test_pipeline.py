@@ -4,7 +4,13 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from skyherd.vision.pipeline import ClassifyPipeline
+import pytest
+
+# supervision requires opencv-python (cv2) which is not installed in the base
+# WSL2 / CI environment.  Skip cleanly rather than failing with ImportError.
+pytest.importorskip("cv2", reason="opencv-python not installed in this environment")
+
+from skyherd.vision.pipeline import ClassifyPipeline  # noqa: E402
 from skyherd.world.world import World
 
 

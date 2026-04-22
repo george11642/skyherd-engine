@@ -4,9 +4,16 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from PIL import Image
+import pytest
 
-from skyherd.vision.renderer import annotate_frame, render_trough_frame
+# supervision requires opencv-python (cv2) which is not installed in the base
+# WSL2 / CI environment (it requires native libs).  Skip the whole module
+# gracefully rather than failing with an ImportError.
+pytest.importorskip("cv2", reason="opencv-python not installed in this environment")
+
+from PIL import Image  # noqa: E402
+
+from skyherd.vision.renderer import annotate_frame, render_trough_frame  # noqa: E402
 from skyherd.vision.result import DetectionResult
 from skyherd.world.world import World
 
