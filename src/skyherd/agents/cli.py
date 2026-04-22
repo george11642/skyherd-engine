@@ -12,7 +12,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import signal
-from typing import Annotated
+from typing import Annotated, Any
 
 import typer
 
@@ -107,7 +107,7 @@ def mesh_smoke(
     if verbose:
         logging.getLogger().setLevel(logging.DEBUG)
 
-    async def _run() -> dict[str, object]:
+    async def _run() -> dict[str, list[dict[str, Any]]]:
         from skyherd.agents.mesh import AgentMesh
 
         mesh = AgentMesh()

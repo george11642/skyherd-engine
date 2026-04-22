@@ -172,10 +172,13 @@ def _simulate_handler(
 def _try_run_classify_pipeline(wake_event: dict[str, Any]) -> dict[str, Any]:
     """Attempt to run the ClassifyPipeline; return stub result if unavailable."""
     try:
-        from skyherd.vision.pipeline import ClassifyPipeline
-        from skyherd.world.world import World
+        from pathlib import Path as _Path
 
-        world = World.create_default()
+        from skyherd.vision.pipeline import ClassifyPipeline
+        from skyherd.world.world import make_world
+
+        _repo_root = _Path(__file__).parent.parent.parent.parent
+        world = make_world(seed=42, config_path=_repo_root / "worlds" / "ranch_a.yaml")
         trough_id = wake_event.get("trough_id", "trough_a")
         pipeline = ClassifyPipeline()
         result = pipeline.run(world, trough_id)

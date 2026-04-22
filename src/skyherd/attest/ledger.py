@@ -182,7 +182,7 @@ class Ledger:
                     pubkey,
                 ),
             )
-            seq = cur.lastrowid
+            seq = cur.lastrowid or 0
 
         return Event(
             seq=seq,
