@@ -34,7 +34,7 @@ import time
 import uuid
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, Literal, cast
 
 from skyherd.agents.cost import CostTicker
 from skyherd.agents.spec import AgentSpec
@@ -390,8 +390,8 @@ LocalSessionManager = SessionManager
 
 def get_session_manager(
     runtime: str = "auto",
-    mqtt_publish_callback=None,
-    ledger_callback=None,
+    mqtt_publish_callback: Any | None = None,
+    ledger_callback: Any | None = None,
 ) -> SessionManager:
     """Return the appropriate session manager based on *runtime*.
 
@@ -400,30 +400,48 @@ def get_session_manager(
     - ``"managed"`` — always return :class:`~skyherd.agents.managed.ManagedSessionManager`.
     - ``"auto"``    — use ``ManagedSessionManager`` when ``ANTHROPIC_API_KEY`` is set
                       **and** ``SKYHERD_AGENTS=managed``; otherwise ``LocalSessionManager``.
-    """
-    kwargs = dict(
-        mqtt_publish_callback=mqtt_publish_callback,
-        ledger_callback=ledger_callback,
-    )
 
+    Returns either ``LocalSessionManager`` (a ``SessionManager`` subclass alias) or
+    ``ManagedSessionManager``. Both expose the same public API but are not nominally
+    related, so the managed-path returns are cast to ``SessionManager`` for the
+    annotation contract. Callers depend only on the common public surface.
+    """
     if runtime == "local":
-        return LocalSessionManager(**kwargs)
+        return LocalSessionManager(
+            mqtt_publish_callback=mqtt_publish_callback,
+            ledger_callback=ledger_callback,
+        )
 
     if runtime == "managed":
         from skyherd.agents.managed import ManagedSessionManager  # noqa: PLC0415
 
-        return ManagedSessionManager(**kwargs)
+        return cast(
+            SessionManager,
+            ManagedSessionManager(
+                mqtt_publish_callback=mqtt_publish_callback,
+                ledger_callback=ledger_callback,
+            ),
+        )
 
     # "auto" branch
     if os.environ.get("ANTHROPIC_API_KEY") and os.environ.get("SKYHERD_AGENTS") == "managed":
         try:
             from skyherd.agents.managed import ManagedSessionManager  # noqa: PLC0415
 
-            return ManagedSessionManager(**kwargs)
+            return cast(
+                SessionManager,
+                ManagedSessionManager(
+                    mqtt_publish_callback=mqtt_publish_callback,
+                    ledger_callback=ledger_callback,
+                ),
+            )
         except Exception as exc:  # noqa: BLE001
             logger.warning(
                 "ManagedSessionManager unavailable (%s) — falling back to LocalSessionManager",
                 exc,
             )
 
-    return LocalSessionManager(**kwargs)
+    return LocalSessionManager(
+        mqtt_publish_callback=mqtt_publish_callback,
+        ledger_callback=ledger_callback,
+    )
