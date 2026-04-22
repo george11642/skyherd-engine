@@ -6,10 +6,6 @@ No real MQTT broker is required.
 
 from __future__ import annotations
 
-from typing import Any
-
-import pytest
-
 from skyherd.scenarios.cross_ranch_coyote import (
     _BREACH_AT_S,
     _RANCH_A_SHARED_FENCE,
@@ -43,6 +39,7 @@ class TestCrossRanchCoyoteScenarioMetadata:
 class TestCrossRanchCoyoteSetup:
     def test_setup_sets_southerly_wind(self):
         from pathlib import Path
+
         from skyherd.world.world import make_world
 
         config = Path(__file__).parent.parent.parent / "worlds" / "ranch_a.yaml"
@@ -53,6 +50,7 @@ class TestCrossRanchCoyoteSetup:
 
     def test_no_breach_before_threshold(self):
         from pathlib import Path
+
         from skyherd.world.world import make_world
 
         config = Path(__file__).parent.parent.parent / "worlds" / "ranch_a.yaml"
@@ -64,6 +62,7 @@ class TestCrossRanchCoyoteSetup:
 
     def test_breach_injected_at_threshold(self):
         from pathlib import Path
+
         from skyherd.world.world import make_world
 
         config = Path(__file__).parent.parent.parent / "worlds" / "ranch_a.yaml"
@@ -76,6 +75,7 @@ class TestCrossRanchCoyoteSetup:
 
     def test_breach_is_on_shared_fence(self):
         from pathlib import Path
+
         from skyherd.world.world import make_world
 
         config = Path(__file__).parent.parent.parent / "worlds" / "ranch_a.yaml"
@@ -89,6 +89,7 @@ class TestCrossRanchCoyoteSetup:
 
     def test_coyote_spawned_at_east_boundary(self):
         from pathlib import Path
+
         from skyherd.world.world import make_world
 
         config = Path(__file__).parent.parent.parent / "worlds" / "ranch_a.yaml"
@@ -102,6 +103,7 @@ class TestCrossRanchCoyoteSetup:
     def test_coyote_not_injected_twice(self):
         """Second call past threshold does not re-inject the same coyote."""
         from pathlib import Path
+
         from skyherd.world.world import make_world
 
         config = Path(__file__).parent.parent.parent / "worlds" / "ranch_a.yaml"

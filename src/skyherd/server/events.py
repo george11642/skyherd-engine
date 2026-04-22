@@ -401,3 +401,25 @@ class EventBroadcaster:
             except Exception as exc:  # noqa: BLE001
                 logger.debug("mock log loop error: %s", exc)
             await asyncio.sleep(MOCK_EVENT_INTERVAL_S)
+
+    def broadcast_neighbor_handoff(self, payload: dict[str, Any]) -> None:
+        """Publish a ``neighbor.handoff`` SSE event to all subscribers.
+
+        Called by CrossRanchMesh when ranch_b FenceLineDispatcher responds to a
+        neighbor alert in pre_position mode.  The dashboard ``/?view=cross-ranch``
+        uses this to update the side-by-side ranch-map canvases.
+
+        Payload shape::
+
+            {
+                "from_ranch": "ranch_a",
+                "to_ranch":   "ranch_b",
+                "species":    "coyote",
+                "shared_fence": "fence_east",
+                "response_mode": "pre_position",
+                "tool_calls": ["get_thermal_clip", "launch_drone", "log_agent_event"],
+                "rancher_paged": false,
+                "ts": 1745200000.0,
+            }
+        """
+        self._broadcast("neighbor.handoff", payload)

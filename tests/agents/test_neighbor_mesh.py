@@ -9,21 +9,16 @@ from __future__ import annotations
 import asyncio
 import time
 from typing import Any
-from unittest.mock import AsyncMock
 
-import pytest
-
+from skyherd.agents.fenceline_dispatcher import FENCELINE_DISPATCHER_SPEC
+from skyherd.agents.mesh import AgentMesh
 from skyherd.agents.mesh_neighbor import (
-    _DEDUP_TTL_S,
-    _attestation_hash,
     CrossRanchMesh,
     NeighborBroadcaster,
     NeighborListener,
+    _attestation_hash,
 )
-from skyherd.agents.mesh import AgentMesh
 from skyherd.agents.session import SessionManager
-from skyherd.agents.fenceline_dispatcher import FENCELINE_DISPATCHER_SPEC
-
 
 # ---------------------------------------------------------------------------
 # Helpers
