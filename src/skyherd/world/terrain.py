@@ -51,6 +51,15 @@ class CattleSpawnEntry(BaseModel):
     pregnancy_days_remaining: int | None = None
 
 
+class NeighborRef(BaseModel):
+    """Reference to a neighbouring ranch and the shared fence segment IDs."""
+
+    id: str  # e.g. "ranch_a"
+    shared_fence: str  # cardinal direction of the shared boundary ("west", "east", …)
+    shared_fence_segment_ids: list[str] = Field(default_factory=list)
+    # e.g. ["ranch_a:fence_east", "ranch_b:fence_west"]
+
+
 class TerrainConfig(BaseModel):
     name: str
     bounds_m: tuple[float, float]  # (width, height)
@@ -60,6 +69,7 @@ class TerrainConfig(BaseModel):
     fence_lines: list[FenceLineConfig] = Field(default_factory=list)
     barn: BarnConfig
     cattle_spawn: list[CattleSpawnEntry] = Field(default_factory=list)
+    neighbors: list[NeighborRef] = Field(default_factory=list)
 
     @classmethod
     def from_yaml(cls, path: Path) -> TerrainConfig:

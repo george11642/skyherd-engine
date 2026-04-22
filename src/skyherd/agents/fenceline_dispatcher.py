@@ -1,6 +1,7 @@
 """FenceLineDispatcher — responds to fence breach + thermal confirmation events.
 
 Wake topics : ``skyherd/+/fence/+``, ``skyherd/+/thermal/+``
+              ``skyherd/neighbor/+/<ranch>/predator_confirmed``  (cross-ranch)
 Target latency : <30s per wake cycle
 MCP servers : drone_mcp, sensor_mcp, rancher_mcp, galileo_mcp
 
@@ -12,7 +13,18 @@ Handler flow
 4. Based on classification:
    * Real predator / trespass → ``drone_mcp.launch_drone`` + ``drone_mcp.play_deterrent``
    * Also page rancher with appropriate urgency.
-5. Return list of tool call records.
+5. For ``neighbor_alert`` events (response_mode="pre_position"):
+   * Pre-position patrol drone on the shared fence — no deterrent, no rancher page.
+   * Emit a ``neighbor_handoff`` log entry for the dashboard.
+   * Only escalate to page_rancher if the threat cascades into a direct observation.
+6. Return list of tool call records.
+
+System prompt addendum for neighbor alerts
+------------------------------------------
+"Neighbor alerts arrive in advance of direct observation; treat them as leading
+indicators, NOT confirmed breaches.  Pre-position a drone on the shared fence
+and log a neighbor_handoff entry.  Do NOT page the rancher unless you receive a
+direct fence.breach event on the same segment."
 """
 
 from __future__ import annotations
@@ -43,6 +55,7 @@ FENCELINE_DISPATCHER_SPEC = AgentSpec(
     wake_topics=[
         "skyherd/+/fence/+",
         "skyherd/+/thermal/+",
+        "skyherd/neighbor/+/+/predator_confirmed",  # cross-ranch neighbor alerts
     ],
     mcp_servers=["drone_mcp", "sensor_mcp", "rancher_mcp", "galileo_mcp"],
     skills=[
@@ -128,6 +141,13 @@ async def handler(
     )
 
     cached_payload = build_cached_messages(system_prompt, skill_texts, user_message)
+
+    # Route neighbor alerts to the pre-position handler (no API key needed)
+    if event_type == "neighbor_alert":
+        from skyherd.agents.mesh_neighbor import _simulate_neighbor_handler
+
+        tool_calls = _simulate_neighbor_handler(wake_event, session)
+        return tool_calls
 
     # Use SDK client if available; otherwise simulate tool calls for smoke test
     if sdk_client is not None and os.environ.get("ANTHROPIC_API_KEY"):

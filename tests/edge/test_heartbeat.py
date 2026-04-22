@@ -91,7 +91,14 @@ class TestHeartbeatPayload:
     def test_required_keys_present(self) -> None:
         watcher = _make_watcher()
         payload = watcher.heartbeat_payload()
-        required = {"edge_id", "ts", "capture_cadence_s", "last_detection_ts", "cpu_temp_c", "mem_pct"}
+        required = {
+            "edge_id",
+            "ts",
+            "capture_cadence_s",
+            "last_detection_ts",
+            "cpu_temp_c",
+            "mem_pct",
+        }
         assert required.issubset(payload.keys()), f"Missing: {required - payload.keys()}"
 
     def test_edge_id_matches_config(self) -> None:

@@ -216,6 +216,4 @@ class TestMqttSubscriptionCoverage:
         """skyherd/+/edge_status/# matches both nodes."""
         for edge_id in ("edge-house", "edge-barn"):
             watcher = _make_edge(edge_id)
-            assert self._matches_wildcard(
-                watcher._status_topic, "skyherd/+/edge_status/#"
-            )
+            assert self._matches_wildcard(watcher._status_topic, "skyherd/+/edge_status/#")
