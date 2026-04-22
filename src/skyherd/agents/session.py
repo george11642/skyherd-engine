@@ -29,6 +29,7 @@ from __future__ import annotations
 import hashlib
 import json
 import logging
+import os
 import time
 import uuid
 from dataclasses import dataclass, field
@@ -376,3 +377,53 @@ def _mqtt_topic_matches(topic: str, pattern: str) -> bool:
     if len(topic_parts) != len(pattern_parts):
         return False
     return all(p == "+" or p == t for p, t in zip(pattern_parts, topic_parts, strict=True))
+
+
+# ---------------------------------------------------------------------------
+# Alias + factory (Managed Agents compat)
+# ---------------------------------------------------------------------------
+
+#: Alias so imports of ``LocalSessionManager`` keep working after the
+#: ``ManagedSessionManager`` is introduced.
+LocalSessionManager = SessionManager
+
+
+def get_session_manager(
+    runtime: str = "auto",
+    mqtt_publish_callback=None,
+    ledger_callback=None,
+) -> SessionManager:
+    """Return the appropriate session manager based on *runtime*.
+
+    Values for *runtime*:
+    - ``"local"``   — always return :class:`LocalSessionManager`.
+    - ``"managed"`` — always return :class:`~skyherd.agents.managed.ManagedSessionManager`.
+    - ``"auto"``    — use ``ManagedSessionManager`` when ``ANTHROPIC_API_KEY`` is set
+                      **and** ``SKYHERD_AGENTS=managed``; otherwise ``LocalSessionManager``.
+    """
+    kwargs = dict(
+        mqtt_publish_callback=mqtt_publish_callback,
+        ledger_callback=ledger_callback,
+    )
+
+    if runtime == "local":
+        return LocalSessionManager(**kwargs)
+
+    if runtime == "managed":
+        from skyherd.agents.managed import ManagedSessionManager  # noqa: PLC0415
+
+        return ManagedSessionManager(**kwargs)
+
+    # "auto" branch
+    if os.environ.get("ANTHROPIC_API_KEY") and os.environ.get("SKYHERD_AGENTS") == "managed":
+        try:
+            from skyherd.agents.managed import ManagedSessionManager  # noqa: PLC0415
+
+            return ManagedSessionManager(**kwargs)
+        except Exception as exc:  # noqa: BLE001
+            logger.warning(
+                "ManagedSessionManager unavailable (%s) — falling back to LocalSessionManager",
+                exc,
+            )
+
+    return LocalSessionManager(**kwargs)
