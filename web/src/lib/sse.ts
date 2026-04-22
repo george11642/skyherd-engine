@@ -7,7 +7,14 @@
  *   sse.on("cost.tick", (payload: CostTickPayload) => { ... });
  *   // cleanup:
  *   sse.off("world.snapshot", handler);
+ *
+ * Demo mode:
+ *   When VITE_DEMO_MODE === "replay", getSSE() returns a SkyHerdReplay instance
+ *   instead of a live EventSource connection. The replay driver loads
+ *   /replay.json at runtime and re-emits events at 3× speed.
  */
+
+import { SkyHerdReplay, getReplay } from "./replay";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type SSEHandler = (payload: any) => void;
@@ -110,7 +117,18 @@ export class SkyHerdSSE {
 /** Global singleton SSE client */
 let _globalSSE: SkyHerdSSE | null = null;
 
-export function getSSE(): SkyHerdSSE {
+/**
+ * Returns the active event driver.
+ * - In replay/demo mode (VITE_DEMO_MODE=replay): returns a SkyHerdReplay.
+ * - Otherwise: returns a live SkyHerdSSE connected to /events.
+ *
+ * Both classes share the same on/off/connect/close interface via SSEHandler,
+ * so callers need no changes when the mode changes.
+ */
+export function getSSE(): SkyHerdSSE | SkyHerdReplay {
+  if (import.meta.env.VITE_DEMO_MODE === "replay") {
+    return getReplay();
+  }
   if (!_globalSSE) {
     _globalSSE = new SkyHerdSSE("/events");
     _globalSSE.connect();

@@ -12,7 +12,7 @@
  */
 
 import { useEffect, useRef, useState } from "react";
-import RanchMap from "./RanchMap";
+import { RanchMap } from "./RanchMap";
 
 // ---------------------------------------------------------------------------
 // Types

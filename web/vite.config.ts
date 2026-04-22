@@ -3,6 +3,11 @@ import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import path from "path";
 
+// VITE_DEMO_MODE is picked up automatically from the environment at build time.
+// Vercel production sets VITE_DEMO_MODE=replay via project env vars so the
+// deployed SPA runs the replay driver instead of connecting to /events.
+// Local `make dashboard` leaves VITE_DEMO_MODE unset (live FastAPI SSE).
+
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   resolve: {
