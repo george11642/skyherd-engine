@@ -36,13 +36,10 @@ def _make_default_bus_state() -> dict[str, deque]:  # type: ignore[type-arg]
 
 
 def _try_load_bus() -> dict[str, deque] | None:  # type: ignore[type-arg]
-    """Attempt to import the live sensor bus; return None if not yet present."""
-    try:
-        from skyherd.sensors.bus import get_bus_state  # type: ignore[import]
+    """Attempt to import the live sensor bus; return None if unavailable."""
+    from skyherd.sensors.bus import get_bus_state  # type: ignore[import]
 
-        return get_bus_state()
-    except (ImportError, AttributeError):
-        return None
+    return get_bus_state()
 
 
 # ---------------------------------------------------------------------------
