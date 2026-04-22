@@ -1,3 +1,4 @@
+T17: stable — ruff clean, 1106 tests at 87.42% (80% passed), 16/16 demo PASSes (seed 42), HTTP 200. 2026-04-21.
 T16: stable — ruff clean, 1106 tests at 87.42% (80% passed), 16/16 demo PASSes (seed 42), HTTP 200. 2026-04-21.
 
 # T15 Stability Note — 20260421-000000
