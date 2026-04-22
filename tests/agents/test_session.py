@@ -174,3 +174,138 @@ class TestOnWebhook:
         mgr.create_session(spec)
         woken = mgr.on_webhook({"type": "no_topic_event"})
         assert woken == []
+
+
+# ---------------------------------------------------------------------------
+# MA-05: Checkpoint persistence — PredatorPatternLearner across sim-day boundary
+# ---------------------------------------------------------------------------
+
+
+class TestCheckpointPersistence:
+    """Verify Managed Agents checkpoint persistence (MA-05).
+
+    PredatorPatternLearner runs nightly and must retain context across sim-day
+    boundaries within a scenario run. The local shim models the real MA platform
+    checkpoint semantics: serialize session state to runtime/sessions/{id}.json,
+    then rehydrate on the other side of the boundary.
+    """
+
+    def test_predator_pattern_learner_checkpoint_round_trip(
+        self, tmp_path, monkeypatch
+    ) -> None:
+        """MA-05: learner session state survives checkpoint → restore cycle.
+
+        Simulates a sim-day boundary: two wake events (thermal clip + nightly
+        analysis), separated by sleep calls, then checkpoint + restore into a
+        fresh SessionManager. wake_events_consumed must be preserved.
+        """
+        import skyherd.agents.session as sess_mod
+
+        monkeypatch.setattr(sess_mod, "_RUNTIME_DIR", tmp_path)
+
+        from skyherd.agents.predator_pattern_learner import (
+            PREDATOR_PATTERN_LEARNER_SPEC,
+        )
+        from skyherd.agents.session import SessionManager
+
+        mgr = SessionManager()
+        session = mgr.create_session(PREDATOR_PATTERN_LEARNER_SPEC)
+        session_id = session.id
+
+        # Sim-day 1: thermal clip arrives, handler processes, sleeps.
+        thermal_event = {
+            "topic": "skyherd/ranch_a/thermal/cam_1",
+            "type": "thermal.clip",
+            "ranch_id": "ranch_a",
+        }
+        mgr.wake(session_id, thermal_event)
+        mgr.sleep(session_id)
+
+        # Sim-day 2: nightly analysis cron fires, handler runs, sleeps.
+        nightly_event = {
+            "topic": "skyherd/ranch_a/cron/nightly",
+            "type": "nightly.analysis",
+            "ranch_id": "ranch_a",
+        }
+        mgr.wake(session_id, nightly_event)
+        mgr.sleep(session_id)
+
+        # Pre-checkpoint invariant: both events recorded.
+        assert len(session.wake_events_consumed) == 2, (
+            f"Pre-checkpoint wake_events_consumed count wrong: "
+            f"{len(session.wake_events_consumed)}"
+        )
+
+        # Serialize state.
+        checkpoint_path = mgr.checkpoint(session_id)
+        assert checkpoint_path.exists(), (
+            f"Checkpoint file not written: {checkpoint_path}"
+        )
+
+        # Simulate sim-day boundary: fresh SessionManager, restore from disk.
+        mgr2 = SessionManager()
+        # The restore path needs the session pre-registered to resolve its
+        # AgentSpec (per session.py line 284). Pre-register by copying the
+        # reference — mimics a scenario runner that carried the session object
+        # across the boundary.
+        mgr2._sessions[session_id] = session
+
+        restored = mgr2.restore_from_checkpoint(session_id)
+
+        # MA-05 assertions.
+        assert restored.id == session_id
+        assert restored.agent_name == "PredatorPatternLearner", (
+            f"Agent name lost in round-trip: {restored.agent_name}"
+        )
+        assert len(restored.wake_events_consumed) == 2, (
+            f"wake_events_consumed count lost in round-trip: "
+            f"{len(restored.wake_events_consumed)}"
+        )
+        # Event payloads preserved
+        restored_types = [e.get("type") for e in restored.wake_events_consumed]
+        assert "thermal.clip" in restored_types
+        assert "nightly.analysis" in restored_types
+        # State always restores to idle per session.py:304
+        assert restored.state == "idle"
+
+    def test_checkpoint_preserves_agent_name(self, tmp_path, monkeypatch) -> None:
+        """Simple regression: agent_name survives serialization."""
+        import skyherd.agents.session as sess_mod
+
+        monkeypatch.setattr(sess_mod, "_RUNTIME_DIR", tmp_path)
+
+        from skyherd.agents.predator_pattern_learner import (
+            PREDATOR_PATTERN_LEARNER_SPEC,
+        )
+        from skyherd.agents.session import SessionManager
+
+        mgr = SessionManager()
+        session = mgr.create_session(PREDATOR_PATTERN_LEARNER_SPEC)
+        mgr.checkpoint(session.id)
+
+        mgr2 = SessionManager()
+        mgr2._sessions[session.id] = session
+        restored = mgr2.restore_from_checkpoint(session.id)
+        assert restored.agent_name == "PredatorPatternLearner"
+
+    def test_checkpoint_file_written_to_runtime_dir(
+        self, tmp_path, monkeypatch
+    ) -> None:
+        """Checkpoint writes a JSON file named {session_id}.json in _RUNTIME_DIR."""
+        import skyherd.agents.session as sess_mod
+
+        monkeypatch.setattr(sess_mod, "_RUNTIME_DIR", tmp_path)
+
+        from skyherd.agents.predator_pattern_learner import (
+            PREDATOR_PATTERN_LEARNER_SPEC,
+        )
+        from skyherd.agents.session import SessionManager
+
+        mgr = SessionManager()
+        session = mgr.create_session(PREDATOR_PATTERN_LEARNER_SPEC)
+        path = mgr.checkpoint(session.id)
+
+        expected_path = tmp_path / f"{session.id}.json"
+        assert path == expected_path
+        assert path.exists()
+        assert path.suffix == ".json"
