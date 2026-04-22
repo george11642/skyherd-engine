@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 from skyherd.vision.heads.pinkeye import Pinkeye
 from skyherd.world.cattle import Cow
 
@@ -91,3 +93,25 @@ def test_reasoning_contains_cow_tag() -> None:
     result = _HEAD.classify(cow, _META)
     assert result is not None
     assert "REDTAG" in result.reasoning
+
+
+# --- Rule fallback explicit tests (Plan 05) ---
+
+
+def test_rule_fallback_fires_when_raw_path_missing() -> None:
+    """frame_meta without raw_path -> rule path -> bbox is None."""
+    cow = _make_cow(ocular_discharge=0.75)
+    result = _HEAD.classify(cow, {"raw_path": None})
+    assert result is not None
+    assert result.severity == "log"
+    assert result.bbox is None
+    assert "pinkeye.md" in result.reasoning
+
+
+def test_rule_fallback_fires_when_raw_path_nonexistent() -> None:
+    """frame_meta with a raw_path that doesn't exist on disk -> rule fallback -> bbox is None."""
+    cow = _make_cow(ocular_discharge=0.85)
+    result = _HEAD.classify(cow, {"raw_path": Path("/nonexistent/xxx.png")})
+    assert result is not None
+    assert result.severity == "escalate"
+    assert result.bbox is None
