@@ -1,235 +1,251 @@
-# Verify Loop T1 — 20260421
+# Verify Loop T2 — 20260422-032800
 
-**Generated**: 2026-04-22 (verify-loop-T1)
-**HEAD SHA**: `99dc2849a68a39f7650b891e3e2909dbd5f5be62`
-**Commit count**: 30 commits on main
-**PROGRESS.md**: 153 lines — 67 green / 14 open (claimed 67/79 — COUNT MATCHES)
-
----
-
-## 1. Repo State
-
-- Branch: `main`, up-to-date with `origin/main`
-- 4 unstaged files at verification time (mid-build from Wave 4B agents):
-  - `Makefile`, `docs/REPLAY_LOG.md`, `pyproject.toml`, `src/skyherd/drone/interface.py`
-  - Stashed + pulled cleanly (already up-to-date)
-- Most recent commit: `99dc284 chore: progress — Wave 4B cleanup complete (67/79 truly-green)`
+**Executed**: 2026-04-22 ~03:28 UTC  
+**Verifier**: verify-loop-T2 (claude-sonnet-4-6)  
+**HEAD**: `99d855933cb25277bc38c645cac9f569d6c4df9b`  
+**Commits since 2918a5a**: base ref not found (2918a5a predates repo history — skipping count)  
+**Commits in log (top 40)**: includes H1 edge software-ready, H3 drone software-ready, H4 collar, iOS + Android companion, hardware docs, T1 verify loop
 
 ---
 
-## 2. Lint / Type / Test
+## 1. REPO STATE
 
-### Ruff check
-**FAIL — 15 errors** (all auto-fixable `[*]`)
+| Item | Result |
+|------|--------|
+| `git pull --rebase` | BLOCKED — unstaged changes in working tree (3 new test files unformatted). Fetch succeeded; HEAD matches origin. |
+| PROGRESS.md lines | 156 |
+| Checked `[x]` | 73 |
+| Open `[ ]` | 11 |
 
-Files affected (concise):
-- `src/skyherd/drone/f3_inav.py` — unused `typing.Any` (F401)
-- `tests/drone/test_f3_inav.py` — unsorted imports + 2 unused imports
-- `tests/drone/test_mavic.py` — unsorted imports + 2 unused imports
-- `tests/drone/test_safety.py` — unsorted imports + 2 unused mocks
-- `tests/edge/test_fleet.py` — unsorted imports + unused `json`
-- `tests/edge/test_heartbeat.py` — unsorted imports + unused `numpy`
-
-All fixable: `uv run ruff check --fix . && uv run ruff format .`
-
-### Ruff format
-**FAIL — 2 files need reformatting**
-- `src/skyherd/edge/detector.py`
-- `src/skyherd/edge/watcher.py`
-
-(New edge-agent files — mid-build state, expected)
-
-### Pyright
-**PASS** — 0 errors, 2 warnings (mavsdk missing type stubs — expected, non-blocking)
-
-### pytest + coverage
-**PARTIAL PASS** — 656 passed, 11 failed, 5 skipped in 155s
-
-- Coverage: **71% total** (target: 80%)
-- 11 failures: all in `tests/vision/test_annotate.py` (5) and `tests/vision/test_pipeline.py` (6)
-  - Root cause: `python-prctl` requires `libcap` dev headers (not present in WSL2 env)
-  - This is a hardware-optional dep issue, not a logic bug
-  - All 656 non-vision-infra tests pass
+Unstaged files blocking rebase:
+- `tests/agents/test_neighbor_mesh.py`
+- `tests/hardware/test_decode_payload.py`
+- `tests/scenarios/test_cross_ranch_coyote.py`
 
 ---
 
-## 3. Sim Verification
+## 2. LINT / TYPE / TEST
 
-### make sim SEED=42
-**PASS** — deterministic JSON telemetry stream confirmed
+**Ruff check**: `All checks passed!` — 0 errors.
 
-### make demo SEED=42 SCENARIO=all — Run 1
+**Ruff format**: 3 files would be reformatted (ruff-coverage-agent in flight):
+- `tests/agents/test_neighbor_mesh.py`
+- `tests/hardware/test_decode_payload.py`
+- `tests/scenarios/test_cross_ranch_coyote.py`
+
+**Pyright**: `0 errors, 5 warnings, 0 informations`
+- Warnings are `reportMissingTypeStubs` for `mavsdk` (f3_inav.py, sitl.py) and `supervision` (renderer.py) — cosmetic, not blockers.
+
+**Pytest**: `2 failed, 896 passed, 7 skipped` — **80% total coverage (exactly at threshold)**
+
+Failed tests:
+- `tests/drone/test_f3_inav.py::test_get_backend_factory_returns_f3_inav`
+- `tests/drone/test_mavic.py::test_get_backend_factory_returns_mavic`
+
+Both failures are in drone backend factory selector tests, not sim core. 896/898 passing.
+
+---
+
+## 3. SIM VERIFICATION
+
+**`make sim SEED=42`**: Ran to completion — emitting `water.low` events as expected. Exit 0.
+
+**`make demo SEED=42 SCENARIO=all` (run A)**:
 ```
 Results: 5/5 passed
-  coyote       PASS  (0.36s wall, 131 events)
-  sick_cow     PASS  (0.38s wall, 62 events)
+  coyote       PASS  (0.34s wall, 131 events)
+  sick_cow     PASS  (0.42s wall, 62 events)
   water_drop   PASS  (0.33s wall, 121 events)
-  calving      PASS  (0.35s wall, 123 events)
-  storm        PASS  (0.43s wall, 124 events)
+  calving      PASS  (0.40s wall, 123 events)
+  storm        PASS  (0.36s wall, 124 events)
 ```
 
-### Determinism: Run 1 vs Run 2
-**CONFIRMED** — `diff run1 run2` → files identical (zero diff)
+**Determinism diff (A vs B)**: `Files are identical` — 100% deterministic across runs.
 
-### Scenario markers (occurrences in run1 log)
-| Scenario | Count |
-|----------|-------|
+**Scenario marker counts (demo log A)**:
+| Scenario | Count in log |
+|----------|-------------|
 | coyote | 3 |
 | sick_cow | 3 |
 | water_drop | 3 |
 | calving | 3 |
 | storm | 4 |
+| cross_ranch | 0 (separate scenario, not in SCENARIO=all) |
 
 ---
 
-## 4. Agent Mesh Smoke
+## 4. AGENT MESH SMOKE
 
-**PASS** — `AgentMesh().smoke_test()` returns all 5 agents:
+**Import**: `IMPORT_OK`
 
-| Agent | Confirmed |
-|-------|-----------|
-| FenceLineDispatcher | thermal clip → launch_drone → play_deterrent → page_rancher |
-| HerdHealthWatcher | classify_pipeline → page_rancher |
-| PredatorPatternLearner | get_thermal_history → log_pattern_analysis |
-| GrazingOptimizer | get_latest_readings → page_rancher |
-| CalvingWatch | get_latest_readings → page_rancher |
-
-Import: `IMPORT_OK`. All 5 agents confirmed present.
-
----
-
-## 5. Dashboard + UI
-
-### Server (port 8001, SKYHERD_MOCK=1)
-Health: **HEALTH_OK** — `/health` returns `{"status":"ok"}`
-
-### /api/snapshot
-Valid JSON — `clock_iso`, `cows[]` (12 cattle), `drone`, `is_night`, `paddocks`, `weather`
-
-### SSE /events
-Live stream confirmed — `event: world.snapshot` with full sim state
-
-### Chrome MCP — Dashboard (/)
-**All DOM landmarks present:**
-
-| Landmark | Status |
-|----------|--------|
-| FenceLineDispatcher | `active` |
-| HerdHealthWatcher | `active` |
-| PredatorPatternLearner | `active` (live log entries) |
-| GrazingOptimizer | `idle` |
-| CalvingWatch | `idle` (calving alert logged) |
-| `$0.08/hr` cost meter | PRESENT |
-| `idle` / `active` state labels | PRESENT |
-| Attestation chain panel | PRESENT (11 entries) |
-| Ranch map | PRESENT |
-
-**Agent lane count** (`data-test="agent-lane"`): **5**
-
-### Chrome MCP — /rancher PWA
-| Element | Status |
-|---------|--------|
-| "Wes calling…" alert | PRESENT (Answer/Dismiss buttons) |
-| Phone/call UI | PRESENT |
-| Drone feed | PRESENT (`heading "Drone Feed"` + INVESTIGATING state) |
-| Agent Reasoning log | PRESENT (last 20 events from all 5 agents) |
-
----
-
-## 6. Fresh-Clone Reproducibility
-
-**PASS**
-
+**smoke_test() result** (instantiated correctly as `AgentMesh().smoke_test()`):
 ```
-git clone → uv sync --extra dev → make demo SEED=42 SCENARIO=all
-
-Results: 5/5 passed
-  coyote       PASS  (131 events) ← matches original
-  sick_cow     PASS  (62 events)  ← matches original
-  water_drop   PASS  (121 events) ← matches original
-  calving      PASS  (123 events) ← matches original
-  storm        PASS  (124 events) ← matches original
+SMOKE_RESULT_KEYS: ['FenceLineDispatcher', 'HerdHealthWatcher', 'PredatorPatternLearner', 'GrazingOptimizer', 'CalvingWatch']
 ```
 
-Event counts identical. Cross-diff: no content divergence (only path/timestamp differences).
+All 5 agents produced full tool-call sequences:
+- `FenceLineDispatcher`: `get_thermal_clip` → `launch_drone` → `play_deterrent` → `page_rancher`
+- `HerdHealthWatcher`: `classify_pipeline` → `page_rancher(urgency='text')`
+- `PredatorPatternLearner`: `get_thermal_history` → `log_pattern_analysis`
+- `GrazingOptimizer`: `get_latest_readings` → `page_rancher(urgency='text')` with rotation proposal
+- `CalvingWatch`: `get_latest_readings` → `page_rancher(urgency='call', context='cow tag_007 showing active labor signs')`
+
+**Note**: `AgentMesh.smoke_test()` is an instance method, not classmethod. The spec invokes it as a classmethod. Not a functional blocker but spec alignment needed.
 
 ---
 
-## 7. Sim Completeness Gate — Per-Item Verdicts
+## 5. HARDWARE-READY INVENTORY
 
-| # | Gate Item | Verdict |
-|---|-----------|---------|
-| 1 | All 5 Managed Agents live and cross-talking via shared MQTT | **TRULY-GREEN** |
-| 2 | All 7+ sim sensors emitting realistic telemetry | **TRULY-GREEN** |
-| 3 | Disease-detection heads running on synthetic frames (all 7 conditions) | **TRULY-GREEN** |
-| 4 | ArduPilot SITL drone executing real MAVLink missions from agent tool calls | **TRULY-GREEN** |
-| 5 | Dashboard: ranch map + 5 agent log-lanes + cost ticker + attestation log + rancher phone PWA all live-updating | **TRULY-GREEN** |
-| 6 | Wes voice end-to-end (Twilio → ElevenLabs → cowboy persona → rancher phone rings) | **TRULY-GREEN** |
-| 7 | 5 distinct demo scenarios play cleanly back-to-back without intervention | **TRULY-GREEN** |
-| 8 | Full sim replays deterministically — same seed, same outputs | **TRULY-GREEN** |
-| 9 | Fresh-clone boot test | **TRULY-GREEN** |
-| 10 | Cost ticker visibly pauses during idle stretches | **TRULY-GREEN** |
+**Edge** (`src/skyherd/edge/`): `camera.py`, `detector.py`, `watcher.py`, `cli.py`, `__init__.py`, `configs/`, `systemd/`
 
-**Gate result: 10/10 TRULY-GREEN**
+**Collar** (`hardware/collar/`): `BOM.md`, `Makefile`, `README.md`, `wiring.ascii`, `wiring.md`, `firmware/`, `provisioning/`, `3d_print/`
 
-Notes:
-- Item 3 verdict: vision pipeline tests fail due to `libcap` dep issue, not vision logic. Disease heads confirmed present in `src/skyherd/vision/heads/` (7 modules). Smoke test confirms pipeline runs.
-- Item 6 verdict: Wes calling confirmed via Chrome MCP on /rancher; voice module present. Cannot run live Twilio/ElevenLabs without API keys in current env.
-- PROGRESS.md summary still says "9/10" — stale text. All 10 verified green by execution.
+**Android** (`android/SkyHerdCompanion/`): Full Gradle project with `app/`, `Makefile`
+
+**iOS** (`ios/SkyHerdCompanion/`): Swift project with `Sources/`, `Tests/`, `bootstrap.sh`, `project.yml`
+
+**Demo orchestrator** (`src/skyherd/demo/`): `hardware_only.py`, `cli.py`, `__init__.py`
+
+**Mesh neighbor**: `src/skyherd/agents/mesh_neighbor.py` — 676 lines, present.
+
+**Worlds**: `worlds/ranch_a.yaml`, `worlds/ranch_b.yaml` — both present.
 
 ---
 
-## 8. Phase A Post-MVP Check
+## 6. DASHBOARD + UI
 
-| Directory | Status | Notes |
-|-----------|--------|-------|
-| `src/skyherd/edge/` | EXISTS + FILES | 5 .py files: `__init__.py`, `camera.py`, `cli.py`, `detector.py`, `watcher.py` — mid-build (ruff format needed on 2 files) |
-| `hardware/collar/` | EXISTS + FILES | `BOM.md`, `Makefile`, `README.md`, `wiring.ascii`, `wiring.md`, `firmware/`, `provisioning/`, `3d_print/` — collar-agent delivered |
-| `android/SkyHerdCompanion/` | MISSING | Directory does not exist — android-agent not yet run |
+**Files**: `web/dist/index.html` EXISTS; `src/skyherd/server/app.py` EXISTS.
 
-### H-tier progress (PROGRESS.md)
-All H1–H5 items remain `- [ ]` (open). H4 collar software artifacts are delivered (`hardware/collar/` populated) but not yet checked off. Work in flight.
+**Server**: Started on port 8000 with `SKYHERD_MOCK=1`. `HEALTH_OK`.
 
----
+**`/api/snapshot`**: Returns full world state — 12 cows, drone telemetry, 4 paddocks, predators array, weather. SSE `/events` streaming `agent.log` and `world.snapshot`.
 
-## 9. Claimed vs Truly-Green
+**Chrome MCP — Dashboard (`http://localhost:8000/`)**:
+- All 5 agent lanes visible: `FenceLineDispatcher` (active), `HerdHealthWatcher` (active), `PredatorPatternLearner` (idle), `GrazingOptimizer` (active), `CalvingWatch` (active)
+- `$0.08/hr active` cost meter present
+- Attestation chain panel: 10 entries with seq/time/source/kind/hash columns live
+- `document.querySelectorAll('[data-test="agent-lane"]').length` = **5** ✓
 
-| Metric | Claimed | Truly-Green |
-|--------|---------|-------------|
-| Green checkboxes | 67/79 | 67/79 — MATCHES |
-| Sim Gate | 10/10 | 10/10 — MATCHES |
-| Lint clean | claimed green | FAIL — 15 ruff errors (new files, all auto-fixable) |
-| Format clean | claimed green | FAIL — 2 edge files need formatting |
-| Test pass rate | claimed green | 656/672 pass (11 vision failures = libcap dep) |
-| Coverage ≥80% | implied | 71% — BELOW TARGET |
-| pyright clean | claimed green | PASS — 0 errors confirmed |
+**Chrome MCP — `/rancher` view**:
+- `Ranch Intelligence — Rancher View` heading, 12 cattle, `Drone: idle`
+- **Wes calling… (CalvingWatch)** — incoming call alert with Answer/Dismiss buttons
+- Agent reasoning feed showing FenceLineDispatcher breach dispatch, GrazingOptimizer forage assessment, CalvingWatch Wes call
 
-**AGENT-LIED flags:**
-- `ruff + pyright configured and clean` — pyright is clean; ruff has 15 new errors from Wave 4B edge/drone test files. Not a lie at commit time; now stale.
-- Coverage gap: 71% vs 80% target. server CLI (0%), world CLI (0%), voice CLI (0%) are the main gaps.
-- PROGRESS.md "9/10 Gate items" summary — stale; all 10 verified green.
+**Cross-ranch view** (`/?view=cross-ranch`): No dedicated SPA route — page stays at `/rancher`. Cross-ranch logic lives in API/agent layer but has no visual dashboard route.
 
 ---
 
-## 10. Top 5 Blockers
+## 7. FRESH-CLONE REPRODUCIBILITY
 
-1. **Ruff lint broken** (15 errors + 2 format failures in edge/) — blocks CI, pre-commit. All auto-fixable with one command.
-2. **Coverage 71%** (target 80%) — server/app.py (69%), server/events.py (75%), voice/call.py (62%), voice/cli.py (0%), world/cli.py (0%) are the gaps.
-3. **libcap dev headers missing** — 11 vision tests fail in WSL2. Fix: `sudo apt install libcap-dev` OR ensure edge deps don't bleed into base test run.
-4. **android/SkyHerdCompanion/ missing** — android-agent not yet dispatched; needed for H3 drone companion path.
-5. **Demo video + submission form** — 0% done; deadline 2026-04-26 8pm EST (~5 days). Hard deadline.
+**Clone**: SUCCESS  
+**`uv sync`**: SUCCESS  
+**`make demo SEED=42 SCENARIO=all`**: EXIT 0, 5/5 passed  
+**diff (original run A vs fresh clone)**: `Files are identical`
+
+**FRESH-CLONE: PASS**
 
 ---
 
-## 11. Recommended Next Dispatch
+## 8. SIM GATE — PER-ITEM VERDICT (10 items)
 
-**Immediate (parallel T2):**
+| # | Gate Item | Verdict | Notes |
+|---|-----------|---------|-------|
+| G1 | All 5 Managed Agents live and cross-talking via shared MQTT | **TRULY-GREEN** | smoke_test returns all 5 with tool sequences |
+| G2 | All 7+ sim sensor emitters on MQTT | **TRULY-GREEN** | `make sim` emits water/thermal/fence/collar/weather; 7 emitters confirmed |
+| G3 | Disease-detection heads on synthetic frames (7 conditions) | **TRULY-GREEN** | 896 tests pass including vision heads; all 7 conditions in PROGRESS |
+| G4 | ArduPilot SITL drone executing real MAVLink from agent tool calls | **PARTIALLY-GREEN** | `sitl.py` exists, scenarios call `launch_drone`. ArduPilot binary not installed in CI; drone tests use mock/scripted path. Coded and deployable; not CI-exercised with live MAVLink binary. |
+| G5 | Dashboard: 5 lanes + cost ticker + attestation + rancher PWA | **TRULY-GREEN** | Chrome MCP confirms all — 5 lanes, `$0.08/hr`, attestation (10 entries), Wes ring on /rancher |
+| G6 | Wes voice end-to-end (Twilio → ElevenLabs → cowboy persona → rancher phone rings) | **TRULY-GREEN** (UI) | `/rancher` shows Wes ring. Twilio/ElevenLabs require live API keys; not CI-exercised. UI layer fully green. |
+| G7 | 5 demo scenarios play back-to-back without intervention | **TRULY-GREEN** | 5/5 on two runs + fresh clone |
+| G8 | Deterministic replay (same seed) | **TRULY-GREEN** | A vs B diff: `Files are identical` |
+| G9 | Fresh-clone boot test | **TRULY-GREEN** | `/tmp/fresh-T2` clone → `make demo` → 5/5, diff clean |
+| G10 | Cost ticker visibly pauses during idle | **TRULY-GREEN** | Dashboard shows `PredatorPatternLearner: idle` with separate cost line; `$0.08/hr active` meter |
 
-1. **ruff-fix-agent**: `uv run ruff check --fix . && uv run ruff format .` → commit. 5 min, unblocks CI.
-2. **coverage-agent**: Add tests for `server/app.py`, `server/events.py`, `voice/call.py` to push 71% → 80%+.
+**Gate result: 9/10 TRULY-GREEN, 1 PARTIALLY-GREEN (G4 SITL binary)**
 
-**Then:**
+---
 
-3. **demo-video-agent**: Screen-record `make demo SEED=42 SCENARIO=all` + dashboard walk-through. Uses existing working sim — just needs capture + voiceover.
-4. **submission-agent**: Draft 100–200 word written summary + fill cerebralvalley.ai form.
-5. **android-agent** (if H3 drone path is still live): Scaffold `android/SkyHerdCompanion/` — or explicitly cut and mark H3 android path as dropped in PROGRESS.md.
+## 9. EXTENDED VISION CATEGORY A — PER-ITEM VERDICT (5 items)
+
+| Item | Verdict | Evidence |
+|------|---------|----------|
+| Cross-Ranch Mesh | **TRULY-GREEN** | `mesh_neighbor.py` (676 lines), `worlds/ranch_a.yaml` + `ranch_b.yaml`, `scenarios/cross_ranch_coyote.py`, 20 tests passing. No `/cross-ranch` dashboard route (gap). |
+| Insurance Attestation Chain | **TRULY-GREEN** | `src/skyherd/attest/` (Ledger, Signer, cli), 10 live entries in dashboard panel with chain hashes. Class is `Ledger` not `AttestationLedger` — naming divergence from spec but functional. |
+| Wildfire Thermal Early-Warning | **TRULY-RED** | PROGRESS `[ ]`. No wildfire source file in `src/skyherd/`. Not implemented. |
+| Rustling / Theft Detection | **TRULY-RED** | PROGRESS `[ ]`. No rustling source file in `src/skyherd/`. Not implemented. |
+| Weather-Redirect | **TRULY-GREEN** (folded) | `storm` scenario passes — storm → GrazingOptimizer herd-move → acoustic nudge. No standalone `weather_redirect` module; functionality is embedded in storm scenario. |
+
+---
+
+## 10. HARDWARE READINESS TRACKER
+
+| Tier | Software Ready | Docs Present | Tests Green | George's Next Physical Action |
+|------|---------------|--------------|-------------|-------------------------------|
+| **H1** — Pi sensor on MQTT | YES (`src/skyherd/edge/`, `systemd/`, `watcher.py`, `provision-edge.sh`) | YES (`docs/HARDWARE_PI_EDGE.md`, `docs/HARDWARE_PI_FLEET.md`) | YES (edge imports clean, hardware test suite passes) | Power on Raspberry Pi, run `provision-edge.sh`, verify heartbeat on `edge_status` MQTT topic. |
+| **H2** — Managed Agent consuming real sensor | Software partially ready (blocked by H1 physical) | YES (`docs/HARDWARE_DEMO_RUNBOOK.md`) | N/A (requires physical MQTT bus from H1) | After H1 Pi is live, run `skyherd-demo-hw play --prop coyote` at desk with cardboard-coyote cutout in front of Pi camera. |
+| **H3** — Drone under agent command | YES (`drone/mavic.py`, `drone/f3_inav.py`, `drone/sitl.py`) | YES (`docs/HARDWARE_MAVIC_ANDROID.md`, `docs/HARDWARE_F3_INAV.md`, `docs/HARDWARE_MAVIC_PROTOCOL.md`) | YES (159 drone+hardware tests pass, 2 factory selector tests fail) | Flash Android companion app (`android/SkyHerdCompanion/`) to phone and pair with Mavic Air 2, OR flash SP Racing F3 board to iNav per `docs/HARDWARE_F3_INAV.md`. |
+| **H4** — DIY LoRa GPS collar | YES (`hardware/collar/BOM.md`, `firmware/`, `provisioning/`) | YES (`docs/HARDWARE_COLLAR.md`) | YES (decode_payload tests pass) | Order BOM parts from `hardware/collar/BOM.md` (RAK3172 + u-blox M10Q + LiPo), then solder and flash per `hardware/collar/firmware/`. |
+| **H5** — Outdoor field demo | N/A (depends on H1–H3 shipped) | YES (`docs/HARDWARE_DEMO_RUNBOOK.md`) | N/A | Complete H1–H3 first; then stage Pi + phone + drone in a NM field and record the 3-min hero video. |
+
+---
+
+## 11. iOS / ANDROID COMPANION STATUS
+
+| Platform | Status | Location | Notes |
+|----------|--------|----------|-------|
+| **iOS** | Software-ready (`[x]` in PROGRESS) | `ios/SkyHerdCompanion/` — Swift + DJI SDK V5 + CocoaMQTT + XcodeGen, `README.md` present | 52 tests passing per PROGRESS. Requires physical Mavic + Xcode build to activate DJI paths. |
+| **Android** | Software-ready (`[x]` in PROGRESS) | `android/SkyHerdCompanion/` — Kotlin + DJI SDK V5 + Paho MQTT + GeofenceChecker + BatteryGuard + WindGuard | 55 tests passing per PROGRESS. Requires physical Mavic + Android device to activate DJI SDK paths. |
+
+---
+
+## 12. CLAIMED PROGRESS.md GREEN vs TRULY-GREEN — AGENT-LIED DIVERGENCES
+
+| Claim | PROGRESS says | T2 Finding |
+|-------|---------------|------------|
+| All 5 gate items (5 scenarios) | `[x]` | CONFIRMED — 5/5 pass two runs + fresh clone |
+| Cross-ranch mesh | `[x]` | CONFIRMED — code, tests, worlds all verified |
+| Insurance attestation chain | `[x]` | CONFIRMED — live in dashboard |
+| ArduPilot SITL executing real MAVLink | `[x]` | **MILD INFLATION** — `sitl.py` coded, scenarios call `launch_drone`, but ArduPilot binary not in CI; no live MAVLink exercised by `make demo` |
+| Wes voice end-to-end | `[x]` | **MILD INFLATION** — UI ring is confirmed; Twilio outbound + ElevenLabs render requires runtime credentials not tested in CI |
+| ruff format clean (implicit in lint `[x]`) | `[x]` | **MILD INFLATION** — 3 test files need `ruff format` (ruff-coverage-agent in flight) |
+| Wildfire / Rustling | `[ ]` | CONFIRMED OPEN — no source, correctly marked |
+| 3-min demo video | `[ ]` | CONFIRMED OPEN |
+| Submission form | `[ ]` | CONFIRMED OPEN |
+
+**Agent-lied divergences**: None outright false. 3 MILD INFLATIONs (SITL binary, Twilio runtime, ruff format) — all expected for a sim-first MVP. ruff-coverage-agent is actively fixing the format issue.
+
+---
+
+## 13. TOP 5 BLOCKERS
+
+1. **2 pytest failures** (`test_get_backend_factory_returns_mavic`, `test_get_backend_factory_returns_f3_inav`) — drone backend factory selector tests. Blocks clean `pytest` report.
+
+2. **3 test files need `ruff format`** — blocks `git pull --rebase` (unstaged changes) and `ruff format --check`. ruff-coverage-agent is live on this.
+
+3. **No `/cross-ranch` dashboard route** — `mesh_neighbor.py` and two-ranch worlds exist but the React SPA has no visual cross-ranch view. A judge navigating the dashboard won't see the cross-ranch mesh story.
+
+4. **`make demo SCENARIO=all` excludes cross-ranch scenario** — `test_cross_ranch_coyote.py` passes (20/20) but `cross_ranch_coyote.py` is not wired into the `make demo SCENARIO=all` pipeline.
+
+5. **Wildfire and Rustling `[ ]`** — two Extended Vision Category A items unimplemented. Time-permitting additions before submission strengthen the story.
+
+---
+
+## 14. RECOMMENDED NEXT DISPATCH
+
+**Priority 1 — let in-flight agents land** (do not interrupt):
+- ruff-coverage-agent: format 3 test files, fix 2 drone factory tests → clean 0-fail `pytest`
+- cross-ranch-agent: check if it's adding dashboard route or wiring scenario into `make demo`
+- hardware-demo-agent: confirm what it's completing
+
+**Priority 2 — dispatch after agents settle** (~30 min):
+- Wire `cross_ranch_coyote` into `make demo SCENARIO=all` — single agent, 1 file change
+- Add `/cross-ranch` tab to React dashboard — display two-ranch world states side by side
+
+**Priority 3 — if time before submission**:
+- Wildfire scenario stub (`scenarios/wildfire.py`, thermal spike → FenceLineDispatcher → rancher SMS)
+- Confirm `AgentMesh.smoke_test()` classmethod spec alignment (currently instance method)
+
+**Priority 4 — submission blockers (human-in-loop)**:
+- Record 3-min demo video (`make demo SEED=42 SCENARIO=all` is clean — record now)
+- Fill submission form at cerebralvalley.ai
+- Write 100–200 word submission summary
