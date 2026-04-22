@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleDisplayName</key>
+    <string>SkyHerd</string>
+    <key>CFBundleExecutable</key>
+    <string>$(EXECUTABLE_NAME)</string>
+    <key>CFBundleIdentifier</key>
+    <string>com.skyherd.companion</string>
+    <key>CFBundleInfoDictionaryVersion</key>
+    <string>6.0</string>
+    <key>CFBundleName</key>
+    <string>SkyHerdCompanion</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleShortVersionString</key>
+    <string>1.0.0</string>
+    <key>CFBundleVersion</key>
+    <string>1</string>
+
+    <!-- DJI SDK API key.  Replace $(DJI_API_KEY) with your real key, or
+         set the DJI_API_KEY build variable in Config.xcconfig. -->
+    <key>DJIAppKey</key>
+    <string>$(DJI_API_KEY)</string>
+
+    <!-- Location permissions (required for DJI geofence enforcement) -->
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>SkyHerd needs location access to enforce geofence boundaries during drone operations and to log flight events.</string>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>SkyHerd uses your location to validate geofence compliance during drone operations.</string>
+
+    <!-- Background modes: location for geofence, external-accessory for DJI remote,
+         audio may be required by DJI SDK accessory communication. -->
+    <key>UIBackgroundModes</key>
+    <array>
+        <string>location</string>
+        <string>external-accessory</string>
+        <string>audio</string>
+    </array>
+
+    <!-- Supported interface orientations (iPhone) -->
+    <key>UISupportedInterfaceOrientations</key>
+    <array>
+        <string>UIInterfaceOrientationPortrait</string>
+        <string>UIInterfaceOrientationLandscapeLeft</string>
+        <string>UIInterfaceOrientationLandscapeRight</string>
+    </array>
+
+    <!-- Supported interface orientations (iPad) -->
+    <key>UISupportedInterfaceOrientations~ipad</key>
+    <array>
+        <string>UIInterfaceOrientationPortrait</string>
+        <string>UIInterfaceOrientationPortraitUpsideDown</string>
+        <string>UIInterfaceOrientationLandscapeLeft</string>
+        <string>UIInterfaceOrientationLandscapeRight</string>
+    </array>
+
+    <key>UIRequiredDeviceCapabilities</key>
+    <array>
+        <string>arm64</string>
+    </array>
+
+    <key>UILaunchScreen</key>
+    <dict/>
+</dict>
+</plist>

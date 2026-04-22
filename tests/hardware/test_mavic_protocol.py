@@ -15,8 +15,8 @@ from __future__ import annotations
 
 import json
 
-import pytest
 import jsonschema
+import pytest
 
 # ---------------------------------------------------------------------------
 # Schema (extracted from docs/HARDWARE_MAVIC_PROTOCOL.md)
@@ -26,9 +26,9 @@ _WAYPOINT_SCHEMA: dict = {
     "type": "object",
     "required": ["lat", "lon", "alt_m"],
     "properties": {
-        "lat":    {"type": "number"},
-        "lon":    {"type": "number"},
-        "alt_m":  {"type": "number", "minimum": 0, "maximum": 120},
+        "lat": {"type": "number"},
+        "lon": {"type": "number"},
+        "alt_m": {"type": "number", "minimum": 0, "maximum": 120},
         "hold_s": {"type": "number", "minimum": 0},
     },
     "additionalProperties": False,
@@ -38,13 +38,13 @@ _STATE_SCHEMA: dict = {
     "type": "object",
     "required": ["armed", "in_air", "altitude_m", "battery_pct", "mode", "lat", "lon"],
     "properties": {
-        "armed":       {"type": "boolean"},
-        "in_air":      {"type": "boolean"},
-        "altitude_m":  {"type": "number", "minimum": 0},
+        "armed": {"type": "boolean"},
+        "in_air": {"type": "boolean"},
+        "altitude_m": {"type": "number", "minimum": 0},
         "battery_pct": {"type": "number", "minimum": 0, "maximum": 100},
-        "mode":        {"type": "string"},
-        "lat":         {"type": "number", "minimum": -90, "maximum": 90},
-        "lon":         {"type": "number", "minimum": -180, "maximum": 180},
+        "mode": {"type": "string"},
+        "lat": {"type": "number", "minimum": -90, "maximum": 90},
+        "lon": {"type": "number", "minimum": -180, "maximum": 180},
     },
     "additionalProperties": False,
 }
@@ -65,7 +65,7 @@ _COMMAND_SCHEMA: dict = {
             ],
         },
         "args": {"type": "object"},
-        "seq":  {"type": "integer", "minimum": 0},
+        "seq": {"type": "integer", "minimum": 0},
     },
     "additionalProperties": False,
 }
@@ -74,11 +74,11 @@ _ACK_SCHEMA: dict = {
     "type": "object",
     "required": ["ack", "result", "seq"],
     "properties": {
-        "ack":     {"type": "string"},
-        "result":  {"type": "string", "enum": ["ok", "error"]},
-        "seq":     {"type": "integer", "minimum": 0},
+        "ack": {"type": "string"},
+        "result": {"type": "string", "enum": ["ok", "error"]},
+        "seq": {"type": "integer", "minimum": 0},
         "message": {"type": "string"},
-        "data":    {},  # freeform object or null
+        "data": {},  # freeform object or null
     },
     # message / data are optional
 }
@@ -90,69 +90,123 @@ _ACK_SCHEMA: dict = {
 
 # Python MavicBackend path (from mavic.py _send calls)
 _PYTHON_COMMANDS: list[dict] = [
-    {"cmd": "takeoff",        "args": {"alt_m": 5.0},    "seq": 1},
-    {"cmd": "takeoff",        "args": {"alt_m": 30.0},   "seq": 2},
-    {"cmd": "patrol",         "args": {"waypoints": [
-        {"lat": 36.1, "lon": -105.2, "alt_m": 30.0, "hold_s": 0.0},
-        {"lat": 36.2, "lon": -105.3, "alt_m": 30.0, "hold_s": 5.0},
-    ]},                                                   "seq": 3},
-    {"cmd": "return_to_home", "args": {},                 "seq": 4},
+    {"cmd": "takeoff", "args": {"alt_m": 5.0}, "seq": 1},
+    {"cmd": "takeoff", "args": {"alt_m": 30.0}, "seq": 2},
+    {
+        "cmd": "patrol",
+        "args": {
+            "waypoints": [
+                {"lat": 36.1, "lon": -105.2, "alt_m": 30.0, "hold_s": 0.0},
+                {"lat": 36.2, "lon": -105.3, "alt_m": 30.0, "hold_s": 5.0},
+            ]
+        },
+        "seq": 3,
+    },
+    {"cmd": "return_to_home", "args": {}, "seq": 4},
     {"cmd": "play_deterrent", "args": {"tone_hz": 12000, "duration_s": 6.0}, "seq": 5},
-    {"cmd": "capture_visual_clip", "args": {"duration_s": 10.0},             "seq": 6},
-    {"cmd": "get_state",      "args": {},                 "seq": 7},
+    {"cmd": "capture_visual_clip", "args": {"duration_s": 10.0}, "seq": 6},
+    {"cmd": "get_state", "args": {}, "seq": 7},
 ]
 
 # iOS SkyHerdCompanion path (from CommandRouter.swift dispatch)
 _IOS_COMMANDS: list[dict] = [
-    {"cmd": "takeoff",        "args": {"alt_m": 5.0},    "seq": 10},
-    {"cmd": "return_to_home", "args": {},                 "seq": 11},
-    {"cmd": "get_state",      "args": {},                 "seq": 12},
+    {"cmd": "takeoff", "args": {"alt_m": 5.0}, "seq": 10},
+    {"cmd": "return_to_home", "args": {}, "seq": 11},
+    {"cmd": "get_state", "args": {}, "seq": 12},
     {"cmd": "play_deterrent", "args": {"tone_hz": 12000, "duration_s": 6.0}, "seq": 13},
-    {"cmd": "capture_visual_clip", "args": {"duration_s": 10.0},             "seq": 14},
+    {"cmd": "capture_visual_clip", "args": {"duration_s": 10.0}, "seq": 14},
 ]
 
 # Android SkyHerdCompanion path (mirrors iOS; Android agent writes identical JSON)
 _ANDROID_COMMANDS: list[dict] = [
-    {"cmd": "takeoff",        "args": {"alt_m": 5.0},    "seq": 20},
-    {"cmd": "patrol",         "args": {"waypoints": [
-        {"lat": 36.5, "lon": -105.5, "alt_m": 25.0},
-    ]},                                                   "seq": 21},
-    {"cmd": "return_to_home", "args": {},                 "seq": 22},
-    {"cmd": "get_state",      "args": {},                 "seq": 23},
+    {"cmd": "takeoff", "args": {"alt_m": 5.0}, "seq": 20},
+    {
+        "cmd": "patrol",
+        "args": {
+            "waypoints": [
+                {"lat": 36.5, "lon": -105.5, "alt_m": 25.0},
+            ]
+        },
+        "seq": 21,
+    },
+    {"cmd": "return_to_home", "args": {}, "seq": 22},
+    {"cmd": "get_state", "args": {}, "seq": 23},
 ]
 
 # ACK samples — ok and error variants
 _ACK_SAMPLES: list[dict] = [
     # ok variants
-    {"ack": "takeoff",         "result": "ok", "seq": 1},
-    {"ack": "patrol",          "result": "ok", "seq": 3},
-    {"ack": "return_to_home",  "result": "ok", "seq": 4},
-    {"ack": "play_deterrent",  "result": "ok", "seq": 5},
-    {"ack": "capture_visual_clip", "result": "ok", "seq": 6,
-     "data": {"path": "/var/mobile/Containers/.../mavic_1234567890.mp4"}},
-    {"ack": "get_state",       "result": "ok", "seq": 7, "data": {
-        "armed": False, "in_air": False, "altitude_m": 0.0,
-        "battery_pct": 85.0, "mode": "STANDBY", "lat": 36.1, "lon": -105.2,
-    }},
+    {"ack": "takeoff", "result": "ok", "seq": 1},
+    {"ack": "patrol", "result": "ok", "seq": 3},
+    {"ack": "return_to_home", "result": "ok", "seq": 4},
+    {"ack": "play_deterrent", "result": "ok", "seq": 5},
+    {
+        "ack": "capture_visual_clip",
+        "result": "ok",
+        "seq": 6,
+        "data": {"path": "/var/mobile/Containers/.../mavic_1234567890.mp4"},
+    },
+    {
+        "ack": "get_state",
+        "result": "ok",
+        "seq": 7,
+        "data": {
+            "armed": False,
+            "in_air": False,
+            "altitude_m": 0.0,
+            "battery_pct": 85.0,
+            "mode": "STANDBY",
+            "lat": 36.1,
+            "lon": -105.2,
+        },
+    },
     # error variants — each canonical error code
-    {"ack": "takeoff", "result": "error", "message": "E_DJI_NOT_READY",   "seq": 100},
-    {"ack": "patrol",  "result": "error", "message": "E_GEOFENCE_REJECT", "seq": 101},
-    {"ack": "takeoff", "result": "error", "message": "E_BATTERY_LOW",     "seq": 102},
-    {"ack": "takeoff", "result": "error", "message": "E_WIND_CEILING",    "seq": 103},
-    {"ack": "takeoff", "result": "error", "message": "E_TIMEOUT",         "seq": 104},
-    {"ack": "unknown", "result": "error", "message": "E_UNKNOWN_CMD",     "seq": 105},
+    {"ack": "takeoff", "result": "error", "message": "E_DJI_NOT_READY", "seq": 100},
+    {"ack": "patrol", "result": "error", "message": "E_GEOFENCE_REJECT", "seq": 101},
+    {"ack": "takeoff", "result": "error", "message": "E_BATTERY_LOW", "seq": 102},
+    {"ack": "takeoff", "result": "error", "message": "E_WIND_CEILING", "seq": 103},
+    {"ack": "takeoff", "result": "error", "message": "E_TIMEOUT", "seq": 104},
+    {"ack": "unknown", "result": "error", "message": "E_UNKNOWN_CMD", "seq": 105},
 ]
 
 # DroneStateSnapshot samples
 _STATE_SAMPLES: list[dict] = [
-    {"armed": False, "in_air": False, "altitude_m": 0.0,
-     "battery_pct": 100.0, "mode": "UNKNOWN", "lat": 0.0, "lon": 0.0},
-    {"armed": True,  "in_air": True,  "altitude_m": 30.0,
-     "battery_pct": 72.0, "mode": "GUIDED", "lat": 36.1, "lon": -105.2},
-    {"armed": True,  "in_air": True,  "altitude_m": 5.0,
-     "battery_pct": 25.1, "mode": "GUIDED", "lat": 36.15, "lon": -105.25},
-    {"armed": False, "in_air": False, "altitude_m": 0.0,
-     "battery_pct": 85.0, "mode": "STANDBY", "lat": 36.1, "lon": -105.2},
+    {
+        "armed": False,
+        "in_air": False,
+        "altitude_m": 0.0,
+        "battery_pct": 100.0,
+        "mode": "UNKNOWN",
+        "lat": 0.0,
+        "lon": 0.0,
+    },
+    {
+        "armed": True,
+        "in_air": True,
+        "altitude_m": 30.0,
+        "battery_pct": 72.0,
+        "mode": "GUIDED",
+        "lat": 36.1,
+        "lon": -105.2,
+    },
+    {
+        "armed": True,
+        "in_air": True,
+        "altitude_m": 5.0,
+        "battery_pct": 25.1,
+        "mode": "GUIDED",
+        "lat": 36.15,
+        "lon": -105.25,
+    },
+    {
+        "armed": False,
+        "in_air": False,
+        "altitude_m": 0.0,
+        "battery_pct": 85.0,
+        "mode": "STANDBY",
+        "lat": 36.1,
+        "lon": -105.2,
+    },
 ]
 
 # Waypoint samples
@@ -167,6 +221,7 @@ _WAYPOINT_SAMPLES: list[dict] = [
 # Helper
 # ---------------------------------------------------------------------------
 
+
 def _validate(instance: dict, schema: dict) -> None:
     """Raise jsonschema.ValidationError if instance does not match schema."""
     jsonschema.validate(instance=instance, schema=schema)
@@ -175,6 +230,7 @@ def _validate(instance: dict, schema: dict) -> None:
 # ---------------------------------------------------------------------------
 # Tests — Command envelopes
 # ---------------------------------------------------------------------------
+
 
 class TestCommandEnvelopes:
     @pytest.mark.parametrize("cmd", _PYTHON_COMMANDS)
@@ -218,6 +274,7 @@ class TestCommandEnvelopes:
 # Tests — ACK envelopes
 # ---------------------------------------------------------------------------
 
+
 class TestAckEnvelopes:
     @pytest.mark.parametrize("ack", _ACK_SAMPLES)
     def test_ack_sample_valid(self, ack: dict) -> None:
@@ -234,8 +291,12 @@ class TestAckEnvelopes:
     def test_error_ack_has_error_code_in_message(self) -> None:
         error_acks = [a for a in _ACK_SAMPLES if a["result"] == "error"]
         known_codes = {
-            "E_DJI_NOT_READY", "E_GEOFENCE_REJECT", "E_BATTERY_LOW",
-            "E_WIND_CEILING", "E_TIMEOUT", "E_UNKNOWN_CMD",
+            "E_DJI_NOT_READY",
+            "E_GEOFENCE_REJECT",
+            "E_BATTERY_LOW",
+            "E_WIND_CEILING",
+            "E_TIMEOUT",
+            "E_UNKNOWN_CMD",
         }
         for ack in error_acks:
             assert "message" in ack, f"Error ACK missing message: {ack}"
@@ -253,32 +314,61 @@ class TestAckEnvelopes:
 # Tests — State snapshot
 # ---------------------------------------------------------------------------
 
+
 class TestStateSnapshot:
     @pytest.mark.parametrize("state", _STATE_SAMPLES)
     def test_state_sample_valid(self, state: dict) -> None:
         _validate(state, _STATE_SCHEMA)
 
     def test_battery_out_of_range_invalid(self) -> None:
-        bad = {"armed": False, "in_air": False, "altitude_m": 0.0,
-               "battery_pct": 101.0, "mode": "STANDBY", "lat": 0.0, "lon": 0.0}
+        bad = {
+            "armed": False,
+            "in_air": False,
+            "altitude_m": 0.0,
+            "battery_pct": 101.0,
+            "mode": "STANDBY",
+            "lat": 0.0,
+            "lon": 0.0,
+        }
         with pytest.raises(jsonschema.ValidationError):
             _validate(bad, _STATE_SCHEMA)
 
     def test_altitude_negative_invalid(self) -> None:
-        bad = {"armed": False, "in_air": False, "altitude_m": -1.0,
-               "battery_pct": 80.0, "mode": "STANDBY", "lat": 0.0, "lon": 0.0}
+        bad = {
+            "armed": False,
+            "in_air": False,
+            "altitude_m": -1.0,
+            "battery_pct": 80.0,
+            "mode": "STANDBY",
+            "lat": 0.0,
+            "lon": 0.0,
+        }
         with pytest.raises(jsonschema.ValidationError):
             _validate(bad, _STATE_SCHEMA)
 
     def test_lat_out_of_range_invalid(self) -> None:
-        bad = {"armed": False, "in_air": False, "altitude_m": 0.0,
-               "battery_pct": 80.0, "mode": "STANDBY", "lat": 91.0, "lon": 0.0}
+        bad = {
+            "armed": False,
+            "in_air": False,
+            "altitude_m": 0.0,
+            "battery_pct": 80.0,
+            "mode": "STANDBY",
+            "lat": 91.0,
+            "lon": 0.0,
+        }
         with pytest.raises(jsonschema.ValidationError):
             _validate(bad, _STATE_SCHEMA)
 
     def test_lon_out_of_range_invalid(self) -> None:
-        bad = {"armed": False, "in_air": False, "altitude_m": 0.0,
-               "battery_pct": 80.0, "mode": "STANDBY", "lat": 0.0, "lon": -181.0}
+        bad = {
+            "armed": False,
+            "in_air": False,
+            "altitude_m": 0.0,
+            "battery_pct": 80.0,
+            "mode": "STANDBY",
+            "lat": 0.0,
+            "lon": -181.0,
+        }
         with pytest.raises(jsonschema.ValidationError):
             _validate(bad, _STATE_SCHEMA)
 
@@ -286,6 +376,7 @@ class TestStateSnapshot:
 # ---------------------------------------------------------------------------
 # Tests — Waypoints
 # ---------------------------------------------------------------------------
+
 
 class TestWaypoints:
     @pytest.mark.parametrize("wp", _WAYPOINT_SAMPLES)
@@ -306,6 +397,7 @@ class TestWaypoints:
 # ---------------------------------------------------------------------------
 # Tests — Cross-path field-name consistency
 # ---------------------------------------------------------------------------
+
 
 class TestCrossPathConsistency:
     """

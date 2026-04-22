@@ -1,0 +1,101 @@
+name: SkyHerdCompanion
+options:
+  bundleIdPrefix: com.skyherd
+  deploymentTarget:
+    iOS: "16.0"
+  xcodeVersion: "15.0"
+  generateEmptyDirectories: true
+  createIntermediateGroups: true
+
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    IPHONEOS_DEPLOYMENT_TARGET: "16.0"
+    PRODUCT_BUNDLE_IDENTIFIER: com.skyherd.companion
+    DEVELOPMENT_TEAM: ""          # Set to your Apple team ID or leave blank for automatic signing
+    CODE_SIGN_STYLE: Automatic
+    ENABLE_BITCODE: NO
+    SWIFT_STRICT_CONCURRENCY: targeted
+    # DJI API key injected from xcconfig; override in Config.xcconfig
+    DJI_API_KEY: ""
+
+packages:
+  CocoaMQTT:
+    url: https://github.com/emqx/CocoaMQTT
+    from: "2.1.0"
+
+targets:
+  SkyHerdCompanion:
+    type: application
+    platform: iOS
+    deploymentTarget: "16.0"
+    sources:
+      - path: Sources/SkyHerdCompanion
+    resources:
+      - path: SupportingFiles/Assets.xcassets
+      - path: SupportingFiles/Info.plist
+        optional: false
+    entitlements:
+      path: SupportingFiles/SkyHerdCompanion.entitlements
+    info:
+      path: SupportingFiles/Info.plist
+      properties:
+        CFBundleDisplayName: SkyHerd
+        CFBundleIdentifier: com.skyherd.companion
+        CFBundleShortVersionString: "1.0.0"
+        CFBundleVersion: "1"
+        LSRequiresIPhoneOS: true
+        UIRequiredDeviceCapabilities:
+          - arm64
+        UILaunchScreen: {}
+        NSLocationAlwaysAndWhenInUseUsageDescription: >
+          SkyHerd needs location access to enforce geofence boundaries during
+          drone operations and to log flight events.
+        NSLocationWhenInUseUsageDescription: >
+          SkyHerd uses your location to validate geofence compliance during
+          drone operations.
+        UIBackgroundModes:
+          - location
+          - external-accessory
+          - audio                      # Needed for DJI SDK USB accessory comms
+        DJIAppKey: $(DJI_API_KEY)
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+    dependencies:
+      - package: CocoaMQTT
+      # DJI Mobile SDK V5 ships as a binary XCFramework.
+      # After running ./bootstrap.sh, download DJISDK.xcframework from
+      # https://developer.dji.com/mobile-sdk/ and place it in:
+      #   ios/SkyHerdCompanion/Frameworks/DJISDK.xcframework
+      # Then uncomment the next two lines:
+      # - framework: Frameworks/DJISDK.xcframework
+      #   embed: true
+    settings:
+      base:
+        FRAMEWORK_SEARCH_PATHS: "$(PROJECT_DIR)/Frameworks"
+        LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/Frameworks"
+    scheme:
+      testTargets:
+        - SkyHerdCompanionTests
+      gatherCoverageData: true
+
+  SkyHerdCompanionTests:
+    type: bundle.unit-test
+    platform: iOS
+    deploymentTarget: "16.0"
+    sources:
+      - path: Tests/SkyHerdCompanionTests
+    dependencies:
+      - target: SkyHerdCompanion
+      - package: CocoaMQTT
+    settings:
+      base:
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/SkyHerdCompanion.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/SkyHerdCompanion"
+        BUNDLE_LOADER: "$(TEST_HOST)"

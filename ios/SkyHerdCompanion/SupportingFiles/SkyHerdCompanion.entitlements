@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- Background location for geofence enforcement during drone missions -->
+    <key>com.apple.developer.location.always-usage-description</key>
+    <string>SkyHerd enforces geofence boundaries during drone operations.</string>
+
+    <!-- Required for DJI remote controller accessory communication -->
+    <key>com.apple.developer.networking.networkextension</key>
+    <array>
+        <string>app-proxy-provider</string>
+    </array>
+
+    <!-- App Group — reserved for future cross-app data sharing (e.g. with a SkyHerd widget) -->
+    <!-- Uncomment and set the correct group ID when needed:
+    <key>com.apple.security.application-groups</key>
+    <array>
+        <string>group.com.skyherd.companion</string>
+    </array>
+    -->
+</dict>
+</plist>
