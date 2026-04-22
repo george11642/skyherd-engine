@@ -1,4 +1,4 @@
-.PHONY: setup sim demo dashboard test lint format typecheck clean ci sitl-up sitl-down bus-up bus-down mesh-smoke
+.PHONY: setup sim demo dashboard test lint format typecheck clean ci sitl-up sitl-down bus-up bus-down mesh-smoke one-pager
 
 SEED ?= 42
 SCENARIO ?= all
@@ -58,3 +58,6 @@ bus-down:
 
 mesh-smoke:
 	uv run skyherd-mesh mesh smoke --verbose
+
+one-pager:
+	uv run python scripts/render_pdf.py docs/ONE_PAGER.md docs/ONE_PAGER.pdf
