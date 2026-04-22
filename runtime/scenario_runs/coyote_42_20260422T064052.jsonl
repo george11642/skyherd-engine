@@ -1,1 +1,0 @@
-{"record": "scenario_header", "name": "coyote", "seed": 42, "duration_s": 600.0, "outcome_passed": true, "outcome_error": null, "wall_time_s": 1.5059486031532288e-06, "event_count": 0, "tool_call_count": 0, "attestation_count": 0}

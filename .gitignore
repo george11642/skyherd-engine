@@ -58,3 +58,10 @@ attestation-chain.db
 *.mp4
 *.mov
 demos/
+
+# Reference repos — mined for patterns, never committed
+.refs/
+
+# Runtime artifacts
+runtime/
+.venv/
