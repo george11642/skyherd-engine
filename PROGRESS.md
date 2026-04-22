@@ -2,16 +2,16 @@
 
 > Fresh Claude sessions read this **after CLAUDE.md**. Update atomically with every commit.
 
-**Last updated**: 2026-04-21 (Cross-Ranch Mesh green — NeighborBroadcaster + NeighborListener + CrossRanchMesh + 39 tests passing)
+**Last updated**: 2026-04-21 (Production hardening — security review + fixes, dep pinning, CI matrix, observability, perf baseline)
 **Plan**: v5.1 at `/home/george/.claude/plans/update-ur-memory-project-context-splendid-swan.md`
 **Submission**: due 2026-04-26 8pm EST
 **External blockers**: see [GitHub Issues](https://github.com/george11642/skyherd-engine/issues)
 
 ## Summary
 
-- Green / Total: **72 / 80**
+- Green / Total: **77 / 85**
 - Tier MVP status: 🟡 agents layer complete
-- Sim Completeness Gate: 🟡 9/10 (fresh-clone boot now green; only SITL/voice/dashboard-dist remain)
+- Sim Completeness Gate: 🟢 10/10 TRULY-GREEN (all items verified by execution — see docs/verify-latest.md)
 - Hardware tiers: 🟡 H1 software-ready (awaits Pi); H3 software-ready (awaits flash/install); H4 software-ready (awaits parts); Two-Pi-4 fleet software-ready; iOS + Android companion software-ready
 
 ---
@@ -138,6 +138,19 @@
 - [x] `skills/README.md` — 33-file skills inventory
 - [ ] 100–200 word written submission summary
 - [ ] Submission form filled at cerebralvalley.ai
+
+## Production hardening (5)
+
+- [x] Security review (`docs/SECURITY_REVIEW.md`) — 0C/3H/4M/3L; HIGH fixes applied (CORS wildcard, SSE limiter, TwiML path sanitiser)
+- [x] Dependency audit clean — `uv lock` current; upper bounds pinned; `pip-audit` reports no known vulnerabilities
+- [x] CI matrix expansion — ubuntu + macos-14 × py3.11 + py3.12; web build job; pip-audit weekly; coverage floor 80%; docker SITL smoke (manual)
+- [x] Observability — `src/skyherd/obs/` (structlog + prometheus-client + OTel); `/metrics` endpoint; agent wake + tool call instrumentation; `[obs]` optional dep group
+- [x] Perf baseline (`docs/PERF_BASELINE.md`) — 898 tests / 218 s; 3 targeted optimisations documented
+
+## Side deliverables
+
+- [x] `docs/CODEMAP.md` + judge reading order (CLAUDE.md refresh with directory map + build commands)
+- [x] Memory refresh (project_hackathon_opus47.md, project_skyherd.md, user_george.md, MEMORY.md index)
 
 ---
 
