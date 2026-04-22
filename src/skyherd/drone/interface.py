@@ -146,10 +146,18 @@ def get_backend(name: str | None = None) -> DroneBackend:
             from skyherd.drone.stub import StubBackend  # noqa: PLC0415
 
             _register("stub", StubBackend)
+        elif backend_name == "mavic":
+            from skyherd.drone.mavic import MavicBackend  # noqa: PLC0415
+
+            _register("mavic", MavicBackend)
+        elif backend_name == "f3_inav":
+            from skyherd.drone.f3_inav import F3InavBackend  # noqa: PLC0415
+
+            _register("f3_inav", F3InavBackend)
         else:
             raise DroneError(
                 f"Unknown drone backend {backend_name!r}. "
-                f"Available: {sorted(_REGISTRY) or ['sitl', 'stub']}"
+                f"Available: {sorted(_REGISTRY) or ['sitl', 'stub', 'mavic', 'f3_inav']}"
             )
 
     cls = _REGISTRY[backend_name]

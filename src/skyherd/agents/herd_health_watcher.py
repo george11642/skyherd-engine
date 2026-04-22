@@ -139,53 +139,7 @@ def _simulate_handler(
     wake_event: dict[str, Any],
     session: Session,
 ) -> list[dict[str, Any]]:
-    """Deterministic simulation path — invokes ClassifyPipeline stub."""
-    trough_id = wake_event.get("trough_id", "trough_a")
+    """Deterministic simulation path — delegates to :mod:`skyherd.agents.simulate`."""
+    from skyherd.agents.simulate import herd_health_watcher
 
-    # Attempt to run the real ClassifyPipeline if world is available
-    pipeline_result = _try_run_classify_pipeline(wake_event)
-
-    calls = [
-        {
-            "tool": "classify_pipeline",
-            "input": {"trough_id": trough_id},
-            "result": pipeline_result,
-        },
-    ]
-
-    # Simulate an escalation if the wake event signals anomaly
-    if wake_event.get("anomaly", False) or wake_event.get("type") == "camera.motion":
-        calls.append(
-            {
-                "tool": "page_rancher",
-                "input": {
-                    "urgency": "text",
-                    "context": f"HerdHealthWatcher: anomaly detected at {trough_id}. "
-                    "Review recommended within 24h.",
-                },
-            }
-        )
-
-    return calls
-
-
-def _try_run_classify_pipeline(wake_event: dict[str, Any]) -> dict[str, Any]:
-    """Attempt to run the ClassifyPipeline; return stub result if unavailable."""
-    try:
-        from pathlib import Path as _Path
-
-        from skyherd.vision.pipeline import ClassifyPipeline
-        from skyherd.world.world import make_world
-
-        _repo_root = _Path(__file__).parent.parent.parent.parent
-        world = make_world(seed=42, config_path=_repo_root / "worlds" / "ranch_a.yaml")
-        trough_id = wake_event.get("trough_id", "trough_a")
-        pipeline = ClassifyPipeline()
-        result = pipeline.run(world, trough_id)
-        return {
-            "detection_count": result.detection_count,
-            "annotated_frame": str(result.annotated_frame_path),
-        }
-    except Exception as exc:  # noqa: BLE001
-        logger.debug("classify pipeline unavailable: %s", exc)
-        return {"detection_count": 0, "annotated_frame": None}
+    return herd_health_watcher(wake_event, session)

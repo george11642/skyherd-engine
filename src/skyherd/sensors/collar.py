@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 import logging
-import time
+import math
+from collections.abc import Callable
 from typing import TYPE_CHECKING
 
 from skyherd.sensors.base import Sensor
@@ -47,6 +48,7 @@ class CollarSensor(Sensor):
         period_s: float = 60.0,
         ledger: Ledger | None = None,
         initial_battery_pct: float = 100.0,
+        ts_provider: Callable[[], float] | None = None,
     ) -> None:
         super().__init__(
             world=world,
@@ -55,6 +57,7 @@ class CollarSensor(Sensor):
             entity_id=cow_id,
             period_s=period_s,
             ledger=ledger,
+            ts_provider=ts_provider,
         )
         self._cow_id = cow_id
         self._battery_pct: float = initial_battery_pct
@@ -73,8 +76,6 @@ class CollarSensor(Sensor):
         # Estimate speed from position delta
         pos: tuple[float, float] = tuple(cow["pos"])  # type: ignore[assignment]
         if self._prev_pos is not None:
-            import math
-
             dx = pos[0] - self._prev_pos[0]
             dy = pos[1] - self._prev_pos[1]
             dist = math.sqrt(dx * dx + dy * dy)
@@ -86,7 +87,7 @@ class CollarSensor(Sensor):
         activity = _classify_activity(speed_m_s)
 
         payload = {
-            "ts": time.time(),
+            "ts": self._ts(),
             "kind": "collar.reading",
             "ranch": self.ranch_id,
             "entity": self._cow_id,
@@ -101,7 +102,7 @@ class CollarSensor(Sensor):
         if self._battery_pct < _LOW_BATTERY_THRESHOLD_PCT and not self._low_battery_fired:
             self._low_battery_fired = True
             alert = {
-                "ts": time.time(),
+                "ts": self._ts(),
                 "kind": "collar.low_battery",
                 "ranch": self.ranch_id,
                 "entity": self._cow_id,

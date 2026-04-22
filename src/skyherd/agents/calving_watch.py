@@ -129,48 +129,7 @@ def _simulate_handler(
     wake_event: dict[str, Any],
     session: Session,
 ) -> list[dict[str, Any]]:
-    tag = wake_event.get("tag", "cow_001")
-    event_type = wake_event.get("type", "collar.activity_spike")
+    """Deterministic simulation path — delegates to :mod:`skyherd.agents.simulate`."""
+    from skyherd.agents.simulate import calving_watch
 
-    calls = [
-        {
-            "tool": "get_latest_readings",
-            "input": {"kind": "collar_imu", "n": 20},
-        },
-    ]
-
-    if event_type == "dystocia_detected":
-        calls.append(
-            {
-                "tool": "page_rancher",
-                "input": {
-                    "urgency": "emergency",
-                    "context": f"DYSTOCIA DETECTED: cow {tag} requires immediate intervention. "
-                    "Vet has also been notified.",
-                },
-            }
-        )
-    elif event_type in ("active_labor", "collar.activity_spike"):
-        calls.append(
-            {
-                "tool": "page_rancher",
-                "input": {
-                    "urgency": "call",
-                    "context": f"CalvingWatch: cow {tag} showing active labor signs. "
-                    "Please check immediately.",
-                },
-            }
-        )
-    else:
-        calls.append(
-            {
-                "tool": "page_rancher",
-                "input": {
-                    "urgency": "text",
-                    "context": f"CalvingWatch: cow {tag} showing pre-labor indicators. "
-                    "Monitoring — will update if condition escalates.",
-                },
-            }
-        )
-
-    return calls
+    return calving_watch(wake_event, session)

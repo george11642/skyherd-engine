@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-import time
+from collections.abc import Callable
 from typing import TYPE_CHECKING
 
 from skyherd.sensors.base import Sensor
@@ -34,6 +34,7 @@ class WeatherSensor(Sensor):
         station_id: str = "station_1",
         period_s: float = 30.0,
         ledger: Ledger | None = None,
+        ts_provider: Callable[[], float] | None = None,
     ) -> None:
         super().__init__(
             world=world,
@@ -42,6 +43,7 @@ class WeatherSensor(Sensor):
             entity_id=station_id,
             period_s=period_s,
             ledger=ledger,
+            ts_provider=ts_provider,
         )
         self._storm_active: bool = False  # track storm state for edge-fire
 
@@ -49,7 +51,7 @@ class WeatherSensor(Sensor):
         w = self.world.weather_driver.current
 
         payload = {
-            "ts": time.time(),
+            "ts": self._ts(),
             "kind": "weather.reading",
             "ranch": self.ranch_id,
             "entity": self.entity_id,
@@ -64,7 +66,7 @@ class WeatherSensor(Sensor):
         is_storm = str(w.conditions) == _STORM_CONDITION
         if is_storm:
             alert = {
-                "ts": time.time(),
+                "ts": self._ts(),
                 "kind": "weather.storm",
                 "ranch": self.ranch_id,
                 "entity": self.entity_id,

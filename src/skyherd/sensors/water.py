@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-import time
+from collections.abc import Callable
 from typing import TYPE_CHECKING
 
 from skyherd.sensors.base import Sensor
@@ -36,6 +36,7 @@ class WaterTankSensor(Sensor):
         tank_cfg: WaterTankConfig,
         period_s: float = 5.0,
         ledger: Ledger | None = None,
+        ts_provider: Callable[[], float] | None = None,
     ) -> None:
         super().__init__(
             world=world,
@@ -44,6 +45,7 @@ class WaterTankSensor(Sensor):
             entity_id=tank_cfg.id,
             period_s=period_s,
             ledger=ledger,
+            ts_provider=ts_provider,
         )
         self._tank_id = tank_cfg.id
         self._low_event_fired = False  # debounce: fire once per low episode
@@ -57,7 +59,7 @@ class WaterTankSensor(Sensor):
 
         flow_lpm = round(tank.pressure_psi * _FLOW_LPM_PER_PSI, 2)
         payload = {
-            "ts": time.time(),
+            "ts": self._ts(),
             "kind": "water.reading",
             "ranch": self.ranch_id,
             "entity": self._tank_id,
@@ -72,7 +74,7 @@ class WaterTankSensor(Sensor):
         if tank.level_pct < _WATER_LOW_THRESHOLD_PCT and not self._low_event_fired:
             self._low_event_fired = True
             alert = {
-                "ts": time.time(),
+                "ts": self._ts(),
                 "kind": "water.low",
                 "ranch": self.ranch_id,
                 "entity": self._tank_id,

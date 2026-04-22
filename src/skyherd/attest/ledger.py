@@ -20,7 +20,8 @@ import hashlib
 import hmac
 import json
 import sqlite3
-from collections.abc import Iterator
+import time
+from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from datetime import UTC, datetime
 from pathlib import Path
@@ -48,6 +49,9 @@ CREATE TABLE IF NOT EXISTS events(
     pubkey       TEXT    NOT NULL
 );
 """
+
+# Default wall-clock ts_provider — replaced with world.clock.sim_time_s in sim
+_WALL_CLOCK_TS: Callable[[], float] = time.time
 
 # ---------------------------------------------------------------------------
 # Data model
@@ -116,16 +120,27 @@ def _constant_eq(a: str, b: str) -> bool:
 class Ledger:
     """Append-only, hash-chained, Ed25519-signed event log."""
 
-    def __init__(self, conn: sqlite3.Connection, signer: Signer) -> None:
+    def __init__(
+        self,
+        conn: sqlite3.Connection,
+        signer: Signer,
+        ts_provider: Callable[[], float] | None = None,
+    ) -> None:
         self._conn = conn
         self._signer = signer
+        self._ts: Callable[[], float] = ts_provider if ts_provider is not None else _WALL_CLOCK_TS
 
     # ------------------------------------------------------------------
     # Factory
     # ------------------------------------------------------------------
 
     @classmethod
-    def open(cls, path: Path | str, signer: Signer) -> Ledger:
+    def open(
+        cls,
+        path: Path | str,
+        signer: Signer,
+        ts_provider: Callable[[], float] | None = None,
+    ) -> Ledger:
         """Open (or create) the ledger at *path*."""
         path = Path(path)
         conn = sqlite3.connect(str(path), check_same_thread=False)
@@ -133,7 +148,7 @@ class Ledger:
         conn.execute("PRAGMA synchronous=NORMAL")
         conn.execute(_DDL)
         conn.commit()
-        return cls(conn, signer)
+        return cls(conn, signer, ts_provider=ts_provider)
 
     # ------------------------------------------------------------------
     # Context manager (optional but handy in tests)
@@ -151,7 +166,7 @@ class Ledger:
 
     def append(self, source: str, kind: str, payload: dict) -> Event:
         """Append one event atomically; returns the committed Event."""
-        ts_iso = datetime.now(tz=UTC).isoformat()
+        ts_iso = datetime.fromtimestamp(self._ts(), tz=UTC).isoformat()
         canonical_payload = _canonical_json(payload)
         prev_hash = self._last_hash()
 

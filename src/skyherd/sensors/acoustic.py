@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
-import time
+from collections.abc import Callable
 from typing import TYPE_CHECKING, Any
 
 from skyherd.sensors.base import Sensor
@@ -36,6 +36,7 @@ class AcousticEmitterSensor(Sensor):
         emitter_id: str = "emit_1",
         period_s: float = 30.0,
         ledger: Ledger | None = None,
+        ts_provider: Callable[[], float] | None = None,
     ) -> None:
         super().__init__(
             world=world,
@@ -44,6 +45,7 @@ class AcousticEmitterSensor(Sensor):
             entity_id=emitter_id,
             period_s=period_s,
             ledger=ledger,
+            ts_provider=ts_provider,
         )
         self._active: bool = False
         self._frequency_hz: float = 15000.0  # ultrasonic default
@@ -101,7 +103,7 @@ class AcousticEmitterSensor(Sensor):
 
     async def tick(self) -> None:
         payload = {
-            "ts": time.time(),
+            "ts": self._ts(),
             "kind": "acoustic.reading",
             "ranch": self.ranch_id,
             "entity": self.entity_id,

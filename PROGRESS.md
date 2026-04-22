@@ -2,14 +2,14 @@
 
 > Fresh Claude sessions read this **after CLAUDE.md**. Update atomically with every commit.
 
-**Last updated**: 2026-04-22 (Dashboard redesign — Gotham/Lattice/Bloomberg ops-console aesthetic live)
+**Last updated**: 2026-04-22 (Wildfire + Rustling scenarios live, all 8 in SCENARIO=all, CrossRanchView vitest test — 137 pytest + 38 vitest green)
 **Plan**: v5.1 at `/home/george/.claude/plans/update-ur-memory-project-context-splendid-swan.md`
 **Submission**: due 2026-04-26 8pm EST
 **External blockers**: see [GitHub Issues](https://github.com/george11642/skyherd-engine/issues)
 
 ## Summary
 
-- Green / Total: **84 / 92**
+- Green / Total: **89 / 95**
 - Tier MVP status: 🟡 agents layer complete
 - Sim Completeness Gate: 🟢 10/10 TRULY-GREEN (all items verified by execution — see docs/verify-latest.md)
 - Hardware tiers: 🟡 H1 software-ready (awaits Pi); H3 software-ready (awaits flash/install); H4 software-ready (awaits parts); Two-Pi-4 fleet software-ready; iOS + Android companion software-ready
@@ -37,18 +37,21 @@
 - [x] ArduPilot SITL drone executing real MAVLink missions from agent tool calls
 - [x] Dashboard live-updating (ranch map + 5 agent lanes + cost ticker + attestation + rancher phone PWA)
 - [x] Wes voice end-to-end (Twilio → ElevenLabs → cowboy persona → rancher phone rings)
-- [x] 5 demo scenarios play back-to-back without intervention
+- [x] 8 demo scenarios play back-to-back without intervention (SCENARIO=all, seed=42)
 - [x] Deterministic replay (`make sim SEED=42`)
 - [x] Fresh-clone boot test green on second machine
 - [x] Cost ticker visibly pauses during idle stretches
 
-## Demo scenarios (5 — MVP must-have)
+## Demo scenarios (8 — all live in SCENARIO=all)
 
 - [x] **1. Coyote at fence** — FenceLineDispatcher → SITL drone → deterrent → Wes call
 - [x] **2. Sick cow flagged** — HerdHealthWatcher → Doc escalation → vet-intake packet
 - [x] **3. Water tank pressure drop** — LoRaWAN alert → drone flyover → attestation logged
 - [x] **4. Calving detected** — CalvingWatch labor behavior → priority rancher page
 - [x] **5. Storm incoming** — Weather-Redirect → GrazingOptimizer herd-move → acoustic nudge
+- [x] **6. Cross-ranch coyote** — ranch_a → NeighborBroadcaster → ranch_b silent pre-position
+- [x] **7. Wildfire early warning** — dawn thermal hotspot → confirmation drone → urgency=high page
+- [x] **8. Rustling / theft detection** — nighttime human+vehicle → silent alert → no deterrent → sheriff draft
 
 ## Managed Agents (5 — MVP must-have)
 
@@ -68,7 +71,7 @@
 - [x] Heat stress
 - [x] Body Condition Score (BCS 1–9)
 
-## Skills library (26 — CrossBeam pattern)
+## Skills library (29 — CrossBeam pattern)
 
 ### cattle-behavior/ (5)
 - [x] feeding-patterns.md
@@ -84,18 +87,21 @@
 - [x] livestock-guardian-dogs.md
 - [x] thermal-signatures.md
 
-### ranch-ops/ (5)
+### ranch-ops/ (7)
 - [x] fence-line-protocols.md
 - [x] water-tank-sops.md
 - [x] paddock-rotation.md
 - [x] part-107-rules.md
 - [x] human-in-loop-etiquette.md
+- [x] fire-response.md
+- [x] rustling-indicators.md
 
-### nm-ecology/ (4)
+### nm-ecology/ (5)
 - [x] nm-predator-ranges.md
 - [x] nm-forage.md
 - [x] seasonal-calendar.md
 - [x] weather-patterns.md
+- [x] wildfire-signatures.md
 
 ### drone-ops/ (4)
 - [x] patrol-planning.md
@@ -112,8 +118,8 @@
 
 - [x] Cross-Ranch Mesh Network (2 sim ranches + agent-to-agent mesh)
 - [x] Insurance Attestation Chain (SQLite + Ed25519 Merkle log + dashboard panel)
-- [ ] Wildfire Thermal Early-Warning
-- [ ] Rustling / Theft Detection
+- [x] Wildfire Thermal Early-Warning
+- [x] Rustling / Theft Detection
 - [ ] Rancher Digital Twin "Wes Memory"
 - [ ] AI Veterinarian "Doc" (6th agent)
 - [ ] Market-Timing "Broker" (7th agent)

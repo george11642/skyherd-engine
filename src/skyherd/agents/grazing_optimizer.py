@@ -122,36 +122,7 @@ def _simulate_handler(
     wake_event: dict[str, Any],
     session: Session,
 ) -> list[dict[str, Any]]:
-    is_storm = "weather" in wake_event.get("topic", "")
+    """Deterministic simulation path — delegates to :mod:`skyherd.agents.simulate`."""
+    from skyherd.agents.simulate import grazing_optimizer
 
-    calls = [
-        {
-            "tool": "get_latest_readings",
-            "input": {"kind": "water_pressure", "n": 10},
-        },
-    ]
-
-    if is_storm:
-        calls.append(
-            {
-                "tool": "page_rancher",
-                "input": {
-                    "urgency": "text",
-                    "context": "Storm alert: recommending early paddock rotation to higher ground. "
-                    "Awaiting your approval before acoustic nudge.",
-                },
-            }
-        )
-    else:
-        calls.append(
-            {
-                "tool": "page_rancher",
-                "input": {
-                    "urgency": "text",
-                    "context": "Weekly rotation proposal: move herd from north paddock to east "
-                    "paddock Monday. Forage levels nominal. Reply APPROVE to confirm.",
-                },
-            }
-        )
-
-    return calls
+    return grazing_optimizer(wake_event, session)

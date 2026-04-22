@@ -381,12 +381,25 @@ class HardwareOnlyDemo:
             return True
 
         except (DroneUnavailable, DroneError) as exc:
+            # Explicit hardware backends must not silently degrade to SITL —
+            # surface the failure so operators know the real hardware is down.
+            if backend_name in {"mavic", "f3_inav"}:
+                logger.error(
+                    "Hardware backend %r failed (%s) — NOT falling back to SITL",
+                    backend_name,
+                    exc,
+                )
+                self._record_event(
+                    {"type": "drone_launch_failed", "error": str(exc), "ts": time.time()}
+                )
+                raise
+
             logger.warning(
                 "Drone backend %r unavailable (%s) — falling back to SITL for video",
                 backend_name,
                 exc,
             )
-            # Retry with SITL so demo still shows visual
+            # Retry with SITL so demo still shows visual (non-hardware backends only)
             if backend_name != "sitl":
                 return await self._launch_drone_sitl(lat, lon)
             self._record_event(

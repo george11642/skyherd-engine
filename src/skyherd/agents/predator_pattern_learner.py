@@ -117,19 +117,7 @@ def _simulate_handler(
     wake_event: dict[str, Any],
     session: Session,
 ) -> list[dict[str, Any]]:
-    return [
-        {
-            "tool": "get_thermal_history",
-            "input": {"days": 7, "ranch_id": wake_event.get("ranch_id", "ranch_a")},
-        },
-        {
-            "tool": "log_pattern_analysis",
-            "input": {
-                "summary": "Coyote activity peaks 02:00–04:00 MST near fence segments 3–5.",
-                "proposed_patrols": [
-                    {"time": "01:45", "segment": "seg_3"},
-                    {"time": "03:30", "segment": "seg_5"},
-                ],
-            },
-        },
-    ]
+    """Deterministic simulation path — delegates to :mod:`skyherd.agents.simulate`."""
+    from skyherd.agents.simulate import predator_pattern_learner
+
+    return predator_pattern_learner(wake_event, session)

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import logging
 import math
-import time
+from collections.abc import Callable
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -54,6 +54,7 @@ class TroughCamSensor(Sensor):
         cam_id: str,
         period_s: float = 10.0,
         ledger: Ledger | None = None,
+        ts_provider: Callable[[], float] | None = None,
     ) -> None:
         super().__init__(
             world=world,
@@ -62,6 +63,7 @@ class TroughCamSensor(Sensor):
             entity_id=cam_id,
             period_s=period_s,
             ledger=ledger,
+            ts_provider=ts_provider,
         )
         self._trough_id = trough_cfg.id
         self._trough_pos = trough_cfg.pos
@@ -78,7 +80,7 @@ class TroughCamSensor(Sensor):
             if dist <= _COW_PROXIMITY_M:
                 nearby_ids.append(cow_dict["id"])
 
-        ts_int = int(time.time())
+        ts_int = int(self._ts())
         frame_path = _FRAME_DIR / f"{self._trough_id}_{ts_int}.png"
 
         # Try vision renderer first; fall back to PIL placeholder
@@ -95,7 +97,7 @@ class TroughCamSensor(Sensor):
             _write_placeholder_png(frame_path, len(nearby_ids))
 
         payload = {
-            "ts": time.time(),
+            "ts": self._ts(),
             "kind": "trough_cam.reading",
             "ranch": self.ranch_id,
             "entity": self.entity_id,

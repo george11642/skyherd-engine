@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 import time
+from collections.abc import Callable
 from typing import TYPE_CHECKING
 
 from skyherd.sensors.base import Sensor
@@ -36,6 +37,7 @@ class FenceMotionSensor(Sensor):
         fence_cfg: FenceLineConfig,
         period_s: float = 3.0,
         ledger: Ledger | None = None,
+        ts_provider: Callable[[], float] | None = None,
     ) -> None:
         super().__init__(
             world=world,
@@ -44,12 +46,13 @@ class FenceMotionSensor(Sensor):
             entity_id=fence_cfg.id,
             period_s=period_s,
             ledger=ledger,
+            ts_provider=ts_provider,
         )
         self._segment_id = fence_cfg.id
         self._last_alert_time: float = 0.0
 
     async def tick(self) -> None:
-        # Debounce check
+        # Debounce check using monotonic clock (wall-clock independent)
         now = time.monotonic()
         if now - self._last_alert_time < _DEBOUNCE_S:
             return
@@ -82,7 +85,7 @@ class FenceMotionSensor(Sensor):
         self._last_alert_time = now
 
         payload = {
-            "ts": time.time(),
+            "ts": self._ts(),
             "kind": "fence.breach",
             "ranch": self.ranch_id,
             "entity": self._segment_id,

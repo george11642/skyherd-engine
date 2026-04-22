@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import logging
 import math
-import time
+from collections.abc import Callable
 from typing import TYPE_CHECKING
 
 from skyherd.sensors.base import Sensor
@@ -56,6 +56,7 @@ class ThermalCamSensor(Sensor):
         cam_id: str,
         period_s: float = 15.0,
         ledger: Ledger | None = None,
+        ts_provider: Callable[[], float] | None = None,
     ) -> None:
         super().__init__(
             world=world,
@@ -64,6 +65,7 @@ class ThermalCamSensor(Sensor):
             entity_id=cam_id,
             period_s=period_s,
             ledger=ledger,
+            ts_provider=ts_provider,
         )
 
     def _cam_pose(self) -> tuple[tuple[float, float], float]:
@@ -93,7 +95,7 @@ class ThermalCamSensor(Sensor):
                 )
 
         payload = {
-            "ts": time.time(),
+            "ts": self._ts(),
             "kind": "thermal.reading",
             "ranch": self.ranch_id,
             "entity": self.entity_id,
@@ -107,7 +109,7 @@ class ThermalCamSensor(Sensor):
         # Fire alert for each detected predator
         for hit in hits:
             alert = {
-                "ts": time.time(),
+                "ts": self._ts(),
                 "kind": "predator.thermal_hit",
                 "ranch": self.ranch_id,
                 "entity": self.entity_id,
