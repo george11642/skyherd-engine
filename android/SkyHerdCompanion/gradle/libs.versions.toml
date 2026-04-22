@@ -1,0 +1,33 @@
+[versions]
+agp = "8.4.2"
+kotlin = "2.0.0"
+compileSdk = "34"
+minSdk = "26"
+targetSdk = "34"
+djiSdkV5 = "5.8.0"
+okhttp = "4.12.0"
+slf4jAndroid = "2.0.9"
+pahomqtt = "1.2.5"
+coroutines = "1.8.0"
+
+[libraries]
+# DJI Mobile SDK V5
+dji-sdk-v5-aircraft = { group = "com.dji", name = "dji-sdk-v5-aircraft", version.ref = "djiSdkV5" }
+dji-sdk-v5-networkImp = { group = "com.dji", name = "dji-sdk-v5-networkImp", version.ref = "djiSdkV5" }
+
+# HTTP / WebSocket
+okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
+
+# MQTT
+paho-mqtt-android = { group = "org.eclipse.paho", name = "org.eclipse.paho.android.service", version.ref = "pahomqtt" }
+paho-mqtt-client = { group = "org.eclipse.paho", name = "org.eclipse.paho.client.mqttv3", version.ref = "pahomqtt" }
+
+# Logging
+slf4j-android = { group = "org.slf4j", name = "slf4j-android", version.ref = "slf4jAndroid" }
+
+# Coroutines
+kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }

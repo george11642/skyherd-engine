@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SkyHerd Companion</string>
+    <string name="hint_broker_url">MQTT Broker URL (tcp://&lt;laptop-ip&gt;:1883)</string>
+    <string name="btn_connect">Connect to SkyHerd</string>
+    <string name="status_idle">Status: idle</string>
+    <string name="status_sdk_registered">DJI SDK: registered</string>
+    <string name="status_sdk_failed">DJI SDK: not registered</string>
+    <string name="status_drone_connected">Connected to DJI: %1$s</string>
+    <string name="status_drone_disconnected">Drone: not connected</string>
+</resources>
