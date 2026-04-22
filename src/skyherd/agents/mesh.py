@@ -117,6 +117,7 @@ class AgentMesh:
         self._stop_event = asyncio.Event()
         self._tick_task: asyncio.Task[None] | None = None
         self._mqtt_task: asyncio.Task[None] | None = None
+        self._inflight_handlers: set[asyncio.Task] = set()  # prevent GC of fire-and-forget tasks
 
     # ------------------------------------------------------------------
     # Lifecycle
@@ -228,10 +229,12 @@ class AgentMesh:
                     for session in woken:
                         handler_fn = self._handlers.get(session.agent_name)
                         if handler_fn:
-                            asyncio.create_task(
+                            _task = asyncio.create_task(
                                 self._run_handler(session, event, handler_fn),
                                 name=f"handler-{session.agent_name}",
                             )
+                            self._inflight_handlers.add(_task)
+                            _task.add_done_callback(self._inflight_handlers.discard)
         except Exception as exc:  # noqa: BLE001
             logger.debug("MQTT loop unavailable (%s) — running without live sensor bus.", exc)
 
