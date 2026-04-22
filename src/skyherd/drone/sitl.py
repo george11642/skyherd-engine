@@ -16,12 +16,25 @@ import logging
 import time
 from pathlib import Path
 
-from skyherd.drone.interface import DroneBackend, DroneState, DroneUnavailable, Waypoint
+from skyherd.drone.interface import (
+    DroneBackend,
+    DroneState,
+    DroneTimeoutError,
+    DroneUnavailable,
+    Waypoint,
+)
 
 logger = logging.getLogger(__name__)
 
 _SITL_ADDRESS = "udpin://0.0.0.0:14540"
 _CONNECT_TIMEOUT_S = 30.0
+# Per-operation SLO timeouts (seconds)
+_TIMEOUT_HEALTH_S = 30.0   # GPS fix after connect
+_TIMEOUT_ARM_S = 15.0      # arm + takeoff command
+_TIMEOUT_IN_AIR_S = 45.0   # wait until airborne after takeoff
+_TIMEOUT_MISSION_S = 30.0  # mission upload
+_TIMEOUT_RTL_S = 60.0      # return-to-launch + landing
+_TIMEOUT_STATE_S = 5.0     # individual telemetry reads in state()
 _EVENTS_PATH = Path("runtime/drone_events.jsonl")
 _THERMAL_DIR = Path("runtime/thermal")
 
@@ -88,9 +101,18 @@ class SitlBackend(DroneBackend):
             raise DroneUnavailable(f"Error while waiting for SITL connection: {exc}") from exc
 
         # Wait for GPS fix before declaring ready.
-        async for health in drone.telemetry.health():
-            if health.is_global_position_ok and health.is_home_position_ok:
-                break
+        async def _wait_health() -> None:
+            async for health in drone.telemetry.health():
+                if health.is_global_position_ok and health.is_home_position_ok:
+                    return
+
+        try:
+            await asyncio.wait_for(_wait_health(), timeout=_TIMEOUT_HEALTH_S)
+        except TimeoutError as exc:
+            raise DroneTimeoutError(
+                f"GPS health check did not complete within {_TIMEOUT_HEALTH_S:.0f} s. "
+                "Hint: check SITL GPS model or increase _TIMEOUT_HEALTH_S."
+            ) from exc
 
         self._drone = drone
         self._connected = True
@@ -99,14 +121,29 @@ class SitlBackend(DroneBackend):
 
     async def takeoff(self, alt_m: float = 30.0) -> None:
         drone = self._assert_connected()
-        await drone.action.set_takeoff_altitude(alt_m)
-        await drone.action.arm()
-        await drone.action.takeoff()
+        try:
+            await asyncio.wait_for(
+                drone.action.set_takeoff_altitude(alt_m), timeout=_TIMEOUT_ARM_S
+            )
+            await asyncio.wait_for(drone.action.arm(), timeout=_TIMEOUT_ARM_S)
+            await asyncio.wait_for(drone.action.takeoff(), timeout=_TIMEOUT_ARM_S)
+        except TimeoutError as exc:
+            raise DroneTimeoutError(
+                f"Arm/takeoff command did not complete within {_TIMEOUT_ARM_S:.0f} s."
+            ) from exc
 
         # Wait until airborne.
-        async for in_air in drone.telemetry.in_air():
-            if in_air:
-                break
+        async def _wait_in_air() -> None:
+            async for in_air in drone.telemetry.in_air():
+                if in_air:
+                    return
+
+        try:
+            await asyncio.wait_for(_wait_in_air(), timeout=_TIMEOUT_IN_AIR_S)
+        except TimeoutError as exc:
+            raise DroneTimeoutError(
+                f"Drone did not become airborne within {_TIMEOUT_IN_AIR_S:.0f} s."
+            ) from exc
 
         logger.info("SitlBackend airborne at %.1f m AGL", alt_m)
         _append_event({"ts": time.time(), "event": "takeoff", "alt_m": alt_m})
@@ -144,15 +181,35 @@ class SitlBackend(DroneBackend):
         ]
 
         plan = MissionPlan(mission_items)
-        await drone.mission.set_return_to_launch_after_mission(False)
-        await drone.mission.upload_mission(plan)
-        await drone.mission.start_mission()
+        try:
+            await asyncio.wait_for(
+                drone.mission.set_return_to_launch_after_mission(False),
+                timeout=_TIMEOUT_MISSION_S,
+            )
+            await asyncio.wait_for(
+                drone.mission.upload_mission(plan), timeout=_TIMEOUT_MISSION_S
+            )
+            await asyncio.wait_for(
+                drone.mission.start_mission(), timeout=_TIMEOUT_MISSION_S
+            )
+        except TimeoutError as exc:
+            raise DroneTimeoutError(
+                f"Mission upload/start did not complete within {_TIMEOUT_MISSION_S:.0f} s."
+            ) from exc
 
         # Wait for mission completion.
-        async for progress in drone.mission.mission_progress():
-            logger.debug("Mission progress: %d/%d", progress.current, progress.total)
-            if progress.current == progress.total and progress.total > 0:
-                break
+        async def _wait_mission_done() -> None:
+            async for progress in drone.mission.mission_progress():
+                logger.debug("Mission progress: %d/%d", progress.current, progress.total)
+                if progress.current == progress.total and progress.total > 0:
+                    return
+
+        try:
+            await asyncio.wait_for(_wait_mission_done(), timeout=_TIMEOUT_RTL_S)
+        except TimeoutError as exc:
+            raise DroneTimeoutError(
+                f"Mission did not complete within {_TIMEOUT_RTL_S:.0f} s."
+            ) from exc
 
         _append_event(
             {
@@ -164,14 +221,33 @@ class SitlBackend(DroneBackend):
 
     async def return_to_home(self) -> None:
         drone = self._assert_connected()
-        await drone.action.return_to_launch()
+        try:
+            await asyncio.wait_for(drone.action.return_to_launch(), timeout=_TIMEOUT_RTL_S)
+        except TimeoutError as exc:
+            raise DroneTimeoutError(
+                f"RTL command did not complete within {_TIMEOUT_RTL_S:.0f} s."
+            ) from exc
 
         # Wait until on the ground.
-        async for in_air in drone.telemetry.in_air():
-            if not in_air:
-                break
+        async def _wait_landed() -> None:
+            async for in_air in drone.telemetry.in_air():
+                if not in_air:
+                    return
 
-        await drone.action.disarm()
+        try:
+            await asyncio.wait_for(_wait_landed(), timeout=_TIMEOUT_RTL_S)
+        except TimeoutError as exc:
+            raise DroneTimeoutError(
+                f"Drone did not land within {_TIMEOUT_RTL_S:.0f} s after RTL."
+            ) from exc
+
+        try:
+            await asyncio.wait_for(drone.action.disarm(), timeout=_TIMEOUT_ARM_S)
+        except TimeoutError as exc:
+            raise DroneTimeoutError(
+                f"Disarm did not complete within {_TIMEOUT_ARM_S:.0f} s."
+            ) from exc
+
         logger.info("SitlBackend returned to home and disarmed")
         _append_event({"ts": time.time(), "event": "return_to_home"})
 
@@ -237,42 +313,43 @@ class SitlBackend(DroneBackend):
         lat = 0.0
         lon = 0.0
 
-        try:
+        async def _read_armed() -> None:
+            nonlocal armed
             async for is_armed in drone.telemetry.armed():
                 armed = is_armed
-                break
-        except Exception:
-            pass
+                return
 
-        try:
+        async def _read_in_air() -> None:
+            nonlocal in_air
             async for is_in_air in drone.telemetry.in_air():
                 in_air = is_in_air
-                break
-        except Exception:
-            pass
+                return
 
-        try:
+        async def _read_position() -> None:
+            nonlocal lat, lon, alt_m
             async for pos in drone.telemetry.position():
                 lat = pos.latitude_deg
                 lon = pos.longitude_deg
                 alt_m = pos.relative_altitude_m
-                break
-        except Exception:
-            pass
+                return
 
-        try:
+        async def _read_battery() -> None:
+            nonlocal battery_pct
             async for bat in drone.telemetry.battery():
                 battery_pct = bat.remaining_percent * 100.0
-                break
-        except Exception:
-            pass
+                return
 
-        try:
+        async def _read_flight_mode() -> None:
+            nonlocal mode
             async for fm in drone.telemetry.flight_mode():
                 mode = str(fm)
-                break
-        except Exception:
-            pass
+                return
+
+        for _coro in (_read_armed, _read_in_air, _read_position, _read_battery, _read_flight_mode):
+            try:
+                await asyncio.wait_for(_coro(), timeout=_TIMEOUT_STATE_S)
+            except (TimeoutError, Exception):  # noqa: BLE001
+                pass  # use default value; state is best-effort
 
         return DroneState(
             armed=armed,

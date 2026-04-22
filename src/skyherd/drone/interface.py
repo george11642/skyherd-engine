@@ -54,6 +54,14 @@ class DroneUnavailable(DroneError):
     """Raised when the drone (or SITL) cannot be reached."""
 
 
+class DroneTimeoutError(DroneUnavailable):
+    """Raised when a MAVSDK telemetry await does not complete within its SLO.
+
+    Inherits from :class:`DroneUnavailable` so existing callers that catch
+    ``DroneUnavailable`` handle this transparently.
+    """
+
+
 # ---------------------------------------------------------------------------
 # Abstract backend
 # ---------------------------------------------------------------------------
