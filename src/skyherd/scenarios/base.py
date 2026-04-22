@@ -414,6 +414,11 @@ async def _route_event(
         "weather.storm": ["GrazingOptimizer"],
         "weekly.schedule": ["GrazingOptimizer"],
         "storm.warning": ["GrazingOptimizer"],
+        # ROUT-02 — PredatorPatternLearner wake fan-out.
+        # thermal.anomaly: rustling/predator-thermal clip → dispatcher + learner.
+        # nightly.analysis: cron-style daily analysis → learner only.
+        "thermal.anomaly": ["FenceLineDispatcher", "PredatorPatternLearner"],
+        "nightly.analysis": ["PredatorPatternLearner"],
     }
 
     targets = routing.get(event_type, [])
