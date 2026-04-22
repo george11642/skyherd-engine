@@ -1,5 +1,7 @@
 # SkyHerd Engine
 
+**Live demo: https://skyherd-engine.vercel.app** — open on your phone; no install needed.
+
 [![CI](https://github.com/george11642/skyherd-engine/actions/workflows/ci.yml/badge.svg)](https://github.com/george11642/skyherd-engine/actions/workflows/ci.yml) [![tests](https://img.shields.io/badge/tests-880%2B-brightgreen)](https://github.com/george11642/skyherd-engine/actions) [![coverage](https://img.shields.io/badge/coverage-71%25-yellow)](https://github.com/george11642/skyherd-engine/actions) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 **The nervous system for working land.**

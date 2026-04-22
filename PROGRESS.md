@@ -2,14 +2,14 @@
 
 > Fresh Claude sessions read this **after CLAUDE.md**. Update atomically with every commit.
 
-**Last updated**: 2026-04-21 (Production hardening — security review + fixes, dep pinning, CI matrix, observability, perf baseline)
+**Last updated**: 2026-04-22 (Vercel deploy live — replay-mode SPA at https://skyherd-engine.vercel.app)
 **Plan**: v5.1 at `/home/george/.claude/plans/update-ur-memory-project-context-splendid-swan.md`
 **Submission**: due 2026-04-26 8pm EST
 **External blockers**: see [GitHub Issues](https://github.com/george11642/skyherd-engine/issues)
 
 ## Summary
 
-- Green / Total: **77 / 85**
+- Green / Total: **78 / 86**
 - Tier MVP status: 🟡 agents layer complete
 - Sim Completeness Gate: 🟢 10/10 TRULY-GREEN (all items verified by execution — see docs/verify-latest.md)
 - Hardware tiers: 🟡 H1 software-ready (awaits Pi); H3 software-ready (awaits flash/install); H4 software-ready (awaits parts); Two-Pi-4 fleet software-ready; iOS + Android companion software-ready
@@ -129,13 +129,14 @@
 - [x] **Android companion app (software ready)** — SkyHerdCompanion Android (DJI SDK V5 + Paho MQTT); MavicBackend + F3InavBackend; GeofenceChecker + BatteryGuard + WindGuard; 55 new tests green
 - [x] **Hardware-only demo runbook (2 Pi + Mavic, no collar required)** — `HardwareOnlyDemo` orchestrator; HARDWARE_OVERRIDES registry suppression; 180s fallback guard; `skyherd-demo-hw play --prop combo`; `make hardware-demo`; 37 tests green; shot list + coyote SVG cutout template
 
-## Deliverables (6)
+## Deliverables (7)
 
 - [ ] 3-min demo video (YouTube unlisted)
 - [x] `docs/ARCHITECTURE.md` — tier-MVP architecture map
 - [x] `docs/MANAGED_AGENTS.md` — $5k prize essay for judges
 - [x] `docs/ONE_PAGER.pdf` — judge one-pager (md + pdf, weasyprint, 24 KB)
 - [x] `skills/README.md` — 33-file skills inventory
+- [x] Vercel deploy live — https://skyherd-engine.vercel.app (replay-mode SPA, 5 scenarios, 646 events)
 - [ ] 100–200 word written submission summary
 - [ ] Submission form filled at cerebralvalley.ai
 
