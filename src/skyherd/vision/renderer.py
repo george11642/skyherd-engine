@@ -8,6 +8,7 @@ this module is called.
 from __future__ import annotations
 
 import math
+import os
 from pathlib import Path
 from typing import Any
 
@@ -127,7 +128,9 @@ def render_trough_frame(
     if out_path is None:
         import tempfile
 
-        out_path = Path(tempfile.mktemp(suffix=".png"))
+        _fd, _tmp = tempfile.mkstemp(suffix=".png")
+        os.close(_fd)
+        out_path = Path(_tmp)
 
     out_path = Path(out_path)
     out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -203,7 +206,9 @@ def render_thermal_frame(
     if out_path is None:
         import tempfile
 
-        out_path = Path(tempfile.mktemp(suffix=".png"))
+        _fd, _tmp = tempfile.mkstemp(suffix=".png")
+        os.close(_fd)
+        out_path = Path(_tmp)
 
     out_path = Path(out_path)
     out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -284,7 +289,9 @@ def annotate_frame(
     if out_path is None:
         import tempfile
 
-        out_path = Path(tempfile.mktemp(suffix=".png"))
+        _fd, _tmp = tempfile.mkstemp(suffix=".png")
+        os.close(_fd)
+        out_path = Path(_tmp)
 
     out_path = Path(out_path)
     out_path.parent.mkdir(parents=True, exist_ok=True)
