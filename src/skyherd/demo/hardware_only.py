@@ -40,6 +40,11 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+# Top-level imports so tests can patch via skyherd.demo.hardware_only.<name>
+from skyherd.drone.interface import get_backend  # noqa: F401 — re-exported for patching
+from skyherd.sensors.bus import SensorBus  # noqa: F401 — re-exported for patching
+from skyherd.scenarios.base import _run_async  # noqa: F401 — re-exported for patching
+
 logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
