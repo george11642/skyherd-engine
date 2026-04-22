@@ -2,14 +2,14 @@
 
 > Fresh Claude sessions read this **after CLAUDE.md**. Update atomically with every commit.
 
-**Last updated**: 2026-04-22 — T9 cleanup: R3 get_bus_state real API, ruff F401 fixed, determinism e2e test added, FINAL_STATE.md written. 14 GREEN / 0 YELLOW / 0 RED (4 yellows closed). 1105 tests, 87.41% cov.
+**Last updated**: 2026-04-22 — Phase D close-out: DESIGN_SYSTEM.md + CLAUDE_DESIGN.md written; ULTRAREVIEW_CHECKLIST.md for George; T26 + T19 closed. 92 GREEN / 95 total. 1106 tests, 87.42% cov.
 **Plan**: v5.1 at `/home/george/.claude/plans/update-ur-memory-project-context-splendid-swan.md`
 **Submission**: due 2026-04-26 8pm EST
 **External blockers**: see [GitHub Issues](https://github.com/george11642/skyherd-engine/issues)
 
 ## Summary
 
-- Green / Total: **90 / 95**
+- Green / Total: **92 / 95**
 
 ## Review fixes (10/10 — all CRITICAL/HIGH closed)
 
@@ -174,6 +174,8 @@
 
 - [x] `docs/CODEMAP.md` + judge reading order (CLAUDE.md refresh with directory map + build commands)
 - [x] Memory refresh (project_hackathon_opus47.md, project_skyherd.md, user_george.md, MEMORY.md index)
+- [x] Claude Design integration (T26) — DESIGN_SYSTEM.md + CLAUDE_DESIGN.md; Stitch-shipped aesthetic; linked from ARCHITECTURE.md + README
+- [x] /ultrareview checklist + runbook (T19) — docs/ULTRAREVIEW_CHECKLIST.md written; George to execute `/ultrareview` at repo root
 
 ---
 
