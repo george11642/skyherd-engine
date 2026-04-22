@@ -150,8 +150,7 @@ def convert(md_path: str, pdf_path: str) -> None:
         from weasyprint import CSS, HTML  # type: ignore[import]
     except ImportError as exc:
         print(  # noqa: T201
-            f"Missing dependency: {exc}\n"
-            "Install docs extras: uv sync --extra docs",
+            f"Missing dependency: {exc}\nInstall docs extras: uv sync --extra docs",
             file=sys.stderr,
         )
         sys.exit(1)
@@ -168,7 +167,9 @@ def convert(md_path: str, pdf_path: str) -> None:
         md_text,
         extensions=["tables", "fenced_code", "codehilite"],
     )
-    full_html = f"<!DOCTYPE html><html><head><meta charset='utf-8'></head><body>{html_body}</body></html>"
+    full_html = (
+        f"<!DOCTYPE html><html><head><meta charset='utf-8'></head><body>{html_body}</body></html>"
+    )
 
     dest = Path(pdf_path)
     dest.parent.mkdir(parents=True, exist_ok=True)
