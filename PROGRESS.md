@@ -2,17 +2,17 @@
 
 > Fresh Claude sessions read this **after CLAUDE.md**. Update atomically with every commit.
 
-**Last updated**: 2026-04-21 (H4 collar software-ready — firmware + 3D shell + provisioning + runbook)
+**Last updated**: 2026-04-21 (iOS companion app software-ready)
 **Plan**: v5.1 at `/home/george/.claude/plans/update-ur-memory-project-context-splendid-swan.md`
 **Submission**: due 2026-04-26 8pm EST
 **External blockers**: see [GitHub Issues](https://github.com/george11642/skyherd-engine/issues)
 
 ## Summary
 
-- Green / Total: **68 / 79**
+- Green / Total: **69 / 80**
 - Tier MVP status: 🟡 agents layer complete
 - Sim Completeness Gate: 🟡 9/10 (fresh-clone boot now green; only SITL/voice/dashboard-dist remain)
-- Hardware tiers: 🟡 H4 software-ready (awaits physical parts)
+- Hardware tiers: 🟡 H4 software-ready (awaits physical parts); Two-Pi-4 fleet software-ready; iOS companion software-ready
 
 ---
 
@@ -124,6 +124,8 @@
 - [ ] **H3** — One drone under agent command (~1 day after H2)
 - [x] **H4** — DIY LoRa GPS collar node (software ready — awaits parts)
 - [ ] **H5** — Outdoor field demo composition (~½ day, only if H3 shipped)
+- [x] **Two-Pi-4 fleet provisioning + heartbeat** — edge-house + edge-barn; per-Pi configs; heartbeat on `edge_status` topic; /healthz; Coral path documented; one-command `provision-edge.sh`
+- [x] **iOS companion app (software ready)** — SkyHerdCompanion Swift app (DJI SDK V5 + CocoaMQTT + XcodeGen); WebSocket bridge to MavicBackend; safety guards; protocol schema tests (52 passing)
 
 ## Deliverables (6)
 
