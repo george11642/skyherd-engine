@@ -1,0 +1,56 @@
+name: Collar Firmware CI
+
+on:
+  push:
+    paths:
+      - "hardware/collar/**"
+  pull_request:
+    paths:
+      - "hardware/collar/**"
+  workflow_dispatch:
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # C++ payload unit tests (pio test -e native in Docker)
+  # ---------------------------------------------------------------------------
+  firmware-tests:
+    name: PlatformIO native tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run PlatformIO native tests in Docker
+        run: |
+          docker run --rm \
+            -v "${{ github.workspace }}/hardware/collar/firmware:/workspace" \
+            -w /workspace \
+            platformio/platformio:latest \
+            pio test -e native
+
+  # ---------------------------------------------------------------------------
+  # Python provisioning + decoder tests
+  # ---------------------------------------------------------------------------
+  python-tests:
+    name: Python provisioning tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          version: "latest"
+
+      - name: Install dependencies
+        run: uv sync --frozen
+
+      - name: Run hardware tests
+        run: uv run pytest -q tests/hardware/ -v
+
+      - name: Ruff lint
+        run: uv run ruff check hardware/collar/provisioning tests/hardware
+
+      - name: Compile syntax check
+        run: |
+          uv run python -m py_compile hardware/collar/provisioning/register-collar.py
+          uv run python -m py_compile hardware/collar/provisioning/decode_payload.py
