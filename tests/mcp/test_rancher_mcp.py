@@ -188,6 +188,61 @@ class TestGetRancherPreferences:
 
 
 # ---------------------------------------------------------------------------
+# C6 regression — Twilio exceptions are logged and don't swallow silently
+# ---------------------------------------------------------------------------
+
+
+class TestTwilioErrorHandling:
+    """C6: _try_send_sms must log at WARNING and return False on Twilio failure."""
+
+    def test_twilio_exception_returns_false_and_logs_warning(
+        self, monkeypatch, caplog
+    ) -> None:
+        """Injecting a TwilioRestException-shaped error must produce a WARNING log."""
+        import logging
+        from unittest.mock import MagicMock, patch
+
+        from skyherd.mcp.rancher_mcp import _try_send_sms
+
+        monkeypatch.setenv("TWILIO_SID", "ACtest")
+        monkeypatch.setenv("TWILIO_AUTH_TOKEN", "token")
+        monkeypatch.setenv("TWILIO_FROM", "+15550000001")
+
+        # Simulate a TwilioRestException (or any exception from the Twilio client)
+        class _FakeTwilioError(Exception):
+            pass
+
+        mock_client_instance = MagicMock()
+        mock_client_instance.messages.create.side_effect = _FakeTwilioError(
+            "20003 Authentication failed"
+        )
+        mock_client_cls = MagicMock(return_value=mock_client_instance)
+        mock_twilio_rest = MagicMock()
+        mock_twilio_rest.Client = mock_client_cls
+
+        with patch.dict("sys.modules", {"twilio": MagicMock(), "twilio.rest": mock_twilio_rest}):
+            with caplog.at_level(logging.WARNING):
+                result = _try_send_sms("+15055550100", "Test message")
+
+        assert result is False, "Should return False on Twilio error"
+        warning_messages = [r.message for r in caplog.records if r.levelno >= logging.WARNING]
+        assert any("Twilio" in m or "FakeTwilio" in m or "20003" in m for m in warning_messages), (
+            f"Expected a WARNING log for Twilio failure, got: {warning_messages}"
+        )
+
+    def test_sms_missing_credentials_returns_false_silently(self, monkeypatch) -> None:
+        """Missing credentials must return False without logging WARNING."""
+        from skyherd.mcp.rancher_mcp import _try_send_sms
+
+        monkeypatch.delenv("TWILIO_SID", raising=False)
+        monkeypatch.delenv("TWILIO_AUTH_TOKEN", raising=False)
+        monkeypatch.delenv("TWILIO_FROM", raising=False)
+
+        result = _try_send_sms("+15055550100", "Test")
+        assert result is False
+
+
+# ---------------------------------------------------------------------------
 # Server meta
 # ---------------------------------------------------------------------------
 

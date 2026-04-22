@@ -89,7 +89,14 @@ def _try_twilio_call(script: str, wav_path: Path, to: str) -> str | None:
         )
         return call.sid  # type: ignore[no-any-return]
     except Exception as exc:  # noqa: BLE001
-        logger.warning("Twilio call failed: %s", exc)
+        # Catches TwilioRestException, requests.exceptions.RequestException,
+        # ssl.SSLError, asyncio.TimeoutError, and similar network/auth errors.
+        logger.warning(
+            "Twilio voice call failed (to=%s): %s: %s",
+            to,
+            type(exc).__name__,
+            exc,
+        )
         return None
 
 

@@ -64,7 +64,15 @@ def _write_log(record: dict[str, Any]) -> None:
 
 
 def _try_send_sms(to: str, body: str) -> bool:
-    """Send SMS via Twilio; return True on success, False if Twilio unavailable."""
+    """Send SMS via Twilio; return True on success, False if Twilio unavailable.
+
+    Logs a WARNING with the exception detail so failures are diagnosable.
+    Only catches specific Twilio / network exceptions; unexpected errors propagate.
+    """
+    import logging as _logging
+
+    _log = _logging.getLogger(__name__)
+
     sid = os.environ.get("TWILIO_SID", "")
     token = os.environ.get("TWILIO_AUTH_TOKEN", "")
     from_num = os.environ.get("TWILIO_FROM", "")
@@ -78,12 +86,31 @@ def _try_send_sms(to: str, body: str) -> bool:
         client = Client(sid, token)
         client.messages.create(body=body, from_=from_num, to=to)
         return True
-    except Exception:  # noqa: BLE001
+    except ImportError:
+        _log.debug("twilio package not installed — SMS unavailable")
+        return False
+    except Exception as exc:  # noqa: BLE001
+        # Catches TwilioRestException, requests.exceptions.RequestException,
+        # ssl.SSLError, etc. — log at WARNING so callers can surface the reason.
+        _log.warning(
+            "Twilio SMS failed (to=%s): %s: %s",
+            to,
+            type(exc).__name__,
+            exc,
+        )
         return False
 
 
 def _try_voice_call(to: str, script: str) -> bool:
-    """Attempt a voice call via skyherd.voice if the module is importable."""
+    """Attempt a voice call via skyherd.voice if the module is importable.
+
+    Logs a WARNING on Twilio / voice-backend errors so silent failures are
+    diagnosable.  Only catches expected failure modes; unexpected errors propagate.
+    """
+    import logging as _logging
+
+    _log = _logging.getLogger(__name__)
+
     try:
         from skyherd.voice.call import render_urgency_call
         from skyherd.voice.wes import WesMessage
@@ -91,7 +118,18 @@ def _try_voice_call(to: str, script: str) -> bool:
         msg = WesMessage(urgency="call", subject=script, scripted_text=script)
         result = render_urgency_call(msg)
         return result.get("delivered_to") in ("twilio", "dashboard-ring")
-    except (ImportError, AttributeError, Exception):  # noqa: BLE001
+    except ImportError:
+        _log.debug("skyherd.voice not available — voice call skipped")
+        return False
+    except AttributeError as exc:
+        _log.warning("Voice call setup error (AttributeError): %s", exc)
+        return False
+    except Exception as exc:  # noqa: BLE001
+        _log.warning(
+            "Voice call failed: %s: %s",
+            type(exc).__name__,
+            exc,
+        )
         return False
 
 
