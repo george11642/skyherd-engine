@@ -767,7 +767,7 @@ Confidence grounding:
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Should the scenario routing table also honor MQTT topic patterns (via `agent_spec.wake_topics`)?**
    - What we know: live `AgentMesh` uses topics; scenario `_DemoMesh` uses event-type dict. Both work. `ROUT-02` can be satisfied entirely via event-type dict.

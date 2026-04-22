@@ -891,7 +891,7 @@ Every claim in this research was verified against the live codebase or official 
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **How strict is "no bare silent-catch"?**
    - What we know: HYG-01 says "No bare silent-catch remains." Audit listed ~15 sites; exhaustive grep finds 24.

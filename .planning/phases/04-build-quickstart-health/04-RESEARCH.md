@@ -646,7 +646,7 @@ def test_make_world_deterministic_without_config() -> None:
 | A5 | Phase 5 (Dashboard Live-Mode & Vet-Intake) consumes Phase 4's live bootstrap without further plumbing changes | §Domain Context | If Phase 5 rewires the bootstrap, Phase 4 work is partially thrown away. Coordinate: Phase 4 lands the plumbing signature (`create_app(mock=False, mesh, world, ledger)`); Phase 5 can wrap it but should not redesign it. |
 | A6 | No existing tests in `tests/` rely on `make_world` *failing* when called without config_path | §Domain Context | If a test pins the current TypeError behavior, BLD-01 would break it. Mitigation: grep `tests/` for `TypeError` near `make_world` — none found in quick audit. |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Should `make dashboard` live-mode run a background scenario loop so agent lanes populate?**
    - What we know: Live `/api/agents` returns empty until a scenario wakes an agent.

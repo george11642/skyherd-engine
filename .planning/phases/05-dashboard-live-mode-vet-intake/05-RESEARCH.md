@@ -741,7 +741,7 @@ async def test_real_cost_tick_with_injected_mesh():
 | A6 | Vet-intake content draft can be generated deterministically by `HerdHealthWatcher` in simulation mode (no API key) | Pattern 5 | Sim-path tests don't produce an intake artifact → SCEN-01 assertion fails in CI. Mitigation: `simulate.herd_health_watcher` must mirror the drafter call |
 | A7 | `text/markdown` is acceptable as a rancher-readable format vs. a PDF/HTML | Pattern 5 | If judges expect PDF, add `scripts/render_intake_pdf.sh` — deferred unless requested |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Does "Doc" become its own agent/skill, or is the drafter inline in `HerdHealthWatcher`?**
    - What we know: `VISION.md` mentions a "Doc" concept; PROJECT.md lists `EXT-02` (Doc 6th agent) as README-roadmap-only deferred item.

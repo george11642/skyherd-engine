@@ -486,7 +486,7 @@ Gate status: 10/10 GREEN — phase 6 complete.
 
 **If this table is empty:** [not empty — see above]
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Docker path vs emulator-only path?**
    - What we know: emulator covers MAVLink wire protocol; Docker covers ArduPilot firmware (EKF, flight modes, actual C++ code).

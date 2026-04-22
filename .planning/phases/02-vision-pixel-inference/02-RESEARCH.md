@@ -571,7 +571,7 @@ from skyherd.world.world import World  # or build a stub World
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Should the fine-tuning training script live in `scripts/` or `tools/`?**
    - What we know: The hackathon repo has `hardware/`, `web/`, `android/`, `ios/`, `tests/`, `skills/`, `src/skyherd/`, `worlds/`, `docs/`. There's no precedent `scripts/` or `tools/` directory.

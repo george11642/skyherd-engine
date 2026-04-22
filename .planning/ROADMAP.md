@@ -84,7 +84,12 @@ Phase 3 (HYG) — fully parallel with 1, 2, 4 (no shared files)
   3. `ClassifyPipeline.run()` output format (list of `DetectionResult`) is unchanged — the other 6 rule-based heads still work alongside the pixel head.
   4. On the dev-box baseline (CPU), pixel-head inference completes in under 500ms per frame; sim still runs at 2× real time or faster.
   5. Running the sick-cow scenario surfaces a visible pixel-head detection in the dashboard with real bounding box + confidence — not a mocked overlay.
-**Plans**: TBD
+**Plans**: 5 plans (4 waves)
+  - Wave 1: 02-01-PLAN — License guard + interface extensions (DetectionResult.bbox, frame_meta.raw_path, annotate_frame bbox branch) (VIS-02, VIS-03, VIS-05)
+  - Wave 1: 02-02-PLAN — Synthetic frame fixtures + bbox-flow integration tests (VIS-03, VIS-05)
+  - Wave 2: 02-03-PLAN — Training script + committed MobileNetV3-Small weights (VIS-01, VIS-02)
+  - Wave 3: 02-04-PLAN — Pinkeye pixel-head rewrite + preprocess/detector helpers (VIS-01, VIS-02, VIS-03, VIS-04)
+  - Wave 4: 02-05-PLAN — Pinkeye test rewrite (pixel + rule) + scenario bbox assertion + VALIDATION.md fill (VIS-01, VIS-03, VIS-04, VIS-05)
 
 ### Phase 3: Code Hygiene Sweep
 **Goal**: All silent-except blocks replaced with logged warnings; Twilio auth env var standardized; cost.py billing logic fully tested; ruff + pyright run clean (for files Phase 3 owns).
@@ -127,7 +132,11 @@ Phase 3 (HYG) — fully parallel with 1, 2, 4 (no shared files)
   4. Agent-lane entry animations, drone trail fade on the ranch map, and predator pulse ring smoothing are present — no design-system rebuild, only motion polish.
   5. The attestation panel streams live Merkle chain appends over SSE as scenarios run; a verify-chain button in the UI invokes the existing verify-chain path.
   6. Server live-path coverage ≥ 85% (from current 73%); Lighthouse score on the SPA ≥ 90.
-**Plans**: TBD
+**Plans**: 4 plans (3 waves)
+  - [ ] Wave 1: 05-01-PLAN — events.py public-accessor refactor + live-path test scaffolds (DASH-02)
+  - [ ] Wave 1: 05-02-PLAN — Vet-intake drafter + HerdHealthWatcher wire + sick_cow assertions + SSE broadcast (SCEN-01)
+  - [ ] Wave 2: 05-03-PLAN — /api/attest/verify + /api/vet-intake endpoints + VetIntakePanel + Verify button + SSE registration (DASH-01, DASH-04, DASH-06, SCEN-01)
+  - [ ] Wave 3: 05-04-PLAN — CostTicker paused polish + RanchMap predator RAF + Lighthouse CI + coverage gate (DASH-03, DASH-05, DASH-06)
 **UI hint**: yes
 
 ### Phase 6: SITL-CI & Determinism Gate
@@ -139,7 +148,10 @@ Phase 3 (HYG) — fully parallel with 1, 2, 4 (no shared files)
   2. Three back-to-back runs of `make sim SEED=42` produce byte-identical JSONL output (after standardized timestamp sanitization) — asserted by a determinism test that computes and compares hashes.
   3. All 8 scenarios (coyote / sick_cow / water_drop / calving / storm / cross_ranch_coyote / wildfire / rustling) PASS `make demo SEED=42 SCENARIO=all` — the milestone-wide zero-regression criterion.
   4. The SITL smoke CI job failure does NOT block other CI jobs (scenario suite, lint, tests, coverage) — isolated so infra flakiness doesn't mask real regressions.
-**Plans**: TBD
+**Plans**: 3 plans (2 waves)
+  - Wave 1: 06-01-PLAN.md — Determinism 3-run in-body-loop test (SCEN-03)
+  - Wave 1: 06-02-PLAN.md — SITL smoke CI promotion + failure test + evidence wrapper (BLD-04)
+  - Wave 2: 06-03-PLAN.md — `scripts/gate_check.py` retro-audit + Makefile targets (SCEN-02, SCEN-03, BLD-04)
 
 ---
 
@@ -148,11 +160,11 @@ Phase 3 (HYG) — fully parallel with 1, 2, 4 (no shared files)
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Agent Session Persistence & Routing | 0/3 | Planned | - |
-| 2. Vision Pixel Inference | 0/TBD | Not started | - |
+| 2. Vision Pixel Inference | 0/5 | Not started | - |
 | 3. Code Hygiene Sweep | 0/4 | Planned | - |
 | 4. Build & Quickstart Health | 0/3 | Planned | - |
-| 5. Dashboard Live-Mode & Vet-Intake | 0/TBD | Not started | - |
-| 6. SITL-CI & Determinism Gate | 0/TBD | Not started | - |
+| 5. Dashboard Live-Mode & Vet-Intake | 0/4 | Planned | - |
+| 6. SITL-CI & Determinism Gate | 0/3 | Planned | - |
 
 ---
 
@@ -177,3 +189,4 @@ Phase 3 (HYG) — fully parallel with 1, 2, 4 (no shared files)
 
 *Roadmap created: 2026-04-22*
 *Phase 3 planned: 2026-04-22 (4 plans, 1 wave)*
+*Phase 6 planned: 2026-04-22 (3 plans, 2 waves)*
