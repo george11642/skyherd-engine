@@ -105,7 +105,10 @@ Phase 3 (HYG) — fully parallel with 1, 2, 4 (no shared files)
   2. On a clean worktree, `uv sync && make demo SEED=42 SCENARIO=all` completes in under 5 minutes and all 8 scenarios PASS — documented in README and asserted by a CI job that uses a fresh checkout.
   3. `make dashboard` (without `SKYHERD_MOCK=1`) serves a functional dashboard from a clean clone — real `/api/snapshot` returns live sim data, not mock fixtures.
   4. README Judge Quickstart (3 commands) is verified executable as written; no hidden setup steps.
-**Plans**: TBD
+**Plans**: 3 plans
+  - [ ] 04-01-PLAN.md — BLD-01: hatchling force-include for worlds/ + `make_world(seed=42)` no-arg default via importlib.resources
+  - [ ] 04-02-PLAN.md — BLD-03: live-mode dashboard bootstrap (`src/skyherd/server/live.py` typer CLI) + Makefile flip (`dashboard` -> live, `dashboard-mock` legacy)
+  - [ ] 04-03-PLAN.md — BLD-02: fresh-clone smoke script + nightly GH Actions job (enable-cache: false) + README doc-drift pytest guard
 
 ### Phase 5: Dashboard Live-Mode & Vet-Intake
 **Goal**: The dashboard demonstrates the full real stack on camera — real mesh sessions with real wake events, real attestation Merkle appends, a visible idle-pause cost ticker, agent-lane motion polish, and a rendered rancher-readable vet-intake packet produced during the sick-cow scenario.
@@ -141,7 +144,7 @@ Phase 3 (HYG) — fully parallel with 1, 2, 4 (no shared files)
 | 1. Agent Session Persistence & Routing | 0/3 | Planned | - |
 | 2. Vision Pixel Inference | 0/TBD | Not started | - |
 | 3. Code Hygiene Sweep | 0/TBD | Not started | - |
-| 4. Build & Quickstart Health | 0/TBD | Not started | - |
+| 4. Build & Quickstart Health | 0/3 | Planned | - |
 | 5. Dashboard Live-Mode & Vet-Intake | 0/TBD | Not started | - |
 | 6. SITL-CI & Determinism Gate | 0/TBD | Not started | - |
 
