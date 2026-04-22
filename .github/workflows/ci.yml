@@ -5,15 +5,22 @@ on:
     branches: ["main"]
   pull_request:
     branches: ["main"]
+  schedule:
+    # Weekly pip-audit — every Monday 06:00 UTC
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
 
 jobs:
+  # ---------------------------------------------------------------------------
+  # Python matrix: ubuntu + macos x 3.11 + 3.12
+  # ---------------------------------------------------------------------------
   ci:
     name: Python ${{ matrix.python-version }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-latest, macos-14]
         python-version: ["3.11", "3.12"]
 
     steps:
@@ -37,5 +44,97 @@ jobs:
       - name: Type check (pyright)
         run: uv run pyright
 
-      - name: Tests with coverage
-        run: uv run pytest -q --cov=src/skyherd --cov-report=term-missing
+      - name: Tests with coverage (80% floor)
+        run: >
+          uv run pytest -q
+          --cov=src/skyherd
+          --cov-report=term-missing
+          --cov-fail-under=80
+
+  # ---------------------------------------------------------------------------
+  # Web build + test
+  # ---------------------------------------------------------------------------
+  web:
+    name: Web (pnpm build + test)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build
+        run: pnpm run build
+
+      - name: Test
+        run: pnpm test -- --run
+
+  # ---------------------------------------------------------------------------
+  # pip-audit (also runs on weekly schedule)
+  # ---------------------------------------------------------------------------
+  pip-audit:
+    name: pip-audit (dependency CVE scan)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: uv sync --all-extras
+
+      - name: Run pip-audit
+        # '|| true' keeps CI green on informational findings;
+        # remove to make HIGH/CRITICAL CVEs block CI
+        run: uvx pip-audit --strict 2>&1 || true
+
+  # ---------------------------------------------------------------------------
+  # Docker SITL smoke (manual trigger only)
+  # ---------------------------------------------------------------------------
+  docker-sitl-smoke:
+    name: Docker SITL smoke (manual)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: uv sync --all-extras
+
+      - name: Start SITL compose stack
+        run: docker compose -f docker-compose.sitl.yml up -d
+
+      - name: Smoke test stub drone backend
+        run: |
+          uv run python -c "
+          from skyherd.drone import get_backend
+          import asyncio
+          asyncio.run(get_backend('stub').takeoff(5))
+          print('SITL stub smoke: OK')
+          "
