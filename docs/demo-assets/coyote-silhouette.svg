@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  SkyHerd Demo Asset — Coyote Silhouette Cutout Template
+  Print at 100% on 8.5"×11" paper (letter, landscape orientation works best).
+  Cut along the outer black silhouette. Tape to cardboard backing.
+  Attach fishing line to upper-back notch for smooth pull-through.
+  Cost: $3 at FedEx / free on home printer.
+-->
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 816 612"
+  width="816"
+  height="612"
+  role="img"
+  aria-label="Coyote silhouette for SkyHerd demo prop"
+>
+  <!-- White background for print -->
+  <rect width="816" height="612" fill="white"/>
+
+  <!-- Print guide border -->
+  <rect x="18" y="18" width="780" height="576"
+        fill="none" stroke="#cccccc" stroke-width="1" stroke-dasharray="6,4"/>
+
+  <!-- Label -->
+  <text x="408" y="48" text-anchor="middle"
+        font-family="Arial, sans-serif" font-size="16" fill="#888888">
+    SkyHerd Demo Prop — Coyote Silhouette — Print 100%, Cut Out, Mount on Cardboard
+  </text>
+
+  <!--
+    Coyote profile silhouette — classic New Mexico coyote stance:
+    alert, slightly crouched, head turned toward viewer, bushy tail low.
+    Designed for side-profile recognition at 3–8m from Pi Camera v3.
+    All paths filled solid black for maximum contrast.
+  -->
+  <g transform="translate(100, 80)" fill="#111111">
+
+    <!-- Main body -->
+    <path d="
+      M 380 300
+      C 370 290, 360 270, 355 255
+      C 350 240, 348 220, 350 200
+      C 352 180, 358 165, 365 155
+      C 372 145, 382 138, 390 130
+      C 400 120, 408 108, 412 95
+      C 415 85, 414 75, 410 68
+      C 406 60, 398 55, 390 52
+      C 382 49, 373 50, 366 54
+      C 358 58, 352 65, 348 72
+      C 344 79, 342 86, 342 92
+      C 342 100, 345 108, 342 115
+      C 338 124, 328 130, 318 133
+      C 308 136, 296 136, 285 135
+      C 272 134, 259 130, 248 126
+      C 236 121, 225 115, 215 110
+      C 204 104, 194 98, 183 94
+      C 170 89, 156 86, 142 84
+      C 128 82, 114 82, 100 85
+      C 86 88, 73 94, 63 103
+      C 53 112, 47 124, 44 137
+      C 41 150, 42 163, 46 175
+      C 50 187, 57 198, 58 210
+      C 60 223, 56 236, 52 249
+      C 48 262, 42 275, 40 288
+      C 37 302, 38 316, 42 329
+      C 46 342, 54 353, 65 361
+      C 76 369, 90 373, 104 374
+      C 118 375, 132 372, 144 366
+      C 156 360, 165 351, 168 340
+      C 171 328, 168 315, 162 304
+      C 156 292, 147 282, 142 271
+      C 137 259, 136 246, 140 234
+      C 144 222, 153 212, 165 206
+      C 177 200, 192 198, 207 200
+      C 222 202, 236 208, 250 212
+      C 264 216, 278 218, 292 218
+      C 307 218, 321 215, 334 210
+      C 347 204, 359 196, 368 205
+      C 374 211, 376 221, 378 231
+      C 380 242, 381 254, 383 265
+      C 385 277, 388 289, 388 300
+      Z
+    "/>
+
+    <!-- Head -->
+    <path d="
+      M 390 52
+      C 398 46, 408 42, 418 40
+      C 430 38, 442 40, 452 46
+      C 462 52, 468 62, 470 73
+      C 472 84, 469 96, 463 105
+      C 457 115, 448 122, 438 126
+      C 428 130, 416 130, 407 126
+      C 396 122, 388 114, 384 104
+      C 380 94, 380 82, 384 72
+      C 387 64, 390 57, 390 52
+      Z
+    "/>
+
+    <!-- Snout / muzzle elongation -->
+    <path d="
+      M 452 73
+      C 462 70, 474 70, 484 74
+      C 496 78, 506 86, 512 96
+      C 518 107, 518 120, 514 131
+      C 510 142, 502 151, 492 156
+      C 482 161, 470 162, 460 158
+      C 450 154, 443 146, 438 136
+      C 432 125, 430 113, 432 103
+      C 434 92, 441 82, 452 73
+      Z
+    "/>
+
+    <!-- Nose tip -->
+    <ellipse cx="515" cy="128" rx="10" ry="7" fill="#111111"/>
+
+    <!-- Eye (white sclera + dark pupil for print contrast) -->
+    <ellipse cx="440" cy="72" rx="9" ry="7" fill="white" stroke="#111111" stroke-width="2"/>
+    <ellipse cx="442" cy="72" rx="4" ry="4" fill="#111111"/>
+
+    <!-- Ear — upright left ear -->
+    <path d="
+      M 410 45
+      C 406 30, 402 14, 404 4
+      C 406 -6, 414 -8, 420 0
+      C 426 8, 426 24, 424 40
+      Z
+    "/>
+
+    <!-- Ear — upright right ear (slightly back) -->
+    <path d="
+      M 430 43
+      C 432 28, 436 12, 442 4
+      C 448 -4, 456 -4, 458 6
+      C 460 16, 456 32, 450 44
+      Z
+    "/>
+
+    <!-- Neck -->
+    <path d="
+      M 390 130
+      C 382 136, 372 143, 365 152
+      C 358 161, 354 172, 356 183
+      C 358 194, 365 203, 374 208
+      C 384 213, 396 213, 406 208
+      C 418 202, 426 191, 428 180
+      C 430 168, 426 156, 418 148
+      C 410 140, 400 136, 390 130
+      Z
+    "/>
+
+    <!-- Front left leg -->
+    <path d="
+      M 165 374
+      C 162 388, 158 402, 155 416
+      C 152 430, 150 444, 151 458
+      C 152 465, 155 470, 160 472
+      C 165 474, 170 471, 174 466
+      C 178 460, 179 452, 180 444
+      C 181 434, 181 424, 182 414
+      C 183 402, 185 390, 185 378
+      Z
+    "/>
+
+    <!-- Front right leg -->
+    <path d="
+      M 220 374
+      C 218 388, 215 402, 213 416
+      C 211 430, 210 444, 212 458
+      C 213 465, 217 470, 222 472
+      C 227 474, 232 471, 235 466
+      C 238 460, 238 452, 238 444
+      C 238 434, 237 424, 237 414
+      C 237 402, 238 390, 238 378
+      Z
+    "/>
+
+    <!-- Rear left leg -->
+    <path d="
+      M 78 374
+      C 74 388, 70 402, 67 416
+      C 64 430, 63 444, 65 458
+      C 66 465, 70 470, 75 472
+      C 80 474, 85 471, 88 466
+      C 91 460, 92 452, 92 444
+      C 92 434, 91 424, 90 414
+      C 89 402, 88 390, 88 378
+      Z
+    "/>
+
+    <!-- Rear right leg -->
+    <path d="
+      M 130 374
+      C 128 388, 126 402, 125 416
+      C 123 430, 123 444, 125 458
+      C 126 465, 130 470, 135 472
+      C 140 474, 145 471, 148 466
+      C 151 460, 151 452, 151 444
+      C 150 434, 149 424, 149 414
+      C 149 402, 150 390, 150 378
+      Z
+    "/>
+
+    <!-- Tail — low, bushy, characteristic coyote droop -->
+    <path d="
+      M 40 300
+      C 30 308, 18 318, 8 330
+      C -2 342, -8 356, -6 368
+      C -4 378, 4 384, 14 383
+      C 24 382, 32 374, 38 364
+      C 44 353, 46 340, 46 328
+      C 46 318, 44 308, 40 300
+      Z
+    "/>
+
+    <!-- Tail tuft (bushy end) -->
+    <path d="
+      M -6 368
+      C -14 374, -22 382, -26 390
+      C -30 400, -28 410, -20 414
+      C -12 418, -2 414, 6 408
+      C 14 402, 20 394, 22 386
+      C 24 376, 20 366, 14 362
+      C 6 358, -2 362, -6 368
+      Z
+    "/>
+
+  </g>
+
+  <!-- Fishing-line attachment guide -->
+  <text x="408" y="570" text-anchor="middle"
+        font-family="Arial, sans-serif" font-size="12" fill="#888888">
+    Attach fishing line at upper-back area. Pull left-to-right through Pi camera frame at 1–2 m/sec.
+  </text>
+  <line x1="408" y1="555" x2="408" y2="545" stroke="#888888" stroke-width="1"/>
+  <circle cx="408" cy="540" r="3" fill="#888888"/>
+</svg>
