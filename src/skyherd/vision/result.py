@@ -19,3 +19,5 @@ class DetectionResult(BaseModel):
     severity: Severity
     reasoning: str
     timestamp: str = Field(default_factory=lambda: datetime.now(UTC).isoformat())
+    # NEW: real pixel bbox from pixel head; None for rule-based heads (backwards-compatible)
+    bbox: tuple[float, float, float, float] | None = Field(default=None)
