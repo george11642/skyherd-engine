@@ -1,3 +1,9 @@
+# T14 Stability Note — 20260422-091631
+
+HEAD `c4ad982397e8e23eb6c3410646e5774610430ded` — ruff clean, 1106 tests at 87.42% coverage (80% threshold passed), all 8/8 SITL scenarios PASS (seed 42), prod endpoint `https://skyherd-engine.vercel.app` HTTP 200. No regression from T13. System stable at 9/10 gate.
+
+---
+
 # Verify Loop T13 — 20260422-085000
 
 Generated: 2026-04-22T08:50:00Z
