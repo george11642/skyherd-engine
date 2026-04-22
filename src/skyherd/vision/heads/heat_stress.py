@@ -65,8 +65,15 @@ class HeatStress(Head):
             return None
 
         severity = _severity_from_signals(has_panting, cow.health_score, temp_f)
-        confidence = round(min(1.0, 0.60 + (max(temp_f - _TEMP_THRESHOLD_F, 0) / 20.0)
-                               + ((_HEALTH_THRESHOLD - cow.health_score) * 0.5)), 2)
+        confidence = round(
+            min(
+                1.0,
+                0.60
+                + (max(temp_f - _TEMP_THRESHOLD_F, 0) / 20.0)
+                + ((_HEALTH_THRESHOLD - cow.health_score) * 0.5),
+            ),
+            2,
+        )
 
         panting_detail = " + 'panting' flag set" if has_panting else ""
         reasoning = (
@@ -95,9 +102,7 @@ class HeatStress(Head):
                 "Tier 4: vet call now; cold-water cooling starting immediately. "
             )
 
-        reasoning += (
-            "Per `skills/cattle-behavior/disease/heat-stress-disease.md` §Decision rules."
-        )
+        reasoning += "Per `skills/cattle-behavior/disease/heat-stress-disease.md` §Decision rules."
 
         return DetectionResult(
             head_name=self.name,

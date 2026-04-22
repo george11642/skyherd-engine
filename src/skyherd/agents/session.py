@@ -73,7 +73,7 @@ class Session:
     cumulative_tokens_in: int = 0
     cumulative_tokens_out: int = 0
     cumulative_cost_usd: float = 0.0
-    run_time_active_s: float = 0.0   # ticks up only when state == "active"
+    run_time_active_s: float = 0.0  # ticks up only when state == "active"
     run_time_idle_s: float = 0.0
 
     # Internal timing — not serialised in the public repr
@@ -284,6 +284,7 @@ class SessionManager:
         else:
             # Minimal recovery — caller should re-register properly
             from skyherd.agents.spec import AgentSpec
+
             agent_spec = AgentSpec(
                 name=data["agent_name"],
                 system_prompt_template_path="",
@@ -373,6 +374,4 @@ def _mqtt_topic_matches(topic: str, pattern: str) -> bool:
     pattern_parts = pattern.split("/")
     if len(topic_parts) != len(pattern_parts):
         return False
-    return all(
-        p == "+" or p == t for p, t in zip(pattern_parts, topic_parts, strict=True)
-    )
+    return all(p == "+" or p == t for p, t in zip(pattern_parts, topic_parts, strict=True))

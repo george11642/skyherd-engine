@@ -15,9 +15,7 @@ def _normalize_stream(events: list[dict[str, Any]]) -> list[tuple[str, float | N
     return [(e.get("type", ""), e.get("sim_time_s")) for e in events]
 
 
-def _normalize_tool_calls(
-    tool_call_log: dict[str, list[dict[str, Any]]]
-) -> list[tuple[str, str]]:
+def _normalize_tool_calls(tool_call_log: dict[str, list[dict[str, Any]]]) -> list[tuple[str, str]]:
     """Extract (agent_name, tool_name) pairs in order."""
     pairs: list[tuple[str, str]] = []
     for agent, calls in sorted(tool_call_log.items()):
@@ -53,9 +51,7 @@ class TestDeterminism:
         calls1 = _normalize_tool_calls(result1.agent_tool_calls)
         calls2 = _normalize_tool_calls(result2.agent_tool_calls)
 
-        assert calls1 == calls2, (
-            f"Tool call sequences differ:\n  run1: {calls1}\n  run2: {calls2}"
-        )
+        assert calls1 == calls2, f"Tool call sequences differ:\n  run1: {calls1}\n  run2: {calls2}"
 
     def test_different_seeds_produce_different_streams(self) -> None:
         """Sanity check: seed=42 and seed=99 diverge (predator spawns differ)."""

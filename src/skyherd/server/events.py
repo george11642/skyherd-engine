@@ -46,6 +46,7 @@ def _json(obj: Any) -> str:
 # Mock data generators
 # ---------------------------------------------------------------------------
 
+
 def _mock_world_snapshot() -> dict[str, Any]:
     t = time.time()
     rng = random.Random(int(t * 10) % 10000)
@@ -111,7 +112,7 @@ def _mock_cost_tick(seq: int) -> dict[str, Any]:
     all_idle = True
     total_cost = 0.0
     for name in AGENT_NAMES:
-        phase = (int(t + offset_map[name]) % period)
+        phase = int(t + offset_map[name]) % period
         state = "active" if phase < 10 else "idle"
         if state == "active":
             all_idle = False
@@ -200,8 +201,13 @@ def _mock_attest_entry() -> dict[str, Any]:
     global _mock_attest_seq
     _mock_attest_seq += 1
     kinds = ["sensor.reading", "cost.tick", "fence.breach", "agent.wake", "agent.sleep"]
-    sources = ["skyherd/ranch_a/fence/seg_1", "skyherd/ranch_a/cost/ticker",
-               "skyherd/ranch_a/collar/tag_007", "FenceLineDispatcher", "HerdHealthWatcher"]
+    sources = [
+        "skyherd/ranch_a/fence/seg_1",
+        "skyherd/ranch_a/cost/ticker",
+        "skyherd/ranch_a/collar/tag_007",
+        "FenceLineDispatcher",
+        "HerdHealthWatcher",
+    ]
     rng = random.Random(_mock_attest_seq)
     return {
         "seq": _mock_attest_seq,

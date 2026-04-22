@@ -8,14 +8,18 @@ from skyherd.vision.pipeline import ClassifyPipeline
 from skyherd.world.world import World
 
 
-def test_pipeline_returns_detections_for_sick_cow(world_with_sick_cow: World, tmp_path: Path) -> None:
+def test_pipeline_returns_detections_for_sick_cow(
+    world_with_sick_cow: World, tmp_path: Path
+) -> None:
     """Pipeline returns at least 1 detection when a sick cow is present."""
     pipeline = ClassifyPipeline()
     result = pipeline.run(world_with_sick_cow, "trough_a", out_dir=tmp_path)
     assert result.detection_count >= 1
 
 
-def test_pipeline_returns_zero_detections_for_healthy_herd(world_healthy: World, tmp_path: Path) -> None:
+def test_pipeline_returns_zero_detections_for_healthy_herd(
+    world_healthy: World, tmp_path: Path
+) -> None:
     """Pipeline returns 0 detections for a herd of fully healthy cows."""
     pipeline = ClassifyPipeline()
     result = pipeline.run(world_healthy, "trough_a", out_dir=tmp_path)

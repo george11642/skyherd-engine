@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from skyherd.scenarios import run
-from skyherd.scenarios.coyote import CoyoteScenario, _BREACH_AT_S
+from skyherd.scenarios.coyote import _BREACH_AT_S, CoyoteScenario
 
 
 class TestCoyoteScenario:
@@ -76,9 +76,7 @@ class TestCoyoteScenario:
 
     def test_full_run_has_fence_breach(self) -> None:
         result = run("coyote", seed=42)
-        breach = next(
-            (e for e in result.event_stream if e.get("type") == "fence.breach"), None
-        )
+        breach = next((e for e in result.event_stream if e.get("type") == "fence.breach"), None)
         assert breach is not None
 
     def test_full_run_has_predator_fleeing(self) -> None:

@@ -102,9 +102,7 @@ def list_scenarios() -> None:
     for name, cls in SCENARIOS.items():
         scenario = cls()
         typer.echo(f"  {name:<12}  {scenario.description}")
-    typer.echo(
-        "\nRun with: skyherd-demo play <name> [--seed 42] [--dry-run]"
-    )
+    typer.echo("\nRun with: skyherd-demo play <name> [--seed 42] [--dry-run]")
 
 
 def main() -> None:

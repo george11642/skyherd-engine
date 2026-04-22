@@ -63,4 +63,4 @@ class TestWriteWav:
         assert data[8:12] == b"WAVE"
         # data payload should match
         data_size = struct.unpack_from("<I", data, 40)[0]
-        assert data[44:44 + data_size] == pcm
+        assert data[44 : 44 + data_size] == pcm

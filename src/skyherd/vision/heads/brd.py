@@ -85,9 +85,7 @@ class BRD(Head):
         )
 
         if severity == "log":
-            reasoning += (
-                "DART ≥2; antibiotic treatment today (tulathromycin 2.5 mg/kg). "
-            )
+            reasoning += "DART ≥2; antibiotic treatment today (tulathromycin 2.5 mg/kg). "
         elif severity == "escalate":
             reasoning += (
                 "Rapid shallow breathing, no improvement in 24 hrs; "

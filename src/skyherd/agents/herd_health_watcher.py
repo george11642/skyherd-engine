@@ -101,9 +101,7 @@ async def handler(
         "Run the classify pipeline on this trough and report your findings."
     )
 
-    cached_payload = build_cached_messages(
-        _SYSTEM_PROMPT_INLINE, skill_texts, user_message
-    )
+    cached_payload = build_cached_messages(_SYSTEM_PROMPT_INLINE, skill_texts, user_message)
 
     if sdk_client is not None and os.environ.get("ANTHROPIC_API_KEY"):
         tool_calls = await _run_with_sdk(sdk_client, cached_payload, session)

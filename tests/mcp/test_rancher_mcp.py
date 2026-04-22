@@ -17,7 +17,9 @@ async def _call_tool(server, tool_name: str, args: dict) -> object:
     from mcp.types import CallToolRequest, ListToolsRequest
 
     inst = server["instance"]
-    list_result = await inst.request_handlers[ListToolsRequest](ListToolsRequest(method="tools/list"))
+    list_result = await inst.request_handlers[ListToolsRequest](
+        ListToolsRequest(method="tools/list")
+    )
     tools = list_result.root.tools
     assert any(t.name == tool_name for t in tools), f"Tool '{tool_name}' not registered"
     call_result = await inst.request_handlers[CallToolRequest](
@@ -178,9 +180,7 @@ class TestGetRancherPreferences:
 
     async def test_loads_custom_prefs_from_file(self, rancher_server, tmp_runtime):
         prefs_file = tmp_runtime / "rancher_prefs.json"
-        prefs_file.write_text(
-            json.dumps({"timezone": "America/Chicago", "urgency_thresholds": {}})
-        )
+        prefs_file.write_text(json.dumps({"timezone": "America/Chicago", "urgency_thresholds": {}}))
         # Re-create server so it picks up new prefs location
 
         result = await _call_tool(rancher_server, "get_rancher_preferences", {})

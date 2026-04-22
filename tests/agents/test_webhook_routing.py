@@ -44,7 +44,9 @@ class TestTopicMatchingUnit:
         assert _mqtt_topic_matches("skyherd/ranch_a/collar/tag_007", "skyherd/+/collar/+")
 
     def test_weekly_cron_matches_grazing_pattern(self):
-        assert _mqtt_topic_matches("skyherd/ranch_a/cron/weekly_monday", "skyherd/+/cron/weekly_monday")
+        assert _mqtt_topic_matches(
+            "skyherd/ranch_a/cron/weekly_monday", "skyherd/+/cron/weekly_monday"
+        )
 
     def test_nightly_cron_matches_predator_pattern(self):
         assert _mqtt_topic_matches("skyherd/ranch_a/cron/nightly", "skyherd/+/cron/nightly")

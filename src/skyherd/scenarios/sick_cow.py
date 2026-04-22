@@ -51,9 +51,7 @@ class SickCowScenario(Scenario):
             updated.append(cow)
         world.herd.cows = updated
 
-    def inject_events(
-        self, world: World, sim_time_s: float
-    ) -> list[dict[str, Any]]:
+    def inject_events(self, world: World, sim_time_s: float) -> list[dict[str, Any]]:
         """At ~06:30 offset, inject a camera.motion health-check event."""
         events: list[dict[str, Any]] = []
         if not self._check_injected and sim_time_s >= _HEALTH_CHECK_AT_S:
@@ -106,9 +104,7 @@ class SickCowScenario(Scenario):
             f"Expected health check on A014, got {health_check.get('cow_tag')!r}"
         )
         disease_flags = health_check.get("disease_flags", [])
-        assert "pinkeye" in disease_flags, (
-            f"Expected pinkeye in disease_flags, got {disease_flags}"
-        )
+        assert "pinkeye" in disease_flags, f"Expected pinkeye in disease_flags, got {disease_flags}"
 
         # 3. HerdHealthWatcher ran classify_pipeline and paged rancher
         all_tools = self._all_tool_calls(mesh)

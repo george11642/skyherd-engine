@@ -47,8 +47,7 @@ class _EmbeddedBroker:
             from amqtt.broker import Broker  # type: ignore[import-untyped]
         except ImportError as exc:
             raise RuntimeError(
-                "amqtt is required for the embedded broker. "
-                "Run: uv add amqtt"
+                "amqtt is required for the embedded broker. Run: uv add amqtt"
             ) from exc
 
         config = {

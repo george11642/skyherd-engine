@@ -20,6 +20,7 @@ def _make_cow(tag: str = "T001", disease_flags: set[str] | None = None) -> Cow:
 
 # --- Negative paths ---
 
+
 def test_healthy_cow_no_detection() -> None:
     """No flags — no detection."""
     result = _HEAD.classify(_make_cow(), _META)
@@ -39,6 +40,7 @@ def test_larvae_alone_no_detection() -> None:
 
 
 # --- Positive paths ---
+
 
 def test_screwworm_flag_triggers_vet_now() -> None:
     """'screwworm' flag always results in vet_now."""

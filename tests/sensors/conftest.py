@@ -88,9 +88,7 @@ def world() -> World:
             bcs=entry.bcs,
             thirst=rng.uniform(0.1, 0.4),
             hunger=rng.uniform(0.1, 0.3),
-            pregnancy_days_remaining=(
-                entry.pregnancy_days_remaining if entry.pregnant else None
-            ),
+            pregnancy_days_remaining=(entry.pregnancy_days_remaining if entry.pregnant else None),
         )
         cows.append(cow)
 

@@ -78,7 +78,7 @@ def _try_twilio_call(script: str, wav_path: Path, to: str) -> str | None:
         return None
 
     wav_url = f"{tunnel_base}/voice/{wav_path.name}"
-    twiml = f'<Response><Play>{wav_url}</Play></Response>'
+    twiml = f"<Response><Play>{wav_url}</Play></Response>"
 
     try:
         client = Client(sid, token)

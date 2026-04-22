@@ -175,7 +175,9 @@ class SilentBackend(TTSBackend):
 # ---------------------------------------------------------------------------
 
 
-def _write_wav(pcm: bytes, path: Path, *, sample_rate: int, channels: int, sample_width: int) -> None:
+def _write_wav(
+    pcm: bytes, path: Path, *, sample_rate: int, channels: int, sample_width: int
+) -> None:
     """Write raw PCM data as a RIFF/WAV file."""
     data_size = len(pcm)
     byte_rate = sample_rate * channels * sample_width
@@ -188,8 +190,8 @@ def _write_wav(pcm: bytes, path: Path, *, sample_rate: int, channels: int, sampl
         fh.write(b"WAVE")
         # fmt chunk
         fh.write(b"fmt ")
-        fh.write(struct.pack("<I", 16))             # chunk size
-        fh.write(struct.pack("<H", 1))              # PCM = 1
+        fh.write(struct.pack("<I", 16))  # chunk size
+        fh.write(struct.pack("<H", 1))  # PCM = 1
         fh.write(struct.pack("<H", channels))
         fh.write(struct.pack("<I", sample_rate))
         fh.write(struct.pack("<I", byte_rate))

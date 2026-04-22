@@ -27,11 +27,11 @@ _THERMAL_W, _THERMAL_H = 320, 240
 # Colour palette
 # ---------------------------------------------------------------------------
 
-_BG_TOP = (34, 85, 34)   # dark pasture green
+_BG_TOP = (34, 85, 34)  # dark pasture green
 _BG_BOT = (56, 120, 45)  # lighter green at horizon
-_TROUGH_COLOUR = (120, 80, 40)   # brown trough rectangle
-_COW_BASE = (180, 140, 100)      # fawn body colour
-_COW_SICK_EYE = (220, 60, 60)   # red discharge streak
+_TROUGH_COLOUR = (120, 80, 40)  # brown trough rectangle
+_COW_BASE = (180, 140, 100)  # fawn body colour
+_COW_SICK_EYE = (220, 60, 60)  # red discharge streak
 _COW_LAME_TILT = (200, 100, 40)  # darker amber when tilted
 
 
@@ -234,7 +234,7 @@ def render_thermal_frame(
         for py in range(max(0, fy - 20), min(_THERMAL_H, fy + 21)):
             for px in range(max(0, fx - 20), min(_THERMAL_W, fx + 21)):
                 d2 = (px - fx) ** 2 + (py - fy) ** 2
-                arr[py, px] += heat * math.exp(-d2 / (2.0 * sigma_px ** 2))
+                arr[py, px] += heat * math.exp(-d2 / (2.0 * sigma_px**2))
 
     # Cows — warm blobs (heat 0.5–0.8)
     for cow in world.herd.cows:
@@ -329,9 +329,7 @@ def annotate_frame(
     label_annotator = sv.LabelAnnotator()
 
     annotated = box_annotator.annotate(scene=frame, detections=sv_detections)
-    annotated = label_annotator.annotate(
-        scene=annotated, detections=sv_detections, labels=labels
-    )
+    annotated = label_annotator.annotate(scene=annotated, detections=sv_detections, labels=labels)
 
     Image.fromarray(annotated).save(str(out_path), "PNG")
     return out_path

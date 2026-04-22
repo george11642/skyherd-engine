@@ -26,7 +26,7 @@ class TestStormScenario:
     def test_storm_warning_injected_at_threshold(self) -> None:
         from pathlib import Path
 
-        from skyherd.scenarios.storm import StormScenario, _STORM_WARNING_AT_S
+        from skyherd.scenarios.storm import _STORM_WARNING_AT_S, StormScenario
         from skyherd.world.world import make_world
 
         config = Path(__file__).parent.parent.parent / "worlds" / "ranch_a.yaml"
@@ -45,7 +45,7 @@ class TestStormScenario:
     def test_auto_approval_injected_60s_after_warning(self) -> None:
         from pathlib import Path
 
-        from skyherd.scenarios.storm import StormScenario, _STORM_WARNING_AT_S
+        from skyherd.scenarios.storm import _STORM_WARNING_AT_S, StormScenario
         from skyherd.world.world import make_world
 
         config = Path(__file__).parent.parent.parent / "worlds" / "ranch_a.yaml"
@@ -63,7 +63,7 @@ class TestStormScenario:
     def test_acoustic_tone_sub_20khz(self) -> None:
         from pathlib import Path
 
-        from skyherd.scenarios.storm import StormScenario, _STORM_WARNING_AT_S
+        from skyherd.scenarios.storm import _STORM_WARNING_AT_S, StormScenario
         from skyherd.world.world import make_world
 
         config = Path(__file__).parent.parent.parent / "worlds" / "ranch_a.yaml"
@@ -85,9 +85,7 @@ class TestStormScenario:
         from skyherd.scenarios import run
 
         result = run("storm", seed=42)
-        warning = next(
-            (e for e in result.event_stream if e.get("type") == "storm.warning"), None
-        )
+        warning = next((e for e in result.event_stream if e.get("type") == "storm.warning"), None)
         assert warning is not None
 
     def test_full_run_has_acoustic_activation(self) -> None:

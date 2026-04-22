@@ -47,9 +47,7 @@ class CalvingScenario(Scenario):
             updated.append(cow)
         world.herd.cows = updated
 
-    def inject_events(
-        self, world: World, sim_time_s: float
-    ) -> list[dict[str, Any]]:
+    def inject_events(self, world: World, sim_time_s: float) -> list[dict[str, Any]]:
         """At minute 2, inject collar activity spike and isolation sighting."""
         events: list[dict[str, Any]] = []
         if not self._prelabor_injected and sim_time_s >= _PRELABOR_AT_S:
@@ -133,9 +131,7 @@ class CalvingScenario(Scenario):
         )
 
         # 5. page_rancher at high urgency
-        assert "page_rancher" in tool_names, (
-            f"Expected page_rancher tool call. Got: {tool_names}"
-        )
+        assert "page_rancher" in tool_names, f"Expected page_rancher tool call. Got: {tool_names}"
         rancher_calls = [c for c in all_tools if c.get("tool") == "page_rancher"]
         urgency = rancher_calls[0].get("input", {}).get("urgency", "")
         assert urgency in ("call", "high", "emergency", "text"), (

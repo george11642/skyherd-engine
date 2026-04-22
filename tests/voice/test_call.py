@@ -68,7 +68,9 @@ class TestRenderUrgencyCall:
     def test_script_in_result_matches_message(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
         monkeypatch.delenv("TWILIO_SID", raising=False)
-        msg = WesMessage(urgency="text", subject="tank low", scripted_text="Heads up, boss. Tank's low.")
+        msg = WesMessage(
+            urgency="text", subject="tank low", scripted_text="Heads up, boss. Tank's low."
+        )
         result = render_urgency_call(msg)
         assert result["script"] == "Heads up, boss. Tank's low."
 

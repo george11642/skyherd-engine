@@ -44,7 +44,7 @@ class TestSickCowScenario:
     def test_health_check_injected_at_threshold(self) -> None:
         from pathlib import Path
 
-        from skyherd.scenarios.sick_cow import SickCowScenario, _HEALTH_CHECK_AT_S
+        from skyherd.scenarios.sick_cow import _HEALTH_CHECK_AT_S, SickCowScenario
         from skyherd.world.world import make_world
 
         config = Path(__file__).parent.parent.parent / "worlds" / "ranch_a.yaml"
@@ -59,7 +59,7 @@ class TestSickCowScenario:
     def test_health_check_has_correct_cow_tag(self) -> None:
         from pathlib import Path
 
-        from skyherd.scenarios.sick_cow import SickCowScenario, _HEALTH_CHECK_AT_S
+        from skyherd.scenarios.sick_cow import _HEALTH_CHECK_AT_S, SickCowScenario
         from skyherd.world.world import make_world
 
         config = Path(__file__).parent.parent.parent / "worlds" / "ranch_a.yaml"
@@ -82,8 +82,6 @@ class TestSickCowScenario:
         from skyherd.scenarios import run
 
         result = run("sick_cow", seed=42)
-        hc = next(
-            (e for e in result.event_stream if e.get("type") == "health.check"), None
-        )
+        hc = next((e for e in result.event_stream if e.get("type") == "health.check"), None)
         assert hc is not None
         assert hc.get("cow_tag") == "A014"

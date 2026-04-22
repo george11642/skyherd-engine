@@ -6,7 +6,6 @@ Uses httpx AsyncClient with the app in mock mode so no live mesh/bus is needed.
 from __future__ import annotations
 
 import asyncio
-import json
 
 import pytest
 import pytest_asyncio
@@ -145,13 +144,14 @@ async def test_events_sse_broadcaster_emits_within_3s():
     bc.start()
     received = []
     try:
+
         async def collect():
             async for event_type, payload in bc.subscribe():
                 received.append((event_type, payload))
                 return
 
         await asyncio.wait_for(collect(), timeout=3.0)
-    except asyncio.TimeoutError:
+    except TimeoutError:
         pytest.fail("EventBroadcaster did not emit any event within 3 seconds")
     finally:
         bc.stop()
@@ -167,14 +167,15 @@ async def test_events_sse_broadcaster_emits_known_event_types():
     bc.start()
     seen_types: set[str] = set()
     try:
+
         async def collect():
-            async for event_type, payload in bc.subscribe():
+            async for event_type, _payload in bc.subscribe():
                 seen_types.add(event_type)
                 if len(seen_types) >= 2:
                     return
 
         await asyncio.wait_for(collect(), timeout=5.0)
-    except asyncio.TimeoutError:
+    except TimeoutError:
         pass
     finally:
         bc.stop()

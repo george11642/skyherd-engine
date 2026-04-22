@@ -47,7 +47,13 @@ async def test_embedded_broker_pubsub() -> None:
     # Give subscriber time to connect
     await asyncio.sleep(0.3)
 
-    payload_in = {"ts": 12345.0, "kind": "water.reading", "ranch": "test", "entity": "tank_99", "level_pct": 42.0}
+    payload_in = {
+        "ts": 12345.0,
+        "kind": "water.reading",
+        "ranch": "test",
+        "entity": "tank_99",
+        "level_pct": 42.0,
+    }
     await bus.publish(target_topic, payload_in)
 
     await asyncio.wait_for(collect_task, timeout=5.0)

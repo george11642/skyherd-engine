@@ -27,7 +27,9 @@ async def _call_tool(server, tool_name: str, args: dict) -> object:
     from mcp.types import CallToolRequest, ListToolsRequest
 
     inst = server["instance"]
-    list_result = await inst.request_handlers[ListToolsRequest](ListToolsRequest(method="tools/list"))
+    list_result = await inst.request_handlers[ListToolsRequest](
+        ListToolsRequest(method="tools/list")
+    )
     tools = list_result.root.tools
     assert any(t.name == tool_name for t in tools), f"Tool '{tool_name}' not registered"
     call_result = await inst.request_handlers[CallToolRequest](
@@ -137,17 +139,13 @@ class TestGetCattlePositions:
         assert "2" in text  # 2 cows in fixture
 
     async def test_filter_by_tag(self, galileo_server):
-        result = await _call_tool(
-            galileo_server, "get_cattle_positions", {"tags": ["TAG001"]}
-        )
+        result = await _call_tool(galileo_server, "get_cattle_positions", {"tags": ["TAG001"]})
         assert not result.isError
         text = result.content[0].text
         assert "1" in text  # only TAG001 returned
 
     async def test_unknown_tag_returns_zero(self, galileo_server):
-        result = await _call_tool(
-            galileo_server, "get_cattle_positions", {"tags": ["NOTEXIST"]}
-        )
+        result = await _call_tool(galileo_server, "get_cattle_positions", {"tags": ["NOTEXIST"]})
         assert not result.isError
         text = result.content[0].text
         assert "0" in text

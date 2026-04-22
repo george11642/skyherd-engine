@@ -45,9 +45,7 @@ class StormScenario(Scenario):
             update={"conditions": "clear", "temp_f": 68.0, "wind_kt": 5.0}
         )
 
-    def inject_events(
-        self, world: World, sim_time_s: float
-    ) -> list[dict[str, Any]]:
+    def inject_events(self, world: World, sim_time_s: float) -> list[dict[str, Any]]:
         """Inject storm warning at 03:15, then approval, then acoustic nudge."""
         events: list[dict[str, Any]] = []
 
@@ -123,9 +121,7 @@ class StormScenario(Scenario):
         # 1. storm.warning event in stream
         warning = self._find_event(event_stream, "storm.warning")
         assert warning is not None, "Expected storm.warning event"
-        assert warning.get("eta_s", 9999) <= 1200, (
-            "Expected ETA <= 20 minutes"
-        )
+        assert warning.get("eta_s", 9999) <= 1200, "Expected ETA <= 20 minutes"
 
         # 2. weather.storm event fired (wakes GrazingOptimizer)
         storm_ev = self._find_event(event_stream, "weather.storm")
@@ -149,9 +145,7 @@ class StormScenario(Scenario):
 
         # Tone must be sub-20 kHz for herd redirect
         tone = acoustic_ev.get("tone_hz", 0)
-        assert tone < 20000, (
-            f"Acoustic tone {tone}Hz exceeds 20 kHz herd-redirect limit"
-        )
+        assert tone < 20000, f"Acoustic tone {tone}Hz exceeds 20 kHz herd-redirect limit"
 
         # 6. Auto-approval event confirms scenario mode worked
         approval = self._find_event(event_stream, "rancher.approval")

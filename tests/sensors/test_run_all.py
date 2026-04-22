@@ -16,13 +16,13 @@ async def test_run_all_task_counts(world, mock_bus) -> None:
 
     # Expected: 3 water + 6 trough_cam + 1 thermal + 8 fence + 50 collar + 1 acoustic + 1 weather
     expected_sensors = (
-        len(cfg.water_tanks)   # 3
-        + len(cfg.troughs)     # 6
-        + 1                    # thermal
-        + len(cfg.fence_lines) # 8
-        + len(world.herd.cows) # 50
-        + 1                    # acoustic
-        + 1                    # weather
+        len(cfg.water_tanks)  # 3
+        + len(cfg.troughs)  # 6
+        + 1  # thermal
+        + len(cfg.fence_lines)  # 8
+        + len(world.herd.cows)  # 50
+        + 1  # acoustic
+        + 1  # weather
     )
     assert len(world.herd.cows) == 50
     assert expected_sensors == 70

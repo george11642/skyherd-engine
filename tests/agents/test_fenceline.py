@@ -76,10 +76,7 @@ class TestFencelineSimulateHandler:
         calls = _simulate_handler(self._fence_event(), session)
         drone_call = next(c for c in calls if c["tool"] == "launch_drone")
         inp = drone_call["input"]
-        has_coords = (
-            "lat" in inp or "target_lat" in inp
-            or "coordinates" in inp or "segment" in inp
-        )
+        has_coords = "lat" in inp or "target_lat" in inp or "coordinates" in inp or "segment" in inp
         assert has_coords, f"launch_drone input missing coordinates: {inp}"
 
     def test_page_rancher_includes_urgency(self):

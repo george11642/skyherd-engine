@@ -182,9 +182,7 @@ def _build_tools() -> list[Any]:
             )
 
         return {
-            "content": [
-                {"type": "text", "text": f"Rancher paged via {channel}: {wes}"}
-            ],
+            "content": [{"type": "text", "text": f"Rancher paged via {channel}: {wes}"}],
             "page_id": page_id,
             "channel": channel,
             "wes_script": wes,

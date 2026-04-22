@@ -44,9 +44,7 @@ class CoyoteScenario(Scenario):
             update={"wind_dir_deg": 180.0}  # wind from south
         )
 
-    def inject_events(
-        self, world: World, sim_time_s: float
-    ) -> list[dict[str, Any]]:
+    def inject_events(self, world: World, sim_time_s: float) -> list[dict[str, Any]]:
         """At ~7:42 pm offset, inject fence breach + coyote presence."""
         events: list[dict[str, Any]] = []
         if not self._breach_injected and sim_time_s >= _BREACH_AT_S:
@@ -87,9 +85,7 @@ class CoyoteScenario(Scenario):
                 if pred.id == "coyote_scenario_001":
                     from skyherd.world.predators import PredatorState
 
-                    updated = pred.model_copy(
-                        update={"state": PredatorState.FLEEING.value}
-                    )
+                    updated = pred.model_copy(update={"state": PredatorState.FLEEING.value})
                     idx = world.predator_spawner.predators.index(pred)
                     world.predator_spawner.predators[idx] = updated
                     events.append(
@@ -130,23 +126,17 @@ class CoyoteScenario(Scenario):
         assert "get_thermal_clip" in tool_names, (
             f"Expected get_thermal_clip tool call. Got: {tool_names}"
         )
-        assert "launch_drone" in tool_names, (
-            f"Expected launch_drone tool call. Got: {tool_names}"
-        )
+        assert "launch_drone" in tool_names, f"Expected launch_drone tool call. Got: {tool_names}"
         assert "play_deterrent" in tool_names, (
             f"Expected play_deterrent tool call. Got: {tool_names}"
         )
-        assert "page_rancher" in tool_names, (
-            f"Expected page_rancher tool call. Got: {tool_names}"
-        )
+        assert "page_rancher" in tool_names, f"Expected page_rancher tool call. Got: {tool_names}"
 
         # 4. Deterrent tone in 8–18 kHz range
         deterrent_calls = [c for c in all_tools if c.get("tool") == "play_deterrent"]
         assert deterrent_calls, "No play_deterrent call found"
         tone = deterrent_calls[0].get("input", {}).get("tone_hz", 0)
-        assert 8000 <= tone <= 18000, (
-            f"Deterrent tone {tone}Hz not in 8–18 kHz range"
-        )
+        assert 8000 <= tone <= 18000, f"Deterrent tone {tone}Hz not in 8–18 kHz range"
 
         # 5. Rancher page urgency is call or emergency (Wes voice call placed)
         rancher_calls = [c for c in all_tools if c.get("tool") == "page_rancher"]

@@ -21,7 +21,9 @@ def _make_detection(tag: str = "T001", severity: str = "watch") -> DetectionResu
     )
 
 
-def test_annotate_frame_no_crash_with_detections(world_with_sick_cow: World, tmp_path: Path) -> None:
+def test_annotate_frame_no_crash_with_detections(
+    world_with_sick_cow: World, tmp_path: Path
+) -> None:
     """annotate_frame runs without raising with one detection."""
     raw = tmp_path / "raw.png"
     render_trough_frame(world_with_sick_cow, "trough_a", out_path=raw)

@@ -28,7 +28,7 @@ class TestCalvingScenario:
     def test_prelabor_injected_at_minute_2(self) -> None:
         from pathlib import Path
 
-        from skyherd.scenarios.calving import CalvingScenario, _PRELABOR_AT_S
+        from skyherd.scenarios.calving import _PRELABOR_AT_S, CalvingScenario
         from skyherd.world.world import make_world
 
         config = Path(__file__).parent.parent.parent / "worlds" / "ranch_a.yaml"
@@ -47,7 +47,7 @@ class TestCalvingScenario:
     def test_prelabor_event_has_correct_tag(self) -> None:
         from pathlib import Path
 
-        from skyherd.scenarios.calving import CalvingScenario, _PRELABOR_AT_S
+        from skyherd.scenarios.calving import _PRELABOR_AT_S, CalvingScenario
         from skyherd.world.world import make_world
 
         config = Path(__file__).parent.parent.parent / "worlds" / "ranch_a.yaml"

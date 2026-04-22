@@ -47,7 +47,7 @@ GRAZING_OPTIMIZER_SPEC = AgentSpec(
         _skill("cattle-behavior/feeding-patterns.md"),
         _skill("voice-persona/wes-register.md"),
     ],
-    checkpoint_interval_s=86400,   # nightly checkpoints between weekly wakes
+    checkpoint_interval_s=86400,  # nightly checkpoints between weekly wakes
     max_idle_s_before_checkpoint=3600,
     model="claude-opus-4-7",
 )
@@ -89,9 +89,7 @@ async def handler(
         "Page the rancher with your proposal and await approval before any action."
     )
 
-    cached_payload = build_cached_messages(
-        _SYSTEM_PROMPT_INLINE, skill_texts, user_message
-    )
+    cached_payload = build_cached_messages(_SYSTEM_PROMPT_INLINE, skill_texts, user_message)
 
     if sdk_client is not None and os.environ.get("ANTHROPIC_API_KEY"):
         return await _run_with_sdk(sdk_client, cached_payload, session)

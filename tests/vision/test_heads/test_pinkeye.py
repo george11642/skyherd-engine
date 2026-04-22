@@ -9,7 +9,9 @@ _HEAD = Pinkeye()
 _META: dict = {}
 
 
-def _make_cow(tag: str = "T001", ocular_discharge: float = 0.0, disease_flags: set[str] | None = None) -> Cow:
+def _make_cow(
+    tag: str = "T001", ocular_discharge: float = 0.0, disease_flags: set[str] | None = None
+) -> Cow:
     return Cow(
         id=f"cow_{tag}",
         tag=tag,
@@ -20,6 +22,7 @@ def _make_cow(tag: str = "T001", ocular_discharge: float = 0.0, disease_flags: s
 
 
 # --- Negative path ---
+
 
 def test_healthy_cow_no_detection() -> None:
     """Cow with zero discharge and no flag — no detection."""
@@ -34,6 +37,7 @@ def test_below_threshold_no_detection() -> None:
 
 
 # --- Positive paths ---
+
 
 def test_watch_at_low_discharge() -> None:
     """discharge=0.45 (above 0.4) → watch severity."""

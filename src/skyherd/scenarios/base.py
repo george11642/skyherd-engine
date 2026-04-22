@@ -305,6 +305,7 @@ async def _run_async(
 
     ledger._conn.close()
     import os as _os
+
     try:
         _os.unlink(tmp.name)
     except OSError:
@@ -360,9 +361,7 @@ def _write_jsonl(path: Path, result: ScenarioResult) -> None:
                     "outcome_error": result.outcome_error,
                     "wall_time_s": result.wall_time_s,
                     "event_count": len(result.event_stream),
-                    "tool_call_count": sum(
-                        len(v) for v in result.agent_tool_calls.values()
-                    ),
+                    "tool_call_count": sum(len(v) for v in result.agent_tool_calls.values()),
                     "attestation_count": len(result.attestation_entries),
                 }
             )
@@ -374,9 +373,7 @@ def _write_jsonl(path: Path, result: ScenarioResult) -> None:
         # Tool calls
         for agent_name, calls in result.agent_tool_calls.items():
             for call in calls:
-                fh.write(
-                    json.dumps({"record": "tool_call", "agent": agent_name, **call}) + "\n"
-                )
+                fh.write(json.dumps({"record": "tool_call", "agent": agent_name, **call}) + "\n")
 
 
 def _append_replay_log(result: ScenarioResult) -> None:

@@ -30,9 +30,7 @@ logger = logging.getLogger(__name__)
 @app.command()
 def run(
     seed: Annotated[int, typer.Option("--seed", help="RNG seed.")] = 42,
-    duration: Annotated[
-        float, typer.Option("--duration", help="Sim seconds to run.")
-    ] = 300.0,
+    duration: Annotated[float, typer.Option("--duration", help="Sim seconds to run.")] = 300.0,
     verbose: Annotated[bool, typer.Option("--verbose", "-v")] = False,
 ) -> None:
     """Tick the world simulation for DURATION seconds and print events as JSONL."""

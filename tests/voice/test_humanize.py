@@ -51,7 +51,11 @@ _SCENARIOS = [
     ("log", "LGD patrol complete", {}),
     ("text", "paddock rotation due", {"paddock": "east paddock"}),
     ("call", "predator spotted near herd", {"predator": "mountain lion", "distance": "300 yards"}),
-    ("emergency", "water dry in summer heat", {"tank_id": "south tank", "temp_f": "close to a hundred"}),
+    (
+        "emergency",
+        "water dry in summer heat",
+        {"tank_id": "south tank", "temp_f": "close to a hundred"},
+    ),
 ]
 
 

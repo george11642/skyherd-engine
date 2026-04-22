@@ -168,9 +168,7 @@ def create_app(
 
         @app.get("/rancher")
         async def dev_rancher() -> HTMLResponse:
-            return HTMLResponse(
-                "<html><body><h1>Rancher PWA (dev)</h1></body></html>"
-            )
+            return HTMLResponse("<html><body><h1>Rancher PWA (dev)</h1></body></html>")
 
     return app
 

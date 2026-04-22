@@ -40,9 +40,7 @@ class WaterDropScenario(Scenario):
         updated_tanks: list[WaterTankConfig] = []
         for tank in world.terrain.config.water_tanks:
             if tank.id == "wt_sw":
-                tank = tank.model_copy(
-                    update={"level_pct": 18.0, "pressure_psi": 12.0}
-                )
+                tank = tank.model_copy(update={"level_pct": 18.0, "pressure_psi": 12.0})
             updated_tanks.append(tank)
         world.terrain.config.water_tanks = updated_tanks
 
@@ -51,15 +49,12 @@ class WaterDropScenario(Scenario):
             update={"temp_f": 95.0}
         )
 
-    def inject_events(
-        self, world: World, sim_time_s: float
-    ) -> list[dict[str, Any]]:
+    def inject_events(self, world: World, sim_time_s: float) -> list[dict[str, Any]]:
         """After water.low has fired, inject a drone flyover confirmation."""
         events: list[dict[str, Any]] = []
         # Check if a water.low event has been emitted for wt_sw
         water_low_seen = any(
-            ev.get("type") == "water.low" and ev.get("tank_id") == "wt_sw"
-            for ev in world.events
+            ev.get("type") == "water.low" and ev.get("tank_id") == "wt_sw" for ev in world.events
         )
 
         if water_low_seen and not self._flyover_injected and sim_time_s >= _DRONE_FLYOVER_AT_S:
@@ -91,9 +86,7 @@ class WaterDropScenario(Scenario):
             if ev.get("type") == "water.low" and ev.get("tank_id") == "wt_sw":
                 water_ev = ev
                 break
-        assert water_ev is not None, (
-            "Expected water.low event for tank wt_sw (set to 18%)"
-        )
+        assert water_ev is not None, "Expected water.low event for tank wt_sw (set to 18%)"
         assert water_ev.get("level_pct", 100) < 20.0, (
             f"Expected level_pct < 20, got {water_ev.get('level_pct')}"
         )
@@ -109,9 +102,7 @@ class WaterDropScenario(Scenario):
         all_tools = self._all_tool_calls(mesh)
 
         # At least one agent responded to water.low
-        assert len(all_tools) > 0, (
-            "Expected at least one agent tool call in response to water.low"
-        )
+        assert len(all_tools) > 0, "Expected at least one agent tool call in response to water.low"
 
         # FenceLineDispatcher or GrazingOptimizer should have triggered
         agents_that_responded = set(mesh._tool_call_log.keys())

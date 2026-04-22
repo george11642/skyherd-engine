@@ -1,5 +1,18 @@
 # CLAUDE.md — Project Orientation
 
+## Judge Quickstart (3 commands)
+
+```bash
+git clone https://github.com/george11642/skyherd-engine && cd skyherd-engine
+uv sync && (cd web && pnpm install && pnpm run build)
+make demo SEED=42 SCENARIO=all         # 5 scenarios, deterministic replay
+make dashboard                          # http://localhost:8000
+```
+
+Read in order: docs/ONE_PAGER.md → docs/ARCHITECTURE.md → docs/MANAGED_AGENTS.md.
+
+---
+
 > **Read this file first, then read the plan, then start building.**
 
 You are helping George build **SkyHerd Engine** — a hackathon submission for Built with Opus 4.7 (Apr 21–26 2026). This file is the fast-loader for any Claude session picking up this repo.

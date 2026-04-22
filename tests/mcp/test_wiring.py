@@ -16,8 +16,19 @@ from skyherd.mcp import (
 # Expected tool names per server
 # ---------------------------------------------------------------------------
 
-_DRONE_TOOLS = {"launch_drone", "return_to_home", "play_deterrent", "get_thermal_clip", "drone_status"}
-_SENSOR_TOOLS = {"get_latest_readings", "get_camera_clip", "get_thermal_clip", "subscribe_anomalies"}
+_DRONE_TOOLS = {
+    "launch_drone",
+    "return_to_home",
+    "play_deterrent",
+    "get_thermal_clip",
+    "drone_status",
+}
+_SENSOR_TOOLS = {
+    "get_latest_readings",
+    "get_camera_clip",
+    "get_thermal_clip",
+    "subscribe_anomalies",
+}
 _RANCHER_TOOLS = {"page_rancher", "page_vet", "get_rancher_preferences"}
 _GALILEO_TOOLS = {"get_drone_position", "get_cattle_positions", "distance_between"}
 
@@ -83,7 +94,10 @@ class TestServerNamesAndTypes:
         assert create_rancher_mcp_server()["name"] == "rancher"
 
     def test_galileo_server_name(self):
-        assert create_galileo_mcp_server(world_snapshot_fn=lambda: _make_snapshot())["name"] == "galileo"
+        assert (
+            create_galileo_mcp_server(world_snapshot_fn=lambda: _make_snapshot())["name"]
+            == "galileo"
+        )
 
     def test_all_types_are_sdk(self):
         servers = [

@@ -83,9 +83,7 @@ class WaterTankSensor(Sensor):
                 alert,
                 ledger=self.ledger,
             )
-            logger.warning(
-                "water.low fired for %s (%.1f%%)", self._tank_id, tank.level_pct
-            )
+            logger.warning("water.low fired for %s (%.1f%%)", self._tank_id, tank.level_pct)
         elif tank.level_pct >= _WATER_LOW_THRESHOLD_PCT:
             # Reset debounce when level recovers
             self._low_event_fired = False

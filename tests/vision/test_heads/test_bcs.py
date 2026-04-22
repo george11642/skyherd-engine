@@ -25,6 +25,7 @@ def _make_cow(
 
 # --- Negative paths: within target window ---
 
+
 def test_gestating_cow_in_window_no_detection() -> None:
     """Pregnant cow BCS 5.0 — within gestating window [3.5, 6.5] — no detection."""
     assert _HEAD.classify(_make_cow(bcs=5.0, pregnancy_days_remaining=90), _META) is None
@@ -47,6 +48,7 @@ def test_bcs_exactly_at_high_bound_no_detection() -> None:
 
 # --- Positive paths: emaciation (critical) ---
 
+
 def test_critical_emaciation_escalate() -> None:
     """BCS < 3.0 → escalate regardless of stage."""
     result = _HEAD.classify(_make_cow(bcs=2.5), _META)
@@ -64,6 +66,7 @@ def test_bcs_1_escalate_high_confidence() -> None:
 
 
 # --- Positive paths: below target window ---
+
 
 def test_pregnant_cow_below_calving_risk_log() -> None:
     """Pregnant cow BCS 3.8 — below calving-risk threshold 4.0 → log."""
@@ -91,6 +94,7 @@ def test_gestating_below_gestating_low_watch() -> None:
 
 # --- Positive paths: above target window ---
 
+
 def test_pregnant_obese_above_7_log() -> None:
     """Pregnant cow BCS 7.5 — fat-cow calving risk → log."""
     result = _HEAD.classify(_make_cow(bcs=7.5, pregnancy_days_remaining=10), _META)
@@ -106,6 +110,7 @@ def test_nonpregnant_obese_above_high_watch() -> None:
 
 
 # --- Reasoning ---
+
 
 def test_reasoning_cites_skill() -> None:
     result = _HEAD.classify(_make_cow(bcs=2.0), _META)

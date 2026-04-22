@@ -20,6 +20,7 @@ def _make_cow(tag: str = "T001", lameness_score: int = 0) -> Cow:
 
 # --- Negative paths ---
 
+
 def test_no_lameness_no_detection() -> None:
     """lameness_score=0 → no detection."""
     assert _HEAD.classify(_make_cow(lameness_score=0), _META) is None
@@ -31,6 +32,7 @@ def test_score_1_no_detection() -> None:
 
 
 # --- Positive paths ---
+
 
 def test_score_2_watch() -> None:
     """lameness_score=2 → watch severity."""
@@ -63,10 +65,7 @@ def test_score_5_vet_now() -> None:
 
 def test_confidence_increases_with_score() -> None:
     """Higher lameness scores should yield higher confidence."""
-    results = [
-        _HEAD.classify(_make_cow(lameness_score=s), _META)
-        for s in range(2, 6)
-    ]
+    results = [_HEAD.classify(_make_cow(lameness_score=s), _META) for s in range(2, 6)]
     confidences = [r.confidence for r in results if r is not None]
     assert confidences == sorted(confidences), "Confidence should increase with lameness score"
 

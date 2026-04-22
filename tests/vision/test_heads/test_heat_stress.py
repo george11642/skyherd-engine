@@ -28,6 +28,7 @@ def _meta(temp_f: float = 72.0) -> dict:
 
 # --- Negative paths ---
 
+
 def test_cool_healthy_no_detection() -> None:
     """Cool weather + healthy cow → no detection."""
     assert _HEAD.classify(_make_cow(), _meta(70.0)) is None
@@ -44,6 +45,7 @@ def test_unhealthy_but_cool_no_detection() -> None:
 
 
 # --- Positive paths: ambient trigger ---
+
 
 def test_hot_and_unhealthy_triggers() -> None:
     """Temp > 95 + health < 0.8 → detection."""
@@ -81,6 +83,7 @@ def test_vet_now_at_critical() -> None:
 
 
 # --- Positive paths: panting flag ---
+
 
 def test_panting_flag_triggers_at_any_temp() -> None:
     """'panting' flag triggers even in cool weather."""

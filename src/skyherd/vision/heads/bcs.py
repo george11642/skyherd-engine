@@ -28,8 +28,8 @@ _LACTATING_HIGH = 7.0
 
 # Critical thresholds (apply regardless of stage)
 _EMACIATION_THRESHOLD = 3.0  # → escalate (Tier 3)
-_CALVING_RISK_LOW = 4.0       # → log when pregnant (Tier 2)
-_OBESITY_RISK_HIGH = 7.0      # → log when pregnant (Tier 2)
+_CALVING_RISK_LOW = 4.0  # → log when pregnant (Tier 2)
+_OBESITY_RISK_HIGH = 7.0  # → log when pregnant (Tier 2)
 
 
 def _target_window(cow: Cow) -> tuple[float, float]:

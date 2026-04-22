@@ -93,6 +93,7 @@ fail_under = 0
 [tool.ruff]
 line-length = 100
 target-version = "py311"
+exclude = [".refs"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "N"]

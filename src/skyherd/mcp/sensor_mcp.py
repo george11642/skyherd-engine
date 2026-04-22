@@ -59,7 +59,10 @@ def _build_tools(bus: dict[str, deque]) -> list[Any]:  # type: ignore[type-arg]
         {
             "type": "object",
             "properties": {
-                "sensor_kind": {"type": "string", "description": "Filter by sensor kind; omit for all kinds"},
+                "sensor_kind": {
+                    "type": "string",
+                    "description": "Filter by sensor kind; omit for all kinds",
+                },
                 "ranch_id": {"type": "string"},
                 "limit": {"type": "integer"},
             },
@@ -85,9 +88,7 @@ def _build_tools(bus: dict[str, deque]) -> list[Any]:  # type: ignore[type-arg]
             readings = readings[-limit:]
 
         return {
-            "content": [
-                {"type": "text", "text": f"Returning {len(readings)} readings"}
-            ],
+            "content": [{"type": "text", "text": f"Returning {len(readings)} readings"}],
             "readings": readings,
             "count": len(readings),
         }

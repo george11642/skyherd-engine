@@ -112,9 +112,7 @@ class CollarSensor(Sensor):
                 alert,
                 ledger=self.ledger,
             )
-            logger.warning(
-                "collar.low_battery for %s (%.1f%%)", self._cow_id, self._battery_pct
-            )
+            logger.warning("collar.low_battery for %s (%.1f%%)", self._cow_id, self._battery_pct)
         elif self._battery_pct >= _LOW_BATTERY_THRESHOLD_PCT:
             self._low_battery_fired = False
 

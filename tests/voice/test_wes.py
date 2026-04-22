@@ -93,12 +93,16 @@ def test_no_ai_telltales():
         msg = _make(urgency, subject)
         script = wes_script(msg)
         match = _TELLTALE_RE.search(script)
-        assert match is None, f"Telltale {match.group()!r} found in {urgency!r}/{subject!r}: {script!r}"
+        assert match is None, (
+            f"Telltale {match.group()!r} found in {urgency!r}/{subject!r}: {script!r}"
+        )
 
 
 def test_no_system_jargon():
     """Technical system jargon must be absent or translated."""
-    jargon_patterns = re.compile(r"\bMAVLink\b|\bBRD\b|\bNDVI\b|\bTHI\b|\bgait score\b", re.IGNORECASE)
+    jargon_patterns = re.compile(
+        r"\bMAVLink\b|\bBRD\b|\bNDVI\b|\bTHI\b|\bgait score\b", re.IGNORECASE
+    )
     msg = _make("call", "BRD suspected in cow B007", animal_id="B007")
     script = wes_script(msg)
     assert not jargon_patterns.search(script), f"Jargon found: {script!r}"
@@ -139,4 +143,6 @@ def test_model_respects_provided_script():
 def test_scenario_scripts(urgency, subject, ctx_key, ctx_val, expected_fragment):
     msg = _make(urgency, subject, **{ctx_key: ctx_val})
     script = wes_script(msg)
-    assert expected_fragment.lower() in script.lower(), f"Fragment {expected_fragment!r} missing from: {script!r}"
+    assert expected_fragment.lower() in script.lower(), (
+        f"Fragment {expected_fragment!r} missing from: {script!r}"
+    )

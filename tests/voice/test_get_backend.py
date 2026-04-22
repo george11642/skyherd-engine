@@ -28,8 +28,11 @@ class TestGetBackend:
         _reset_logged(monkeypatch)
         monkeypatch.delenv("ELEVENLABS_API_KEY", raising=False)
         # Fake `piper` on PATH
-        monkeypatch.setattr("shutil.which", lambda cmd: "/usr/bin/piper" if cmd == "piper" else None)
+        monkeypatch.setattr(
+            "shutil.which", lambda cmd: "/usr/bin/piper" if cmd == "piper" else None
+        )
         from skyherd.voice import tts
+
         backend = tts._resolve_backend()
         assert isinstance(backend, PiperBackend)
 
@@ -44,6 +47,7 @@ class TestGetBackend:
 
         monkeypatch.setattr("shutil.which", _which)
         from skyherd.voice import tts
+
         backend = tts._resolve_backend()
         assert isinstance(backend, EspeakBackend)
 
@@ -52,6 +56,7 @@ class TestGetBackend:
         monkeypatch.delenv("ELEVENLABS_API_KEY", raising=False)
         monkeypatch.setattr("shutil.which", lambda cmd: None)
         from skyherd.voice import tts
+
         backend = tts._resolve_backend()
         assert isinstance(backend, SilentBackend)
 
@@ -66,6 +71,7 @@ class TestGetBackend:
     def test_logged_once(self, monkeypatch, caplog):
         """get_backend() logs backend name exactly once per process."""
         import logging
+
         _reset_logged(monkeypatch)
         monkeypatch.delenv("ELEVENLABS_API_KEY", raising=False)
         monkeypatch.setattr("shutil.which", lambda cmd: None)

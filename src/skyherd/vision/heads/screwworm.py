@@ -28,9 +28,7 @@ class Screwworm(Head):
 
     def classify(self, cow: Cow, frame_meta: dict[str, Any]) -> DetectionResult | None:
         has_screwworm = "screwworm" in cow.disease_flags
-        has_larvae_in_wound = (
-            "open_wound" in cow.disease_flags and "larvae" in cow.disease_flags
-        )
+        has_larvae_in_wound = "open_wound" in cow.disease_flags and "larvae" in cow.disease_flags
 
         if not has_screwworm and not has_larvae_in_wound:
             return None

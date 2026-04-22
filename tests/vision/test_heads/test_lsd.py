@@ -20,6 +20,7 @@ def _make_cow(tag: str = "T001", disease_flags: set[str] | None = None) -> Cow:
 
 # --- Negative paths ---
 
+
 def test_healthy_cow_no_detection() -> None:
     """No flags → no detection."""
     assert _HEAD.classify(_make_cow(), _META) is None
@@ -31,6 +32,7 @@ def test_unrelated_flags_no_detection() -> None:
 
 
 # --- Positive paths ---
+
 
 def test_lsd_nodules_flag_triggers() -> None:
     """'lsd_nodules' flag → detection with escalate severity."""

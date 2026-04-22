@@ -46,17 +46,57 @@ class WesMessage(BaseModel):
 # Subject keywords are matched case-insensitively anywhere in `subject`
 _TEMPLATES: list[tuple[str, str, str]] = [
     # ---- call / emergency ----
-    ("call", "coyote", "Hey boss. Coyote at the {location}. Drone's on it. I'll call back if it comes back."),
-    ("emergency", "coyote", "Boss. Coyote is inside the {location}, right at the calving pen. Need you now."),
-    ("call", "calv", "Boss. {animal} has gone off alone. Looks like early labor. Might want a look."),
-    ("emergency", "calv", "Boss. {animal} has been in Stage 2 over ninety minutes. She needs help now."),
-    ("call", "predator", "Boss, I've got eyes on a {predator} about {distance} from the calving pen. I've got the drone on it. Might want to come take a look."),
-    ("emergency", "predator", "Boss. {predator} inside the south fence with the calves. I need you now."),
-    ("call", "water", "Boss. The {tank} is down to {level}. Drone's on the way. Might be worth a drive-out."),
-    ("emergency", "water", "Boss. {tank} is bone dry. It's {temp} out. Need someone out there now."),
-    ("call", "sick", "Boss. {animal} has been off her feed and she's favoring that {leg}. Might want to get the vet out."),
+    (
+        "call",
+        "coyote",
+        "Hey boss. Coyote at the {location}. Drone's on it. I'll call back if it comes back.",
+    ),
+    (
+        "emergency",
+        "coyote",
+        "Boss. Coyote is inside the {location}, right at the calving pen. Need you now.",
+    ),
+    (
+        "call",
+        "calv",
+        "Boss. {animal} has gone off alone. Looks like early labor. Might want a look.",
+    ),
+    (
+        "emergency",
+        "calv",
+        "Boss. {animal} has been in Stage 2 over ninety minutes. She needs help now.",
+    ),
+    (
+        "call",
+        "predator",
+        "Boss, I've got eyes on a {predator} about {distance} from the calving pen. I've got the drone on it. Might want to come take a look.",
+    ),
+    (
+        "emergency",
+        "predator",
+        "Boss. {predator} inside the south fence with the calves. I need you now.",
+    ),
+    (
+        "call",
+        "water",
+        "Boss. The {tank} is down to {level}. Drone's on the way. Might be worth a drive-out.",
+    ),
+    (
+        "emergency",
+        "water",
+        "Boss. {tank} is bone dry. It's {temp} out. Need someone out there now.",
+    ),
+    (
+        "call",
+        "sick",
+        "Boss. {animal} has been off her feed and she's favoring that {leg}. Might want to get the vet out.",
+    ),
     ("emergency", "sick", "Boss. {animal} is down and not getting up. Get the vet out."),
-    ("call", "fence", "Boss. Got a cut wire on the {location}. No cattle loose yet. Worth fixing today."),
+    (
+        "call",
+        "fence",
+        "Boss. Got a cut wire on the {location}. No cattle loose yet. Worth fixing today.",
+    ),
     ("emergency", "fence", "Boss. Wire's down on the {location} and cattle are out. Need you now."),
     # ---- text ----
     ("text", "water", "{tank} dropped to {level}. Drone's verifying. No need to ride out yet."),
@@ -64,7 +104,11 @@ _TEMPLATES: list[tuple[str, str, str]] = [
     ("text", "calv", "{animal} showing early signs. Keeping eyes on her."),
     ("text", "sick", "{animal} looks a little off. Watching her through the day."),
     ("text", "fence", "Top wire down on {location}. No cattle at risk. Worth fixing this week."),
-    ("text", "weather", "Storm coming in from the {direction}. May want to move the herd off the {pasture}."),
+    (
+        "text",
+        "weather",
+        "Storm coming in from the {direction}. May want to move the herd off the {pasture}.",
+    ),
     ("text", "rotation", "South pasture is getting thin. Time to rotate to {paddock}."),
     # ---- log ----
     ("log", "", "Heads up. {subject}. No action needed right now."),
@@ -136,8 +180,8 @@ def _fill(template: str, message: WesMessage) -> str:
 # ---------------------------------------------------------------------------
 
 _FORBIDDEN_PATTERNS = [
-    r"—",                     # em-dash
-    r"–",                # en-dash
+    r"—",  # em-dash
+    r"–",  # en-dash
     r"I just wanted",
     r"Just to let you know",
     r"Just to be sure",

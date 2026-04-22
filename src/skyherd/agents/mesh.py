@@ -112,8 +112,8 @@ class AgentMesh:
             mqtt_publish_callback=mqtt_publish_callback,
             ledger_callback=ledger_callback,
         )
-        self._sessions: dict[str, Session] = {}   # name → session
-        self._handlers: dict[str, Any] = {}        # name → handler fn
+        self._sessions: dict[str, Session] = {}  # name → session
+        self._handlers: dict[str, Any] = {}  # name → handler fn
         self._stop_event = asyncio.Event()
         self._tick_task: asyncio.Task[None] | None = None
         self._mqtt_task: asyncio.Task[None] | None = None
@@ -188,9 +188,7 @@ class AgentMesh:
         if sdk_client is None and not os.environ.get("ANTHROPIC_API_KEY"):
             sdk_client = None
 
-        for (spec, handler_fn), wake_event in zip(
-            _AGENT_REGISTRY, _SMOKE_WAKE_EVENTS, strict=True
-        ):
+        for (spec, handler_fn), wake_event in zip(_AGENT_REGISTRY, _SMOKE_WAKE_EVENTS, strict=True):
             session = self._session_manager.create_session(spec)
             self._session_manager.wake(session.id, wake_event)
 

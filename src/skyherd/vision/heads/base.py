@@ -23,9 +23,7 @@ class Head(ABC):
         """Unique identifier for this head (used in DetectionResult.head_name)."""
 
     @abstractmethod
-    def classify(
-        self, cow: Cow, frame_meta: dict[str, Any]
-    ) -> DetectionResult | None:
+    def classify(self, cow: Cow, frame_meta: dict[str, Any]) -> DetectionResult | None:
         """Classify a single cow.
 
         Parameters

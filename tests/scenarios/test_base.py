@@ -3,13 +3,11 @@
 from __future__ import annotations
 
 from dataclasses import fields
-from pathlib import Path
 from typing import Any
 
 import pytest
 
 from skyherd.scenarios.base import Scenario, ScenarioResult
-
 
 # ---------------------------------------------------------------------------
 # ScenarioResult dataclass

@@ -54,7 +54,7 @@ class TestWaterDropScenario:
     def test_flyover_injected_after_water_low(self) -> None:
         from pathlib import Path
 
-        from skyherd.scenarios.water_drop import WaterDropScenario, _DRONE_FLYOVER_AT_S
+        from skyherd.scenarios.water_drop import _DRONE_FLYOVER_AT_S, WaterDropScenario
         from skyherd.world.world import make_world
 
         config = Path(__file__).parent.parent.parent / "worlds" / "ranch_a.yaml"

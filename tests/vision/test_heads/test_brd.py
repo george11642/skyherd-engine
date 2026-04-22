@@ -27,6 +27,7 @@ def _make_cow(
 
 # --- Negative paths ---
 
+
 def test_healthy_cow_no_detection() -> None:
     """health_score >= 0.6 → no detection regardless of bpm."""
     assert _HEAD.classify(_make_cow(health_score=1.0), _META_HIGH_BPM) is None
@@ -43,6 +44,7 @@ def test_high_bpm_without_health_threshold_no_detection() -> None:
 
 
 # --- Positive paths: respiratory flag ---
+
 
 def test_respiratory_flag_triggers() -> None:
     """'respiratory' flag + health < 0.6 → detection."""
@@ -77,6 +79,7 @@ def test_vet_now_at_critical_health() -> None:
 
 
 # --- Positive paths: high respiration bpm ---
+
 
 def test_high_bpm_triggers_with_low_health() -> None:
     """bpm > threshold + health < 0.6 → detection via bpm signal."""

@@ -94,7 +94,9 @@ def mesh_stop() -> None:
 
 @mesh_app.command("smoke")
 def mesh_smoke(
-    verbose: Annotated[bool, typer.Option("--verbose", "-v", help="Print per-agent tool calls.")] = False,
+    verbose: Annotated[
+        bool, typer.Option("--verbose", "-v", help="Print per-agent tool calls.")
+    ] = False,
 ) -> None:
     """Run the smoke test — fire one synthetic wake event per agent.
 

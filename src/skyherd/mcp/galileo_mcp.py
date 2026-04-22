@@ -109,7 +109,10 @@ def _build_tools(
         {
             "type": "object",
             "properties": {
-                "tags": {"anyOf": [{"type": "array", "items": {"type": "string"}}, {"type": "null"}], "description": "Tag IDs to filter; omit or null for all"},
+                "tags": {
+                    "anyOf": [{"type": "array", "items": {"type": "string"}}, {"type": "null"}],
+                    "description": "Tag IDs to filter; omit or null for all",
+                },
             },
             "required": [],
         },
@@ -152,9 +155,7 @@ def _build_tools(
             )
 
         return {
-            "content": [
-                {"type": "text", "text": f"Returned {len(results)} cattle positions"}
-            ],
+            "content": [{"type": "text", "text": f"Returned {len(results)} cattle positions"}],
             "positions": results,
             "count": len(results),
         }
@@ -186,9 +187,7 @@ def _build_tools(
         if cow_a is None or cow_b is None:
             missing = tag_a if cow_a is None else tag_b
             return {
-                "content": [
-                    {"type": "text", "text": f"Tag not found: {missing}"}
-                ],
+                "content": [{"type": "text", "text": f"Tag not found: {missing}"}],
                 "is_error": True,
             }
 
@@ -211,8 +210,7 @@ def _build_tools(
                 {
                     "type": "text",
                     "text": (
-                        f"Distance {tag_a}↔{tag_b}: "
-                        f"haversine={hav_m:.2f}m ECEF={ecef_m:.2f}m"
+                        f"Distance {tag_a}↔{tag_b}: haversine={hav_m:.2f}m ECEF={ecef_m:.2f}m"
                     ),
                 }
             ],

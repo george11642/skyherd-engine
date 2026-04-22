@@ -59,7 +59,12 @@ class TestLaunchDrone:
         result = await _call_tool(
             drone_server,
             "launch_drone",
-            {"mission": "coyote_patrol", "target_lat": 34.001, "target_lon": -106.001, "alt_m": 60.0},
+            {
+                "mission": "coyote_patrol",
+                "target_lat": 34.001,
+                "target_lon": -106.001,
+                "alt_m": 60.0,
+            },
         )
         # Result is a CallToolResult — check it's not an error
         assert not result.isError
@@ -130,18 +135,14 @@ class TestPlayDeterrent:
 
 class TestGetThermalClip:
     async def test_returns_path_and_counts(self, drone_server):
-        result = await _call_tool(
-            drone_server, "get_thermal_clip", {"duration_s": 5.0}
-        )
+        result = await _call_tool(drone_server, "get_thermal_clip", {"duration_s": 5.0})
         assert not result.isError
         text = result.content[0].text
         assert "thermal" in text.lower() or "clip" in text.lower()
 
     async def test_frame_count_proportional_to_duration(self, drone_server):
         # frame_count = duration_s * 10 (10fps)
-        result = await _call_tool(
-            drone_server, "get_thermal_clip", {"duration_s": 10.0}
-        )
+        result = await _call_tool(drone_server, "get_thermal_clip", {"duration_s": 10.0})
         assert not result.isError
         # We can only check content text; full dict is in the tool response
         # Verify no error

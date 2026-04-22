@@ -46,7 +46,7 @@ PREDATOR_PATTERN_LEARNER_SPEC = AgentSpec(
         _skill("nm-ecology/nm-predator-ranges.md"),
         _skill("drone-ops/patrol-planning.md"),
     ],
-    checkpoint_interval_s=86400,   # nightly
+    checkpoint_interval_s=86400,  # nightly
     max_idle_s_before_checkpoint=7200,
     model="claude-opus-4-7",
 )
@@ -84,9 +84,7 @@ async def handler(
         "Analyse the recent thermal history and propose updated patrol schedules."
     )
 
-    cached_payload = build_cached_messages(
-        _SYSTEM_PROMPT_INLINE, skill_texts, user_message
-    )
+    cached_payload = build_cached_messages(_SYSTEM_PROMPT_INLINE, skill_texts, user_message)
 
     if sdk_client is not None and os.environ.get("ANTHROPIC_API_KEY"):
         return await _run_with_sdk(sdk_client, cached_payload, session)

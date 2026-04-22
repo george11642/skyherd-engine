@@ -25,7 +25,9 @@ async def _call_tool(server, tool_name: str, args: dict) -> object:
     from mcp.types import CallToolRequest, ListToolsRequest
 
     inst = server["instance"]
-    list_result = await inst.request_handlers[ListToolsRequest](ListToolsRequest(method="tools/list"))
+    list_result = await inst.request_handlers[ListToolsRequest](
+        ListToolsRequest(method="tools/list")
+    )
     tools = list_result.root.tools
     assert any(t.name == tool_name for t in tools), f"Tool '{tool_name}' not registered"
     call_result = await inst.request_handlers[CallToolRequest](
@@ -45,12 +47,26 @@ def rich_bus():
     return _make_bus(
         {
             "trough_cam": [
-                {"cam_id": "cam_1", "frame_path": "/frames/1.png", "cows_seen": 3, "anomalies": ["limping"]},
+                {
+                    "cam_id": "cam_1",
+                    "frame_path": "/frames/1.png",
+                    "cows_seen": 3,
+                    "anomalies": ["limping"],
+                },
                 {"cam_id": "cam_1", "frame_path": "/frames/2.png", "cows_seen": 2, "anomalies": []},
-                {"cam_id": "cam_2", "frame_path": "/frames/3.png", "cows_seen": 5, "anomalies": ["discharge"]},
+                {
+                    "cam_id": "cam_2",
+                    "frame_path": "/frames/3.png",
+                    "cows_seen": 5,
+                    "anomalies": ["discharge"],
+                },
             ],
             "thermal": [
-                {"cam_id": "thermal_1", "frame_path": "/thermal/1.png", "hot_spots": [{"x": 10, "y": 20}]},
+                {
+                    "cam_id": "thermal_1",
+                    "frame_path": "/thermal/1.png",
+                    "hot_spots": [{"x": 10, "y": 20}],
+                },
                 {"cam_id": "thermal_2", "frame_path": "/thermal/2.png", "hot_spots": []},
             ],
             "water_pressure": [
@@ -187,14 +203,16 @@ class TestSubscribeAnomalies:
         assert not result.isError
 
     async def test_empty_filter_returns_all_anomalies(self, sensor_server):
-        result = await _call_tool(
-            sensor_server, "subscribe_anomalies", {"kind_filter": ""}
-        )
+        result = await _call_tool(sensor_server, "subscribe_anomalies", {"kind_filter": ""})
         assert not result.isError
 
     async def test_no_anomalies_in_clean_bus(self):
         clean_bus = _make_bus(
-            {"trough_cam": [{"cam_id": "c", "frame_path": "/f.png", "cows_seen": 1, "anomalies": []}]}
+            {
+                "trough_cam": [
+                    {"cam_id": "c", "frame_path": "/f.png", "cows_seen": 1, "anomalies": []}
+                ]
+            }
         )
         server = create_sensor_mcp_server(bus_state=clean_bus)
         result = await _call_tool(server, "subscribe_anomalies", {"kind_filter": ""})

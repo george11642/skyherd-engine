@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import random
 
 import pytest
 
@@ -14,8 +15,6 @@ from skyherd.server.events import (
     _mock_cost_tick,
     _mock_world_snapshot,
 )
-import random
-
 
 # ------------------------------------------------------------------
 # Mock data generators
@@ -129,7 +128,7 @@ async def test_broadcaster_emits_events():
 
     try:
         await asyncio.wait_for(collect(), timeout=5.0)
-    except asyncio.TimeoutError:
+    except TimeoutError:
         pytest.fail("Broadcaster did not emit 3 events within 5s")
     finally:
         bc.stop()
@@ -153,7 +152,7 @@ async def test_broadcaster_emits_cost_tick():
 
     try:
         await asyncio.wait_for(collect(), timeout=5.0)
-    except asyncio.TimeoutError:
+    except TimeoutError:
         pytest.fail("Broadcaster did not emit a cost.tick within 5s")
     finally:
         bc.stop()
@@ -180,7 +179,7 @@ async def test_broadcaster_emits_world_snapshot():
 
     try:
         await asyncio.wait_for(collect(), timeout=5.0)
-    except asyncio.TimeoutError:
+    except TimeoutError:
         pytest.fail("Broadcaster did not emit a world.snapshot within 5s")
     finally:
         bc.stop()
@@ -199,13 +198,13 @@ async def test_broadcaster_multiple_subscribers():
     results_b: list = []
 
     async def collect_a():
-        async for event_type, payload in bc.subscribe():
+        async for event_type, _payload in bc.subscribe():
             results_a.append(event_type)
             if len(results_a) >= 2:
                 break
 
     async def collect_b():
-        async for event_type, payload in bc.subscribe():
+        async for event_type, _payload in bc.subscribe():
             results_b.append(event_type)
             if len(results_b) >= 2:
                 break
@@ -215,7 +214,7 @@ async def test_broadcaster_multiple_subscribers():
             asyncio.gather(collect_a(), collect_b()),
             timeout=5.0,
         )
-    except asyncio.TimeoutError:
+    except TimeoutError:
         pytest.fail("Multiple subscribers timed out")
     finally:
         bc.stop()
@@ -234,7 +233,7 @@ async def test_broadcaster_backpressure_slow_consumer():
     fast_received = []
 
     async def fast():
-        async for event_type, payload in bc.subscribe():
+        async for event_type, _payload in bc.subscribe():
             fast_received.append(event_type)
             if len(fast_received) >= 5:
                 break
@@ -243,7 +242,7 @@ async def test_broadcaster_backpressure_slow_consumer():
     slow_received = []
 
     async def slow():
-        async for event_type, payload in bc.subscribe():
+        async for event_type, _payload in bc.subscribe():
             await asyncio.sleep(0.5)  # deliberate slow consumer
             slow_received.append(event_type)
             if len(slow_received) >= 2:
@@ -254,7 +253,7 @@ async def test_broadcaster_backpressure_slow_consumer():
             asyncio.gather(fast(), slow()),
             timeout=8.0,
         )
-    except asyncio.TimeoutError:
+    except TimeoutError:
         # Fast subscriber should still have received events even if slow timed out
         pass
     finally:
@@ -281,7 +280,7 @@ async def test_broadcaster_no_mock_world_uses_mock_fallback():
 
     try:
         await asyncio.wait_for(collect(), timeout=5.0)
-    except asyncio.TimeoutError:
+    except TimeoutError:
         pytest.fail("Broadcaster (no world) did not emit world.snapshot within 5s")
     finally:
         bc.stop()

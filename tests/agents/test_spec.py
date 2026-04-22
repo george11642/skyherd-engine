@@ -83,9 +83,7 @@ class TestBuildCachedMessages:
         if isinstance(user_msg["content"], str):
             assert "hello world" in user_msg["content"]
         else:
-            text = " ".join(
-                b.get("text", "") for b in user_msg["content"] if isinstance(b, dict)
-            )
+            text = " ".join(b.get("text", "") for b in user_msg["content"] if isinstance(b, dict))
             assert "hello world" in text
 
     def test_stable_content_precedes_volatile(self):
