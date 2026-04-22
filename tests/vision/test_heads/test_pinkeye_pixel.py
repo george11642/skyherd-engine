@@ -280,3 +280,111 @@ def test_bounds_m_override_accepted(
     head = Pinkeye()
     # Should not raise
     head.classify(sick_cow, frame_meta)
+
+
+# ---------------------------------------------------------------------------
+# Plan 05 required named tests (aliased or supplemental)
+# ---------------------------------------------------------------------------
+
+
+import ast
+import time
+from statistics import median as _median
+
+
+def test_positive_frame_triggers_non_healthy_detection(
+    rendered_positive_frame: tuple[Path, object],
+) -> None:
+    """Pixel path on a sick cow returns a detection with bbox set (Plan 05 VIS-01)."""
+    from skyherd.vision.heads.pinkeye import Pinkeye
+
+    raw_path, world = rendered_positive_frame  # type: ignore[misc]
+    sick = world.herd.cows[0]  # type: ignore[attr-defined]
+    frame_meta = {"raw_path": raw_path, "trough_id": "trough_a"}
+    result = Pinkeye().classify(sick, frame_meta)
+    assert result is not None, "pixel path returned None for a positive frame"
+    assert result.severity in {"watch", "log", "escalate"}, result.severity
+    assert result.bbox is not None
+    x0, y0, x1, y1 = result.bbox
+    assert 0 <= x0 < x1 <= 640, f"invalid x coords: {result.bbox}"
+    assert 0 <= y0 < y1 <= 480, f"invalid y coords: {result.bbox}"
+    assert "pinkeye.md" in result.reasoning
+    assert "SICK01" in result.reasoning
+
+
+def test_negative_frame_returns_none(
+    rendered_negative_frame: tuple[Path, object],
+) -> None:
+    """Pixel path on healthy cows returns None (should_evaluate gate closes) (Plan 05 VIS-01)."""
+    from skyherd.vision.heads.pinkeye import Pinkeye
+
+    raw_path, world = rendered_negative_frame  # type: ignore[misc]
+    frame_meta = {"raw_path": raw_path, "trough_id": "trough_a"}
+    for cow in world.herd.cows:  # type: ignore[attr-defined]
+        result = Pinkeye().classify(cow, frame_meta)
+        assert result is None, f"healthy cow {cow.tag} yielded detection: {result}"
+
+
+def test_inference_is_deterministic(
+    rendered_positive_frame: tuple[Path, object],
+) -> None:
+    """Two back-to-back classify calls on identical input produce equal results (Plan 05)."""
+    from skyherd.vision.heads.pinkeye import Pinkeye
+
+    raw_path, world = rendered_positive_frame  # type: ignore[misc]
+    sick = world.herd.cows[0]  # type: ignore[attr-defined]
+    frame_meta = {"raw_path": raw_path, "trough_id": "trough_a"}
+    head = Pinkeye()
+    r1 = head.classify(sick, frame_meta)
+    r2 = head.classify(sick, frame_meta)
+    assert r1 is not None and r2 is not None
+    d1 = r1.model_dump(exclude={"timestamp"})
+    d2 = r2.model_dump(exclude={"timestamp"})
+    assert d1 == d2, f"non-deterministic inference: {d1} vs {d2}"
+
+
+def test_inference_under_500ms_cpu(
+    rendered_positive_frame: tuple[Path, object],
+) -> None:
+    """Median of 5 classify calls completes under 500ms on CPU (VIS-04, Plan 05)."""
+    from skyherd.vision.heads.pinkeye import Pinkeye
+
+    raw_path, world = rendered_positive_frame  # type: ignore[misc]
+    sick = world.herd.cows[0]  # type: ignore[attr-defined]
+    frame_meta = {"raw_path": raw_path, "trough_id": "trough_a"}
+    head = Pinkeye()
+    # Warm the model + any caches
+    head.classify(sick, frame_meta)
+    durations_ms: list[float] = []
+    for _ in range(5):
+        t0 = time.perf_counter()
+        head.classify(sick, frame_meta)
+        durations_ms.append((time.perf_counter() - t0) * 1000.0)
+    median_ms = _median(durations_ms)
+    assert median_ms < 500.0, (
+        f"inference median {median_ms:.1f}ms exceeds 500ms budget; durations={durations_ms}"
+    )
+
+
+def test_imports_are_license_clean() -> None:
+    """Pinkeye source MUST NOT import ultralytics or yolov5 (VIS-02, Plan 05)."""
+    src_path = Path("src/skyherd/vision/heads/pinkeye.py")
+    tree = ast.parse(src_path.read_text())
+    forbidden = {"ultralytics", "yolov5"}
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            for alias in node.names:
+                assert alias.name.split(".")[0] not in forbidden, alias.name
+        elif isinstance(node, ast.ImportFrom):
+            if node.module:
+                assert node.module.split(".")[0] not in forbidden, node.module
+
+
+def test_model_loads_via_lru_cache() -> None:
+    """_get_model is cached — two calls return the same object (Plan 05)."""
+    from skyherd.vision.heads.pinkeye import _get_model
+
+    m1 = _get_model()
+    m2 = _get_model()
+    assert m1 is m2, "lru_cache not hit — model reloaded on second call"
+    assert m1 is not None, "Plan 03 weights missing — model failed to load"
