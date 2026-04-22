@@ -1,3 +1,5 @@
+T16: stable — ruff clean, 1106 tests at 87.42% (80% passed), 16/16 demo PASSes (seed 42), HTTP 200. 2026-04-21.
+
 # T15 Stability Note — 20260421-000000
 
 HEAD `efa0c2f239bdc49fcd6b53beb4c52c8a68caf6c5` — ruff clean, 1106 tests at 87.42% coverage (80% threshold passed), 16/16 demo PASSes (seed 42), prod endpoint `https://skyherd-engine.vercel.app` HTTP 200. No regression from T14. System stable at 9/10 gate TRULY-GREEN.
