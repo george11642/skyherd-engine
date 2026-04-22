@@ -20,6 +20,7 @@ import logging
 import os
 from typing import Any
 
+from skyherd.agents._handler_base import run_handler_cycle
 from skyherd.agents.session import Session, _load_text, build_cached_messages
 from skyherd.agents.spec import AgentSpec
 
@@ -99,30 +100,8 @@ async def handler(
     cached_payload = build_cached_messages(_SYSTEM_PROMPT_INLINE, skill_texts, user_message)
 
     if sdk_client is not None and os.environ.get("ANTHROPIC_API_KEY"):
-        return await _run_with_sdk(sdk_client, cached_payload, session)
+        return await run_handler_cycle(session, wake_event, sdk_client, cached_payload)
     return _simulate_handler(wake_event, session)
-
-
-async def _run_with_sdk(
-    sdk_client: Any,
-    cached_payload: dict[str, Any],
-    session: Session,
-) -> list[dict[str, Any]]:
-    from claude_agent_sdk import AssistantMessage, ResultMessage, ToolUseBlock
-
-    calls: list[dict[str, Any]] = []
-    prompt = cached_payload["messages"][0]["content"][0]["text"]
-    async for msg in sdk_client.query(prompt=prompt):
-        if isinstance(msg, AssistantMessage):
-            for block in msg.content:
-                if isinstance(block, ToolUseBlock):
-                    calls.append({"tool": block.name, "input": block.input})
-            if msg.usage:
-                session.cumulative_tokens_in += msg.usage.get("input_tokens", 0)
-                session.cumulative_tokens_out += msg.usage.get("output_tokens", 0)
-        elif isinstance(msg, ResultMessage) and msg.total_cost_usd:
-            session.cumulative_cost_usd += msg.total_cost_usd
-    return calls
 
 
 def _simulate_handler(
