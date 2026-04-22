@@ -2,14 +2,14 @@
 
 > Fresh Claude sessions read this **after CLAUDE.md**. Update atomically with every commit.
 
-**Last updated**: 2026-04-21 (5 demo scenarios green — coyote/sick-cow/water/calving/storm, 76 new tests, skyherd-demo CLI)
+**Last updated**: 2026-04-21 (judge docs green — ARCHITECTURE.md, MANAGED_AGENTS.md, ONE_PAGER.md+pdf, skills/README.md, judge quickstart in CLAUDE.md)
 **Plan**: v5.1 at `/home/george/.claude/plans/update-ur-memory-project-context-splendid-swan.md`
 **Submission**: due 2026-04-26 8pm EST
 **External blockers**: see [GitHub Issues](https://github.com/george11642/skyherd-engine/issues)
 
 ## Summary
 
-- Green / Total: **62 / 79**
+- Green / Total: **66 / 79**
 - Tier MVP status: 🟡 agents layer complete
 - Sim Completeness Gate: 🔴 not passed (target Fri Apr 24 noon)
 - Hardware tiers: 🔴 blocked on Gate
@@ -128,9 +128,10 @@
 ## Deliverables (6)
 
 - [ ] 3-min demo video (YouTube unlisted)
-- [ ] `docs/ARCHITECTURE.md` — tier-MVP architecture map
-- [ ] `docs/MANAGED_AGENTS.md` — $5k prize essay for judges
-- [ ] `docs/ONE_PAGER.pdf` — judge one-pager via Claude Design handoff
+- [x] `docs/ARCHITECTURE.md` — tier-MVP architecture map
+- [x] `docs/MANAGED_AGENTS.md` — $5k prize essay for judges
+- [x] `docs/ONE_PAGER.pdf` — judge one-pager (md + pdf, weasyprint, 24 KB)
+- [x] `skills/README.md` — 33-file skills inventory
 - [ ] 100–200 word written submission summary
 - [ ] Submission form filled at cerebralvalley.ai
 
