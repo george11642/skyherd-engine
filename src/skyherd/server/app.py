@@ -6,14 +6,25 @@ Serves:
 - /api/agents          — 5 agent statuses
 - /api/attest          — recent ledger entries (since_seq param)
 - /events              — SSE stream (EventSourceResponse)
+- /metrics             — Prometheus text format (obs extras)
 - /                    — serves Vite SPA (web/dist/index.html)
 - /rancher             — same SPA, client-side router handles /rancher
 
 Mock mode (SKYHERD_MOCK=1): no live mesh/bus/world required.
+
+Security notes
+--------------
+- CORS origins restricted via SKYHERD_CORS_ORIGINS env var (comma-separated).
+  Defaults to localhost dev origins only; wildcard "*" is never set.
+  See SECURITY_REVIEW.md F-01.
+- SSE connections capped at SSE_MAX_CONNECTIONS (default 100) to prevent
+  resource exhaustion. See SECURITY_REVIEW.md F-02.
+- No credentials (cookies/auth headers) used — allow_credentials=False.
 """
 
 from __future__ import annotations
 
+import asyncio
 import json
 import logging
 import os
@@ -24,7 +35,7 @@ from typing import Any
 
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 from sse_starlette.sse import EventSourceResponse
 
@@ -40,8 +51,24 @@ logger = logging.getLogger(__name__)
 _MOCK_MODE = os.environ.get("SKYHERD_MOCK", "0") == "1"
 _STATIC_DIR = Path(__file__).parent.parent.parent.parent / "web" / "dist"
 
+# SSE connection limiter — prevents resource exhaustion (SECURITY_REVIEW F-02)
+_SSE_MAX_CONNECTIONS = int(os.environ.get("SSE_MAX_CONNECTIONS", "100"))
+_sse_semaphore: asyncio.Semaphore | None = None
+
 # Shared broadcaster instance (module-level, created at startup)
 _broadcaster: EventBroadcaster | None = None
+
+
+def _cors_origins() -> list[str]:
+    """Return allowed CORS origins from env var or safe dev defaults.
+
+    Never includes a wildcard — see SECURITY_REVIEW.md F-01.
+    """
+    raw = os.environ.get("SKYHERD_CORS_ORIGINS", "")
+    if raw:
+        return [o.strip() for o in raw.split(",") if o.strip()]
+    # Dev defaults — localhost only, no wildcard
+    return ["http://localhost:5173", "http://localhost:3000", "http://localhost:8000"]
 
 
 def create_app(
@@ -57,8 +84,9 @@ def create_app(
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
-        global _broadcaster
+        global _broadcaster, _sse_semaphore
         _broadcaster = broadcaster
+        _sse_semaphore = asyncio.Semaphore(_SSE_MAX_CONNECTIONS)
         broadcaster.start()
         logger.info("SkyHerd server started (mock=%s)", use_mock)
         yield
@@ -72,13 +100,13 @@ def create_app(
         lifespan=lifespan,
     )
 
-    # CORS — open for Vite dev server
+    # CORS — restricted origins, no wildcard, no credentials (SECURITY_REVIEW F-01)
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["http://localhost:5173", "http://localhost:3000", "*"],
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
+        allow_origins=_cors_origins(),
+        allow_credentials=False,
+        allow_methods=["GET", "POST", "OPTIONS"],
+        allow_headers=["Content-Type", "Accept", "Cache-Control", "Last-Event-ID"],
     )
 
     # ------------------------------------------------------------------
@@ -118,16 +146,46 @@ def create_app(
         return JSONResponse(content={"entries": entries, "ts": time.time()})
 
     # ------------------------------------------------------------------
-    # SSE endpoint
+    # SSE endpoint — connection-limited (SECURITY_REVIEW F-02)
     # ------------------------------------------------------------------
 
-    @app.get("/events")
-    async def sse_stream() -> EventSourceResponse:
+    @app.get("/events", response_model=None)
+    async def sse_stream() -> Response:
+        sem = _sse_semaphore
+        if sem is not None and sem._value == 0:  # noqa: SLF001
+            return Response(
+                content="Too many SSE connections",
+                status_code=429,
+                media_type="text/plain",
+            )
+
         async def _generator():
-            async for event_type, payload in broadcaster.subscribe():
-                yield {"event": event_type, "data": json.dumps(payload, default=str)}
+            if sem is None:
+                async for event_type, payload in broadcaster.subscribe():
+                    yield {"event": event_type, "data": json.dumps(payload, default=str)}
+                return
+            async with sem:
+                async for event_type, payload in broadcaster.subscribe():
+                    yield {"event": event_type, "data": json.dumps(payload, default=str)}
 
         return EventSourceResponse(_generator())
+
+    # ------------------------------------------------------------------
+    # Metrics endpoint (Prometheus text format)
+    # ------------------------------------------------------------------
+
+    @app.get("/metrics")
+    async def metrics_endpoint() -> Response:
+        try:
+            from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
+
+            data = generate_latest()
+            return Response(content=data, media_type=CONTENT_TYPE_LATEST)
+        except ImportError:
+            return Response(
+                content="# prometheus_client not installed\n",
+                media_type="text/plain; version=0.0.4",
+            )
 
     # ------------------------------------------------------------------
     # Static SPA
