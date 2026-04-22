@@ -37,28 +37,27 @@ HERD_HEALTH_WATCHER_SPEC = AgentSpec(
     ],
     mcp_servers=["sensor_mcp", "rancher_mcp", "galileo_mcp"],
     skills=[
+        # Behaviour context
         _skill("cattle-behavior/feeding-patterns.md"),
         _skill("cattle-behavior/lameness-indicators.md"),
         _skill("cattle-behavior/heat-stress.md"),
         _skill("cattle-behavior/herd-structure.md"),
-        # disease sub-skills
-        _skill("cattle-behavior/disease/pinkeye.md") if False else "",  # loaded if exists
+        _skill("cattle-behavior/calving-signs.md"),
+        # Disease decision rules (all 7 detection heads)
+        _skill("cattle-behavior/disease/pinkeye.md"),
+        _skill("cattle-behavior/disease/screwworm.md"),
+        _skill("cattle-behavior/disease/foot-rot.md"),
+        _skill("cattle-behavior/disease/brd.md"),
+        _skill("cattle-behavior/disease/lsd.md"),
+        _skill("cattle-behavior/disease/heat-stress-disease.md"),
+        _skill("cattle-behavior/disease/bcs.md"),
+        # Ranch operations
         _skill("ranch-ops/human-in-loop-etiquette.md"),
     ],
     checkpoint_interval_s=86400,  # nightly checkpoint
     max_idle_s_before_checkpoint=3600,
     model="claude-opus-4-7",
 )
-
-# Override skills with all that actually exist
-HERD_HEALTH_WATCHER_SPEC.skills = [
-    _skill("cattle-behavior/feeding-patterns.md"),
-    _skill("cattle-behavior/lameness-indicators.md"),
-    _skill("cattle-behavior/heat-stress.md"),
-    _skill("cattle-behavior/herd-structure.md"),
-    _skill("cattle-behavior/calving-signs.md"),
-    _skill("ranch-ops/human-in-loop-etiquette.md"),
-]
 
 _SYSTEM_PROMPT_INLINE = """\
 You are HerdHealthWatcher for the SkyHerd ranch monitoring system.
