@@ -13,7 +13,7 @@
     "quick_branch_template": null
   },
   "workflow": {
-    "research": false,
+    "research": true,
     "plan_check": true,
     "verifier": true,
     "nyquist_validation": true,
@@ -27,7 +27,7 @@
     "text_mode": false,
     "research_before_questions": false,
     "discuss_mode": "discuss",
-    "skip_discuss": false,
+    "skip_discuss": true,
     "code_review": true,
     "code_review_depth": "standard",
     "code_review_command": null,
@@ -36,7 +36,8 @@
     "plan_bounce_script": null,
     "plan_bounce_passes": 2,
     "auto_prune_state": false,
-    "use_worktrees": true
+    "use_worktrees": true,
+    "_auto_chain_active": false
   },
   "hooks": {
     "context_warnings": true
