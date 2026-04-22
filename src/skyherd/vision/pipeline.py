@@ -77,6 +77,7 @@ class ClassifyPipeline:
         frame_meta: dict[str, Any] = {
             "trough_id": trough_id,
             "temp_f": weather.temp_f,
+            "raw_path": raw_path,  # Path to the rendered PNG — pixel heads consume this
         }
         if frame_meta_override:
             frame_meta.update(frame_meta_override)

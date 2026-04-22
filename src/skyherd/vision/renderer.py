@@ -315,14 +315,18 @@ def annotate_frame(
     severity_to_class = {"watch": 0, "log": 1, "escalate": 2, "vet_now": 3}
 
     for i, det in enumerate(detections):
-        # Spread boxes across the frame in a grid layout
-        col = i % 4
-        row = i // 4
-        x0 = col * (w // 4) + 10
-        y0 = row * (h // 5) + 10
-        x1 = min(x0 + box_w, w - 5)
-        y1 = min(y0 + box_h, h - 5)
-        xyxy.append([float(x0), float(y0), float(x1), float(y1)])
+        if det.bbox is not None:
+            # Real pixel bbox from pixel head — use directly
+            xyxy.append([float(det.bbox[0]), float(det.bbox[1]), float(det.bbox[2]), float(det.bbox[3])])
+        else:
+            # Grid layout fallback for rule-based heads (preserves existing behavior)
+            col = i % 4
+            row = i // 4
+            x0 = col * (w // 4) + 10
+            y0 = row * (h // 5) + 10
+            x1 = min(x0 + box_w, w - 5)
+            y1 = min(y0 + box_h, h - 5)
+            xyxy.append([float(x0), float(y0), float(x1), float(y1)])
         labels.append(f"{det.head_name}:{det.severity} [{det.cow_tag}]")
         class_ids.append(severity_to_class.get(det.severity, 0))
 
