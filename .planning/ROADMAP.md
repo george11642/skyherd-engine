@@ -47,10 +47,11 @@ Phase 3 (HYG) — fully parallel with 1, 2, 4 (no shared files)
 - Phase 6 is the final gate — runs last, verifies no phase introduced regression.
 
 **Shared file watch-list (for merge discipline):**
-- `src/skyherd/scenarios/base.py` — Phase 1 only.
+- `src/skyherd/scenarios/base.py` — Phase 1 owns lines 160-200 + 234-337; Phase 3 owns line 311 only (non-overlapping).
 - `src/skyherd/vision/` — Phase 2 only.
-- `src/skyherd/server/` — Phase 5 only.
+- `src/skyherd/server/` — Phase 5 only (Phase 3 touches `server/events.py` and `server/app.py` for hygiene-only edits).
 - `src/skyherd/voice/call.py`, `src/skyherd/mcp/rancher_mcp.py` — Phase 3 (Twilio) only.
+- `src/skyherd/agents/managed.py`, `src/skyherd/agents/session.py` — Phase 1 only (6 pyright errors DEFERRED from Phase 3 to Phase 1).
 - `Makefile`, `.github/workflows/` — Phase 4 and Phase 6 must coordinate.
 
 ---
@@ -67,6 +68,7 @@ Phase 3 (HYG) — fully parallel with 1, 2, 4 (no shared files)
   3. All 5 agents have at least one test assertion across the scenario suite proving they actually ran (`AgentDispatched ≥ 1` per agent).
   4. The SSE stream emits `rate_per_hr_usd: 0.0` and `all_idle: True` after N seconds of no routed events, demonstrating real idle-pause billing.
   5. `PredatorPatternLearner` retains context across sim-day boundaries within a scenario run (checkpoint persistence observable in session state).
+  6. **Pyright handoff from Phase 3:** `uv run pyright src/skyherd/agents/managed.py src/skyherd/agents/session.py` exits with zero errors (Phase 3 deferred 6 errors here per research doc; Phase 1's restructure must close them naturally).
 **Plans**: 3 plans (2 waves)
   - Wave 1: 01-01-PLAN — _DemoMesh session registry refactor (MA-01, MA-02, MA-03, ROUT-01)
   - Wave 2: 01-02-PLAN — Routing table + PredatorPatternLearner dispatch verification (ROUT-02, ROUT-03, ROUT-04)
@@ -85,16 +87,20 @@ Phase 3 (HYG) — fully parallel with 1, 2, 4 (no shared files)
 **Plans**: TBD
 
 ### Phase 3: Code Hygiene Sweep
-**Goal**: All silent-except blocks replaced with logged warnings; Twilio auth env var standardized; cost.py billing logic fully tested; ruff + pyright run clean.
+**Goal**: All silent-except blocks replaced with logged warnings; Twilio auth env var standardized; cost.py billing logic fully tested; ruff + pyright run clean (for files Phase 3 owns).
 **Depends on**: Nothing (parallel with Phases 1, 2, 4)
 **Requirements**: HYG-01, HYG-02, HYG-03, HYG-04, HYG-05
 **Success Criteria** (what must be TRUE):
-  1. A `grep -rn "except.*pass" src/skyherd/` returns zero bare silent catches (all 15+ CONCERNS.md §3 sites converted to `except Exception as exc: logger.warning(...)`).
-  2. Twilio voice calls succeed regardless of code path — both `voice/call.py` and `mcp/rancher_mcp.py` read `TWILIO_AUTH_TOKEN`, with a deprecation warning emitted if the legacy `TWILIO_TOKEN` is set instead.
-  3. `agents/cost.py` coverage ≥ 90%, with explicit tests proving idle-pause billing, active-state delta accumulation, and the `all_idle` aggregation path behave as specified.
-  4. `uv run pyright` exits clean (the 15 pre-existing drone errors resolved or carried with rationale comments); `uv run ruff check` exits clean.
-  5. Project-wide coverage holds or exceeds 87% — no regression on the global gate.
-**Plans**: TBD
+  1. A `grep -rEn "except Exception:\s*pass\s*$" src/skyherd/` returns zero matches; 14-15 FIX sites converted to `logger.{warning,debug}(...)` per category; 9 WONTFIX sites (typed `CancelledError` + `KeyboardInterrupt`) explicitly documented as acceptable non-bare catches.
+  2. Twilio voice calls succeed regardless of code path — `voice/call.py`, `mcp/rancher_mcp.py`, and `demo/hardware_only.py` all route through a single `_get_twilio_auth_token()` helper that prefers `TWILIO_AUTH_TOKEN` and emits `DeprecationWarning` once per process when the legacy `TWILIO_TOKEN` is set.
+  3. `agents/cost.py` coverage ≥ 90% (target ~98%) with 4 new test classes covering MQTT publish callback, ledger callback, property getters, and the `run_tick_loop` iteration body.
+  4. `uv run pyright src/skyherd/drone/ src/skyherd/sensors/ src/skyherd/voice/ src/skyherd/edge/ src/skyherd/server/ src/skyherd/scenarios/ src/skyherd/agents/cost.py` exits clean; `uv run ruff check src/ tests/` exits clean. Pyright errors in `agents/managed.py` + `agents/session.py` are explicitly DEFERRED to Phase 1 (those files are Phase 1's surface).
+  5. Project-wide coverage holds or exceeds 87% — no regression on the global gate (≥80% hard gate).
+**Plans**: 4 plans (1 wave — fully parallel; zero file overlap between plans)
+  - [ ] 03-01-PLAN.md — Twilio env migration (HYG-02): new `_twilio_env.py` helper + voice/call.py + demo/hardware_only.py + mcp/rancher_mcp.py + .env.example + docs; includes voice/call.py:200 silent-except DEBUG conversion.
+  - [ ] 03-02-PLAN.md — Silent-except sweep for non-drone subsystems (HYG-01): 9 FIX sites across sensors/bus.py × 3, sensors/trough_cam.py, server/events.py × 2, voice/tts.py, edge/watcher.py × 3, scenarios/base.py, scenarios/cross_ranch_coyote.py; 5 caplog RED-first tests.
+  - [ ] 03-03-PLAN.md — cost.py coverage uplift (HYG-03 + HYG-05): 4 new test classes in tests/agents/test_cost.py, no source changes.
+  - [ ] 03-04-PLAN.md — Drone silent-except sweep + pyright cleanup + ruff auto-fix (HYG-01 + HYG-04 + HYG-05): 7 FIX + 1 WONTFIX drone sites; 8 pymavlink typed-ignores with rationale; sitl_emulator:582 nullability via assert; ruff auto-fix server/app.py.
 
 ### Phase 4: Build & Quickstart Health
 **Goal**: A judge cloning the repo fresh and running the documented 3-command quickstart succeeds in under 5 minutes, with `make_world(seed=42)` usable without arguments and `make dashboard` serving live-mode (not mock-only).
@@ -143,7 +149,7 @@ Phase 3 (HYG) — fully parallel with 1, 2, 4 (no shared files)
 |-------|----------------|--------|-----------|
 | 1. Agent Session Persistence & Routing | 0/3 | Planned | - |
 | 2. Vision Pixel Inference | 0/TBD | Not started | - |
-| 3. Code Hygiene Sweep | 0/TBD | Not started | - |
+| 3. Code Hygiene Sweep | 0/4 | Planned | - |
 | 4. Build & Quickstart Health | 0/3 | Planned | - |
 | 5. Dashboard Live-Mode & Vet-Intake | 0/TBD | Not started | - |
 | 6. SITL-CI & Determinism Gate | 0/TBD | Not started | - |
@@ -170,3 +176,4 @@ Phase 3 (HYG) — fully parallel with 1, 2, 4 (no shared files)
 ---
 
 *Roadmap created: 2026-04-22*
+*Phase 3 planned: 2026-04-22 (4 plans, 1 wave)*
