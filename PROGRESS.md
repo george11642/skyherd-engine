@@ -2,7 +2,7 @@
 
 > Fresh Claude sessions read this **after CLAUDE.md**. Update atomically with every commit.
 
-**Last updated**: 2026-04-22 (Wildfire + Rustling scenarios live, all 8 in SCENARIO=all, CrossRanchView vitest test — 137 pytest + 38 vitest green)
+**Last updated**: 2026-04-21 — review fixes complete: 10/10 CRITICAL/HIGH items closed (C3, C4×2, C5, C6, H5, H7, H10, C-01, C-02, H-05); 1046 pytest green, 82.63% coverage, 0 pyright errors
 **Plan**: v5.1 at `/home/george/.claude/plans/update-ur-memory-project-context-splendid-swan.md`
 **Submission**: due 2026-04-26 8pm EST
 **External blockers**: see [GitHub Issues](https://github.com/george11642/skyherd-engine/issues)
@@ -10,6 +10,20 @@
 ## Summary
 
 - Green / Total: **89 / 95**
+
+## Review fixes (10/10 — all CRITICAL/HIGH closed)
+
+- [x] **C3** — SensorBus: aiomqtt persistent `__aenter__`/`__aexit__` connection + exponential backoff reconnect
+- [x] **C4 (edge)** — EdgeWatcher: persistent MQTT client in `run()` lifecycle; `_ensure_mqtt_connected()` non-blocking
+- [x] **C4 (sensors)** — SensorBus publish reuses persistent `_client`; single CONNECT for N publishes verified by test
+- [x] **C5** — DroneTimeoutError(DroneUnavailable) hierarchy; all SITL telemetry awaits wrapped in `asyncio.wait_for()`
+- [x] **C6** — Twilio exception narrowing in `rancher_mcp._try_send_sms/voice_call` and `voice.call._try_twilio_call`; bare `except` → `except Exception` with `type(exc).__name__` WARNING log
+- [x] **H5** — `should_evaluate()` gate on Head ABC; all 7 heads implement fast-reject; registry checks gate before classify()
+- [x] **H7** — HerdHealthWatcher: remove dead `if False else ""` ternary; add all 7 disease skills + 5 behavior + ranch-ops inline in AgentSpec
+- [x] **H-10** — numpy vectorized gradient background (linspace+broadcast) and thermal gaussian (mgrid+exp); Pillow deprecation warnings fixed
+- [x] **C-01** — `hashlib.sha256(sp_text.encode()).hexdigest()[:16]` replaces `str(hash(sp_text))` in session.py
+- [x] **C-02** — `tempfile.mkstemp()` replaces 3× deprecated `tempfile.mktemp()` in renderer.py
+- [x] **H-05** — `self._inflight_handlers: set[asyncio.Task]` + `done_callback(discard)` in AgentMesh prevents fire-and-forget GC
 - Tier MVP status: 🟡 agents layer complete
 - Sim Completeness Gate: 🟢 10/10 TRULY-GREEN (all items verified by execution — see docs/verify-latest.md)
 - Hardware tiers: 🟡 H1 software-ready (awaits Pi); H3 software-ready (awaits flash/install); H4 software-ready (awaits parts); Two-Pi-4 fleet software-ready; iOS + Android companion software-ready
