@@ -1,12 +1,12 @@
 /**
- * Client-side routing — / → Dashboard, /rancher → RancherPhone PWA.
- *
- * Minimal router (no react-router dep) — reads window.location.pathname.
+ * Client-side routing — reads window.location.pathname.
+ * / → Dashboard, /rancher → RancherPhone PWA, /cross-ranch → CrossRanchView.
  */
 
 import { useState, useEffect } from "react";
 import App from "@/App";
 import { RancherPhone } from "@/components/RancherPhone";
+import CrossRanchView from "@/components/CrossRanchView";
 
 export function Router() {
   const [path, setPath] = useState(window.location.pathname);
@@ -20,6 +20,8 @@ export function Router() {
   if (path.startsWith("/rancher")) {
     return <RancherPhone />;
   }
-
+  if (path.startsWith("/cross-ranch")) {
+    return <CrossRanchView />;
+  }
   return <App />;
 }

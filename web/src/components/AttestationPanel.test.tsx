@@ -134,9 +134,9 @@ describe("AttestationPanel", () => {
     await act(async () => {
       render(<AttestationPanel collapsed={false} onToggle={onToggle} />);
     });
-    // Find the cardheader area by the title text
+    // The toggle target is a <button> — find it by the title text inside it
     const titleEl = screen.getByText(/attestation chain/i);
-    const header = titleEl.closest("div");
+    const header = titleEl.closest("button") ?? titleEl.closest("div");
     fireEvent.click(header!);
     expect(onToggle).toHaveBeenCalledOnce();
   });

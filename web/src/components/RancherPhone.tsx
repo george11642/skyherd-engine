@@ -1,16 +1,11 @@
 /**
  * RancherPhone — /rancher PWA view.
  *
- * Shows:
- * - Wes cowboy persona call screen (animated phone ring)
- * - Drone thermal feed area
- * - Live agent reasoning panel (last 20 events across all agents)
+ * Dark phone-first. Shows Wes call screen when agents fire critical events,
+ * drone thermal feed, and a live agent reasoning panel.
  */
 
 import { useState, useEffect, useCallback } from "react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/cn";
 import { getSSE } from "@/lib/sse";
 
@@ -29,18 +24,6 @@ interface CallState {
   agent?: string;
 }
 
-const URGENCY_COLORS = {
-  normal: "text-green-400",
-  high: "text-yellow-400",
-  critical: "text-red-400",
-};
-
-const URGENCY_BADGE: Record<string, "success" | "warning" | "destructive"> = {
-  normal: "success",
-  high: "warning",
-  critical: "destructive",
-};
-
 function formatTime(ts: number): string {
   return new Date(ts * 1000).toLocaleTimeString("en-US", {
     hour: "2-digit",
@@ -50,29 +33,51 @@ function formatTime(ts: number): string {
   });
 }
 
+function formatRelative(ts: number): string {
+  const diff = Math.floor(Date.now() / 1000 - ts);
+  if (diff < 60) return `${diff}s ago`;
+  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+  return `${Math.floor(diff / 3600)}h ago`;
+}
+
+const URGENCY_COLOR: Record<string, string> = {
+  normal:   "var(--color-accent-sage)",
+  high:     "var(--color-warn)",
+  critical: "var(--color-danger)",
+};
+
+const LEVEL_COLOR: Record<string, string> = {
+  ERROR: "var(--color-danger)",
+  WARN:  "var(--color-warn)",
+  INFO:  "var(--color-text-1)",
+};
+
 export function RancherPhone() {
   const [logs, setLogs] = useState<AgentLogEntry[]>([]);
   const [call, setCall] = useState<CallState | null>(null);
   const [droneState, setDroneState] = useState("idle");
   const [cowCount, setCowCount] = useState<number | null>(null);
+  const [lastEventTs, setLastEventTs] = useState<number | null>(null);
 
   const handleLog = useCallback((payload: AgentLogEntry) => {
     setLogs((prev) => [...prev, payload].slice(-20));
+    setLastEventTs(payload.ts);
 
-    // Trigger call screen on critical events
+    const msg = payload.message.toLowerCase();
     if (
-      payload.message.toLowerCase().includes("calving") ||
-      payload.message.toLowerCase().includes("coyote") ||
-      payload.message.toLowerCase().includes("priority") ||
-      payload.message.toLowerCase().includes("wes call")
+      msg.includes("calving") ||
+      msg.includes("coyote") ||
+      msg.includes("priority") ||
+      msg.includes("wes call") ||
+      msg.includes("sick") ||
+      msg.includes("breach")
     ) {
       setCall({
         active: true,
-        urgency: payload.message.toLowerCase().includes("priority") ? "critical" : "high",
+        urgency: msg.includes("priority") || msg.includes("critical") ? "critical" : "high",
         message: payload.message,
         agent: payload.agent,
       });
-      // Auto-dismiss after 8s
       setTimeout(() => setCall(null), 8000);
     }
   }, []);
@@ -95,141 +100,360 @@ export function RancherPhone() {
     };
   }, [handleLog, handleSnapshot]);
 
+  const droneActive = droneState !== "idle";
+
   return (
-    <div className="min-h-screen bg-slate-950 p-4 space-y-4">
+    <div
+      className="min-h-screen flex flex-col"
+      style={{
+        backgroundColor: "var(--color-bg-0)",
+        paddingTop: "env(safe-area-inset-top)",
+        paddingBottom: "env(safe-area-inset-bottom)",
+        paddingLeft: "env(safe-area-inset-left)",
+        paddingRight: "env(safe-area-inset-right)",
+      }}
+    >
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <header
+        className="flex items-center justify-between px-4 py-3 shrink-0 border-b"
+        style={{ borderColor: "var(--color-line)", backgroundColor: "var(--color-bg-1)" }}
+      >
         <div>
-          <h1 className="text-xl font-bold text-slate-100">SkyHerd</h1>
-          <p className="text-xs text-slate-500">Ranch Intelligence — Rancher View</p>
-        </div>
-        <div className="flex gap-2">
-          {cowCount !== null && (
-            <Badge variant="success">{cowCount} cattle</Badge>
-          )}
-          <Badge variant={droneState === "idle" ? "muted" : "default"}>
-            Drone: {droneState}
-          </Badge>
-        </div>
-      </div>
-
-      {/* Call screen (conditional) */}
-      {call && (
-        <div
-          className={cn(
-            "rounded-2xl border p-6 text-center space-y-4",
-            call.urgency === "critical"
-              ? "border-red-500/60 bg-red-500/10"
-              : "border-yellow-500/60 bg-yellow-500/10",
-          )}
-          role="alert"
-          aria-live="assertive"
-        >
-          {/* Animated phone */}
-          <div className="flex justify-center">
-            <span className="text-5xl phone-ring" role="img" aria-label="Incoming call">
-              📞
-            </span>
-          </div>
-          <div>
-            <p className="text-lg font-bold text-slate-100">Wes calling…</p>
-            <p className="text-sm text-slate-400 mt-1">{call.agent}</p>
-          </div>
-          <p className={cn("text-sm font-mono", URGENCY_COLORS[call.urgency])}>
-            {call.message}
-          </p>
-          <div className="flex gap-3 justify-center">
-            <Button
-              variant="default"
-              className="bg-green-600 hover:bg-green-700 border-green-700"
-              onClick={() => setCall(null)}
-            >
-              Answer
-            </Button>
-            <Button variant="outline" onClick={() => setCall(null)}>
-              Dismiss
-            </Button>
-          </div>
-        </div>
-      )}
-
-      {/* Drone feed area */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Drone Feed</CardTitle>
-          <Badge variant={droneState !== "idle" ? "success" : "muted"}>
-            {droneState}
-          </Badge>
-        </CardHeader>
-        <CardContent>
-          <div
-            className="rounded-lg bg-slate-900 border border-slate-700 h-40 flex items-center justify-center"
-            role="img"
-            aria-label="Drone thermal feed placeholder"
+          <h1
+            className="leading-none"
+            style={{
+              fontFamily: "var(--font-display)",
+              fontSize: "1.25rem",
+              fontWeight: 600,
+              letterSpacing: "-0.02em",
+              color: "var(--color-text-0)",
+            }}
           >
-            <div className="text-center space-y-2">
-              <div className="text-4xl opacity-20">🚁</div>
-              <p className="text-xs text-slate-600 font-mono">
-                {droneState === "idle"
-                  ? "Drone grounded — no active mission"
-                  : `Live thermal feed · ${droneState.toUpperCase()}`}
+            Sky<span style={{ color: "var(--color-accent-sage)" }}>Herd</span>
+          </h1>
+          <p
+            className="mt-0.5"
+            style={{
+              fontFamily: "var(--font-mono)",
+              fontSize: "0.6875rem",
+              color: "var(--color-text-2)",
+            }}
+          >
+            Rancher View · {import.meta.env.VITE_DEMO_MODE === "replay" ? "replay" : "live"}
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          {cowCount !== null && (
+            <span className="chip chip-sage">{cowCount} cattle</span>
+          )}
+          <span className={cn("chip", droneActive ? "chip-sky" : "chip-muted")}>
+            <span
+              className={cn("h-1.5 w-1.5 rounded-full shrink-0", droneActive ? "bg-[rgb(120_180_220)] pulse-dot" : "bg-[rgb(38_45_58)]")}
+              aria-hidden="true"
+            />
+            {droneState.toUpperCase()}
+          </span>
+        </div>
+      </header>
+
+      <div className="flex-1 flex flex-col gap-3 p-4">
+        {/* ── Call screen ── */}
+        {call ? (
+          <div
+            className="rounded border p-5 flex flex-col items-center gap-4"
+            style={{
+              backgroundColor: `rgb(from ${call.urgency === "critical" ? "224 100 90" : "240 195 80"} r g b / 0.08)`,
+              borderColor: URGENCY_COLOR[call.urgency],
+            }}
+            role="alert"
+            aria-live="assertive"
+          >
+            {/* Caller ID */}
+            <div className="flex flex-col items-center gap-3">
+              <div
+                className="h-16 w-16 rounded-full flex items-center justify-center phone-ring"
+                style={{ backgroundColor: "rgb(148 176 136 / 0.15)", border: "2px solid var(--color-accent-sage)" }}
+                aria-label="Incoming call from Wes"
+              >
+                <span
+                  style={{
+                    fontFamily: "var(--font-display)",
+                    fontSize: "1.75rem",
+                    fontWeight: 700,
+                    color: "var(--color-accent-sage)",
+                    letterSpacing: "-0.02em",
+                  }}
+                >
+                  W
+                </span>
+              </div>
+              <div className="text-center">
+                <p
+                  style={{
+                    fontFamily: "var(--font-display)",
+                    fontSize: "1.25rem",
+                    fontWeight: 600,
+                    letterSpacing: "-0.02em",
+                    color: "var(--color-text-0)",
+                  }}
+                >
+                  Wes calling...
+                </p>
+                <p
+                  className="mt-0.5"
+                  style={{
+                    fontFamily: "var(--font-mono)",
+                    fontSize: "0.6875rem",
+                    color: "var(--color-text-2)",
+                  }}
+                >
+                  {call.agent}
+                </p>
+              </div>
+            </div>
+
+            {/* Message */}
+            <p
+              className="text-center w-full"
+              style={{
+                fontFamily: "var(--font-mono)",
+                fontSize: "0.8125rem",
+                color: URGENCY_COLOR[call.urgency],
+                lineHeight: 1.5,
+              }}
+            >
+              {call.message}
+            </p>
+
+            {/* Action buttons */}
+            <div className="flex flex-col gap-2 w-full">
+              <button
+                className="btn btn-primary w-full"
+                onClick={() => setCall(null)}
+                aria-label="Answer call"
+              >
+                Answer
+              </button>
+              <div className="flex gap-2">
+                <button
+                  className="btn btn-ghost flex-1"
+                  onClick={() => setCall(null)}
+                  aria-label="Dismiss call"
+                >
+                  Dismiss
+                </button>
+                <button
+                  className="btn btn-ghost flex-1"
+                  onClick={() => setCall(null)}
+                  aria-label="Log only"
+                >
+                  Log only
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : (
+          /* All-quiet state */
+          <div
+            className="rounded border px-4 py-3 flex items-center gap-3"
+            style={{
+              backgroundColor: "var(--color-bg-1)",
+              borderColor: "var(--color-line)",
+            }}
+            role="status"
+          >
+            <span
+              className="h-2 w-2 rounded-full shrink-0"
+              style={{ backgroundColor: "var(--color-accent-sage)" }}
+              aria-hidden="true"
+            />
+            <div>
+              <p style={{ color: "var(--color-text-0)", fontSize: "0.875rem" }}>
+                All quiet.
               </p>
-              {droneState !== "idle" && (
-                <div className="flex gap-1 justify-center">
-                  {Array.from({ length: 5 }, (_, i) => (
-                    <span
-                      key={i}
-                      className="h-1 w-6 rounded bg-green-400"
-                      style={{ opacity: 0.3 + i * 0.14 }}
-                    />
-                  ))}
-                </div>
+              {lastEventTs && (
+                <p
+                  className="mt-0.5 tabnum"
+                  style={{
+                    fontFamily: "var(--font-mono)",
+                    fontSize: "0.6875rem",
+                    color: "var(--color-text-2)",
+                  }}
+                >
+                  Last event {formatRelative(lastEventTs)} · {formatTime(lastEventTs)}
+                </p>
               )}
             </div>
           </div>
-        </CardContent>
-      </Card>
+        )}
 
-      {/* Agent reasoning panel */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Agent Reasoning</CardTitle>
-          <span className="text-xs text-slate-500">Last 20 events</span>
-        </CardHeader>
-        <CardContent className="p-0">
-          <div className="divide-y divide-slate-700/30 max-h-72 overflow-y-auto">
+        {/* ── Drone feed ── */}
+        <section
+          className="rounded border"
+          style={{
+            backgroundColor: "var(--color-bg-1)",
+            borderColor: droneActive ? "rgb(120 180 220 / 0.4)" : "var(--color-line)",
+          }}
+          aria-label="Drone feed"
+        >
+          <div
+            className="flex items-center justify-between px-3 py-2 border-b"
+            style={{ borderColor: "var(--color-line)" }}
+          >
+            <span
+              style={{
+                fontFamily: "var(--font-display)",
+                fontSize: "0.8125rem",
+                fontWeight: 600,
+                letterSpacing: "-0.01em",
+                color: "var(--color-text-0)",
+              }}
+            >
+              Drone Feed
+            </span>
+            <span className={cn("chip", droneActive ? "chip-sky" : "chip-muted")}>
+              {droneState.toUpperCase()}
+            </span>
+          </div>
+          <div
+            className="flex items-center justify-center"
+            style={{ height: "9rem", backgroundColor: "var(--color-bg-0)" }}
+            role="img"
+            aria-label={droneActive ? `Live thermal feed — ${droneState}` : "Drone grounded"}
+          >
+            {droneActive ? (
+              <div className="flex flex-col items-center gap-2">
+                {/* Thermal scan lines */}
+                <div className="flex gap-1">
+                  {Array.from({ length: 8 }, (_, i) => (
+                    <div
+                      key={i}
+                      className="w-5 rounded-sm"
+                      style={{
+                        height: `${8 + Math.sin(i * 1.3) * 6}px`,
+                        backgroundColor: `rgb(255 143 60 / ${0.2 + i * 0.08})`,
+                        transition: "height 200ms ease",
+                      }}
+                    />
+                  ))}
+                </div>
+                <span
+                  style={{
+                    fontFamily: "var(--font-mono)",
+                    fontSize: "0.6875rem",
+                    color: "var(--color-accent-thermal)",
+                  }}
+                >
+                  THERMAL · {droneState.toUpperCase()}
+                </span>
+              </div>
+            ) : (
+              <span
+                style={{
+                  fontFamily: "var(--font-mono)",
+                  fontSize: "0.6875rem",
+                  color: "var(--color-text-2)",
+                }}
+              >
+                drone grounded — no active mission
+              </span>
+            )}
+          </div>
+        </section>
+
+        {/* ── Agent reasoning panel ── */}
+        <section
+          className="rounded border flex-1"
+          style={{
+            backgroundColor: "var(--color-bg-1)",
+            borderColor: "var(--color-line)",
+          }}
+          aria-label="Agent reasoning"
+        >
+          <div
+            className="flex items-center justify-between px-3 py-2 border-b"
+            style={{ borderColor: "var(--color-line)" }}
+          >
+            <span
+              style={{
+                fontFamily: "var(--font-display)",
+                fontSize: "0.8125rem",
+                fontWeight: 600,
+                letterSpacing: "-0.01em",
+                color: "var(--color-text-0)",
+              }}
+            >
+              Agent Reasoning
+            </span>
+            <span
+              className="chip chip-muted"
+              style={{ fontFamily: "var(--font-mono)" }}
+            >
+              last {logs.length} events
+            </span>
+          </div>
+
+          <div
+            className="divide-y overflow-y-auto"
+            style={{
+              maxHeight: "16rem",
+            }}
+            role="log"
+            aria-label="Agent event log"
+            aria-live="polite"
+          >
             {logs.length === 0 ? (
-              <p className="px-4 py-3 text-xs text-slate-600 italic">
-                Waiting for agent events…
+              <p
+                className="px-3 py-3 italic"
+                style={{
+                  fontFamily: "var(--font-mono)",
+                  fontSize: "0.6875rem",
+                  color: "var(--color-text-2)",
+                }}
+              >
+                waiting for agent events
               </p>
             ) : (
               logs
                 .slice()
                 .reverse()
                 .map((log, idx) => (
-                  <div key={idx} className="px-4 py-2 flex gap-3 items-start">
-                    <span className="text-xs text-slate-600 font-mono shrink-0">
+                  <div
+                    key={idx}
+                    className="px-3 py-2 flex gap-3 items-start"
+                    style={{ borderColor: "var(--color-line)" }}
+                  >
+                    <span
+                      className="tabnum shrink-0 mt-0.5"
+                      style={{
+                        fontFamily: "var(--font-mono)",
+                        fontSize: "0.6875rem",
+                        color: "var(--color-text-2)",
+                      }}
+                    >
                       {formatTime(log.ts)}
                     </span>
                     <div className="flex-1 min-w-0">
-                      <div className="flex gap-2 items-center mb-0.5">
-                        <span className="text-xs font-semibold text-slate-400 truncate">
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <span
+                          className="text-xs font-medium truncate"
+                          style={{ color: "var(--color-text-1)" }}
+                        >
                           {log.agent}
                         </span>
                         {log.state && (
-                          <Badge
-                            variant={log.state === "active" ? "success" : "muted"}
-                            className="text-xs py-0"
-                          >
+                          <span className={cn("chip", log.state === "active" ? "chip-sage" : "chip-muted")}>
                             {log.state}
-                          </Badge>
+                          </span>
                         )}
                       </div>
                       <p
-                        className={cn(
-                          "text-xs text-slate-300 leading-relaxed",
-                          log.level === "ERROR" && "text-red-400",
-                        )}
+                        style={{
+                          fontFamily: "var(--font-mono)",
+                          fontSize: "0.6875rem",
+                          color: LEVEL_COLOR[log.level ?? "INFO"] ?? "var(--color-text-1)",
+                          lineHeight: 1.5,
+                        }}
                       >
                         {log.message}
                       </p>
@@ -238,8 +462,36 @@ export function RancherPhone() {
                 ))
             )}
           </div>
-        </CardContent>
-      </Card>
+        </section>
+
+        {/* Bottom nav */}
+        <nav
+          className="flex items-center justify-between pt-2"
+          style={{ borderTop: "1px solid var(--color-line)" }}
+          aria-label="App navigation"
+        >
+          <a
+            href="/"
+            style={{
+              fontFamily: "var(--font-mono)",
+              fontSize: "0.6875rem",
+              color: "var(--color-text-2)",
+            }}
+          >
+            Dashboard
+          </a>
+          <a
+            href="/cross-ranch"
+            style={{
+              fontFamily: "var(--font-mono)",
+              fontSize: "0.6875rem",
+              color: "var(--color-text-2)",
+            }}
+          >
+            Cross-Ranch
+          </a>
+        </nav>
+      </div>
     </div>
   );
 }

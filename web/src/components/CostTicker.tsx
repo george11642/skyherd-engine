@@ -1,16 +1,10 @@
 /**
- * CostTicker — live cost meter for SkyHerd Managed Agents.
- *
- * Shows:
- * - $0.08/hr rate when any agent is active
- * - "PAUSED (idle)" when ALL agents are idle
- * - Cumulative cost total
- * - Per-agent breakdown strip
+ * CostTicker — live cost meter with framer-motion animated counter.
+ * Shows rate, cumulative total, per-agent strip, and sparkline of last 60 ticks.
  */
 
-import { useState, useEffect, useCallback } from "react";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { motion, useSpring, useTransform } from "framer-motion";
 import { cn } from "@/lib/cn";
 import { getSSE } from "@/lib/sse";
 
@@ -33,18 +27,78 @@ interface CostTickPayload {
 }
 
 const AGENT_SHORT: Record<string, string> = {
-  FenceLineDispatcher: "Fence",
-  HerdHealthWatcher: "Health",
-  PredatorPatternLearner: "Predator",
-  GrazingOptimizer: "Grazing",
-  CalvingWatch: "Calving",
+  FenceLineDispatcher: "FENCE",
+  HerdHealthWatcher: "HEALTH",
+  PredatorPatternLearner: "PREDTR",
+  GrazingOptimizer: "GRAZNG",
+  CalvingWatch: "CALVNG",
 };
+
+const MAX_SPARKLINE = 60;
+
+function Sparkline({ values }: { values: number[] }) {
+  if (values.length < 2) return null;
+  const max = Math.max(...values, 0.001);
+  const w = 80;
+  const h = 24;
+  const pts = values.map((v, i) => {
+    const x = (i / (values.length - 1)) * w;
+    const y = h - (v / max) * h;
+    return `${x},${y}`;
+  });
+  return (
+    <svg
+      width={w}
+      height={h}
+      viewBox={`0 0 ${w} ${h}`}
+      aria-hidden="true"
+      className="shrink-0 opacity-60"
+    >
+      <polyline
+        points={pts.join(" ")}
+        fill="none"
+        stroke="rgb(148 176 136)"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function AnimatedCost({ value }: { value: number }) {
+  const spring = useSpring(value, { stiffness: 60, damping: 20 });
+  const display = useTransform(spring, (v) => `$${v.toFixed(6)}`);
+
+  useEffect(() => {
+    spring.set(value);
+  }, [value, spring]);
+
+  return (
+    <motion.span
+      className="tabnum"
+      style={{
+        fontFamily: "var(--font-mono)",
+        fontSize: "1.375rem",
+        fontWeight: 600,
+        letterSpacing: "-0.01em",
+        color: "var(--color-accent-sage)",
+      }}
+    >
+      {display}
+    </motion.span>
+  );
+}
 
 export function CostTicker() {
   const [tick, setTick] = useState<CostTickPayload | null>(null);
+  const sparkRef = useRef<number[]>([]);
+  const [sparkline, setSparkline] = useState<number[]>([]);
 
   const handleTick = useCallback((payload: CostTickPayload) => {
     setTick(payload);
+    sparkRef.current = [...sparkRef.current, payload.rate_per_hr_usd].slice(-MAX_SPARKLINE);
+    setSparkline([...sparkRef.current]);
   }, []);
 
   useEffect(() => {
@@ -58,78 +112,94 @@ export function CostTicker() {
   const rateUsd = tick?.rate_per_hr_usd ?? 0;
 
   return (
-    <Card className="shrink-0">
-      <CardHeader className="py-2">
-        <CardTitle className="text-xs">Cost Meter</CardTitle>
-        {/* The "money shot" — visible pause when all idle */}
-        {allIdle ? (
-          <Badge variant="muted" className="text-xs font-mono">
-            <span className="h-1.5 w-1.5 rounded-full bg-slate-500 mr-1" />
-            PAUSED (idle)
-          </Badge>
-        ) : (
-          <Badge variant="success" className="text-xs font-mono">
-            <span className="h-1.5 w-1.5 rounded-full bg-green-400 pulse-dot mr-1" />
-            $0.08/hr active
-          </Badge>
-        )}
-      </CardHeader>
+    <section
+      className="shrink-0 rounded border"
+      style={{
+        backgroundColor: "var(--color-bg-1)",
+        borderColor: allIdle ? "var(--color-line)" : "rgb(148 176 136 / 0.3)",
+      }}
+      aria-label="Cost meter"
+    >
+      <div className="px-3 py-2 flex items-center justify-between border-b" style={{ borderColor: "var(--color-line)" }}>
+        <span
+          className="font-semibold leading-none"
+          style={{
+            fontFamily: "var(--font-display)",
+            fontSize: "0.8125rem",
+            letterSpacing: "-0.01em",
+            color: "var(--color-text-0)",
+          }}
+        >
+          Cost Meter
+        </span>
+        <span
+          className={cn("chip", allIdle ? "chip-muted" : "chip-sage")}
+        >
+          {allIdle ? (
+            <><span className="h-1.5 w-1.5 rounded-full bg-[var(--color-text-2)] shrink-0" aria-hidden="true" />PAUSED (idle)</>
+          ) : (
+            <><span className="h-1.5 w-1.5 rounded-full bg-[rgb(148_176_136)] pulse-dot shrink-0" aria-hidden="true" />${rateUsd.toFixed(2)}/hr</>
+          )}
+        </span>
+      </div>
 
-      <div className="px-4 pb-3 space-y-2">
-        {/* Total cost display */}
-        <div className="flex items-baseline gap-2">
-          <span
-            className={cn(
-              "font-mono text-2xl font-bold tabular-nums transition-colors",
-              allIdle ? "text-slate-500" : "text-green-400",
-            )}
-          >
-            ${totalCost.toFixed(6)}
-          </span>
-          <span className="text-xs text-slate-500">cumulative</span>
+      <div className="px-3 py-2">
+        {/* Main cost + sparkline */}
+        <div className="flex items-end justify-between gap-3">
+          <div className="flex items-baseline gap-2">
+            <AnimatedCost value={totalCost} />
+            <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.6875rem", color: "var(--color-text-2)" }}>
+              cumulative
+            </span>
+          </div>
+          <Sparkline values={sparkline} />
         </div>
 
-        {/* Rate line — must contain literal "$0.08/hr" and "idle"/"paused" */}
-        <div className="text-xs font-mono text-slate-500">
+        {/* Rate line */}
+        <div
+          className="mt-1 tabnum"
+          style={{ fontFamily: "var(--font-mono)", fontSize: "0.6875rem", color: "var(--color-text-2)" }}
+        >
           {allIdle ? (
-            <span>
-              Rate: <span className="text-slate-400">$0.00/hr</span>{" "}
-              — <span className="text-yellow-400">paused</span> (all sessions idle)
-            </span>
+            <>Rate: <span style={{ color: "var(--color-text-1)" }}>$0.00/hr</span> — <span style={{ color: "var(--color-warn)" }}>paused</span></>
           ) : (
-            <span>
-              Rate: <span className="text-green-400">$0.08/hr</span> per active session
-            </span>
+            <>Rate: <span style={{ color: "var(--color-accent-sage)" }}>$0.08/hr</span> per active session</>
           )}
         </div>
 
         {/* Per-agent strip */}
         {tick?.agents && (
-          <div className="grid grid-cols-5 gap-1 pt-1">
+          <div className="grid grid-cols-5 gap-1 mt-2" role="list" aria-label="Agent cost breakdown">
             {tick.agents.map((a) => (
               <div
                 key={a.name}
-                className={cn(
-                  "rounded px-1.5 py-1 text-center border",
-                  a.state === "active"
-                    ? "border-green-500/40 bg-green-500/10"
-                    : "border-slate-700/60 bg-slate-800/30",
-                )}
+                role="listitem"
+                className="rounded border text-center py-1"
+                style={{
+                  backgroundColor: a.state === "active" ? "rgb(148 176 136 / 0.08)" : "var(--color-bg-2)",
+                  borderColor: a.state === "active" ? "rgb(148 176 136 / 0.3)" : "var(--color-line)",
+                }}
                 title={`${a.name}: ${a.state} — $${a.cumulative_cost_usd.toFixed(6)}`}
               >
                 <div
-                  className={cn(
-                    "text-xs font-mono truncate",
-                    a.state === "active" ? "text-green-400" : "text-slate-600",
-                  )}
+                  className="tabnum truncate px-0.5"
+                  style={{
+                    fontFamily: "var(--font-mono)",
+                    fontSize: "0.5625rem",
+                    color: a.state === "active" ? "var(--color-accent-sage)" : "var(--color-text-2)",
+                    letterSpacing: "0.03em",
+                  }}
                 >
                   {AGENT_SHORT[a.name] ?? a.name.slice(0, 5)}
                 </div>
                 <div
-                  className={cn(
-                    "text-xs font-mono tabular-nums mt-0.5",
-                    a.state === "active" ? "text-green-300" : "text-slate-600",
-                  )}
+                  className="mt-0.5"
+                  style={{
+                    fontFamily: "var(--font-mono)",
+                    fontSize: "0.625rem",
+                    color: a.state === "active" ? "var(--color-accent-sage)" : "var(--color-text-2)",
+                  }}
+                  aria-label={a.state}
                 >
                   {a.state === "active" ? "●" : "○"}
                 </div>
@@ -138,6 +208,6 @@ export function CostTicker() {
           </div>
         )}
       </div>
-    </Card>
+    </section>
   );
 }
