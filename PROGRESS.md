@@ -2,7 +2,7 @@
 
 > Fresh Claude sessions read this **after CLAUDE.md**. Update atomically with every commit.
 
-**Last updated**: 2026-04-21 — review fixes complete: 10/10 CRITICAL/HIGH items closed (C3, C4×2, C5, C6, H5, H7, H10, C-01, C-02, H-05); 1046 pytest green, 82.63% coverage, 0 pyright errors
+**Last updated**: 2026-04-22 — Gate #6 PARTIALLY-GREEN: ElevenLabs key obtained (free tier, last 4 61f5), Wes renders 5.06s WAV via ElevenLabsBackend; Twilio not yet obtained (requires manual phone-verified signup); DEMO_PHONE_MODE=dashboard default confirmed; docs/VOICE_ACCESS.md written
 **Plan**: v5.1 at `/home/george/.claude/plans/update-ur-memory-project-context-splendid-swan.md`
 **Submission**: due 2026-04-26 8pm EST
 **External blockers**: see [GitHub Issues](https://github.com/george11642/skyherd-engine/issues)
