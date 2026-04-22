@@ -1,4 +1,4 @@
-"""Tests for run_all() — all 5 scenarios back-to-back."""
+"""Tests for run_all() — all 8 scenarios back-to-back."""
 
 from __future__ import annotations
 
@@ -6,9 +6,9 @@ from skyherd.scenarios import SCENARIOS, run_all
 
 
 class TestRunAll:
-    def test_run_all_returns_five_results(self) -> None:
+    def test_run_all_returns_all_results(self) -> None:
         results = run_all(seed=42)
-        assert len(results) == 5
+        assert len(results) == len(SCENARIOS)
 
     def test_run_all_covers_all_scenario_names(self) -> None:
         results = run_all(seed=42)
