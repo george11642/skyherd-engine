@@ -2,16 +2,16 @@
 
 > Fresh Claude sessions read this **after CLAUDE.md**. Update atomically with every commit.
 
-**Last updated**: 2026-04-21 (judge docs green — ARCHITECTURE.md, MANAGED_AGENTS.md, ONE_PAGER.md+pdf, skills/README.md, judge quickstart in CLAUDE.md)
+**Last updated**: 2026-04-22 (Wave 4B cleanup — ruff/pyright 0-error, fresh-clone pytest+demo green, deterministic replay confirmed)
 **Plan**: v5.1 at `/home/george/.claude/plans/update-ur-memory-project-context-splendid-swan.md`
 **Submission**: due 2026-04-26 8pm EST
 **External blockers**: see [GitHub Issues](https://github.com/george11642/skyherd-engine/issues)
 
 ## Summary
 
-- Green / Total: **66 / 79**
+- Green / Total: **67 / 79**
 - Tier MVP status: 🟡 agents layer complete
-- Sim Completeness Gate: 🔴 not passed (target Fri Apr 24 noon)
+- Sim Completeness Gate: 🟡 9/10 (fresh-clone boot now green; only SITL/voice/dashboard-dist remain)
 - Hardware tiers: 🔴 blocked on Gate
 
 ---
@@ -38,7 +38,7 @@
 - [x] Wes voice end-to-end (Twilio → ElevenLabs → cowboy persona → rancher phone rings)
 - [x] 5 demo scenarios play back-to-back without intervention
 - [x] Deterministic replay (`make sim SEED=42`)
-- [ ] Fresh-clone boot test green on second machine
+- [x] Fresh-clone boot test green on second machine
 - [x] Cost ticker visibly pauses during idle stretches
 
 ## Demo scenarios (5 — MVP must-have)
