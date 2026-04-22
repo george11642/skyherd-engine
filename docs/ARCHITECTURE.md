@@ -1,6 +1,6 @@
 # SkyHerd Architecture
 
-**Related docs**: [skills/README.md](../skills/README.md) · [docs/MANAGED_AGENTS.md](MANAGED_AGENTS.md) · [docs/REPLAY_LOG.md](REPLAY_LOG.md) · [docs/ONE_PAGER.md](ONE_PAGER.md) · [worlds/ranch_a.yaml](../worlds/ranch_a.yaml)
+**Related docs**: [skills/README.md](../skills/README.md) · [docs/MANAGED_AGENTS.md](MANAGED_AGENTS.md) · [docs/REPLAY_LOG.md](REPLAY_LOG.md) · [docs/ONE_PAGER.md](ONE_PAGER.md) · [worlds/ranch_a.yaml](../worlds/ranch_a.yaml) · [docs/DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) · [docs/CLAUDE_DESIGN.md](CLAUDE_DESIGN.md)
 
 ---
 
@@ -119,3 +119,13 @@ make demo SEED=42 SCENARIO=coyote  # single scenario
 ```
 
 The 63-second hero loop in the demo video is a single `make demo SEED=42 SCENARIO=all` run, no edits, no cuts.
+
+---
+
+## Design system
+
+The dashboard aesthetic is a dense, dark ops console — Bloomberg Terminal meets topographic ranch map. Generated via the Stitch MCP (`/stitch-design`) and hand-refined into production components using Tailwind v4 `@theme` tokens.
+
+Full documentation: [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) — token registry, typography scale, component inventory, density and motion rules.
+
+Claude Design integration notes (what the full Opus 4.7-powered design handoff workflow would add): [CLAUDE_DESIGN.md](CLAUDE_DESIGN.md).

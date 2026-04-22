@@ -63,6 +63,8 @@ A simulated ranch that monitors itself. Five Claude Managed Agents watch water t
 - [docs/HARDWARE_DEMO_RUNBOOK.md](docs/HARDWARE_DEMO_RUNBOOK.md) — 60-second Pi + Mavic hero demo
 - [skills/README.md](skills/README.md) — 33-file domain knowledge inventory (CrossBeam pattern)
 - [docs/REPLAY_LOG.md](docs/REPLAY_LOG.md) — deterministic scenario replay log
+- [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md) — token system, typography, components, motion + a11y rules
+- [docs/CLAUDE_DESIGN.md](docs/CLAUDE_DESIGN.md) — Claude Design integration notes + contributor runbook
 
 ---
 
