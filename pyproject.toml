@@ -111,6 +111,8 @@ markers = [
 source = ["src/skyherd"]
 omit = [
     "tests/*",
+    # Dev-time scripts — not run in CI or at runtime
+    "scripts/*",
     # Hardware-only backends — require physical drone/SITL to exercise
     "src/skyherd/drone/pymavlink_backend.py",
     "src/skyherd/drone/sitl.py",
