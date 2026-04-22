@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import random
+from pathlib import Path
 
 import pytest
 
+from skyherd.vision.renderer import render_trough_frame
 from skyherd.world.cattle import Cow, Herd
 from skyherd.world.clock import Clock
 from skyherd.world.predators import PredatorSpawner
@@ -120,3 +122,50 @@ def world_healthy(terrain: Terrain) -> World:
         predator_spawner=pred_spawner,
         weather_driver=weather_driver,
     )
+
+
+@pytest.fixture()
+def sick_pinkeye_world(terrain: Terrain) -> World:
+    """A world containing one pinkeye-positive cow — ocular_discharge=0.85 will render a red eye streak."""
+    sick = _make_cow(
+        tag="SICK01",
+        health_score=0.5,
+        lameness_score=0,
+        ocular_discharge=0.85,
+        disease_flags={"pinkeye"},
+        pos=(300.0, 300.0),
+    )
+    rng = random.Random(42)
+    herd = Herd(cows=[sick], rng=rng)
+    from datetime import UTC, datetime
+
+    clock = Clock(sim_start_utc=datetime(2026, 4, 21, 13, 0, tzinfo=UTC))
+    pred_spawner = PredatorSpawner(rng=random.Random(99))
+    weather_driver = WeatherDriver()
+    return World(
+        clock=clock,
+        terrain=terrain,
+        herd=herd,
+        predator_spawner=pred_spawner,
+        weather_driver=weather_driver,
+    )
+
+
+@pytest.fixture()
+def rendered_positive_frame(
+    sick_pinkeye_world: World, tmp_path: Path
+) -> tuple[Path, World]:
+    """Render trough_a for the pinkeye-positive world. Returns (png_path, world)."""
+    raw_path = tmp_path / "raw_positive.png"
+    render_trough_frame(sick_pinkeye_world, "trough_a", out_path=raw_path)
+    return (raw_path, sick_pinkeye_world)
+
+
+@pytest.fixture()
+def rendered_negative_frame(
+    world_healthy: World, tmp_path: Path
+) -> tuple[Path, World]:
+    """Render trough_a for the all-healthy world. Returns (png_path, world)."""
+    raw_path = tmp_path / "raw_negative.png"
+    render_trough_frame(world_healthy, "trough_a", out_path=raw_path)
+    return (raw_path, world_healthy)
