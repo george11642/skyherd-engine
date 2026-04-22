@@ -92,3 +92,24 @@ class TestCoyoteScenario:
         assert result.jsonl_path.exists()
         lines = result.jsonl_path.read_text().splitlines()
         assert len(lines) > 0
+
+    def test_creates_at_most_five_sessions(self, monkeypatch) -> None:
+        """MA-03 regression guard: coyote scenario must not create >5 SessionManager instances."""
+        from skyherd.agents import session as session_module
+
+        orig_init = session_module.SessionManager.__init__
+        count = {"n": 0}
+
+        def _counting_init(self, *args, **kwargs):
+            count["n"] += 1
+            orig_init(self, *args, **kwargs)
+
+        monkeypatch.setattr(session_module.SessionManager, "__init__", _counting_init)
+
+        result = run("coyote", seed=42)
+
+        assert result.outcome_passed, f"Coyote scenario regressed: {result.outcome_error}"
+        assert count["n"] <= 5, (
+            f"Session leak not closed: {count['n']} SessionManager instances "
+            f"(target: <=5, pre-fix baseline: 241)"
+        )

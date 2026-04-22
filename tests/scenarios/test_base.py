@@ -153,3 +153,63 @@ class TestScenarioAbstract:
         assert len(calls) == 3
         tool_names = {c["tool"] for c in calls}
         assert tool_names == {"a", "b", "c"}
+
+
+# ---------------------------------------------------------------------------
+# _DemoMesh session registry (MA-01, MA-02, ROUT-01)
+# ---------------------------------------------------------------------------
+
+
+class TestDemoMesh:
+    """Verify _DemoMesh holds a persistent session registry per MA-01/MA-02/ROUT-01."""
+
+    _EXPECTED_AGENTS = {
+        "FenceLineDispatcher",
+        "HerdHealthWatcher",
+        "PredatorPatternLearner",
+        "GrazingOptimizer",
+        "CalvingWatch",
+    }
+
+    def test_demo_mesh_holds_five_sessions_keyed_by_name(self) -> None:
+        from skyherd.scenarios.base import _DemoMesh
+
+        mesh = _DemoMesh(ledger=None)
+        assert hasattr(mesh, "_sessions"), "_DemoMesh must expose _sessions registry"
+        assert set(mesh._sessions.keys()) == self._EXPECTED_AGENTS, (
+            f"Expected 5 agent sessions, got: {set(mesh._sessions.keys())}"
+        )
+        assert all(s.state == "idle" for s in mesh._sessions.values()), (
+            "All sessions must start in idle state"
+        )
+
+    def test_registry_includes_predator_pattern_learner(self) -> None:
+        # ROUT-01: learner must be present in _DemoMesh session registry
+        from skyherd.scenarios.base import _DemoMesh
+
+        mesh = _DemoMesh(ledger=None)
+        assert "PredatorPatternLearner" in mesh._sessions, (
+            "PredatorPatternLearner missing from _DemoMesh._sessions (ROUT-01)"
+        )
+
+    def test_public_agent_sessions_accessor_returns_dict(self) -> None:
+        # Phase 5 API contract: read sessions without touching private attrs
+        from skyherd.scenarios.base import _DemoMesh
+
+        mesh = _DemoMesh(ledger=None)
+        sessions = mesh.agent_sessions()
+        assert isinstance(sessions, dict)
+        assert set(sessions.keys()) == self._EXPECTED_AGENTS
+
+    def test_public_agent_tickers_accessor_returns_list(self) -> None:
+        # Phase 5 API contract: cost-tick aggregator iterates tickers via this accessor
+        from skyherd.scenarios.base import _DemoMesh
+
+        mesh = _DemoMesh(ledger=None)
+        tickers = mesh.agent_tickers()
+        assert isinstance(tickers, list)
+        assert len(tickers) == 5, f"Expected 5 tickers (one per agent), got {len(tickers)}"
+        for t in tickers:
+            assert hasattr(t, "_current_state"), (
+                "agent_tickers() must return CostTicker-shaped objects"
+            )
