@@ -93,9 +93,7 @@ def _make_detector(mode: str) -> Detector:
             logger.info("Detector: CoralDetector (mode=coral)")
             return CoralDetector()
         except (ImportError, AttributeError) as exc:
-            logger.warning(
-                "CoralDetector unavailable (%s) — falling back to MegaDetectorHead", exc
-            )
+            logger.warning("CoralDetector unavailable (%s) — falling back to MegaDetectorHead", exc)
     # megadetector (default) or coral fallback
     logger.info("Detector: MegaDetectorHead (mode=%s)", mode)
     return MegaDetectorHead()
@@ -265,9 +263,7 @@ class EdgeWatcher:
             try:
                 import aiomqtt  # type: ignore[import-untyped]
 
-                async with aiomqtt.Client(
-                    hostname=self._mqtt_host, port=self._mqtt_port
-                ) as client:
+                async with aiomqtt.Client(hostname=self._mqtt_host, port=self._mqtt_port) as client:
                     await client.publish(self._status_topic, payload=raw.encode(), qos=0)
                 logger.debug("Heartbeat → %s", self._status_topic)
             except Exception as exc:  # noqa: BLE001
@@ -282,9 +278,7 @@ class EdgeWatcher:
         """
         import asyncio
 
-        async def _handle(
-            reader: asyncio.StreamReader, writer: asyncio.StreamWriter
-        ) -> None:
+        async def _handle(reader: asyncio.StreamReader, writer: asyncio.StreamWriter) -> None:
             try:
                 await reader.read(1024)  # consume the request
                 status = "ok" if self._running else "stopping"
@@ -324,9 +318,7 @@ class EdgeWatcher:
         except OSError as exc:
             logger.warning("healthz server failed to start on port %d: %s", self._healthz_port, exc)
 
-    def _build_payload(
-        self, frame: np.ndarray, detections: list[Detection]
-    ) -> dict:  # type: ignore[type-arg]
+    def _build_payload(self, frame: np.ndarray, detections: list[Detection]) -> dict:  # type: ignore[type-arg]
         """Build a trough_cam-compatible MQTT payload dict.
 
         Matches the schema emitted by TroughCamSensor so agents receive
@@ -362,18 +354,14 @@ class EdgeWatcher:
         try:
             import aiomqtt  # type: ignore[import-untyped]
 
-            async with aiomqtt.Client(
-                hostname=self._mqtt_host, port=self._mqtt_port
-            ) as client:
+            async with aiomqtt.Client(hostname=self._mqtt_host, port=self._mqtt_port) as client:
                 await client.publish(self._topic, payload=raw.encode(), qos=0)
             logger.debug("Published to %s (%d bytes)", self._topic, len(raw))
         except Exception as exc:  # noqa: BLE001
             logger.warning("MQTT publish failed: %s", exc)
         self._published.append(payload)
 
-    def _annotate_and_save(
-        self, frame: np.ndarray, detections: list[Detection], ts: float
-    ) -> None:
+    def _annotate_and_save(self, frame: np.ndarray, detections: list[Detection], ts: float) -> None:
         """Write an annotated JPEG to ``runtime/edge_frames/``."""
         try:
             import supervision as sv  # type: ignore[import-untyped]
@@ -416,9 +404,7 @@ class EdgeWatcher:
         try:
             import aiomqtt  # type: ignore[import-untyped]
 
-            async with aiomqtt.Client(
-                hostname=self._mqtt_host, port=self._mqtt_port
-            ) as client:
+            async with aiomqtt.Client(hostname=self._mqtt_host, port=self._mqtt_port) as client:
                 await client.publish(motion_topic, payload=raw.encode(), qos=0)
             logger.debug("camera.motion event → %s", motion_topic)
         except Exception as exc:  # noqa: BLE001

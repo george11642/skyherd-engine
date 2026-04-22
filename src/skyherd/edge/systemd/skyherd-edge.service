@@ -1,0 +1,16 @@
+[Unit]
+Description=SkyHerd Edge Watcher
+After=network-online.target
+
+[Service]
+Type=simple
+User=skyherd
+WorkingDirectory=/opt/skyherd-engine
+Environment="PATH=/opt/skyherd-engine/.venv/bin:/usr/local/bin:/usr/bin"
+EnvironmentFile=/etc/skyherd/edge.env
+ExecStart=/opt/skyherd-engine/.venv/bin/skyherd-edge run
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target

@@ -1,4 +1,4 @@
-.PHONY: setup sim demo dashboard test lint format typecheck clean ci sitl-up sitl-down bus-up bus-down mesh-smoke one-pager
+.PHONY: setup sim demo dashboard test lint format typecheck clean ci sitl-up sitl-down bus-up bus-down mesh-smoke one-pager hardware-demo mavic-bridge f3-bridge drone-smoke
 
 SEED ?= 42
 SCENARIO ?= all
@@ -61,3 +61,18 @@ mesh-smoke:
 
 one-pager:
 	uv run python scripts/render_pdf.py docs/ONE_PAGER.md docs/ONE_PAGER.pdf
+
+hardware-demo:
+	@echo "Starting SkyHerd hardware-only demo (coyote hero + sick-cow)..."
+	@ANTHROPIC_API_KEY="$(ANTHROPIC_API_KEY)" DRONE_BACKEND="$${DRONE_BACKEND:-mavic}" \
+	    HARDWARE_OVERRIDES="$${HARDWARE_OVERRIDES:-trough_cam:trough_1:edge-fence,trough_cam:trough_2:edge-barn}" \
+	    uv run skyherd-demo-hw play --prop combo
+
+mavic-bridge:
+	uv run python -m skyherd.drone.mavic_bridge
+
+f3-bridge:
+	mavlink-router -e 0.0.0.0:14550 /dev/ttyUSB0:115200
+
+drone-smoke:
+	DRONE_BACKEND=stub uv run skyherd-drone-smoke
