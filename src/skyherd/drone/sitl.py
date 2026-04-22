@@ -29,12 +29,12 @@ logger = logging.getLogger(__name__)
 _SITL_ADDRESS = "udpin://0.0.0.0:14540"
 _CONNECT_TIMEOUT_S = 30.0
 # Per-operation SLO timeouts (seconds)
-_TIMEOUT_HEALTH_S = 30.0   # GPS fix after connect
-_TIMEOUT_ARM_S = 15.0      # arm + takeoff command
-_TIMEOUT_IN_AIR_S = 45.0   # wait until airborne after takeoff
+_TIMEOUT_HEALTH_S = 30.0  # GPS fix after connect
+_TIMEOUT_ARM_S = 15.0  # arm + takeoff command
+_TIMEOUT_IN_AIR_S = 45.0  # wait until airborne after takeoff
 _TIMEOUT_MISSION_S = 30.0  # mission upload
-_TIMEOUT_RTL_S = 60.0      # return-to-launch + landing
-_TIMEOUT_STATE_S = 5.0     # individual telemetry reads in state()
+_TIMEOUT_RTL_S = 60.0  # return-to-launch + landing
+_TIMEOUT_STATE_S = 5.0  # individual telemetry reads in state()
 _EVENTS_PATH = Path("runtime/drone_events.jsonl")
 _THERMAL_DIR = Path("runtime/thermal")
 
@@ -122,9 +122,7 @@ class SitlBackend(DroneBackend):
     async def takeoff(self, alt_m: float = 30.0) -> None:
         drone = self._assert_connected()
         try:
-            await asyncio.wait_for(
-                drone.action.set_takeoff_altitude(alt_m), timeout=_TIMEOUT_ARM_S
-            )
+            await asyncio.wait_for(drone.action.set_takeoff_altitude(alt_m), timeout=_TIMEOUT_ARM_S)
             await asyncio.wait_for(drone.action.arm(), timeout=_TIMEOUT_ARM_S)
             await asyncio.wait_for(drone.action.takeoff(), timeout=_TIMEOUT_ARM_S)
         except TimeoutError as exc:
@@ -186,12 +184,8 @@ class SitlBackend(DroneBackend):
                 drone.mission.set_return_to_launch_after_mission(False),
                 timeout=_TIMEOUT_MISSION_S,
             )
-            await asyncio.wait_for(
-                drone.mission.upload_mission(plan), timeout=_TIMEOUT_MISSION_S
-            )
-            await asyncio.wait_for(
-                drone.mission.start_mission(), timeout=_TIMEOUT_MISSION_S
-            )
+            await asyncio.wait_for(drone.mission.upload_mission(plan), timeout=_TIMEOUT_MISSION_S)
+            await asyncio.wait_for(drone.mission.start_mission(), timeout=_TIMEOUT_MISSION_S)
         except TimeoutError as exc:
             raise DroneTimeoutError(
                 f"Mission upload/start did not complete within {_TIMEOUT_MISSION_S:.0f} s."

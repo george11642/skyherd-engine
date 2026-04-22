@@ -191,7 +191,8 @@ async def run_sitl_e2e(
 def main(
     port: int = typer.Option(14540, help="MAVLink UDP port (GCS listener)"),
     emulator: bool = typer.Option(
-        False, "--emulator/--no-emulator",
+        False,
+        "--emulator/--no-emulator",
         help=(
             "Use built-in pymavlink emulator (no Docker). "
             "When false, connects to a real Docker SITL via MAVSDK."

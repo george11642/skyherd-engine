@@ -1,0 +1,186 @@
+{"record": "scenario_header", "name": "sick_cow", "seed": 42, "duration_s": 300.0, "outcome_passed": true, "outcome_error": null, "wall_time_s": 0.226375597063452, "event_count": 62, "tool_call_count": 123, "attestation_count": 183}
+{"record": "event", "type": "water.low", "tank_id": "wt_n", "level_pct": 15.0, "sim_time_s": 5.0}
+{"record": "event", "type": "water.low", "tank_id": "wt_n", "level_pct": 15.0, "sim_time_s": 10.0}
+{"record": "event", "type": "water.low", "tank_id": "wt_n", "level_pct": 15.0, "sim_time_s": 15.0}
+{"record": "event", "type": "water.low", "tank_id": "wt_n", "level_pct": 15.0, "sim_time_s": 20.0}
+{"record": "event", "type": "water.low", "tank_id": "wt_n", "level_pct": 15.0, "sim_time_s": 25.0}
+{"record": "event", "type": "water.low", "tank_id": "wt_n", "level_pct": 15.0, "sim_time_s": 30.0}
+{"record": "event", "type": "camera.motion", "source": "trough_cam", "trough_id": "trough_a", "ranch_id": "ranch_a", "anomaly": true, "cow_tag": "A014", "schedule": "daily_health_check", "sim_time_s": 30.0}
+{"record": "event", "type": "health.check", "source": "herd_health_watcher", "cow_tag": "A014", "ranch_id": "ranch_a", "ocular_discharge": 0.7, "disease_flags": ["pinkeye"], "severity": "escalate", "sim_time_s": 30.0}
+{"record": "event", "type": "water.low", "tank_id": "wt_n", "level_pct": 15.0, "sim_time_s": 35.0}
+{"record": "event", "type": "water.low", "tank_id": "wt_n", "level_pct": 15.0, "sim_time_s": 40.0}
+{"record": "event", "type": "water.low", "tank_id": "wt_n", "level_pct": 15.0, "sim_time_s": 45.0}
+{"record": "event", "type": "water.low", "tank_id": "wt_n", "level_pct": 15.0, "sim_time_s": 50.0}
+{"record": "event", "type": "water.low", "tank_id": "wt_n", "level_pct": 15.0, "sim_time_s": 55.0}
+{"record": "event", "type": "water.low", "tank_id": "wt_n", "level_pct": 15.0, "sim_time_s": 60.0}
+{"record": "event", "type": "water.low", "tank_id": "wt_n", "level_pct": 15.0, "sim_time_s": 65.0}
+{"record": "event", "type": "water.low", "tank_id": "wt_n", "level_pct": 15.0, "sim_time_s": 70.0}
+{"record": "event", "type": "water.low", "tank_id": "wt_n", "level_pct": 15.0, "sim_time_s": 75.0}
+{"record": "event", "type": "water.low", "tank_id": "wt_n", "level_pct": 15.0, "sim_time_s": 80.0}
+{"record": "event", "type": "water.low", "tank_id": "wt_n", "level_pct": 15.0, "sim_time_s": 85.0}
+{"record": "event", "type": "water.low", "tank_id": "wt_n", "level_pct": 15.0, "sim_time_s": 90.0}
+{"record": "event", "type": "water.low", "tank_id": "wt_n", "level_pct": 15.0, "sim_time_s": 95.0}
+{"record": "event", "type": "water.low", "tank_id": "wt_n", "level_pct": 15.0, "sim_time_s": 100.0}
+{"record": "event", "type": "water.low", "tank_id": "wt_n", "level_pct": 15.0, "sim_time_s": 105.0}
+{"record": "event", "type": "water.low", "tank_id": "wt_n", "level_pct": 15.0, "sim_time_s": 110.0}
+{"record": "event", "type": "water.low", "tank_id": "wt_n", "level_pct": 15.0, "sim_time_s": 115.0}
+{"record": "event", "type": "water.low", "tank_id": "wt_n", "level_pct": 15.0, "sim_time_s": 120.0}
+{"record": "event", "type": "water.low", "tank_id": "wt_n", "level_pct": 15.0, "sim_time_s": 125.0}
+{"record": "event", "type": "water.low", "tank_id": "wt_n", "level_pct": 15.0, "sim_time_s": 130.0}
+{"record": "event", "type": "water.low", "tank_id": "wt_n", "level_pct": 15.0, "sim_time_s": 135.0}
+{"record": "event", "type": "water.low", "tank_id": "wt_n", "level_pct": 15.0, "sim_time_s": 140.0}
+{"record": "event", "type": "water.low", "tank_id": "wt_n", "level_pct": 15.0, "sim_time_s": 145.0}
+{"record": "event", "type": "water.low", "tank_id": "wt_n", "level_pct": 15.0, "sim_time_s": 150.0}
+{"record": "event", "type": "water.low", "tank_id": "wt_n", "level_pct": 15.0, "sim_time_s": 155.0}
+{"record": "event", "type": "water.low", "tank_id": "wt_n", "level_pct": 15.0, "sim_time_s": 160.0}
+{"record": "event", "type": "water.low", "tank_id": "wt_n", "level_pct": 15.0, "sim_time_s": 165.0}
+{"record": "event", "type": "water.low", "tank_id": "wt_n", "level_pct": 15.0, "sim_time_s": 170.0}
+{"record": "event", "type": "water.low", "tank_id": "wt_n", "level_pct": 15.0, "sim_time_s": 175.0}
+{"record": "event", "type": "water.low", "tank_id": "wt_n", "level_pct": 15.0, "sim_time_s": 180.0}
+{"record": "event", "type": "water.low", "tank_id": "wt_n", "level_pct": 15.0, "sim_time_s": 185.0}
+{"record": "event", "type": "water.low", "tank_id": "wt_n", "level_pct": 15.0, "sim_time_s": 190.0}
+{"record": "event", "type": "water.low", "tank_id": "wt_n", "level_pct": 15.0, "sim_time_s": 195.0}
+{"record": "event", "type": "water.low", "tank_id": "wt_n", "level_pct": 15.0, "sim_time_s": 200.0}
+{"record": "event", "type": "water.low", "tank_id": "wt_n", "level_pct": 15.0, "sim_time_s": 205.0}
+{"record": "event", "type": "water.low", "tank_id": "wt_n", "level_pct": 15.0, "sim_time_s": 210.0}
+{"record": "event", "type": "water.low", "tank_id": "wt_n", "level_pct": 15.0, "sim_time_s": 215.0}
+{"record": "event", "type": "water.low", "tank_id": "wt_n", "level_pct": 15.0, "sim_time_s": 220.0}
+{"record": "event", "type": "water.low", "tank_id": "wt_n", "level_pct": 15.0, "sim_time_s": 225.0}
+{"record": "event", "type": "water.low", "tank_id": "wt_n", "level_pct": 15.0, "sim_time_s": 230.0}
+{"record": "event", "type": "water.low", "tank_id": "wt_n", "level_pct": 15.0, "sim_time_s": 235.0}
+{"record": "event", "type": "water.low", "tank_id": "wt_n", "level_pct": 15.0, "sim_time_s": 240.0}
+{"record": "event", "type": "water.low", "tank_id": "wt_n", "level_pct": 15.0, "sim_time_s": 245.0}
+{"record": "event", "type": "water.low", "tank_id": "wt_n", "level_pct": 15.0, "sim_time_s": 250.0}
+{"record": "event", "type": "water.low", "tank_id": "wt_n", "level_pct": 15.0, "sim_time_s": 255.0}
+{"record": "event", "type": "water.low", "tank_id": "wt_n", "level_pct": 15.0, "sim_time_s": 260.0}
+{"record": "event", "type": "water.low", "tank_id": "wt_n", "level_pct": 15.0, "sim_time_s": 265.0}
+{"record": "event", "type": "water.low", "tank_id": "wt_n", "level_pct": 15.0, "sim_time_s": 270.0}
+{"record": "event", "type": "water.low", "tank_id": "wt_n", "level_pct": 15.0, "sim_time_s": 275.0}
+{"record": "event", "type": "water.low", "tank_id": "wt_n", "level_pct": 15.0, "sim_time_s": 280.0}
+{"record": "event", "type": "water.low", "tank_id": "wt_n", "level_pct": 15.0, "sim_time_s": 285.0}
+{"record": "event", "type": "water.low", "tank_id": "wt_n", "level_pct": 15.0, "sim_time_s": 290.0}
+{"record": "event", "type": "water.low", "tank_id": "wt_n", "level_pct": 15.0, "sim_time_s": 295.0}
+{"record": "event", "type": "water.low", "tank_id": "wt_n", "level_pct": 15.0, "sim_time_s": 300.0}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "get_latest_readings", "input": {"kind": "water_pressure", "n": 10}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "page_rancher", "input": {"urgency": "text", "context": "Weekly rotation proposal: move herd from north paddock to east paddock Monday. Forage levels nominal. Reply APPROVE to confirm."}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "get_latest_readings", "input": {"kind": "water_pressure", "n": 10}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "page_rancher", "input": {"urgency": "text", "context": "Weekly rotation proposal: move herd from north paddock to east paddock Monday. Forage levels nominal. Reply APPROVE to confirm."}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "get_latest_readings", "input": {"kind": "water_pressure", "n": 10}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "page_rancher", "input": {"urgency": "text", "context": "Weekly rotation proposal: move herd from north paddock to east paddock Monday. Forage levels nominal. Reply APPROVE to confirm."}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "get_latest_readings", "input": {"kind": "water_pressure", "n": 10}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "page_rancher", "input": {"urgency": "text", "context": "Weekly rotation proposal: move herd from north paddock to east paddock Monday. Forage levels nominal. Reply APPROVE to confirm."}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "get_latest_readings", "input": {"kind": "water_pressure", "n": 10}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "page_rancher", "input": {"urgency": "text", "context": "Weekly rotation proposal: move herd from north paddock to east paddock Monday. Forage levels nominal. Reply APPROVE to confirm."}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "get_latest_readings", "input": {"kind": "water_pressure", "n": 10}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "page_rancher", "input": {"urgency": "text", "context": "Weekly rotation proposal: move herd from north paddock to east paddock Monday. Forage levels nominal. Reply APPROVE to confirm."}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "get_latest_readings", "input": {"kind": "water_pressure", "n": 10}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "page_rancher", "input": {"urgency": "text", "context": "Weekly rotation proposal: move herd from north paddock to east paddock Monday. Forage levels nominal. Reply APPROVE to confirm."}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "get_latest_readings", "input": {"kind": "water_pressure", "n": 10}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "page_rancher", "input": {"urgency": "text", "context": "Weekly rotation proposal: move herd from north paddock to east paddock Monday. Forage levels nominal. Reply APPROVE to confirm."}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "get_latest_readings", "input": {"kind": "water_pressure", "n": 10}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "page_rancher", "input": {"urgency": "text", "context": "Weekly rotation proposal: move herd from north paddock to east paddock Monday. Forage levels nominal. Reply APPROVE to confirm."}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "get_latest_readings", "input": {"kind": "water_pressure", "n": 10}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "page_rancher", "input": {"urgency": "text", "context": "Weekly rotation proposal: move herd from north paddock to east paddock Monday. Forage levels nominal. Reply APPROVE to confirm."}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "get_latest_readings", "input": {"kind": "water_pressure", "n": 10}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "page_rancher", "input": {"urgency": "text", "context": "Weekly rotation proposal: move herd from north paddock to east paddock Monday. Forage levels nominal. Reply APPROVE to confirm."}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "get_latest_readings", "input": {"kind": "water_pressure", "n": 10}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "page_rancher", "input": {"urgency": "text", "context": "Weekly rotation proposal: move herd from north paddock to east paddock Monday. Forage levels nominal. Reply APPROVE to confirm."}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "get_latest_readings", "input": {"kind": "water_pressure", "n": 10}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "page_rancher", "input": {"urgency": "text", "context": "Weekly rotation proposal: move herd from north paddock to east paddock Monday. Forage levels nominal. Reply APPROVE to confirm."}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "get_latest_readings", "input": {"kind": "water_pressure", "n": 10}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "page_rancher", "input": {"urgency": "text", "context": "Weekly rotation proposal: move herd from north paddock to east paddock Monday. Forage levels nominal. Reply APPROVE to confirm."}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "get_latest_readings", "input": {"kind": "water_pressure", "n": 10}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "page_rancher", "input": {"urgency": "text", "context": "Weekly rotation proposal: move herd from north paddock to east paddock Monday. Forage levels nominal. Reply APPROVE to confirm."}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "get_latest_readings", "input": {"kind": "water_pressure", "n": 10}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "page_rancher", "input": {"urgency": "text", "context": "Weekly rotation proposal: move herd from north paddock to east paddock Monday. Forage levels nominal. Reply APPROVE to confirm."}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "get_latest_readings", "input": {"kind": "water_pressure", "n": 10}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "page_rancher", "input": {"urgency": "text", "context": "Weekly rotation proposal: move herd from north paddock to east paddock Monday. Forage levels nominal. Reply APPROVE to confirm."}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "get_latest_readings", "input": {"kind": "water_pressure", "n": 10}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "page_rancher", "input": {"urgency": "text", "context": "Weekly rotation proposal: move herd from north paddock to east paddock Monday. Forage levels nominal. Reply APPROVE to confirm."}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "get_latest_readings", "input": {"kind": "water_pressure", "n": 10}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "page_rancher", "input": {"urgency": "text", "context": "Weekly rotation proposal: move herd from north paddock to east paddock Monday. Forage levels nominal. Reply APPROVE to confirm."}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "get_latest_readings", "input": {"kind": "water_pressure", "n": 10}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "page_rancher", "input": {"urgency": "text", "context": "Weekly rotation proposal: move herd from north paddock to east paddock Monday. Forage levels nominal. Reply APPROVE to confirm."}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "get_latest_readings", "input": {"kind": "water_pressure", "n": 10}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "page_rancher", "input": {"urgency": "text", "context": "Weekly rotation proposal: move herd from north paddock to east paddock Monday. Forage levels nominal. Reply APPROVE to confirm."}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "get_latest_readings", "input": {"kind": "water_pressure", "n": 10}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "page_rancher", "input": {"urgency": "text", "context": "Weekly rotation proposal: move herd from north paddock to east paddock Monday. Forage levels nominal. Reply APPROVE to confirm."}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "get_latest_readings", "input": {"kind": "water_pressure", "n": 10}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "page_rancher", "input": {"urgency": "text", "context": "Weekly rotation proposal: move herd from north paddock to east paddock Monday. Forage levels nominal. Reply APPROVE to confirm."}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "get_latest_readings", "input": {"kind": "water_pressure", "n": 10}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "page_rancher", "input": {"urgency": "text", "context": "Weekly rotation proposal: move herd from north paddock to east paddock Monday. Forage levels nominal. Reply APPROVE to confirm."}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "get_latest_readings", "input": {"kind": "water_pressure", "n": 10}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "page_rancher", "input": {"urgency": "text", "context": "Weekly rotation proposal: move herd from north paddock to east paddock Monday. Forage levels nominal. Reply APPROVE to confirm."}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "get_latest_readings", "input": {"kind": "water_pressure", "n": 10}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "page_rancher", "input": {"urgency": "text", "context": "Weekly rotation proposal: move herd from north paddock to east paddock Monday. Forage levels nominal. Reply APPROVE to confirm."}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "get_latest_readings", "input": {"kind": "water_pressure", "n": 10}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "page_rancher", "input": {"urgency": "text", "context": "Weekly rotation proposal: move herd from north paddock to east paddock Monday. Forage levels nominal. Reply APPROVE to confirm."}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "get_latest_readings", "input": {"kind": "water_pressure", "n": 10}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "page_rancher", "input": {"urgency": "text", "context": "Weekly rotation proposal: move herd from north paddock to east paddock Monday. Forage levels nominal. Reply APPROVE to confirm."}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "get_latest_readings", "input": {"kind": "water_pressure", "n": 10}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "page_rancher", "input": {"urgency": "text", "context": "Weekly rotation proposal: move herd from north paddock to east paddock Monday. Forage levels nominal. Reply APPROVE to confirm."}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "get_latest_readings", "input": {"kind": "water_pressure", "n": 10}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "page_rancher", "input": {"urgency": "text", "context": "Weekly rotation proposal: move herd from north paddock to east paddock Monday. Forage levels nominal. Reply APPROVE to confirm."}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "get_latest_readings", "input": {"kind": "water_pressure", "n": 10}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "page_rancher", "input": {"urgency": "text", "context": "Weekly rotation proposal: move herd from north paddock to east paddock Monday. Forage levels nominal. Reply APPROVE to confirm."}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "get_latest_readings", "input": {"kind": "water_pressure", "n": 10}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "page_rancher", "input": {"urgency": "text", "context": "Weekly rotation proposal: move herd from north paddock to east paddock Monday. Forage levels nominal. Reply APPROVE to confirm."}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "get_latest_readings", "input": {"kind": "water_pressure", "n": 10}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "page_rancher", "input": {"urgency": "text", "context": "Weekly rotation proposal: move herd from north paddock to east paddock Monday. Forage levels nominal. Reply APPROVE to confirm."}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "get_latest_readings", "input": {"kind": "water_pressure", "n": 10}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "page_rancher", "input": {"urgency": "text", "context": "Weekly rotation proposal: move herd from north paddock to east paddock Monday. Forage levels nominal. Reply APPROVE to confirm."}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "get_latest_readings", "input": {"kind": "water_pressure", "n": 10}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "page_rancher", "input": {"urgency": "text", "context": "Weekly rotation proposal: move herd from north paddock to east paddock Monday. Forage levels nominal. Reply APPROVE to confirm."}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "get_latest_readings", "input": {"kind": "water_pressure", "n": 10}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "page_rancher", "input": {"urgency": "text", "context": "Weekly rotation proposal: move herd from north paddock to east paddock Monday. Forage levels nominal. Reply APPROVE to confirm."}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "get_latest_readings", "input": {"kind": "water_pressure", "n": 10}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "page_rancher", "input": {"urgency": "text", "context": "Weekly rotation proposal: move herd from north paddock to east paddock Monday. Forage levels nominal. Reply APPROVE to confirm."}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "get_latest_readings", "input": {"kind": "water_pressure", "n": 10}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "page_rancher", "input": {"urgency": "text", "context": "Weekly rotation proposal: move herd from north paddock to east paddock Monday. Forage levels nominal. Reply APPROVE to confirm."}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "get_latest_readings", "input": {"kind": "water_pressure", "n": 10}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "page_rancher", "input": {"urgency": "text", "context": "Weekly rotation proposal: move herd from north paddock to east paddock Monday. Forage levels nominal. Reply APPROVE to confirm."}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "get_latest_readings", "input": {"kind": "water_pressure", "n": 10}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "page_rancher", "input": {"urgency": "text", "context": "Weekly rotation proposal: move herd from north paddock to east paddock Monday. Forage levels nominal. Reply APPROVE to confirm."}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "get_latest_readings", "input": {"kind": "water_pressure", "n": 10}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "page_rancher", "input": {"urgency": "text", "context": "Weekly rotation proposal: move herd from north paddock to east paddock Monday. Forage levels nominal. Reply APPROVE to confirm."}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "get_latest_readings", "input": {"kind": "water_pressure", "n": 10}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "page_rancher", "input": {"urgency": "text", "context": "Weekly rotation proposal: move herd from north paddock to east paddock Monday. Forage levels nominal. Reply APPROVE to confirm."}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "get_latest_readings", "input": {"kind": "water_pressure", "n": 10}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "page_rancher", "input": {"urgency": "text", "context": "Weekly rotation proposal: move herd from north paddock to east paddock Monday. Forage levels nominal. Reply APPROVE to confirm."}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "get_latest_readings", "input": {"kind": "water_pressure", "n": 10}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "page_rancher", "input": {"urgency": "text", "context": "Weekly rotation proposal: move herd from north paddock to east paddock Monday. Forage levels nominal. Reply APPROVE to confirm."}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "get_latest_readings", "input": {"kind": "water_pressure", "n": 10}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "page_rancher", "input": {"urgency": "text", "context": "Weekly rotation proposal: move herd from north paddock to east paddock Monday. Forage levels nominal. Reply APPROVE to confirm."}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "get_latest_readings", "input": {"kind": "water_pressure", "n": 10}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "page_rancher", "input": {"urgency": "text", "context": "Weekly rotation proposal: move herd from north paddock to east paddock Monday. Forage levels nominal. Reply APPROVE to confirm."}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "get_latest_readings", "input": {"kind": "water_pressure", "n": 10}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "page_rancher", "input": {"urgency": "text", "context": "Weekly rotation proposal: move herd from north paddock to east paddock Monday. Forage levels nominal. Reply APPROVE to confirm."}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "get_latest_readings", "input": {"kind": "water_pressure", "n": 10}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "page_rancher", "input": {"urgency": "text", "context": "Weekly rotation proposal: move herd from north paddock to east paddock Monday. Forage levels nominal. Reply APPROVE to confirm."}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "get_latest_readings", "input": {"kind": "water_pressure", "n": 10}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "page_rancher", "input": {"urgency": "text", "context": "Weekly rotation proposal: move herd from north paddock to east paddock Monday. Forage levels nominal. Reply APPROVE to confirm."}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "get_latest_readings", "input": {"kind": "water_pressure", "n": 10}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "page_rancher", "input": {"urgency": "text", "context": "Weekly rotation proposal: move herd from north paddock to east paddock Monday. Forage levels nominal. Reply APPROVE to confirm."}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "get_latest_readings", "input": {"kind": "water_pressure", "n": 10}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "page_rancher", "input": {"urgency": "text", "context": "Weekly rotation proposal: move herd from north paddock to east paddock Monday. Forage levels nominal. Reply APPROVE to confirm."}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "get_latest_readings", "input": {"kind": "water_pressure", "n": 10}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "page_rancher", "input": {"urgency": "text", "context": "Weekly rotation proposal: move herd from north paddock to east paddock Monday. Forage levels nominal. Reply APPROVE to confirm."}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "get_latest_readings", "input": {"kind": "water_pressure", "n": 10}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "page_rancher", "input": {"urgency": "text", "context": "Weekly rotation proposal: move herd from north paddock to east paddock Monday. Forage levels nominal. Reply APPROVE to confirm."}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "get_latest_readings", "input": {"kind": "water_pressure", "n": 10}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "page_rancher", "input": {"urgency": "text", "context": "Weekly rotation proposal: move herd from north paddock to east paddock Monday. Forage levels nominal. Reply APPROVE to confirm."}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "get_latest_readings", "input": {"kind": "water_pressure", "n": 10}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "page_rancher", "input": {"urgency": "text", "context": "Weekly rotation proposal: move herd from north paddock to east paddock Monday. Forage levels nominal. Reply APPROVE to confirm."}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "get_latest_readings", "input": {"kind": "water_pressure", "n": 10}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "page_rancher", "input": {"urgency": "text", "context": "Weekly rotation proposal: move herd from north paddock to east paddock Monday. Forage levels nominal. Reply APPROVE to confirm."}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "get_latest_readings", "input": {"kind": "water_pressure", "n": 10}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "page_rancher", "input": {"urgency": "text", "context": "Weekly rotation proposal: move herd from north paddock to east paddock Monday. Forage levels nominal. Reply APPROVE to confirm."}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "get_latest_readings", "input": {"kind": "water_pressure", "n": 10}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "page_rancher", "input": {"urgency": "text", "context": "Weekly rotation proposal: move herd from north paddock to east paddock Monday. Forage levels nominal. Reply APPROVE to confirm."}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "get_latest_readings", "input": {"kind": "water_pressure", "n": 10}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "page_rancher", "input": {"urgency": "text", "context": "Weekly rotation proposal: move herd from north paddock to east paddock Monday. Forage levels nominal. Reply APPROVE to confirm."}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "get_latest_readings", "input": {"kind": "water_pressure", "n": 10}}
+{"record": "tool_call", "agent": "GrazingOptimizer", "tool": "page_rancher", "input": {"urgency": "text", "context": "Weekly rotation proposal: move herd from north paddock to east paddock Monday. Forage levels nominal. Reply APPROVE to confirm."}}
+{"record": "tool_call", "agent": "HerdHealthWatcher", "tool": "classify_pipeline", "input": {"trough_id": "trough_a"}, "result": {"detection_count": 5, "annotated_frame": "/tmp/tmpwk_ssszn/annotated_trough_a.png"}}
+{"record": "tool_call", "agent": "HerdHealthWatcher", "tool": "page_rancher", "input": {"urgency": "text", "context": "HerdHealthWatcher: anomaly detected at trough_a. Review recommended within 24h."}}
+{"record": "tool_call", "agent": "HerdHealthWatcher", "tool": "classify_pipeline", "input": {"trough_id": "trough_a"}, "result": {"detection_count": 5, "annotated_frame": "/tmp/tmpi0arehu0/annotated_trough_a.png"}}

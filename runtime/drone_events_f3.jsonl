@@ -1,0 +1,510 @@
+{"ts": 1776832695.5366569, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776832695.5518591, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776832695.5526853, "event": "takeoff", "alt_m": 30.0}
+{"ts": 1776832695.7625668, "event": "patrol_complete", "waypoints": [{"lat": 34.02, "lon": -106.08, "alt_m": 30.0, "hold_s": 0.0}, {"lat": 34.05, "lon": -106.05, "alt_m": 35.0, "hold_s": 0.0}, {"lat": 34.09, "lon": -106.02, "alt_m": 30.0, "hold_s": 0.0}]}
+{"ts": 1776832695.7631288, "event": "return_to_home"}
+{"ts": 1776832695.7681148, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776832695.775895, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776832695.781747, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776832695.7828107, "event": "takeoff", "alt_m": 60.0}
+{"ts": 1776832695.7884607, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776832695.7945607, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776832695.8035047, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776832695.8042588, "event": "deterrent", "tone_hz": 8000, "duration_s": 0.0, "in_air": false, "lat": 34.05, "lon": -106.05, "alt_m": 0.0, "speaker_cue": true}
+{"ts": 1776832695.8145607, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776832695.8544397, "event": "thermal_clip", "path": "/tmp/pytest-of-george/pytest-174/test_get_thermal_clip_returns_0/f3_1776832695.png", "ir_payload": false}
+{"ts": 1776832695.999847, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776832696.000117, "event": "disconnected"}
+{"ts": 1776832744.3221803, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776832744.3292518, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776832744.3301003, "event": "takeoff", "alt_m": 30.0}
+{"ts": 1776832744.4244745, "event": "patrol_complete", "waypoints": [{"lat": 34.02, "lon": -106.08, "alt_m": 30.0, "hold_s": 0.0}, {"lat": 34.05, "lon": -106.05, "alt_m": 35.0, "hold_s": 0.0}, {"lat": 34.09, "lon": -106.02, "alt_m": 30.0, "hold_s": 0.0}]}
+{"ts": 1776832744.424971, "event": "return_to_home"}
+{"ts": 1776832744.428761, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776832744.4329164, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776832744.440453, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776832744.4415, "event": "takeoff", "alt_m": 60.0}
+{"ts": 1776832744.4451957, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776832744.4481063, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776832744.454012, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776832744.4544342, "event": "deterrent", "tone_hz": 8000, "duration_s": 0.0, "in_air": false, "lat": 34.05, "lon": -106.05, "alt_m": 0.0, "speaker_cue": true}
+{"ts": 1776832744.4589217, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776832744.4820693, "event": "thermal_clip", "path": "/tmp/pytest-of-george/pytest-175/test_get_thermal_clip_returns_0/f3_1776832744.png", "ir_payload": false}
+{"ts": 1776832744.486676, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776832744.486897, "event": "disconnected"}
+{"ts": 1776832956.4095054, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776832956.419401, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776832956.4203167, "event": "takeoff", "alt_m": 30.0}
+{"ts": 1776832956.554624, "event": "patrol_complete", "waypoints": [{"lat": 34.02, "lon": -106.08, "alt_m": 30.0, "hold_s": 0.0}, {"lat": 34.05, "lon": -106.05, "alt_m": 35.0, "hold_s": 0.0}, {"lat": 34.09, "lon": -106.02, "alt_m": 30.0, "hold_s": 0.0}]}
+{"ts": 1776832956.5553277, "event": "return_to_home"}
+{"ts": 1776832956.5641844, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776832956.5706694, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776832956.5758576, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776832956.5773625, "event": "takeoff", "alt_m": 60.0}
+{"ts": 1776832956.5834658, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776832956.5884068, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776832956.5948188, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776832956.5952806, "event": "deterrent", "tone_hz": 8000, "duration_s": 0.0, "in_air": false, "lat": 34.05, "lon": -106.05, "alt_m": 0.0, "speaker_cue": true}
+{"ts": 1776832956.6024065, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776832956.6321445, "event": "thermal_clip", "path": "/tmp/pytest-of-george/pytest-176/test_get_thermal_clip_returns_0/f3_1776832956.png", "ir_payload": false}
+{"ts": 1776832956.6369166, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776832956.6371067, "event": "disconnected"}
+{"ts": 1776833098.0349524, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776833098.0528336, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776833098.0545535, "event": "takeoff", "alt_m": 30.0}
+{"ts": 1776833098.2399285, "event": "patrol_complete", "waypoints": [{"lat": 34.02, "lon": -106.08, "alt_m": 30.0, "hold_s": 0.0}, {"lat": 34.05, "lon": -106.05, "alt_m": 35.0, "hold_s": 0.0}, {"lat": 34.09, "lon": -106.02, "alt_m": 30.0, "hold_s": 0.0}]}
+{"ts": 1776833098.2406979, "event": "return_to_home"}
+{"ts": 1776833098.251733, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776833098.2600205, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776833098.2666829, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776833098.2682185, "event": "takeoff", "alt_m": 60.0}
+{"ts": 1776833098.2788281, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776833098.2856822, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776833098.2974627, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776833098.2981155, "event": "deterrent", "tone_hz": 8000, "duration_s": 0.0, "in_air": false, "lat": 34.05, "lon": -106.05, "alt_m": 0.0, "speaker_cue": true}
+{"ts": 1776833098.3064501, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776833098.3326092, "event": "thermal_clip", "path": "/tmp/pytest-of-george/pytest-177/test_get_thermal_clip_returns_0/f3_1776833098.png", "ir_payload": false}
+{"ts": 1776833098.3400187, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776833098.340299, "event": "disconnected"}
+{"ts": 1776833411.39651, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776833411.4141695, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776833411.4162421, "event": "takeoff", "alt_m": 30.0}
+{"ts": 1776833411.6646912, "event": "patrol_complete", "waypoints": [{"lat": 34.02, "lon": -106.08, "alt_m": 30.0, "hold_s": 0.0}, {"lat": 34.05, "lon": -106.05, "alt_m": 35.0, "hold_s": 0.0}, {"lat": 34.09, "lon": -106.02, "alt_m": 30.0, "hold_s": 0.0}]}
+{"ts": 1776833411.6658013, "event": "return_to_home"}
+{"ts": 1776833411.6803014, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776833411.6937475, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776833411.706617, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776833411.708321, "event": "takeoff", "alt_m": 60.0}
+{"ts": 1776833411.7221715, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776833411.735656, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776833411.7481456, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776833411.748985, "event": "deterrent", "tone_hz": 8000, "duration_s": 0.0, "in_air": false, "lat": 34.05, "lon": -106.05, "alt_m": 0.0, "speaker_cue": true}
+{"ts": 1776833411.7601726, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776833411.8006074, "event": "thermal_clip", "path": "/tmp/pytest-of-george/pytest-178/test_get_thermal_clip_returns_0/f3_1776833411.png", "ir_payload": false}
+{"ts": 1776833411.8133438, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776833411.8138797, "event": "disconnected"}
+{"ts": 1776834769.1366062, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776834769.1460068, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776834769.1471806, "event": "takeoff", "alt_m": 30.0}
+{"ts": 1776834769.262762, "event": "patrol_complete", "waypoints": [{"lat": 34.02, "lon": -106.08, "alt_m": 30.0, "hold_s": 0.0}, {"lat": 34.05, "lon": -106.05, "alt_m": 35.0, "hold_s": 0.0}, {"lat": 34.09, "lon": -106.02, "alt_m": 30.0, "hold_s": 0.0}]}
+{"ts": 1776834769.2632344, "event": "return_to_home"}
+{"ts": 1776834769.2681406, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776834769.271936, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776834769.2751563, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776834769.275946, "event": "takeoff", "alt_m": 60.0}
+{"ts": 1776834769.2811482, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776834769.2894359, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776834769.2950478, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776834769.2957418, "event": "deterrent", "tone_hz": 8000, "duration_s": 0.0, "in_air": false, "lat": 34.05, "lon": -106.05, "alt_m": 0.0, "speaker_cue": true}
+{"ts": 1776834769.3016834, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776834769.4454017, "event": "thermal_clip", "path": "/tmp/pytest-of-george/pytest-182/test_get_thermal_clip_returns_0/f3_1776834769.png", "ir_payload": false}
+{"ts": 1776834769.4514377, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776834769.451694, "event": "disconnected"}
+{"ts": 1776834890.7771266, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776834890.7918124, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776834890.793056, "event": "takeoff", "alt_m": 30.0}
+{"ts": 1776834890.9901092, "event": "patrol_complete", "waypoints": [{"lat": 34.02, "lon": -106.08, "alt_m": 30.0, "hold_s": 0.0}, {"lat": 34.05, "lon": -106.05, "alt_m": 35.0, "hold_s": 0.0}, {"lat": 34.09, "lon": -106.02, "alt_m": 30.0, "hold_s": 0.0}]}
+{"ts": 1776834890.9907944, "event": "return_to_home"}
+{"ts": 1776834891.0002463, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776834891.0069497, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776834891.012771, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776834891.0140593, "event": "takeoff", "alt_m": 60.0}
+{"ts": 1776834891.0201218, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776834891.025992, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776834891.0338798, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776834891.0344021, "event": "deterrent", "tone_hz": 8000, "duration_s": 0.0, "in_air": false, "lat": 34.05, "lon": -106.05, "alt_m": 0.0, "speaker_cue": true}
+{"ts": 1776834891.0419598, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776834891.0641031, "event": "thermal_clip", "path": "/tmp/pytest-of-george/pytest-183/test_get_thermal_clip_returns_0/f3_1776834891.png", "ir_payload": false}
+{"ts": 1776834891.0705557, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776834891.0709374, "event": "disconnected"}
+{"ts": 1776835722.9812083, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776835723.0092714, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776835723.0124063, "event": "takeoff", "alt_m": 30.0}
+{"ts": 1776835723.374287, "event": "patrol_complete", "waypoints": [{"lat": 34.02, "lon": -106.08, "alt_m": 30.0, "hold_s": 0.0}, {"lat": 34.05, "lon": -106.05, "alt_m": 35.0, "hold_s": 0.0}, {"lat": 34.09, "lon": -106.02, "alt_m": 30.0, "hold_s": 0.0}]}
+{"ts": 1776835723.3757448, "event": "return_to_home"}
+{"ts": 1776835723.3910477, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776835723.406986, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776835723.423312, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776835723.4261782, "event": "takeoff", "alt_m": 60.0}
+{"ts": 1776835723.440734, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776835723.4540286, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776835723.47356, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776835723.475262, "event": "deterrent", "tone_hz": 8000, "duration_s": 0.0, "in_air": false, "lat": 34.05, "lon": -106.05, "alt_m": 0.0, "speaker_cue": true}
+{"ts": 1776835723.4933777, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776835723.5381274, "event": "thermal_clip", "path": "/tmp/pytest-of-george/pytest-191/test_get_thermal_clip_returns_0/f3_1776835723.png", "ir_payload": false}
+{"ts": 1776835723.552688, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776835723.5530794, "event": "disconnected"}
+{"ts": 1776836760.9917831, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776836761.0143902, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776836761.0160968, "event": "takeoff", "alt_m": 30.0}
+{"ts": 1776836761.269217, "event": "patrol_complete", "waypoints": [{"lat": 34.02, "lon": -106.08, "alt_m": 30.0, "hold_s": 0.0}, {"lat": 34.05, "lon": -106.05, "alt_m": 35.0, "hold_s": 0.0}, {"lat": 34.09, "lon": -106.02, "alt_m": 30.0, "hold_s": 0.0}]}
+{"ts": 1776836761.2703536, "event": "return_to_home"}
+{"ts": 1776836761.283197, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776836761.2945945, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776836761.309949, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776836761.313304, "event": "takeoff", "alt_m": 60.0}
+{"ts": 1776836761.327396, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776836761.3394608, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776836761.3528762, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776836761.3537118, "event": "deterrent", "tone_hz": 8000, "duration_s": 0.0, "in_air": false, "lat": 34.05, "lon": -106.05, "alt_m": 0.0, "speaker_cue": true}
+{"ts": 1776836761.370056, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776836761.4095907, "event": "thermal_clip", "path": "/tmp/pytest-of-george/pytest-192/test_get_thermal_clip_returns_0/f3_1776836761.png", "ir_payload": false}
+{"ts": 1776836761.5578206, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776836761.558184, "event": "disconnected"}
+{"ts": 1776836946.6325648, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776836946.655567, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776836946.6581511, "event": "takeoff", "alt_m": 30.0}
+{"ts": 1776836946.9311037, "event": "patrol_complete", "waypoints": [{"lat": 34.02, "lon": -106.08, "alt_m": 30.0, "hold_s": 0.0}, {"lat": 34.05, "lon": -106.05, "alt_m": 35.0, "hold_s": 0.0}, {"lat": 34.09, "lon": -106.02, "alt_m": 30.0, "hold_s": 0.0}]}
+{"ts": 1776836946.932274, "event": "return_to_home"}
+{"ts": 1776836946.9435751, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776836946.9559073, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776836946.9664361, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776836946.96887, "event": "takeoff", "alt_m": 60.0}
+{"ts": 1776836946.9801388, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776836946.9946437, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776836947.0064592, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776836947.007613, "event": "deterrent", "tone_hz": 8000, "duration_s": 0.0, "in_air": false, "lat": 34.05, "lon": -106.05, "alt_m": 0.0, "speaker_cue": true}
+{"ts": 1776836947.0217726, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776836947.0548775, "event": "thermal_clip", "path": "/tmp/pytest-of-george/pytest-194/test_get_thermal_clip_returns_0/f3_1776836947.png", "ir_payload": false}
+{"ts": 1776836947.064718, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776836947.0651608, "event": "disconnected"}
+{"ts": 1776837124.3417866, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776837124.3570776, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776837124.358859, "event": "takeoff", "alt_m": 30.0}
+{"ts": 1776837124.5727758, "event": "patrol_complete", "waypoints": [{"lat": 34.02, "lon": -106.08, "alt_m": 30.0, "hold_s": 0.0}, {"lat": 34.05, "lon": -106.05, "alt_m": 35.0, "hold_s": 0.0}, {"lat": 34.09, "lon": -106.02, "alt_m": 30.0, "hold_s": 0.0}]}
+{"ts": 1776837124.574229, "event": "return_to_home"}
+{"ts": 1776837124.5825484, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776837124.5924833, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776837124.60155, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776837124.6035454, "event": "takeoff", "alt_m": 60.0}
+{"ts": 1776837124.6129277, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776837124.6243055, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776837124.6345625, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776837124.6354408, "event": "deterrent", "tone_hz": 8000, "duration_s": 0.0, "in_air": false, "lat": 34.05, "lon": -106.05, "alt_m": 0.0, "speaker_cue": true}
+{"ts": 1776837124.6465678, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776837124.680941, "event": "thermal_clip", "path": "/tmp/pytest-of-george/pytest-195/test_get_thermal_clip_returns_0/f3_1776837124.png", "ir_payload": false}
+{"ts": 1776837124.6914556, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776837124.6917973, "event": "disconnected"}
+{"ts": 1776837466.181837, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776837466.2023396, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776837466.2040594, "event": "takeoff", "alt_m": 30.0}
+{"ts": 1776837466.4564693, "event": "patrol_complete", "waypoints": [{"lat": 34.02, "lon": -106.08, "alt_m": 30.0, "hold_s": 0.0}, {"lat": 34.05, "lon": -106.05, "alt_m": 35.0, "hold_s": 0.0}, {"lat": 34.09, "lon": -106.02, "alt_m": 30.0, "hold_s": 0.0}]}
+{"ts": 1776837466.4573703, "event": "return_to_home"}
+{"ts": 1776837466.469162, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776837466.480898, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776837466.494934, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776837466.4978619, "event": "takeoff", "alt_m": 60.0}
+{"ts": 1776837466.5079079, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776837466.5195935, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776837466.5341432, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776837466.5349894, "event": "deterrent", "tone_hz": 8000, "duration_s": 0.0, "in_air": false, "lat": 34.05, "lon": -106.05, "alt_m": 0.0, "speaker_cue": true}
+{"ts": 1776837466.5469897, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776837466.5859928, "event": "thermal_clip", "path": "/tmp/pytest-of-george/pytest-198/test_get_thermal_clip_returns_0/f3_1776837466.png", "ir_payload": false}
+{"ts": 1776837466.6016114, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776837466.6023467, "event": "disconnected"}
+{"ts": 1776837642.7672877, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776837642.7841465, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776837642.7856903, "event": "takeoff", "alt_m": 30.0}
+{"ts": 1776837643.0337656, "event": "patrol_complete", "waypoints": [{"lat": 34.02, "lon": -106.08, "alt_m": 30.0, "hold_s": 0.0}, {"lat": 34.05, "lon": -106.05, "alt_m": 35.0, "hold_s": 0.0}, {"lat": 34.09, "lon": -106.02, "alt_m": 30.0, "hold_s": 0.0}]}
+{"ts": 1776837643.0360415, "event": "return_to_home"}
+{"ts": 1776837643.0458658, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776837643.057938, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776837643.076239, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776837643.07955, "event": "takeoff", "alt_m": 60.0}
+{"ts": 1776837643.0885177, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776837643.0992033, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776837643.110508, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776837643.1113522, "event": "deterrent", "tone_hz": 8000, "duration_s": 0.0, "in_air": false, "lat": 34.05, "lon": -106.05, "alt_m": 0.0, "speaker_cue": true}
+{"ts": 1776837643.121279, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776837643.1532462, "event": "thermal_clip", "path": "/tmp/pytest-of-george/pytest-199/test_get_thermal_clip_returns_0/f3_1776837643.png", "ir_payload": false}
+{"ts": 1776837643.163365, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776837643.1638136, "event": "disconnected"}
+{"ts": 1776837820.3990638, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776837820.4279919, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776837820.431229, "event": "takeoff", "alt_m": 30.0}
+{"ts": 1776837820.821114, "event": "patrol_complete", "waypoints": [{"lat": 34.02, "lon": -106.08, "alt_m": 30.0, "hold_s": 0.0}, {"lat": 34.05, "lon": -106.05, "alt_m": 35.0, "hold_s": 0.0}, {"lat": 34.09, "lon": -106.02, "alt_m": 30.0, "hold_s": 0.0}]}
+{"ts": 1776837820.823921, "event": "return_to_home"}
+{"ts": 1776837820.8485181, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776837820.87747, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776837820.8952875, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776837820.9005494, "event": "takeoff", "alt_m": 60.0}
+{"ts": 1776837820.929223, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776837820.9528227, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776837820.9829257, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776837820.9855494, "event": "deterrent", "tone_hz": 8000, "duration_s": 0.0, "in_air": false, "lat": 34.05, "lon": -106.05, "alt_m": 0.0, "speaker_cue": true}
+{"ts": 1776837821.0157351, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776837821.176548, "event": "thermal_clip", "path": "/tmp/pytest-of-george/pytest-202/test_get_thermal_clip_returns_0/f3_1776837821.png", "ir_payload": false}
+{"ts": 1776837821.1950176, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776837821.1959429, "event": "disconnected"}
+{"ts": 1776838040.1682327, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776838040.1976836, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776838040.2016394, "event": "takeoff", "alt_m": 30.0}
+{"ts": 1776838040.5616179, "event": "patrol_complete", "waypoints": [{"lat": 34.02, "lon": -106.08, "alt_m": 30.0, "hold_s": 0.0}, {"lat": 34.05, "lon": -106.05, "alt_m": 35.0, "hold_s": 0.0}, {"lat": 34.09, "lon": -106.02, "alt_m": 30.0, "hold_s": 0.0}]}
+{"ts": 1776838040.5634208, "event": "return_to_home"}
+{"ts": 1776838040.5790548, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776838040.5936186, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776838040.608213, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776838040.6113672, "event": "takeoff", "alt_m": 60.0}
+{"ts": 1776838040.6295688, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776838040.6418426, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776838040.666067, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776838040.6678941, "event": "deterrent", "tone_hz": 8000, "duration_s": 0.0, "in_air": false, "lat": 34.05, "lon": -106.05, "alt_m": 0.0, "speaker_cue": true}
+{"ts": 1776838040.685048, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776838040.731282, "event": "thermal_clip", "path": "/tmp/pytest-of-george/pytest-203/test_get_thermal_clip_returns_0/f3_1776838040.png", "ir_payload": false}
+{"ts": 1776838040.7441106, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776838040.7447002, "event": "disconnected"}
+{"ts": 1776838060.1348197, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776838060.1654751, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776838060.168807, "event": "takeoff", "alt_m": 30.0}
+{"ts": 1776838060.5903852, "event": "patrol_complete", "waypoints": [{"lat": 34.02, "lon": -106.08, "alt_m": 30.0, "hold_s": 0.0}, {"lat": 34.05, "lon": -106.05, "alt_m": 35.0, "hold_s": 0.0}, {"lat": 34.09, "lon": -106.02, "alt_m": 30.0, "hold_s": 0.0}]}
+{"ts": 1776838060.5923781, "event": "return_to_home"}
+{"ts": 1776838060.6131701, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776838060.632369, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776838060.649833, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776838060.6524658, "event": "takeoff", "alt_m": 60.0}
+{"ts": 1776838060.6720328, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776838060.6913705, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776838060.7218227, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776838060.7236607, "event": "deterrent", "tone_hz": 8000, "duration_s": 0.0, "in_air": false, "lat": 34.05, "lon": -106.05, "alt_m": 0.0, "speaker_cue": true}
+{"ts": 1776838060.746465, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776838060.812208, "event": "thermal_clip", "path": "/tmp/pytest-of-george/pytest-204/test_get_thermal_clip_returns_0/f3_1776838060.png", "ir_payload": false}
+{"ts": 1776838060.8266318, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776838060.8277004, "event": "disconnected"}
+{"ts": 1776838357.9127295, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776838357.9318655, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776838357.9342265, "event": "takeoff", "alt_m": 30.0}
+{"ts": 1776838358.1620557, "event": "patrol_complete", "waypoints": [{"lat": 34.02, "lon": -106.08, "alt_m": 30.0, "hold_s": 0.0}, {"lat": 34.05, "lon": -106.05, "alt_m": 35.0, "hold_s": 0.0}, {"lat": 34.09, "lon": -106.02, "alt_m": 30.0, "hold_s": 0.0}]}
+{"ts": 1776838358.163623, "event": "return_to_home"}
+{"ts": 1776838358.1732824, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776838358.1846514, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776838358.194012, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776838358.1960437, "event": "takeoff", "alt_m": 60.0}
+{"ts": 1776838358.205648, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776838358.2149944, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776838358.2316165, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776838358.2326405, "event": "deterrent", "tone_hz": 8000, "duration_s": 0.0, "in_air": false, "lat": 34.05, "lon": -106.05, "alt_m": 0.0, "speaker_cue": true}
+{"ts": 1776838358.2445111, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776838358.2785702, "event": "thermal_clip", "path": "/tmp/pytest-of-george/pytest-205/test_get_thermal_clip_returns_0/f3_1776838358.png", "ir_payload": false}
+{"ts": 1776838358.289462, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776838358.2898932, "event": "disconnected"}
+{"ts": 1776838546.8380296, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776838546.8561735, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776838546.8583126, "event": "takeoff", "alt_m": 30.0}
+{"ts": 1776838547.1351886, "event": "patrol_complete", "waypoints": [{"lat": 34.02, "lon": -106.08, "alt_m": 30.0, "hold_s": 0.0}, {"lat": 34.05, "lon": -106.05, "alt_m": 35.0, "hold_s": 0.0}, {"lat": 34.09, "lon": -106.02, "alt_m": 30.0, "hold_s": 0.0}]}
+{"ts": 1776838547.1366744, "event": "return_to_home"}
+{"ts": 1776838547.1504266, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776838547.16593, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776838547.180478, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776838547.1845047, "event": "takeoff", "alt_m": 60.0}
+{"ts": 1776838547.2068274, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776838547.3915715, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776838547.4066777, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776838547.4077215, "event": "deterrent", "tone_hz": 8000, "duration_s": 0.0, "in_air": false, "lat": 34.05, "lon": -106.05, "alt_m": 0.0, "speaker_cue": true}
+{"ts": 1776838547.4221363, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776838547.4647732, "event": "thermal_clip", "path": "/tmp/pytest-of-george/pytest-206/test_get_thermal_clip_returns_0/f3_1776838547.png", "ir_payload": false}
+{"ts": 1776838547.475778, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776838547.4762237, "event": "disconnected"}
+{"ts": 1776838812.1218848, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776838812.135666, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776838812.137063, "event": "takeoff", "alt_m": 30.0}
+{"ts": 1776838812.3002524, "event": "patrol_complete", "waypoints": [{"lat": 34.02, "lon": -106.08, "alt_m": 30.0, "hold_s": 0.0}, {"lat": 34.05, "lon": -106.05, "alt_m": 35.0, "hold_s": 0.0}, {"lat": 34.09, "lon": -106.02, "alt_m": 30.0, "hold_s": 0.0}]}
+{"ts": 1776838812.3009171, "event": "return_to_home"}
+{"ts": 1776838812.3071647, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776838812.3148823, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776838812.321162, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776838812.322426, "event": "takeoff", "alt_m": 60.0}
+{"ts": 1776838812.3314488, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776838812.337227, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776838812.3445892, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776838812.3452873, "event": "deterrent", "tone_hz": 8000, "duration_s": 0.0, "in_air": false, "lat": 34.05, "lon": -106.05, "alt_m": 0.0, "speaker_cue": true}
+{"ts": 1776838812.3535144, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776838812.37803, "event": "thermal_clip", "path": "/tmp/pytest-of-george/pytest-207/test_get_thermal_clip_returns_0/f3_1776838812.png", "ir_payload": false}
+{"ts": 1776838812.384539, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776838812.38483, "event": "disconnected"}
+{"ts": 1776839007.1951785, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776839007.209229, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776839007.210329, "event": "takeoff", "alt_m": 30.0}
+{"ts": 1776839007.3695824, "event": "patrol_complete", "waypoints": [{"lat": 34.02, "lon": -106.08, "alt_m": 30.0, "hold_s": 0.0}, {"lat": 34.05, "lon": -106.05, "alt_m": 35.0, "hold_s": 0.0}, {"lat": 34.09, "lon": -106.02, "alt_m": 30.0, "hold_s": 0.0}]}
+{"ts": 1776839007.3704126, "event": "return_to_home"}
+{"ts": 1776839007.3774724, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776839007.383833, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776839007.3909779, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776839007.3923633, "event": "takeoff", "alt_m": 60.0}
+{"ts": 1776839007.3981793, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776839007.404512, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776839007.4153748, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776839007.4161363, "event": "deterrent", "tone_hz": 8000, "duration_s": 0.0, "in_air": false, "lat": 34.05, "lon": -106.05, "alt_m": 0.0, "speaker_cue": true}
+{"ts": 1776839007.4245038, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776839007.4500723, "event": "thermal_clip", "path": "/tmp/pytest-of-george/pytest-209/test_get_thermal_clip_returns_0/f3_1776839007.png", "ir_payload": false}
+{"ts": 1776839007.4569316, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776839007.4571846, "event": "disconnected"}
+{"ts": 1776839398.235749, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776839398.247997, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776839398.2492597, "event": "takeoff", "alt_m": 30.0}
+{"ts": 1776839398.4130683, "event": "patrol_complete", "waypoints": [{"lat": 34.02, "lon": -106.08, "alt_m": 30.0, "hold_s": 0.0}, {"lat": 34.05, "lon": -106.05, "alt_m": 35.0, "hold_s": 0.0}, {"lat": 34.09, "lon": -106.02, "alt_m": 30.0, "hold_s": 0.0}]}
+{"ts": 1776839398.413776, "event": "return_to_home"}
+{"ts": 1776839398.420966, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776839398.42863, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776839398.4364064, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776839398.4378436, "event": "takeoff", "alt_m": 60.0}
+{"ts": 1776839398.4452584, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776839398.4517114, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776839398.4641058, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776839398.464784, "event": "deterrent", "tone_hz": 8000, "duration_s": 0.0, "in_air": false, "lat": 34.05, "lon": -106.05, "alt_m": 0.0, "speaker_cue": true}
+{"ts": 1776839398.4725492, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776839398.496989, "event": "thermal_clip", "path": "/tmp/pytest-of-george/pytest-210/test_get_thermal_clip_returns_0/f3_1776839398.png", "ir_payload": false}
+{"ts": 1776839398.5034204, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776839398.5038629, "event": "disconnected"}
+{"ts": 1776839533.2644227, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776839533.2759511, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776839533.2777002, "event": "takeoff", "alt_m": 30.0}
+{"ts": 1776839533.4426944, "event": "patrol_complete", "waypoints": [{"lat": 34.02, "lon": -106.08, "alt_m": 30.0, "hold_s": 0.0}, {"lat": 34.05, "lon": -106.05, "alt_m": 35.0, "hold_s": 0.0}, {"lat": 34.09, "lon": -106.02, "alt_m": 30.0, "hold_s": 0.0}]}
+{"ts": 1776839533.4433465, "event": "return_to_home"}
+{"ts": 1776839533.450755, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776839533.4590368, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776839533.465928, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776839533.4672904, "event": "takeoff", "alt_m": 60.0}
+{"ts": 1776839533.4743996, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776839533.4814365, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776839533.4936752, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776839533.4943104, "event": "deterrent", "tone_hz": 8000, "duration_s": 0.0, "in_air": false, "lat": 34.05, "lon": -106.05, "alt_m": 0.0, "speaker_cue": true}
+{"ts": 1776839533.5023844, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776839533.5268426, "event": "thermal_clip", "path": "/tmp/pytest-of-george/pytest-211/test_get_thermal_clip_returns_0/f3_1776839533.png", "ir_payload": false}
+{"ts": 1776839533.5331094, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776839533.5333154, "event": "disconnected"}
+{"ts": 1776839757.5233817, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776839757.5359015, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776839757.5370717, "event": "takeoff", "alt_m": 30.0}
+{"ts": 1776839757.7016177, "event": "patrol_complete", "waypoints": [{"lat": 34.02, "lon": -106.08, "alt_m": 30.0, "hold_s": 0.0}, {"lat": 34.05, "lon": -106.05, "alt_m": 35.0, "hold_s": 0.0}, {"lat": 34.09, "lon": -106.02, "alt_m": 30.0, "hold_s": 0.0}]}
+{"ts": 1776839757.702374, "event": "return_to_home"}
+{"ts": 1776839757.7091997, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776839757.7173514, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776839757.7234414, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776839757.7246869, "event": "takeoff", "alt_m": 60.0}
+{"ts": 1776839757.7320657, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776839757.7380188, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776839757.7493286, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776839757.7498877, "event": "deterrent", "tone_hz": 8000, "duration_s": 0.0, "in_air": false, "lat": 34.05, "lon": -106.05, "alt_m": 0.0, "speaker_cue": true}
+{"ts": 1776839757.7568247, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776839757.7808144, "event": "thermal_clip", "path": "/tmp/pytest-of-george/pytest-213/test_get_thermal_clip_returns_0/f3_1776839757.png", "ir_payload": false}
+{"ts": 1776839757.7868767, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776839757.7870831, "event": "disconnected"}
+{"ts": 1776839890.5173163, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776839890.5282536, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776839890.529591, "event": "takeoff", "alt_m": 30.0}
+{"ts": 1776839890.684869, "event": "patrol_complete", "waypoints": [{"lat": 34.02, "lon": -106.08, "alt_m": 30.0, "hold_s": 0.0}, {"lat": 34.05, "lon": -106.05, "alt_m": 35.0, "hold_s": 0.0}, {"lat": 34.09, "lon": -106.02, "alt_m": 30.0, "hold_s": 0.0}]}
+{"ts": 1776839890.6855555, "event": "return_to_home"}
+{"ts": 1776839890.6919115, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776839890.699203, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776839890.705581, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776839890.7067711, "event": "takeoff", "alt_m": 60.0}
+{"ts": 1776839890.7130728, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776839890.7203255, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776839890.7316387, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776839890.732245, "event": "deterrent", "tone_hz": 8000, "duration_s": 0.0, "in_air": false, "lat": 34.05, "lon": -106.05, "alt_m": 0.0, "speaker_cue": true}
+{"ts": 1776839890.7398274, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776839890.766831, "event": "thermal_clip", "path": "/tmp/pytest-of-george/pytest-214/test_get_thermal_clip_returns_0/f3_1776839890.png", "ir_payload": false}
+{"ts": 1776839890.773366, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776839890.7738426, "event": "disconnected"}
+{"ts": 1776840041.667534, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776840041.6804187, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776840041.6816406, "event": "takeoff", "alt_m": 30.0}
+{"ts": 1776840041.8381975, "event": "patrol_complete", "waypoints": [{"lat": 34.02, "lon": -106.08, "alt_m": 30.0, "hold_s": 0.0}, {"lat": 34.05, "lon": -106.05, "alt_m": 35.0, "hold_s": 0.0}, {"lat": 34.09, "lon": -106.02, "alt_m": 30.0, "hold_s": 0.0}]}
+{"ts": 1776840041.8389428, "event": "return_to_home"}
+{"ts": 1776840041.8467185, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776840041.8532798, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776840041.8598537, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776840041.8614361, "event": "takeoff", "alt_m": 60.0}
+{"ts": 1776840041.8678133, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776840041.8742125, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776840041.8876467, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776840041.888271, "event": "deterrent", "tone_hz": 8000, "duration_s": 0.0, "in_air": false, "lat": 34.05, "lon": -106.05, "alt_m": 0.0, "speaker_cue": true}
+{"ts": 1776840041.89702, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776840041.9244924, "event": "thermal_clip", "path": "/tmp/pytest-of-george/pytest-215/test_get_thermal_clip_returns_0/f3_1776840041.png", "ir_payload": false}
+{"ts": 1776840041.9315262, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776840041.9318342, "event": "disconnected"}
+{"ts": 1776840311.5755398, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776840311.5966887, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776840311.5992162, "event": "takeoff", "alt_m": 30.0}
+{"ts": 1776840311.8504248, "event": "patrol_complete", "waypoints": [{"lat": 34.02, "lon": -106.08, "alt_m": 30.0, "hold_s": 0.0}, {"lat": 34.05, "lon": -106.05, "alt_m": 35.0, "hold_s": 0.0}, {"lat": 34.09, "lon": -106.02, "alt_m": 30.0, "hold_s": 0.0}]}
+{"ts": 1776840311.851296, "event": "return_to_home"}
+{"ts": 1776840311.86239, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776840311.8731153, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776840311.8829007, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776840311.8846807, "event": "takeoff", "alt_m": 60.0}
+{"ts": 1776840311.8968916, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776840311.912287, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776840311.9241173, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776840311.925701, "event": "deterrent", "tone_hz": 8000, "duration_s": 0.0, "in_air": false, "lat": 34.05, "lon": -106.05, "alt_m": 0.0, "speaker_cue": true}
+{"ts": 1776840311.9429967, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776840311.9789994, "event": "thermal_clip", "path": "/tmp/pytest-of-george/pytest-216/test_get_thermal_clip_returns_0/f3_1776840311.png", "ir_payload": false}
+{"ts": 1776840311.9899037, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776840311.9907491, "event": "disconnected"}
+{"ts": 1776840351.0407825, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776840351.0591266, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776840351.0606585, "event": "takeoff", "alt_m": 30.0}
+{"ts": 1776840351.3019466, "event": "patrol_complete", "waypoints": [{"lat": 34.02, "lon": -106.08, "alt_m": 30.0, "hold_s": 0.0}, {"lat": 34.05, "lon": -106.05, "alt_m": 35.0, "hold_s": 0.0}, {"lat": 34.09, "lon": -106.02, "alt_m": 30.0, "hold_s": 0.0}]}
+{"ts": 1776840351.303027, "event": "return_to_home"}
+{"ts": 1776840351.3131413, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776840351.3264947, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776840351.3365824, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776840351.3393555, "event": "takeoff", "alt_m": 60.0}
+{"ts": 1776840351.3494737, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776840351.3596652, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776840351.3774562, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776840351.3781824, "event": "deterrent", "tone_hz": 8000, "duration_s": 0.0, "in_air": false, "lat": 34.05, "lon": -106.05, "alt_m": 0.0, "speaker_cue": true}
+{"ts": 1776840351.3891528, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776840351.4266968, "event": "thermal_clip", "path": "/tmp/pytest-of-george/pytest-217/test_get_thermal_clip_returns_0/f3_1776840351.png", "ir_payload": false}
+{"ts": 1776840351.4358482, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776840351.436441, "event": "disconnected"}
+{"ts": 1776841402.2247076, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776841402.2363975, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776841402.237645, "event": "takeoff", "alt_m": 30.0}
+{"ts": 1776841402.3939285, "event": "patrol_complete", "waypoints": [{"lat": 34.02, "lon": -106.08, "alt_m": 30.0, "hold_s": 0.0}, {"lat": 34.05, "lon": -106.05, "alt_m": 35.0, "hold_s": 0.0}, {"lat": 34.09, "lon": -106.02, "alt_m": 30.0, "hold_s": 0.0}]}
+{"ts": 1776841402.3945813, "event": "return_to_home"}
+{"ts": 1776841402.4009569, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776841402.407561, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776841402.4130769, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776841402.414269, "event": "takeoff", "alt_m": 60.0}
+{"ts": 1776841402.420071, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776841402.425774, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776841402.4354875, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776841402.4359717, "event": "deterrent", "tone_hz": 8000, "duration_s": 0.0, "in_air": false, "lat": 34.05, "lon": -106.05, "alt_m": 0.0, "speaker_cue": true}
+{"ts": 1776841402.442964, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776841402.4654105, "event": "thermal_clip", "path": "/tmp/pytest-of-george/pytest-218/test_get_thermal_clip_returns_0/f3_1776841402.png", "ir_payload": false}
+{"ts": 1776841402.4714448, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776841402.4717357, "event": "disconnected"}
+{"ts": 1776841821.6295826, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776841821.642182, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776841821.643415, "event": "takeoff", "alt_m": 30.0}
+{"ts": 1776841821.7966695, "event": "patrol_complete", "waypoints": [{"lat": 34.02, "lon": -106.08, "alt_m": 30.0, "hold_s": 0.0}, {"lat": 34.05, "lon": -106.05, "alt_m": 35.0, "hold_s": 0.0}, {"lat": 34.09, "lon": -106.02, "alt_m": 30.0, "hold_s": 0.0}]}
+{"ts": 1776841821.7973351, "event": "return_to_home"}
+{"ts": 1776841821.8037276, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776841821.8110192, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776841821.816653, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776841821.817832, "event": "takeoff", "alt_m": 60.0}
+{"ts": 1776841821.8255208, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776841821.831393, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776841821.8426807, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776841821.8432658, "event": "deterrent", "tone_hz": 8000, "duration_s": 0.0, "in_air": false, "lat": 34.05, "lon": -106.05, "alt_m": 0.0, "speaker_cue": true}
+{"ts": 1776841821.8503668, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776841821.8783793, "event": "thermal_clip", "path": "/tmp/pytest-of-george/pytest-219/test_get_thermal_clip_returns_0/f3_1776841821.png", "ir_payload": false}
+{"ts": 1776841821.886078, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776841821.88649, "event": "disconnected"}
+{"ts": 1776842135.5460434, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776842135.558155, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776842135.559201, "event": "takeoff", "alt_m": 30.0}
+{"ts": 1776842135.716528, "event": "patrol_complete", "waypoints": [{"lat": 34.02, "lon": -106.08, "alt_m": 30.0, "hold_s": 0.0}, {"lat": 34.05, "lon": -106.05, "alt_m": 35.0, "hold_s": 0.0}, {"lat": 34.09, "lon": -106.02, "alt_m": 30.0, "hold_s": 0.0}]}
+{"ts": 1776842135.717267, "event": "return_to_home"}
+{"ts": 1776842135.7239149, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776842135.7312148, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776842135.7382052, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776842135.739534, "event": "takeoff", "alt_m": 60.0}
+{"ts": 1776842135.7465475, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776842135.753507, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776842135.766151, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776842135.7670188, "event": "deterrent", "tone_hz": 8000, "duration_s": 0.0, "in_air": false, "lat": 34.05, "lon": -106.05, "alt_m": 0.0, "speaker_cue": true}
+{"ts": 1776842135.7748475, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776842135.7998598, "event": "thermal_clip", "path": "/tmp/pytest-of-george/pytest-220/test_get_thermal_clip_returns_0/f3_1776842135.png", "ir_payload": false}
+{"ts": 1776842135.8067155, "event": "connected", "address": "udpin://0.0.0.0:14550"}
+{"ts": 1776842135.8071225, "event": "disconnected"}

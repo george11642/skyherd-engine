@@ -117,7 +117,9 @@ def test_render_thermal_frame_zero_cows(terrain, tmp_path: Path) -> None:
 # ---------------------------------------------------------------------------
 
 
-def _make_large_herd_world(terrain, n_healthy: int = 497, sick_tags: list[str] | None = None) -> World:
+def _make_large_herd_world(
+    terrain, n_healthy: int = 497, sick_tags: list[str] | None = None
+) -> World:
     """Build a world with n_healthy healthy cows + sick cows from sick_tags."""
     if sick_tags is None:
         sick_tags = ["S001", "S002", "S003"]

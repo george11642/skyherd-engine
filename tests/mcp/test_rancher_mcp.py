@@ -195,9 +195,7 @@ class TestGetRancherPreferences:
 class TestTwilioErrorHandling:
     """C6: _try_send_sms must log at WARNING and return False on Twilio failure."""
 
-    def test_twilio_exception_returns_false_and_logs_warning(
-        self, monkeypatch, caplog
-    ) -> None:
+    def test_twilio_exception_returns_false_and_logs_warning(self, monkeypatch, caplog) -> None:
         """Injecting a TwilioRestException-shaped error must produce a WARNING log."""
         import logging
         from unittest.mock import MagicMock, patch

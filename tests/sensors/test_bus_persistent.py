@@ -62,7 +62,10 @@ async def test_single_connect_for_many_publishes() -> None:
             # Directly call publish on already-opened client
             client = await bus._ensure_connected()
             import json
-            await client.publish(f"skyherd/ranch_a/test/t{i}", payload=json.dumps(payload_i).encode(), qos=0)
+
+            await client.publish(
+                f"skyherd/ranch_a/test/t{i}", payload=json.dumps(payload_i).encode(), qos=0
+            )
 
         await bus._close_client()
 

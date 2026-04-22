@@ -23,10 +23,7 @@ import pytest
 # Skip guard
 # ---------------------------------------------------------------------------
 
-_ENABLED = (
-    os.environ.get("SITL_EMULATOR", "0") == "1"
-    or os.environ.get("SITL", "0") == "1"
-)
+_ENABLED = os.environ.get("SITL_EMULATOR", "0") == "1" or os.environ.get("SITL", "0") == "1"
 
 pytestmark = [
     pytest.mark.skipif(
@@ -95,8 +92,7 @@ async def test_coyote_scenario_drone_takes_off_via_pymavlink(
         await backend.takeoff(alt_m=20.0)
         state = await backend.state()
         assert state.in_air, (
-            "Gate item #4 FAIL: drone did not become airborne via PymavlinkBackend. "
-            f"State: {state}"
+            f"Gate item #4 FAIL: drone did not become airborne via PymavlinkBackend. State: {state}"
         )
 
         # Patrol — ranch perimeter triangle
@@ -131,9 +127,7 @@ async def test_coyote_scenario_full_run_event_stream(sitl_emulator) -> None:
 
     event_types = [e.get("type") for e in result.event_stream]
     assert "fence.breach" in event_types, "Expected fence.breach event"
-    assert "predator.fleeing" in event_types, (
-        "Expected predator.fleeing (deterrent worked)"
-    )
+    assert "predator.fleeing" in event_types, "Expected predator.fleeing (deterrent worked)"
 
     print(
         "\n[Gate item #4 TRULY-GREEN] "

@@ -27,10 +27,7 @@ from skyherd.drone.sitl_emulator import MavlinkSitlEmulator
 # Skip guard
 # ---------------------------------------------------------------------------
 
-_ENABLED = (
-    os.environ.get("SITL_EMULATOR", "0") == "1"
-    or os.environ.get("SITL", "0") == "1"
-)
+_ENABLED = os.environ.get("SITL_EMULATOR", "0") == "1" or os.environ.get("SITL", "0") == "1"
 
 pytestmark = pytest.mark.skipif(
     not _ENABLED,

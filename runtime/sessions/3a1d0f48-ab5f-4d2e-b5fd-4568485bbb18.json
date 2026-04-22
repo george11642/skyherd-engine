@@ -1,0 +1,14 @@
+{
+  "id": "3a1d0f48-ab5f-4d2e-b5fd-4568485bbb18",
+  "agent_name": "GrazingOptimizer",
+  "state": "checkpointed",
+  "last_active_ts": 1776838354.982159,
+  "wake_events_consumed": [],
+  "checkpoint_path": "runtime/sessions/3a1d0f48-ab5f-4d2e-b5fd-4568485bbb18.json",
+  "system_prompt_cached_hash": null,
+  "cumulative_tokens_in": 0,
+  "cumulative_tokens_out": 0,
+  "cumulative_cost_usd": 0.0,
+  "run_time_active_s": 0.0,
+  "run_time_idle_s": 0.0
+}

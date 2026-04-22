@@ -1,0 +1,14 @@
+{
+  "id": "870f109a-8a62-4e75-a104-5b7d70b60ae1",
+  "agent_name": "CalvingWatch",
+  "state": "checkpointed",
+  "last_active_ts": 1776837638.7932065,
+  "wake_events_consumed": [],
+  "checkpoint_path": null,
+  "system_prompt_cached_hash": null,
+  "cumulative_tokens_in": 0,
+  "cumulative_tokens_out": 0,
+  "cumulative_cost_usd": 0.0,
+  "run_time_active_s": 0.0,
+  "run_time_idle_s": 0.0
+}

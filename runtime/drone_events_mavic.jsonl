@@ -1,0 +1,638 @@
+{"ts": 1776832744.4982529, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776832744.5036173, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776832744.5037456, "event": "takeoff", "alt_m": 25.0}
+{"ts": 1776832744.503843, "event": "patrol_complete", "waypoints": [{"lat": 34.02, "lon": -106.08, "alt_m": 30.0, "hold_s": 0.0}, {"lat": 34.05, "lon": -106.05, "alt_m": 35.0, "hold_s": 0.0}, {"lat": 34.09, "lon": -106.02, "alt_m": 30.0, "hold_s": 0.0}]}
+{"ts": 1776832744.5039048, "event": "return_to_home"}
+{"ts": 1776832744.5055559, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776832744.5072913, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776832744.5087845, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776832744.5089478, "event": "takeoff", "alt_m": 60.0}
+{"ts": 1776832744.5104575, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776832744.512268, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776832744.514313, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776832744.5158763, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776832744.5183415, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776832744.5185368, "event": "return_to_home"}
+{"ts": 1776832744.5211723, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776832744.5234141, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776832744.5235379, "event": "deterrent", "tone_hz": 8000, "duration_s": 3.0}
+{"ts": 1776832744.5274436, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776832744.549692, "event": "thermal_clip", "path": "/tmp/pytest-of-george/pytest-175/test_get_thermal_clip_returns_1/mavic_1776832744.png", "ir_payload": false, "note": "Mavic Air 2 has no thermal camera \u2014 synthetic frame"}
+{"ts": 1776832744.5521784, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776832744.5524316, "event": "disconnected"}
+{"ts": 1776832956.6513302, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776832956.657206, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776832956.6573873, "event": "takeoff", "alt_m": 25.0}
+{"ts": 1776832956.6575224, "event": "patrol_complete", "waypoints": [{"lat": 34.02, "lon": -106.08, "alt_m": 30.0, "hold_s": 0.0}, {"lat": 34.05, "lon": -106.05, "alt_m": 35.0, "hold_s": 0.0}, {"lat": 34.09, "lon": -106.02, "alt_m": 30.0, "hold_s": 0.0}]}
+{"ts": 1776832956.6576092, "event": "return_to_home"}
+{"ts": 1776832956.6601207, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776832956.662073, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776832956.6638863, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776832956.664122, "event": "takeoff", "alt_m": 60.0}
+{"ts": 1776832956.6661475, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776832956.6715417, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776832956.674472, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776832956.6769862, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776832956.6789765, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776832956.6790884, "event": "return_to_home"}
+{"ts": 1776832956.8068867, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776832956.8100326, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776832956.8102124, "event": "deterrent", "tone_hz": 8000, "duration_s": 3.0}
+{"ts": 1776832956.815636, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776832956.8436844, "event": "thermal_clip", "path": "/tmp/pytest-of-george/pytest-176/test_get_thermal_clip_returns_1/mavic_1776832956.png", "ir_payload": false, "note": "Mavic Air 2 has no thermal camera \u2014 synthetic frame"}
+{"ts": 1776832956.846339, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776832956.8465772, "event": "disconnected"}
+{"ts": 1776833098.3639088, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776833098.3732858, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776833098.373594, "event": "takeoff", "alt_m": 25.0}
+{"ts": 1776833098.3737988, "event": "patrol_complete", "waypoints": [{"lat": 34.02, "lon": -106.08, "alt_m": 30.0, "hold_s": 0.0}, {"lat": 34.05, "lon": -106.05, "alt_m": 35.0, "hold_s": 0.0}, {"lat": 34.09, "lon": -106.02, "alt_m": 30.0, "hold_s": 0.0}]}
+{"ts": 1776833098.3739562, "event": "return_to_home"}
+{"ts": 1776833098.3780274, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776833098.3812711, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776833098.3851426, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776833098.38552, "event": "takeoff", "alt_m": 60.0}
+{"ts": 1776833098.3888712, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776833098.3948684, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776833098.3982058, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776833098.4012442, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776833098.4049823, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776833098.4053638, "event": "return_to_home"}
+{"ts": 1776833098.5539541, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776833098.5577257, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776833098.557898, "event": "deterrent", "tone_hz": 8000, "duration_s": 3.0}
+{"ts": 1776833098.5627246, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776833098.5856636, "event": "thermal_clip", "path": "/tmp/pytest-of-george/pytest-177/test_get_thermal_clip_returns_1/mavic_1776833098.png", "ir_payload": false, "note": "Mavic Air 2 has no thermal camera \u2014 synthetic frame"}
+{"ts": 1776833098.5908482, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776833098.5912638, "event": "disconnected"}
+{"ts": 1776833411.8556237, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776833411.8736699, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776833411.8739982, "event": "takeoff", "alt_m": 25.0}
+{"ts": 1776833411.8741934, "event": "patrol_complete", "waypoints": [{"lat": 34.02, "lon": -106.08, "alt_m": 30.0, "hold_s": 0.0}, {"lat": 34.05, "lon": -106.05, "alt_m": 35.0, "hold_s": 0.0}, {"lat": 34.09, "lon": -106.02, "alt_m": 30.0, "hold_s": 0.0}]}
+{"ts": 1776833411.874339, "event": "return_to_home"}
+{"ts": 1776833411.879616, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776833411.885772, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776833411.8909795, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776833411.8913593, "event": "takeoff", "alt_m": 60.0}
+{"ts": 1776833411.8955472, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776833411.9102068, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776833411.9155917, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776833411.9231148, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776833411.9284089, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776833411.9286287, "event": "return_to_home"}
+{"ts": 1776833412.0805964, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776833412.0857189, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776833412.086276, "event": "deterrent", "tone_hz": 8000, "duration_s": 3.0}
+{"ts": 1776833412.0940678, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776833412.1232631, "event": "thermal_clip", "path": "/tmp/pytest-of-george/pytest-178/test_get_thermal_clip_returns_1/mavic_1776833412.png", "ir_payload": false, "note": "Mavic Air 2 has no thermal camera \u2014 synthetic frame"}
+{"ts": 1776833412.12936, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776833412.130037, "event": "disconnected"}
+{"ts": 1776834769.4619946, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776834769.4684434, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776834769.468578, "event": "takeoff", "alt_m": 25.0}
+{"ts": 1776834769.4686763, "event": "patrol_complete", "waypoints": [{"lat": 34.02, "lon": -106.08, "alt_m": 30.0, "hold_s": 0.0}, {"lat": 34.05, "lon": -106.05, "alt_m": 35.0, "hold_s": 0.0}, {"lat": 34.09, "lon": -106.02, "alt_m": 30.0, "hold_s": 0.0}]}
+{"ts": 1776834769.4688146, "event": "return_to_home"}
+{"ts": 1776834769.4705112, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776834769.472096, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776834769.4738717, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776834769.4740393, "event": "takeoff", "alt_m": 60.0}
+{"ts": 1776834769.4754527, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776834769.4768112, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776834769.4786086, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776834769.4815884, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776834769.4833252, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776834769.4834123, "event": "return_to_home"}
+{"ts": 1776834769.4849045, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776834769.4865825, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776834769.486689, "event": "deterrent", "tone_hz": 8000, "duration_s": 3.0}
+{"ts": 1776834769.4898188, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776834769.5129182, "event": "thermal_clip", "path": "/tmp/pytest-of-george/pytest-182/test_get_thermal_clip_returns_1/mavic_1776834769.png", "ir_payload": false, "note": "Mavic Air 2 has no thermal camera \u2014 synthetic frame"}
+{"ts": 1776834769.5158343, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776834769.5161319, "event": "disconnected"}
+{"ts": 1776834891.0926156, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776834891.1009772, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776834891.1012664, "event": "takeoff", "alt_m": 25.0}
+{"ts": 1776834891.1014915, "event": "patrol_complete", "waypoints": [{"lat": 34.02, "lon": -106.08, "alt_m": 30.0, "hold_s": 0.0}, {"lat": 34.05, "lon": -106.05, "alt_m": 35.0, "hold_s": 0.0}, {"lat": 34.09, "lon": -106.02, "alt_m": 30.0, "hold_s": 0.0}]}
+{"ts": 1776834891.1016798, "event": "return_to_home"}
+{"ts": 1776834891.1052861, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776834891.1079776, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776834891.1105857, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776834891.1108112, "event": "takeoff", "alt_m": 60.0}
+{"ts": 1776834891.1133845, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776834891.1195672, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776834891.1229224, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776834891.1254618, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776834891.1280136, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776834891.1281283, "event": "return_to_home"}
+{"ts": 1776834891.2346253, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776834891.2376475, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776834891.2378304, "event": "deterrent", "tone_hz": 8000, "duration_s": 3.0}
+{"ts": 1776834891.2421122, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776834891.2616081, "event": "thermal_clip", "path": "/tmp/pytest-of-george/pytest-183/test_get_thermal_clip_returns_1/mavic_1776834891.png", "ir_payload": false, "note": "Mavic Air 2 has no thermal camera \u2014 synthetic frame"}
+{"ts": 1776834891.2651367, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776834891.2655127, "event": "disconnected"}
+{"ts": 1776835723.598408, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776835723.613606, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776835723.613871, "event": "takeoff", "alt_m": 25.0}
+{"ts": 1776835723.6141646, "event": "patrol_complete", "waypoints": [{"lat": 34.02, "lon": -106.08, "alt_m": 30.0, "hold_s": 0.0}, {"lat": 34.05, "lon": -106.05, "alt_m": 35.0, "hold_s": 0.0}, {"lat": 34.09, "lon": -106.02, "alt_m": 30.0, "hold_s": 0.0}]}
+{"ts": 1776835723.6144845, "event": "return_to_home"}
+{"ts": 1776835723.6251645, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776835723.6305783, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776835723.634946, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776835723.6354718, "event": "takeoff", "alt_m": 60.0}
+{"ts": 1776835723.6414373, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776835723.8048768, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776835723.812521, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776835723.8178673, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776835723.8252974, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776835723.8256798, "event": "return_to_home"}
+{"ts": 1776835723.8339493, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776835723.842733, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776835723.8430626, "event": "deterrent", "tone_hz": 8000, "duration_s": 3.0}
+{"ts": 1776835723.8532684, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776835723.8904247, "event": "thermal_clip", "path": "/tmp/pytest-of-george/pytest-191/test_get_thermal_clip_returns_1/mavic_1776835723.png", "ir_payload": false, "note": "Mavic Air 2 has no thermal camera \u2014 synthetic frame"}
+{"ts": 1776835723.8967962, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776835723.8976176, "event": "disconnected"}
+{"ts": 1776836761.592334, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776836761.6062253, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776836761.606536, "event": "takeoff", "alt_m": 25.0}
+{"ts": 1776836761.6067657, "event": "patrol_complete", "waypoints": [{"lat": 34.02, "lon": -106.08, "alt_m": 30.0, "hold_s": 0.0}, {"lat": 34.05, "lon": -106.05, "alt_m": 35.0, "hold_s": 0.0}, {"lat": 34.09, "lon": -106.02, "alt_m": 30.0, "hold_s": 0.0}]}
+{"ts": 1776836761.6069236, "event": "return_to_home"}
+{"ts": 1776836761.6123743, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776836761.6169412, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776836761.6205251, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776836761.6208415, "event": "takeoff", "alt_m": 60.0}
+{"ts": 1776836761.6247168, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776836761.6303596, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776836761.6341257, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776836761.6373794, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776836761.6420274, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776836761.6423247, "event": "return_to_home"}
+{"ts": 1776836761.64674, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776836761.650128, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776836761.6502812, "event": "deterrent", "tone_hz": 8000, "duration_s": 3.0}
+{"ts": 1776836761.6555953, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776836761.6810727, "event": "thermal_clip", "path": "/tmp/pytest-of-george/pytest-192/test_get_thermal_clip_returns_1/mavic_1776836761.png", "ir_payload": false, "note": "Mavic Air 2 has no thermal camera \u2014 synthetic frame"}
+{"ts": 1776836761.6850166, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776836761.6855202, "event": "disconnected"}
+{"ts": 1776836947.0951834, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776836947.1098497, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776836947.1100802, "event": "takeoff", "alt_m": 25.0}
+{"ts": 1776836947.1102939, "event": "patrol_complete", "waypoints": [{"lat": 34.02, "lon": -106.08, "alt_m": 30.0, "hold_s": 0.0}, {"lat": 34.05, "lon": -106.05, "alt_m": 35.0, "hold_s": 0.0}, {"lat": 34.09, "lon": -106.02, "alt_m": 30.0, "hold_s": 0.0}]}
+{"ts": 1776836947.110492, "event": "return_to_home"}
+{"ts": 1776836947.1159866, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776836947.1233742, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776836947.1281376, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776836947.1285462, "event": "takeoff", "alt_m": 60.0}
+{"ts": 1776836947.1353803, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776836947.142172, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776836947.149954, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776836947.1556041, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776836947.161227, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776836947.1615703, "event": "return_to_home"}
+{"ts": 1776836947.1685393, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776836947.1737862, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776836947.1742084, "event": "deterrent", "tone_hz": 8000, "duration_s": 3.0}
+{"ts": 1776836947.1837666, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776836947.2170837, "event": "thermal_clip", "path": "/tmp/pytest-of-george/pytest-194/test_get_thermal_clip_returns_1/mavic_1776836947.png", "ir_payload": false, "note": "Mavic Air 2 has no thermal camera \u2014 synthetic frame"}
+{"ts": 1776836947.2231832, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776836947.2236624, "event": "disconnected"}
+{"ts": 1776837124.7236114, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776837124.7360399, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776837124.7362418, "event": "takeoff", "alt_m": 25.0}
+{"ts": 1776837124.7364302, "event": "patrol_complete", "waypoints": [{"lat": 34.02, "lon": -106.08, "alt_m": 30.0, "hold_s": 0.0}, {"lat": 34.05, "lon": -106.05, "alt_m": 35.0, "hold_s": 0.0}, {"lat": 34.09, "lon": -106.02, "alt_m": 30.0, "hold_s": 0.0}]}
+{"ts": 1776837124.7365623, "event": "return_to_home"}
+{"ts": 1776837124.7404122, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776837124.745689, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776837124.7500322, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776837124.7504601, "event": "takeoff", "alt_m": 60.0}
+{"ts": 1776837124.7540877, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776837124.758556, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776837124.763318, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776837124.7671058, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776837124.7709708, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776837124.771188, "event": "return_to_home"}
+{"ts": 1776837124.7775023, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776837124.783798, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776837124.7840278, "event": "deterrent", "tone_hz": 8000, "duration_s": 3.0}
+{"ts": 1776837124.7910533, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776837124.8171036, "event": "thermal_clip", "path": "/tmp/pytest-of-george/pytest-195/test_get_thermal_clip_returns_1/mavic_1776837124.png", "ir_payload": false, "note": "Mavic Air 2 has no thermal camera \u2014 synthetic frame"}
+{"ts": 1776837124.8230042, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776837124.8234398, "event": "disconnected"}
+{"ts": 1776837466.632669, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776837466.6463149, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776837466.6465404, "event": "takeoff", "alt_m": 25.0}
+{"ts": 1776837466.6468554, "event": "patrol_complete", "waypoints": [{"lat": 34.02, "lon": -106.08, "alt_m": 30.0, "hold_s": 0.0}, {"lat": 34.05, "lon": -106.05, "alt_m": 35.0, "hold_s": 0.0}, {"lat": 34.09, "lon": -106.02, "alt_m": 30.0, "hold_s": 0.0}]}
+{"ts": 1776837466.6471348, "event": "return_to_home"}
+{"ts": 1776837466.6525016, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776837466.6571183, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776837466.6614294, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776837466.6618068, "event": "takeoff", "alt_m": 60.0}
+{"ts": 1776837466.6700919, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776837466.6753247, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776837466.682593, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776837466.687788, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776837466.6917374, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776837466.6919572, "event": "return_to_home"}
+{"ts": 1776837466.6974943, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776837466.702441, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776837466.7027073, "event": "deterrent", "tone_hz": 8000, "duration_s": 3.0}
+{"ts": 1776837466.7104456, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776837466.7380903, "event": "thermal_clip", "path": "/tmp/pytest-of-george/pytest-198/test_get_thermal_clip_returns_1/mavic_1776837466.png", "ir_payload": false, "note": "Mavic Air 2 has no thermal camera \u2014 synthetic frame"}
+{"ts": 1776837466.743597, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776837466.7442145, "event": "disconnected"}
+{"ts": 1776837643.1971877, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776837643.2118773, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776837643.212092, "event": "takeoff", "alt_m": 25.0}
+{"ts": 1776837643.2122722, "event": "patrol_complete", "waypoints": [{"lat": 34.02, "lon": -106.08, "alt_m": 30.0, "hold_s": 0.0}, {"lat": 34.05, "lon": -106.05, "alt_m": 35.0, "hold_s": 0.0}, {"lat": 34.09, "lon": -106.02, "alt_m": 30.0, "hold_s": 0.0}]}
+{"ts": 1776837643.2124166, "event": "return_to_home"}
+{"ts": 1776837643.2169046, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776837643.2221081, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776837643.226785, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776837643.2271671, "event": "takeoff", "alt_m": 60.0}
+{"ts": 1776837643.2320974, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776837643.2383192, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776837643.2438724, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776837643.249634, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776837643.2539976, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776837643.2542055, "event": "return_to_home"}
+{"ts": 1776837643.2592654, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776837643.26635, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776837643.266596, "event": "deterrent", "tone_hz": 8000, "duration_s": 3.0}
+{"ts": 1776837643.2728407, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776837643.3041627, "event": "thermal_clip", "path": "/tmp/pytest-of-george/pytest-199/test_get_thermal_clip_returns_1/mavic_1776837643.png", "ir_payload": false, "note": "Mavic Air 2 has no thermal camera \u2014 synthetic frame"}
+{"ts": 1776837643.310455, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776837643.3110435, "event": "disconnected"}
+{"ts": 1776837821.2596679, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776837821.2827902, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776837821.2830627, "event": "takeoff", "alt_m": 25.0}
+{"ts": 1776837821.283417, "event": "patrol_complete", "waypoints": [{"lat": 34.02, "lon": -106.08, "alt_m": 30.0, "hold_s": 0.0}, {"lat": 34.05, "lon": -106.05, "alt_m": 35.0, "hold_s": 0.0}, {"lat": 34.09, "lon": -106.02, "alt_m": 30.0, "hold_s": 0.0}]}
+{"ts": 1776837821.2836995, "event": "return_to_home"}
+{"ts": 1776837821.2920978, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776837821.3001103, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776837821.3095417, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776837821.3101647, "event": "takeoff", "alt_m": 60.0}
+{"ts": 1776837821.317288, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776837821.3265958, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776837821.3331547, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776837821.3431058, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776837821.3532224, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776837821.3537736, "event": "return_to_home"}
+{"ts": 1776837821.3696322, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776837821.381795, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776837821.3826327, "event": "deterrent", "tone_hz": 8000, "duration_s": 3.0}
+{"ts": 1776837821.3967793, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776837821.465929, "event": "thermal_clip", "path": "/tmp/pytest-of-george/pytest-202/test_get_thermal_clip_returns_1/mavic_1776837821.png", "ir_payload": false, "note": "Mavic Air 2 has no thermal camera \u2014 synthetic frame"}
+{"ts": 1776837821.4758203, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776837821.4768522, "event": "disconnected"}
+{"ts": 1776838040.7921498, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838040.8154914, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838040.8159373, "event": "takeoff", "alt_m": 25.0}
+{"ts": 1776838040.816302, "event": "patrol_complete", "waypoints": [{"lat": 34.02, "lon": -106.08, "alt_m": 30.0, "hold_s": 0.0}, {"lat": 34.05, "lon": -106.05, "alt_m": 35.0, "hold_s": 0.0}, {"lat": 34.09, "lon": -106.02, "alt_m": 30.0, "hold_s": 0.0}]}
+{"ts": 1776838040.8165925, "event": "return_to_home"}
+{"ts": 1776838040.8241642, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838040.8335483, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838040.839786, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838040.8401816, "event": "takeoff", "alt_m": 60.0}
+{"ts": 1776838040.8487294, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838040.856247, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838040.8656456, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838040.8726046, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838040.8803155, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838040.8806813, "event": "return_to_home"}
+{"ts": 1776838040.8866441, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838040.895933, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838040.8962498, "event": "deterrent", "tone_hz": 8000, "duration_s": 3.0}
+{"ts": 1776838040.9056373, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838040.9421148, "event": "thermal_clip", "path": "/tmp/pytest-of-george/pytest-203/test_get_thermal_clip_returns_1/mavic_1776838040.png", "ir_payload": false, "note": "Mavic Air 2 has no thermal camera \u2014 synthetic frame"}
+{"ts": 1776838040.9514751, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838040.9521768, "event": "disconnected"}
+{"ts": 1776838060.8920963, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838060.9194605, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838060.919904, "event": "takeoff", "alt_m": 25.0}
+{"ts": 1776838060.9204285, "event": "patrol_complete", "waypoints": [{"lat": 34.02, "lon": -106.08, "alt_m": 30.0, "hold_s": 0.0}, {"lat": 34.05, "lon": -106.05, "alt_m": 35.0, "hold_s": 0.0}, {"lat": 34.09, "lon": -106.02, "alt_m": 30.0, "hold_s": 0.0}]}
+{"ts": 1776838060.9207764, "event": "return_to_home"}
+{"ts": 1776838060.9285686, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838060.937289, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838060.945424, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838060.9465115, "event": "takeoff", "alt_m": 60.0}
+{"ts": 1776838060.953555, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838060.96041, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838060.9696715, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838060.9761474, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838060.98373, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838060.9841523, "event": "return_to_home"}
+{"ts": 1776838060.9904494, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838061.0000558, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838061.0004387, "event": "deterrent", "tone_hz": 8000, "duration_s": 3.0}
+{"ts": 1776838061.0119302, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838061.0485368, "event": "thermal_clip", "path": "/tmp/pytest-of-george/pytest-204/test_get_thermal_clip_returns_1/mavic_1776838061.png", "ir_payload": false, "note": "Mavic Air 2 has no thermal camera \u2014 synthetic frame"}
+{"ts": 1776838061.0562127, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838061.0566366, "event": "disconnected"}
+{"ts": 1776838358.3225904, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838358.3341112, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838358.3343618, "event": "takeoff", "alt_m": 25.0}
+{"ts": 1776838358.334549, "event": "patrol_complete", "waypoints": [{"lat": 34.02, "lon": -106.08, "alt_m": 30.0, "hold_s": 0.0}, {"lat": 34.05, "lon": -106.05, "alt_m": 35.0, "hold_s": 0.0}, {"lat": 34.09, "lon": -106.02, "alt_m": 30.0, "hold_s": 0.0}]}
+{"ts": 1776838358.3346972, "event": "return_to_home"}
+{"ts": 1776838358.3386297, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838358.3424075, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838358.346059, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838358.3464382, "event": "takeoff", "alt_m": 60.0}
+{"ts": 1776838358.3506467, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838358.3548396, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838358.3586366, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838358.3626049, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838358.3663025, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838358.3665078, "event": "return_to_home"}
+{"ts": 1776838358.370757, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838358.374707, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838358.3748999, "event": "deterrent", "tone_hz": 8000, "duration_s": 3.0}
+{"ts": 1776838358.382924, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838358.4132302, "event": "thermal_clip", "path": "/tmp/pytest-of-george/pytest-205/test_get_thermal_clip_returns_1/mavic_1776838358.png", "ir_payload": false, "note": "Mavic Air 2 has no thermal camera \u2014 synthetic frame"}
+{"ts": 1776838358.4176993, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838358.4181297, "event": "disconnected"}
+{"ts": 1776838547.5200922, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838547.5432267, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838547.543655, "event": "takeoff", "alt_m": 25.0}
+{"ts": 1776838547.5440476, "event": "patrol_complete", "waypoints": [{"lat": 34.02, "lon": -106.08, "alt_m": 30.0, "hold_s": 0.0}, {"lat": 34.05, "lon": -106.05, "alt_m": 35.0, "hold_s": 0.0}, {"lat": 34.09, "lon": -106.02, "alt_m": 30.0, "hold_s": 0.0}]}
+{"ts": 1776838547.5443053, "event": "return_to_home"}
+{"ts": 1776838547.553713, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838547.5618696, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838547.5693796, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838547.569967, "event": "takeoff", "alt_m": 60.0}
+{"ts": 1776838547.5769305, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838547.5848463, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838547.5897448, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838547.5967166, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838547.6033473, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838547.6035664, "event": "return_to_home"}
+{"ts": 1776838547.6105475, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838547.6186092, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838547.6189198, "event": "deterrent", "tone_hz": 8000, "duration_s": 3.0}
+{"ts": 1776838547.629672, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838547.665176, "event": "thermal_clip", "path": "/tmp/pytest-of-george/pytest-206/test_get_thermal_clip_returns_1/mavic_1776838547.png", "ir_payload": false, "note": "Mavic Air 2 has no thermal camera \u2014 synthetic frame"}
+{"ts": 1776838547.6741753, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838547.6748033, "event": "disconnected"}
+{"ts": 1776838812.405649, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838812.4142022, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838812.4143877, "event": "takeoff", "alt_m": 25.0}
+{"ts": 1776838812.414602, "event": "patrol_complete", "waypoints": [{"lat": 34.02, "lon": -106.08, "alt_m": 30.0, "hold_s": 0.0}, {"lat": 34.05, "lon": -106.05, "alt_m": 35.0, "hold_s": 0.0}, {"lat": 34.09, "lon": -106.02, "alt_m": 30.0, "hold_s": 0.0}]}
+{"ts": 1776838812.414712, "event": "return_to_home"}
+{"ts": 1776838812.4179077, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838812.4216135, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838812.4245398, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838812.4248302, "event": "takeoff", "alt_m": 60.0}
+{"ts": 1776838812.427488, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838812.4304771, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838812.4343226, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838812.4378088, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838812.4407983, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838812.440934, "event": "return_to_home"}
+{"ts": 1776838812.4437244, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838812.44727, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838812.4475963, "event": "deterrent", "tone_hz": 8000, "duration_s": 3.0}
+{"ts": 1776838812.4533873, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838812.474962, "event": "thermal_clip", "path": "/tmp/pytest-of-george/pytest-207/test_get_thermal_clip_returns_1/mavic_1776838812.png", "ir_payload": false, "note": "Mavic Air 2 has no thermal camera \u2014 synthetic frame"}
+{"ts": 1776838812.4796412, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776838812.4801638, "event": "disconnected"}
+{"ts": 1776839007.4780202, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839007.4861748, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839007.4863849, "event": "takeoff", "alt_m": 25.0}
+{"ts": 1776839007.4867287, "event": "patrol_complete", "waypoints": [{"lat": 34.02, "lon": -106.08, "alt_m": 30.0, "hold_s": 0.0}, {"lat": 34.05, "lon": -106.05, "alt_m": 35.0, "hold_s": 0.0}, {"lat": 34.09, "lon": -106.02, "alt_m": 30.0, "hold_s": 0.0}]}
+{"ts": 1776839007.4868848, "event": "return_to_home"}
+{"ts": 1776839007.4903479, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839007.4940372, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839007.4969163, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839007.4971433, "event": "takeoff", "alt_m": 60.0}
+{"ts": 1776839007.499626, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839007.5021434, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839007.5054805, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839007.5089664, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839007.5117657, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839007.5118754, "event": "return_to_home"}
+{"ts": 1776839007.514264, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839007.516976, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839007.5170898, "event": "deterrent", "tone_hz": 8000, "duration_s": 3.0}
+{"ts": 1776839007.522165, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839007.5430102, "event": "thermal_clip", "path": "/tmp/pytest-of-george/pytest-209/test_get_thermal_clip_returns_1/mavic_1776839007.png", "ir_payload": false, "note": "Mavic Air 2 has no thermal camera \u2014 synthetic frame"}
+{"ts": 1776839007.546589, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839007.5468948, "event": "disconnected"}
+{"ts": 1776839398.5261621, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839398.5339272, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839398.5340967, "event": "takeoff", "alt_m": 25.0}
+{"ts": 1776839398.534252, "event": "patrol_complete", "waypoints": [{"lat": 34.02, "lon": -106.08, "alt_m": 30.0, "hold_s": 0.0}, {"lat": 34.05, "lon": -106.05, "alt_m": 35.0, "hold_s": 0.0}, {"lat": 34.09, "lon": -106.02, "alt_m": 30.0, "hold_s": 0.0}]}
+{"ts": 1776839398.534435, "event": "return_to_home"}
+{"ts": 1776839398.5383794, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839398.5419812, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839398.5448217, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839398.5451057, "event": "takeoff", "alt_m": 60.0}
+{"ts": 1776839398.547549, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839398.5502126, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839398.5538793, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839398.5574229, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839398.560306, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839398.5604322, "event": "return_to_home"}
+{"ts": 1776839398.562958, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839398.5658464, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839398.5660255, "event": "deterrent", "tone_hz": 8000, "duration_s": 3.0}
+{"ts": 1776839398.5712113, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839398.591867, "event": "thermal_clip", "path": "/tmp/pytest-of-george/pytest-210/test_get_thermal_clip_returns_1/mavic_1776839398.png", "ir_payload": false, "note": "Mavic Air 2 has no thermal camera \u2014 synthetic frame"}
+{"ts": 1776839398.5955763, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839398.5960226, "event": "disconnected"}
+{"ts": 1776839533.553731, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839533.5623996, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839533.5625691, "event": "takeoff", "alt_m": 25.0}
+{"ts": 1776839533.5627074, "event": "patrol_complete", "waypoints": [{"lat": 34.02, "lon": -106.08, "alt_m": 30.0, "hold_s": 0.0}, {"lat": 34.05, "lon": -106.05, "alt_m": 35.0, "hold_s": 0.0}, {"lat": 34.09, "lon": -106.02, "alt_m": 30.0, "hold_s": 0.0}]}
+{"ts": 1776839533.5628052, "event": "return_to_home"}
+{"ts": 1776839533.565204, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839533.5683968, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839533.5722458, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839533.572582, "event": "takeoff", "alt_m": 60.0}
+{"ts": 1776839533.5754304, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839533.5779715, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839533.580645, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839533.5837061, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839533.5871425, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839533.5873063, "event": "return_to_home"}
+{"ts": 1776839533.5902057, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839533.5930822, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839533.593221, "event": "deterrent", "tone_hz": 8000, "duration_s": 3.0}
+{"ts": 1776839533.597255, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839533.6188293, "event": "thermal_clip", "path": "/tmp/pytest-of-george/pytest-211/test_get_thermal_clip_returns_1/mavic_1776839533.png", "ir_payload": false, "note": "Mavic Air 2 has no thermal camera \u2014 synthetic frame"}
+{"ts": 1776839533.6234758, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839533.6238348, "event": "disconnected"}
+{"ts": 1776839757.8071706, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839757.8160214, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839757.816186, "event": "takeoff", "alt_m": 25.0}
+{"ts": 1776839757.816331, "event": "patrol_complete", "waypoints": [{"lat": 34.02, "lon": -106.08, "alt_m": 30.0, "hold_s": 0.0}, {"lat": 34.05, "lon": -106.05, "alt_m": 35.0, "hold_s": 0.0}, {"lat": 34.09, "lon": -106.02, "alt_m": 30.0, "hold_s": 0.0}]}
+{"ts": 1776839757.8164346, "event": "return_to_home"}
+{"ts": 1776839757.8188784, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839757.8223815, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839757.8255148, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839757.8258274, "event": "takeoff", "alt_m": 60.0}
+{"ts": 1776839757.8291233, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839757.8319666, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839757.8348563, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839757.837945, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839757.840765, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839757.840897, "event": "return_to_home"}
+{"ts": 1776839757.8442764, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839757.8476477, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839757.8478277, "event": "deterrent", "tone_hz": 8000, "duration_s": 3.0}
+{"ts": 1776839757.8535688, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839757.8767557, "event": "thermal_clip", "path": "/tmp/pytest-of-george/pytest-213/test_get_thermal_clip_returns_1/mavic_1776839757.png", "ir_payload": false, "note": "Mavic Air 2 has no thermal camera \u2014 synthetic frame"}
+{"ts": 1776839757.88095, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839757.8814785, "event": "disconnected"}
+{"ts": 1776839890.7964537, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839890.8048396, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839890.8050737, "event": "takeoff", "alt_m": 25.0}
+{"ts": 1776839890.8052835, "event": "patrol_complete", "waypoints": [{"lat": 34.02, "lon": -106.08, "alt_m": 30.0, "hold_s": 0.0}, {"lat": 34.05, "lon": -106.05, "alt_m": 35.0, "hold_s": 0.0}, {"lat": 34.09, "lon": -106.02, "alt_m": 30.0, "hold_s": 0.0}]}
+{"ts": 1776839890.8054047, "event": "return_to_home"}
+{"ts": 1776839890.8086069, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839890.8120139, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839890.8151755, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839890.8154647, "event": "takeoff", "alt_m": 60.0}
+{"ts": 1776839890.8180377, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839890.8210268, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839890.8243446, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839890.8275807, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839890.83074, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839890.8309028, "event": "return_to_home"}
+{"ts": 1776839890.8335786, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839890.837012, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839890.837201, "event": "deterrent", "tone_hz": 8000, "duration_s": 3.0}
+{"ts": 1776839890.8422596, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839890.8635352, "event": "thermal_clip", "path": "/tmp/pytest-of-george/pytest-214/test_get_thermal_clip_returns_1/mavic_1776839890.png", "ir_payload": false, "note": "Mavic Air 2 has no thermal camera \u2014 synthetic frame"}
+{"ts": 1776839890.8679776, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776839890.8683972, "event": "disconnected"}
+{"ts": 1776840041.953049, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776840041.9627004, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776840041.9628685, "event": "takeoff", "alt_m": 25.0}
+{"ts": 1776840041.9630826, "event": "patrol_complete", "waypoints": [{"lat": 34.02, "lon": -106.08, "alt_m": 30.0, "hold_s": 0.0}, {"lat": 34.05, "lon": -106.05, "alt_m": 35.0, "hold_s": 0.0}, {"lat": 34.09, "lon": -106.02, "alt_m": 30.0, "hold_s": 0.0}]}
+{"ts": 1776840041.9632704, "event": "return_to_home"}
+{"ts": 1776840041.966531, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776840041.96963, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776840041.97231, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776840041.9725735, "event": "takeoff", "alt_m": 60.0}
+{"ts": 1776840041.9752727, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776840041.9782076, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776840041.9823394, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776840041.985624, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776840041.988406, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776840041.9885209, "event": "return_to_home"}
+{"ts": 1776840041.9910793, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776840041.9948583, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776840041.9950747, "event": "deterrent", "tone_hz": 8000, "duration_s": 3.0}
+{"ts": 1776840042.0001988, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776840042.0222292, "event": "thermal_clip", "path": "/tmp/pytest-of-george/pytest-215/test_get_thermal_clip_returns_1/mavic_1776840042.png", "ir_payload": false, "note": "Mavic Air 2 has no thermal camera \u2014 synthetic frame"}
+{"ts": 1776840042.0270958, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776840042.027522, "event": "disconnected"}
+{"ts": 1776840312.0244942, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776840312.0376072, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776840312.03783, "event": "takeoff", "alt_m": 25.0}
+{"ts": 1776840312.0381553, "event": "patrol_complete", "waypoints": [{"lat": 34.02, "lon": -106.08, "alt_m": 30.0, "hold_s": 0.0}, {"lat": 34.05, "lon": -106.05, "alt_m": 35.0, "hold_s": 0.0}, {"lat": 34.09, "lon": -106.02, "alt_m": 30.0, "hold_s": 0.0}]}
+{"ts": 1776840312.038378, "event": "return_to_home"}
+{"ts": 1776840312.0452387, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776840312.051486, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776840312.0564039, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776840312.0570672, "event": "takeoff", "alt_m": 60.0}
+{"ts": 1776840312.0618787, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776840312.0665812, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776840312.071748, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776840312.0784864, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776840312.0839977, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776840312.0842168, "event": "return_to_home"}
+{"ts": 1776840312.088014, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776840312.0942543, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776840312.0946283, "event": "deterrent", "tone_hz": 8000, "duration_s": 3.0}
+{"ts": 1776840312.102321, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776840312.1329992, "event": "thermal_clip", "path": "/tmp/pytest-of-george/pytest-216/test_get_thermal_clip_returns_1/mavic_1776840312.png", "ir_payload": false, "note": "Mavic Air 2 has no thermal camera \u2014 synthetic frame"}
+{"ts": 1776840312.139025, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776840312.1399956, "event": "disconnected"}
+{"ts": 1776840351.4655437, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776840351.4791493, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776840351.479426, "event": "takeoff", "alt_m": 25.0}
+{"ts": 1776840351.479602, "event": "patrol_complete", "waypoints": [{"lat": 34.02, "lon": -106.08, "alt_m": 30.0, "hold_s": 0.0}, {"lat": 34.05, "lon": -106.05, "alt_m": 35.0, "hold_s": 0.0}, {"lat": 34.09, "lon": -106.02, "alt_m": 30.0, "hold_s": 0.0}]}
+{"ts": 1776840351.4797866, "event": "return_to_home"}
+{"ts": 1776840351.484805, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776840351.4903564, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776840351.4947085, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776840351.4950852, "event": "takeoff", "alt_m": 60.0}
+{"ts": 1776840351.4985557, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776840351.5041513, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776840351.5089397, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776840351.5127327, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776840351.5173233, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776840351.5175478, "event": "return_to_home"}
+{"ts": 1776840351.5223591, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776840351.526254, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776840351.5264018, "event": "deterrent", "tone_hz": 8000, "duration_s": 3.0}
+{"ts": 1776840351.5326753, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776840351.55909, "event": "thermal_clip", "path": "/tmp/pytest-of-george/pytest-217/test_get_thermal_clip_returns_1/mavic_1776840351.png", "ir_payload": false, "note": "Mavic Air 2 has no thermal camera \u2014 synthetic frame"}
+{"ts": 1776840351.5636039, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776840351.5640006, "event": "disconnected"}
+{"ts": 1776841402.492907, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776841402.5005596, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776841402.5006852, "event": "takeoff", "alt_m": 25.0}
+{"ts": 1776841402.5008254, "event": "patrol_complete", "waypoints": [{"lat": 34.02, "lon": -106.08, "alt_m": 30.0, "hold_s": 0.0}, {"lat": 34.05, "lon": -106.05, "alt_m": 35.0, "hold_s": 0.0}, {"lat": 34.09, "lon": -106.02, "alt_m": 30.0, "hold_s": 0.0}]}
+{"ts": 1776841402.5009344, "event": "return_to_home"}
+{"ts": 1776841402.503351, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776841402.5069327, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776841402.510036, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776841402.5102718, "event": "takeoff", "alt_m": 60.0}
+{"ts": 1776841402.512838, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776841402.5153153, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776841402.517933, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776841402.5206313, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776841402.5241954, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776841402.5243392, "event": "return_to_home"}
+{"ts": 1776841402.5268087, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776841402.5295196, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776841402.5296311, "event": "deterrent", "tone_hz": 8000, "duration_s": 3.0}
+{"ts": 1776841402.5335202, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776841402.5541787, "event": "thermal_clip", "path": "/tmp/pytest-of-george/pytest-218/test_get_thermal_clip_returns_1/mavic_1776841402.png", "ir_payload": false, "note": "Mavic Air 2 has no thermal camera \u2014 synthetic frame"}
+{"ts": 1776841402.5576336, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776841402.5579257, "event": "disconnected"}
+{"ts": 1776841821.9128315, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776841821.923986, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776841821.9241776, "event": "takeoff", "alt_m": 25.0}
+{"ts": 1776841821.924345, "event": "patrol_complete", "waypoints": [{"lat": 34.02, "lon": -106.08, "alt_m": 30.0, "hold_s": 0.0}, {"lat": 34.05, "lon": -106.05, "alt_m": 35.0, "hold_s": 0.0}, {"lat": 34.09, "lon": -106.02, "alt_m": 30.0, "hold_s": 0.0}]}
+{"ts": 1776841821.924484, "event": "return_to_home"}
+{"ts": 1776841821.9286718, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776841821.9328346, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776841821.936384, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776841821.936775, "event": "takeoff", "alt_m": 60.0}
+{"ts": 1776841821.940939, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776841821.945312, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776841821.9489424, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776841821.952713, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776841821.9572327, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776841821.957459, "event": "return_to_home"}
+{"ts": 1776841821.96208, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776841821.9658806, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776841821.966059, "event": "deterrent", "tone_hz": 8000, "duration_s": 3.0}
+{"ts": 1776841821.9719937, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776841821.9945328, "event": "thermal_clip", "path": "/tmp/pytest-of-george/pytest-219/test_get_thermal_clip_returns_1/mavic_1776841821.png", "ir_payload": false, "note": "Mavic Air 2 has no thermal camera \u2014 synthetic frame"}
+{"ts": 1776841821.9981666, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776841821.998496, "event": "disconnected"}
+{"ts": 1776842135.8296223, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776842135.8380198, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776842135.8382137, "event": "takeoff", "alt_m": 25.0}
+{"ts": 1776842135.8384032, "event": "patrol_complete", "waypoints": [{"lat": 34.02, "lon": -106.08, "alt_m": 30.0, "hold_s": 0.0}, {"lat": 34.05, "lon": -106.05, "alt_m": 35.0, "hold_s": 0.0}, {"lat": 34.09, "lon": -106.02, "alt_m": 30.0, "hold_s": 0.0}]}
+{"ts": 1776842135.8385954, "event": "return_to_home"}
+{"ts": 1776842135.8415565, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776842135.8447866, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776842135.8479989, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776842135.8482685, "event": "takeoff", "alt_m": 60.0}
+{"ts": 1776842135.851093, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776842135.8547974, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776842135.8579187, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776842135.8606455, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776842135.863637, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776842135.863777, "event": "return_to_home"}
+{"ts": 1776842135.8666072, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776842135.8709471, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776842135.871105, "event": "deterrent", "tone_hz": 8000, "duration_s": 3.0}
+{"ts": 1776842135.875676, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776842135.8966436, "event": "thermal_clip", "path": "/tmp/pytest-of-george/pytest-220/test_get_thermal_clip_returns_1/mavic_1776842135.png", "ir_payload": false, "note": "Mavic Air 2 has no thermal camera \u2014 synthetic frame"}
+{"ts": 1776842135.901063, "event": "connected", "url": "ws://localhost:8765"}
+{"ts": 1776842135.9014952, "event": "disconnected"}

@@ -1,0 +1,14 @@
+{
+  "id": "ec521f18-a900-47a5-9147-7bd01260409c",
+  "agent_name": "FenceLineDispatcher",
+  "state": "checkpointed",
+  "last_active_ts": 1776838809.3303094,
+  "wake_events_consumed": [],
+  "checkpoint_path": null,
+  "system_prompt_cached_hash": null,
+  "cumulative_tokens_in": 0,
+  "cumulative_tokens_out": 0,
+  "cumulative_cost_usd": 0.0,
+  "run_time_active_s": 0.0,
+  "run_time_idle_s": 0.0
+}

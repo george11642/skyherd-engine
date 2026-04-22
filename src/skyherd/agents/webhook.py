@@ -61,9 +61,7 @@ def _verify_signature(body: bytes, signature_header: str | None) -> bool:
         return True
     if not signature_header:
         return False
-    expected = "sha256=" + hmac.new(
-        _WEBHOOK_SECRET.encode(), body, hashlib.sha256
-    ).hexdigest()
+    expected = "sha256=" + hmac.new(_WEBHOOK_SECRET.encode(), body, hashlib.sha256).hexdigest()
     return hmac.compare_digest(expected, signature_header)
 
 

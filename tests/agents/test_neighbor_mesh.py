@@ -229,7 +229,7 @@ class TestNeighborListener:
         second = await listener.on_neighbor_event(topic, payload)
 
         assert first is True
-        assert second is False   # deduped
+        assert second is False  # deduped
         assert listener._deduped_count == 1
 
     async def test_dedup_expires_after_ttl(self, monkeypatch):
@@ -262,7 +262,7 @@ class TestNeighborListener:
 
         payload = {
             "from_ranch": "ranch_a",
-            "to_ranch": "ranch_c",   # not ranch_b
+            "to_ranch": "ranch_c",  # not ranch_b
             "species": "coyote",
             "shared_fence": "fence_east",
             "ts": time.time(),

@@ -221,7 +221,6 @@ class TestWesSay:
         fake_backend = SilentBackend()
         monkeypatch.setattr("skyherd.voice.tts.get_backend", lambda: fake_backend)
 
-
         def _not_found(cmd, **kwargs):
             raise FileNotFoundError("no player")
 

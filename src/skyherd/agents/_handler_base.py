@@ -34,9 +34,9 @@ logger = logging.getLogger(__name__)
 
 
 async def run_handler_cycle(
-    session: Any,                    # Session or ManagedSession
+    session: Any,  # Session or ManagedSession
     wake_event: dict[str, Any],
-    sdk_client: Any,                 # anthropic.AsyncAnthropic or None
+    sdk_client: Any,  # anthropic.AsyncAnthropic or None
     cached_payload: dict[str, Any],  # from build_cached_messages()
     tool_dispatcher: Any | None = None,  # optional async callable(name, input) → str
 ) -> list[dict[str, Any]]:
@@ -237,10 +237,12 @@ async def _run_local_with_cache(
         for block in response.content:
             block_type = getattr(block, "type", None)
             if block_type == "tool_use":
-                calls.append({
-                    "tool": getattr(block, "name", "unknown"),
-                    "input": getattr(block, "input", {}),
-                })
+                calls.append(
+                    {
+                        "tool": getattr(block, "name", "unknown"),
+                        "input": getattr(block, "input", {}),
+                    }
+                )
 
     except anthropic.APIError as exc:
         logger.error("messages.create failed: %s", exc)

@@ -22,10 +22,7 @@ import pytest
 # ---------------------------------------------------------------------------
 
 _PROVISIONING = (
-    Path(__file__).resolve().parent.parent.parent
-    / "hardware"
-    / "collar"
-    / "provisioning"
+    Path(__file__).resolve().parent.parent.parent / "hardware" / "collar" / "provisioning"
 )
 
 

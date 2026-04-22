@@ -1,0 +1,51 @@
+{"ts": 1776837055.251623, "event": "disconnected"}
+{"ts": 1776837752.7349727, "event": "connected", "port": 14552, "backend": "pymavlink"}
+{"ts": 1776837756.7452712, "event": "takeoff", "alt_m": 15.0, "backend": "pymavlink"}
+{"ts": 1776837792.7095518, "event": "patrol_complete", "waypoints": [{"lat": 47.3977, "lon": 8.5456, "alt_m": 50.0, "hold_s": 5.0}, {"lat": 47.398, "lon": 8.546, "alt_m": 60.0, "hold_s": 5.0}, {"lat": 47.3977, "lon": 8.5464, "alt_m": 50.0, "hold_s": 5.0}], "backend": "pymavlink"}
+{"ts": 1776837793.7982023, "event": "thermal_clip", "path": "runtime/thermal/1776837793_pymav.png", "backend": "pymavlink"}
+{"ts": 1776837800.7299562, "event": "return_to_home", "backend": "pymavlink"}
+{"ts": 1776837801.7311096, "event": "disconnected", "backend": "pymavlink"}
+{"ts": 1776837904.0646472, "event": "connected", "port": 14560, "backend": "pymavlink"}
+{"ts": 1776837905.0706913, "event": "disconnected", "backend": "pymavlink"}
+{"ts": 1776837907.0652258, "event": "connected", "port": 14560, "backend": "pymavlink"}
+{"ts": 1776837909.0765746, "event": "takeoff", "alt_m": 10.0, "backend": "pymavlink"}
+{"ts": 1776837917.77773, "event": "return_to_home", "backend": "pymavlink"}
+{"ts": 1776837917.7795458, "event": "disconnected", "backend": "pymavlink"}
+{"ts": 1776837919.0092692, "event": "connected", "port": 14560, "backend": "pymavlink"}
+{"ts": 1776837922.7855291, "event": "takeoff", "alt_m": 20.0, "backend": "pymavlink"}
+{"ts": 1776837955.0180943, "event": "patrol_complete", "waypoints": [{"lat": 47.3977, "lon": 8.5456, "alt_m": 20.0, "hold_s": 0.0}, {"lat": 47.398, "lon": 8.546, "alt_m": 25.0, "hold_s": 0.0}, {"lat": 47.3977, "lon": 8.5464, "alt_m": 20.0, "hold_s": 0.0}], "backend": "pymavlink"}
+{"ts": 1776837964.5313218, "event": "return_to_home", "backend": "pymavlink"}
+{"ts": 1776837964.5325882, "event": "disconnected", "backend": "pymavlink"}
+{"ts": 1776837965.9527822, "event": "connected", "port": 14560, "backend": "pymavlink"}
+{"ts": 1776837966.043086, "event": "thermal_clip", "path": "runtime/thermal/1776837965_pymav.png", "backend": "pymavlink"}
+{"ts": 1776837966.0443835, "event": "disconnected", "backend": "pymavlink"}
+{"ts": 1776837967.9532108, "event": "connected", "port": 14560, "backend": "pymavlink"}
+{"ts": 1776837970.0408514, "event": "takeoff", "alt_m": 10.0, "backend": "pymavlink"}
+{"ts": 1776837974.5543218, "event": "return_to_home", "backend": "pymavlink"}
+{"ts": 1776837975.0557265, "event": "disconnected", "backend": "pymavlink"}
+{"ts": 1776837977.7707098, "event": "connected", "port": 14570, "backend": "pymavlink"}
+{"ts": 1776837983.9591184, "event": "takeoff", "alt_m": 15.0, "backend": "pymavlink"}
+{"ts": 1776838019.200729, "event": "patrol_complete", "waypoints": [{"lat": 47.3977, "lon": 8.5456, "alt_m": 50.0, "hold_s": 5.0}, {"lat": 47.398, "lon": 8.546, "alt_m": 60.0, "hold_s": 5.0}, {"lat": 47.3977, "lon": 8.5464, "alt_m": 50.0, "hold_s": 5.0}], "backend": "pymavlink"}
+{"ts": 1776838019.7376332, "event": "thermal_clip", "path": "runtime/thermal/1776838019_pymav.png", "backend": "pymavlink"}
+{"ts": 1776838019.9609177, "event": "return_to_home", "backend": "pymavlink"}
+{"ts": 1776838020.1981957, "event": "disconnected", "backend": "pymavlink"}
+{"ts": 1776838023.835767, "event": "connected", "port": 14580, "backend": "pymavlink"}
+{"ts": 1776838028.5960162, "event": "takeoff", "alt_m": 20.0, "backend": "pymavlink"}
+{"ts": 1776838782.3248744, "event": "connected", "port": 14540, "backend": "pymavlink"}
+{"ts": 1776838788.8359017, "event": "takeoff", "alt_m": 30.0, "backend": "pymavlink"}
+{"ts": 1776838824.906008, "event": "patrol_complete", "waypoints": [{"lat": 47.3977, "lon": 8.5456, "alt_m": 50.0, "hold_s": 5.0}, {"lat": 47.398, "lon": 8.546, "alt_m": 60.0, "hold_s": 5.0}, {"lat": 47.3977, "lon": 8.5464, "alt_m": 50.0, "hold_s": 5.0}], "backend": "pymavlink"}
+{"ts": 1776838828.0468802, "event": "thermal_clip", "path": "runtime/thermal/1776838827_pymav.png", "backend": "pymavlink"}
+{"ts": 1776838842.2545981, "event": "return_to_home", "backend": "pymavlink"}
+{"ts": 1776838843.2554848, "event": "disconnected", "backend": "pymavlink"}
+{"ts": 1776840530.5932524, "event": "connected", "port": 14540, "backend": "pymavlink"}
+{"ts": 1776840537.1049392, "event": "takeoff", "alt_m": 30.0, "backend": "pymavlink"}
+{"ts": 1776840571.8676667, "event": "patrol_complete", "waypoints": [{"lat": 47.3977, "lon": 8.5456, "alt_m": 50.0, "hold_s": 5.0}, {"lat": 47.398, "lon": 8.546, "alt_m": 60.0, "hold_s": 5.0}, {"lat": 47.3977, "lon": 8.5464, "alt_m": 50.0, "hold_s": 5.0}], "backend": "pymavlink"}
+{"ts": 1776840572.6170573, "event": "thermal_clip", "path": "runtime/thermal/1776840572_pymav.png", "backend": "pymavlink"}
+{"ts": 1776840589.517891, "event": "return_to_home", "backend": "pymavlink"}
+{"ts": 1776840590.5190554, "event": "disconnected", "backend": "pymavlink"}
+{"ts": 1776842247.5241365, "event": "connected", "port": 14540, "backend": "pymavlink"}
+{"ts": 1776842254.0352545, "event": "takeoff", "alt_m": 30.0, "backend": "pymavlink"}
+{"ts": 1776842289.7877584, "event": "patrol_complete", "waypoints": [{"lat": 47.3977, "lon": 8.5456, "alt_m": 50.0, "hold_s": 5.0}, {"lat": 47.398, "lon": 8.546, "alt_m": 60.0, "hold_s": 5.0}, {"lat": 47.3977, "lon": 8.5464, "alt_m": 50.0, "hold_s": 5.0}], "backend": "pymavlink"}
+{"ts": 1776842290.5339055, "event": "thermal_clip", "path": "runtime/thermal/1776842290_pymav.png", "backend": "pymavlink"}
+{"ts": 1776842304.501882, "event": "return_to_home", "backend": "pymavlink"}
+{"ts": 1776842305.503247, "event": "disconnected", "backend": "pymavlink"}

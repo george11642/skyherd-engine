@@ -85,7 +85,10 @@ class TestCrossRanchCoyoteSetup:
         events = s.inject_events(world, _BREACH_AT_S + 1.0)
         breach = next((e for e in events if e["type"] == "fence.breach"), None)
         assert breach is not None
-        assert breach.get("fence_id") == _RANCH_A_SHARED_FENCE or breach.get("segment") == _RANCH_A_SHARED_FENCE
+        assert (
+            breach.get("fence_id") == _RANCH_A_SHARED_FENCE
+            or breach.get("segment") == _RANCH_A_SHARED_FENCE
+        )
 
     def test_coyote_spawned_at_east_boundary(self):
         from pathlib import Path
@@ -113,8 +116,7 @@ class TestCrossRanchCoyoteSetup:
         s.inject_events(world, _BREACH_AT_S + 1.0)
         s.inject_events(world, _BREACH_AT_S + 5.0)
         cross_ranch_coyotes = [
-            p for p in world.predator_spawner.predators
-            if p.id == "coyote_cross_ranch_001"
+            p for p in world.predator_spawner.predators if p.id == "coyote_cross_ranch_001"
         ]
         assert len(cross_ranch_coyotes) == 1
 
@@ -190,7 +192,8 @@ class TestCrossRanchFullRun:
         result = run_cross_ranch(seed=42)
         b_calls = result["ranch_b_tool_calls"]
         handoff_logs = [
-            c for c in b_calls
+            c
+            for c in b_calls
             if c.get("tool") == "log_agent_event"
             and c.get("input", {}).get("event_type") == "neighbor_handoff"
         ]

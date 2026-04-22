@@ -61,11 +61,11 @@ class ManagedSession:
     Mirrors the shim ``Session`` dataclass but carries the platform IDs.
     """
 
-    id: str                          # local UUID (kept for API compat)
+    id: str  # local UUID (kept for API compat)
     agent_name: str
-    platform_session_id: str         # returned by sessions.create()
-    platform_agent_id: str           # returned by agents.create()
-    platform_env_id: str             # environment used for this session
+    platform_session_id: str  # returned by sessions.create()
+    platform_agent_id: str  # returned by agents.create()
+    platform_env_id: str  # environment used for this session
     state: str = "idle"
     last_active_ts: float = field(default_factory=time.time)
     wake_events_consumed: list[dict[str, Any]] = field(default_factory=list)
@@ -158,6 +158,7 @@ class ManagedSessionManager:
         # Load persisted agent IDs if available
         if self._agent_ids_path.exists():
             import json
+
             try:
                 self._agent_ids = json.loads(self._agent_ids_path.read_text())
             except Exception as exc:  # noqa: BLE001
@@ -263,13 +264,12 @@ class ManagedSessionManager:
     def create_session(self, agent_spec: Any) -> ManagedSession:
         """Sync wrapper for create_session_async (used in non-async contexts)."""
         import asyncio
+
         try:
             loop = asyncio.get_event_loop()
             if loop.is_running():
                 # If called from within an async context, caller should use await
-                raise RuntimeError(
-                    "Use 'await create_session_async(spec)' inside async code."
-                )
+                raise RuntimeError("Use 'await create_session_async(spec)' inside async code.")
             return loop.run_until_complete(self.create_session_async(agent_spec))
         except RuntimeError:
             raise
@@ -305,6 +305,7 @@ class ManagedSessionManager:
         _dir.mkdir(parents=True, exist_ok=True)
         path = _dir / f"{session_id}.json"
         import json
+
         path.write_text(json.dumps(session.to_dict(), indent=2))
         session.checkpoint_path = str(path)
         return path
@@ -312,6 +313,7 @@ class ManagedSessionManager:
     def restore_from_checkpoint(self, session_id: str) -> ManagedSession:
         """Restore local metadata from checkpoint file."""
         import json
+
         path = Path("runtime/sessions") / f"{session_id}.json"
         if not path.exists():
             raise FileNotFoundError(f"Checkpoint not found: {path}")
@@ -383,9 +385,7 @@ class ManagedSessionManager:
 
     async def stream_session_events(self, session: ManagedSession):
         """Yield platform SSE events from the session stream."""
-        async with self._client.beta.sessions.events.stream(
-            session.platform_session_id
-        ) as stream:
+        async with self._client.beta.sessions.events.stream(session.platform_session_id) as stream:
             async for event in stream:
                 yield event
 

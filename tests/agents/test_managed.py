@@ -30,6 +30,7 @@ from skyherd.agents.session import LocalSessionManager, SessionManager, get_sess
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _make_fence_event() -> dict[str, Any]:
     return {
         "topic": "skyherd/ranch_a/fence/seg_1",
@@ -55,6 +56,7 @@ def _make_trough_event() -> dict[str, Any]:
 # ManagedAgentsUnavailable
 # ---------------------------------------------------------------------------
 
+
 class TestManagedAgentsUnavailable:
     def test_raises_without_api_key(self, monkeypatch):
         monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
@@ -68,6 +70,7 @@ class TestManagedAgentsUnavailable:
 # ---------------------------------------------------------------------------
 # get_session_manager factory
 # ---------------------------------------------------------------------------
+
 
 class TestGetSessionManagerFactory:
     def test_local_runtime_returns_local(self):
@@ -95,6 +98,7 @@ class TestGetSessionManagerFactory:
 # ---------------------------------------------------------------------------
 # ManagedSession dataclass
 # ---------------------------------------------------------------------------
+
 
 class TestManagedSession:
     def _make(self) -> ManagedSession:
@@ -128,6 +132,7 @@ class TestManagedSession:
 # _handler_base.run_handler_cycle — no API key → returns []
 # ---------------------------------------------------------------------------
 
+
 class TestRunHandlerCycleNoKey:
     @pytest.mark.asyncio
     async def test_returns_empty_without_api_key(self, monkeypatch):
@@ -159,6 +164,7 @@ class TestRunHandlerCycleNoKey:
 # ---------------------------------------------------------------------------
 # _handler_base.run_handler_cycle — local runtime with mocked API response
 # ---------------------------------------------------------------------------
+
 
 class TestRunHandlerCycleLocalMock:
     def _make_mock_client(self, tool_name: str = "launch_drone") -> MagicMock:
@@ -247,7 +253,9 @@ class TestRunHandlerCycleLocalMock:
         # Verify messages.create was called with the full system blocks (C1 fix)
         call_kwargs = mock_client.messages.create.call_args
         assert call_kwargs is not None
-        passed_system = call_kwargs.kwargs.get("system", call_kwargs.args[0] if call_kwargs.args else None)
+        passed_system = call_kwargs.kwargs.get(
+            "system", call_kwargs.args[0] if call_kwargs.args else None
+        )
         if passed_system is None and call_kwargs.kwargs:
             passed_system = call_kwargs.kwargs.get("system")
         # The system arg must be the list with cache_control blocks
@@ -259,6 +267,7 @@ class TestRunHandlerCycleLocalMock:
 # ---------------------------------------------------------------------------
 # Handler simulation paths — no API key
 # ---------------------------------------------------------------------------
+
 
 class TestHandlerSimulationPaths:
     @pytest.mark.asyncio
@@ -285,6 +294,7 @@ class TestHandlerSimulationPaths:
 # ---------------------------------------------------------------------------
 # ManagedSessionManager — mocked platform calls
 # ---------------------------------------------------------------------------
+
 
 class TestManagedSessionManagerMocked:
     def _make_manager(self, monkeypatch, tmp_path) -> ManagedSessionManager:
@@ -340,7 +350,9 @@ class TestManagedSessionManagerMocked:
             env_cache.parent = MagicMock()
             env_cache.write_text = MagicMock()
             # Restore normal Path for other uses
-            mock_path_cls.side_effect = lambda p: env_cache if "ma_environment_id" in str(p) else Path(p)
+            mock_path_cls.side_effect = lambda p: (
+                env_cache if "ma_environment_id" in str(p) else Path(p)
+            )
 
             # Reset cached env ID
             mgr._environment_id = None
@@ -374,6 +386,7 @@ class TestManagedSessionManagerMocked:
 # _run_managed — mocked SSE stream
 # ---------------------------------------------------------------------------
 
+
 class TestRunManaged:
     """Cover the _run_managed SSE path in _handler_base."""
 
@@ -393,6 +406,7 @@ class TestRunManaged:
             async def _gen():
                 for ev in events:
                     yield ev
+
             stream = MagicMock()
             stream.__aiter__ = lambda s: _gen()
             yield stream
@@ -512,9 +526,7 @@ class TestRunManaged:
         # requires_action idle — loop continues
         stop_reason = MagicMock()
         stop_reason.type = "requires_action"
-        transient_idle = self._make_stream_event(
-            "session.status_idle", stop_reason=stop_reason
-        )
+        transient_idle = self._make_stream_event("session.status_idle", stop_reason=stop_reason)
 
         # Then a tool_use event after the transient idle
         tool_ev = self._make_stream_event(
@@ -546,6 +558,7 @@ class TestRunManaged:
 # Webhook router
 # ---------------------------------------------------------------------------
 
+
 class TestWebhookRouter:
     """Cover skyherd.agents.webhook via httpx TestClient."""
 
@@ -553,6 +566,7 @@ class TestWebhookRouter:
         from fastapi import FastAPI
 
         from skyherd.agents.webhook import webhook_router
+
         app = FastAPI()
         app.include_router(webhook_router)
         return app
@@ -567,7 +581,9 @@ class TestWebhookRouter:
         wh._WEBHOOK_SECRET = ""  # dev mode — skip sig check
         try:
             app = self._make_app()
-            async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+            async with AsyncClient(
+                transport=ASGITransport(app=app), base_url="http://test"
+            ) as client:
                 resp = await client.post(
                     "/webhooks/managed-agents",
                     json={"type": "agent.custom_tool_use", "session_id": "sess_1"},
@@ -593,7 +609,9 @@ class TestWebhookRouter:
 
         try:
             app = self._make_app()
-            async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+            async with AsyncClient(
+                transport=ASGITransport(app=app), base_url="http://test"
+            ) as client:
                 await client.post(
                     "/webhooks/managed-agents",
                     json={"type": "fence.breach", "session_id": "sess_2", "ranch_id": "ranch_a"},
@@ -615,7 +633,9 @@ class TestWebhookRouter:
         wh._WEBHOOK_SECRET = "real-secret"
         try:
             app = self._make_app()
-            async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+            async with AsyncClient(
+                transport=ASGITransport(app=app), base_url="http://test"
+            ) as client:
                 resp = await client.post(
                     "/webhooks/managed-agents",
                     json={"type": "agent.custom_tool_use", "session_id": "sess_3"},
@@ -642,7 +662,9 @@ class TestWebhookRouter:
             body = json.dumps({"type": "fence.breach", "session_id": "sess_4"}).encode()
             sig = "sha256=" + hmac.new(secret.encode(), body, hashlib.sha256).hexdigest()
             app = self._make_app()
-            async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+            async with AsyncClient(
+                transport=ASGITransport(app=app), base_url="http://test"
+            ) as client:
                 resp = await client.post(
                     "/webhooks/managed-agents",
                     content=body,
@@ -657,6 +679,7 @@ class TestWebhookRouter:
 
     def test_verify_signature_no_secret_always_true(self):
         import skyherd.agents.webhook as wh
+
         original = wh._WEBHOOK_SECRET
         wh._WEBHOOK_SECRET = ""
         try:
@@ -667,6 +690,7 @@ class TestWebhookRouter:
 
     def test_verify_signature_missing_header_returns_false(self):
         import skyherd.agents.webhook as wh
+
         original = wh._WEBHOOK_SECRET
         wh._WEBHOOK_SECRET = "real-secret"
         try:
@@ -678,6 +702,7 @@ class TestWebhookRouter:
 # ---------------------------------------------------------------------------
 # ManagedSessionManager lifecycle methods
 # ---------------------------------------------------------------------------
+
 
 class TestManagedSessionManagerLifecycle:
     """Cover sleep/wake/checkpoint/on_webhook and platform event helpers."""
@@ -717,6 +742,7 @@ class TestManagedSessionManagerLifecycle:
         # Override runtime/sessions to tmp_path
 
         import skyherd.agents.managed as ma_mod
+
         original_path = ma_mod.Path
         try:
             path = mgr.checkpoint("local-sess-001")
@@ -791,7 +817,9 @@ class TestManagedSessionManagerLifecycle:
         mgr._client.beta.sessions.events.send.assert_called_once()
         call_args = mgr._client.beta.sessions.events.send.call_args
         assert call_args.args[0] == "platform-sess-001"
-        events = call_args.kwargs.get("events", call_args.args[1] if len(call_args.args) > 1 else [])
+        events = call_args.kwargs.get(
+            "events", call_args.args[1] if len(call_args.args) > 1 else []
+        )
         assert events[0]["type"] == "user.message"
 
     @pytest.mark.asyncio
@@ -806,7 +834,9 @@ class TestManagedSessionManagerLifecycle:
 
         mgr._client.beta.sessions.events.send.assert_called_once()
         call_args = mgr._client.beta.sessions.events.send.call_args
-        events = call_args.kwargs.get("events", call_args.args[1] if len(call_args.args) > 1 else [])
+        events = call_args.kwargs.get(
+            "events", call_args.args[1] if len(call_args.args) > 1 else []
+        )
         assert events[0]["type"] == "user.custom_tool_result"
         assert events[0]["custom_tool_use_id"] == "tool_use_123"
 
@@ -826,6 +856,10 @@ class TestManagedSessionManagerLifecycle:
         mgr._client.beta.sessions.events = MagicMock()
         mgr._client.beta.sessions.events.send = AsyncMock()
 
-        wake_event = {"type": "fence.breach", "ranch_id": "ranch_a", "topic": "skyherd/ranch_a/fence/seg_1"}
+        wake_event = {
+            "type": "fence.breach",
+            "ranch_id": "ranch_a",
+            "topic": "skyherd/ranch_a/fence/seg_1",
+        }
         result = await mgr.smoke_test_session(FENCELINE_DISPATCHER_SPEC, wake_event)
         assert result == "sess_smoke_001"

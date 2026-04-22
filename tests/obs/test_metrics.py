@@ -64,17 +64,13 @@ def test_agent_wake_counter_increments():
     # Get baseline
     before = 0.0
     try:
-        before = REGISTRY.get_sample_value(
-            "skyherd_agent_wakes_total", {"agent": agent}
-        ) or 0.0
+        before = REGISTRY.get_sample_value("skyherd_agent_wakes_total", {"agent": agent}) or 0.0
     except Exception:
         before = 0.0
 
     record_agent_wake(agent)
 
-    after = REGISTRY.get_sample_value(
-        "skyherd_agent_wakes_total", {"agent": agent}
-    ) or 0.0
+    after = REGISTRY.get_sample_value("skyherd_agent_wakes_total", {"agent": agent}) or 0.0
     assert after == before + 1.0
 
 

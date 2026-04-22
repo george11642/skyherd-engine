@@ -47,15 +47,57 @@ def _synthetic_events(scenario: str) -> list[dict]:
     """Fallback: 3 hand-crafted sample events matching the SSE contract."""
     base = [
         {"ts_rel": 0.5, "kind": "water.low", "payload": {"tank_id": "wt_n", "level_pct": 15.0}},
-        {"ts_rel": 2.0, "kind": "agent.log", "payload": {"agent": "FenceLineDispatcher", "state": "active", "msg": f"[{scenario}] monitoring active"}},
+        {
+            "ts_rel": 2.0,
+            "kind": "agent.log",
+            "payload": {
+                "agent": "FenceLineDispatcher",
+                "state": "active",
+                "msg": f"[{scenario}] monitoring active",
+            },
+        },
         {"ts_rel": 4.0, "kind": "cost.tick", "payload": {"cost_usd_hr": 0.08, "total_usd": 0.001}},
     ]
     scenario_specials = {
-        "coyote": {"ts_rel": 6.0, "kind": "fence.breach", "payload": {"fence_id": "fence_west", "lat": 34.123, "lon": -106.456, "species_hint": "coyote"}},
-        "sick_cow": {"ts_rel": 6.0, "kind": "agent.log", "payload": {"agent": "HerdHealthWatcher", "msg": "Cow A014 — pinkeye flags elevated, escalating"}},
-        "water_drop": {"ts_rel": 6.0, "kind": "drone.update", "payload": {"mission": "water_verify", "tank_id": "wt_sw", "level_pct_confirmed": 18.0}},
-        "calving": {"ts_rel": 6.0, "kind": "agent.log", "payload": {"agent": "CalvingWatch", "msg": "Cow B007 pre-labor isolation detected, paging Wes"}},
-        "storm": {"ts_rel": 6.0, "kind": "agent.log", "payload": {"agent": "GrazingOptimizer", "msg": "Storm ETA 20 min — proposing herd move to paddock_b"}},
+        "coyote": {
+            "ts_rel": 6.0,
+            "kind": "fence.breach",
+            "payload": {
+                "fence_id": "fence_west",
+                "lat": 34.123,
+                "lon": -106.456,
+                "species_hint": "coyote",
+            },
+        },
+        "sick_cow": {
+            "ts_rel": 6.0,
+            "kind": "agent.log",
+            "payload": {
+                "agent": "HerdHealthWatcher",
+                "msg": "Cow A014 — pinkeye flags elevated, escalating",
+            },
+        },
+        "water_drop": {
+            "ts_rel": 6.0,
+            "kind": "drone.update",
+            "payload": {"mission": "water_verify", "tank_id": "wt_sw", "level_pct_confirmed": 18.0},
+        },
+        "calving": {
+            "ts_rel": 6.0,
+            "kind": "agent.log",
+            "payload": {
+                "agent": "CalvingWatch",
+                "msg": "Cow B007 pre-labor isolation detected, paging Wes",
+            },
+        },
+        "storm": {
+            "ts_rel": 6.0,
+            "kind": "agent.log",
+            "payload": {
+                "agent": "GrazingOptimizer",
+                "msg": "Storm ETA 20 min — proposing herd move to paddock_b",
+            },
+        },
     }
     if scenario in scenario_specials:
         base.append(scenario_specials[scenario])
@@ -93,11 +135,13 @@ def _parse_jsonl(path: Path) -> tuple[float, list[dict]]:
     if not has_cost:
         tick = 0.0
         while tick <= duration_s:
-            events.append({
-                "ts_rel": tick,
-                "kind": "cost.tick",
-                "payload": {"cost_usd_hr": 0.08, "total_usd": round(tick / 3600 * 0.08, 6)},
-            })
+            events.append(
+                {
+                    "ts_rel": tick,
+                    "kind": "cost.tick",
+                    "payload": {"cost_usd_hr": 0.08, "total_usd": round(tick / 3600 * 0.08, 6)},
+                }
+            )
             tick += 30.0
 
     # Sort by ts_rel so the replay driver can walk forward monotonically
@@ -134,26 +178,34 @@ def main() -> None:
         if path is not None:
             try:
                 duration_s, events = _parse_jsonl(path)
-                scenarios_out.append({
-                    "name": scenario,
-                    "duration_s": duration_s,
-                    "events": events,
-                })
+                scenarios_out.append(
+                    {
+                        "name": scenario,
+                        "duration_s": duration_s,
+                        "events": events,
+                    }
+                )
                 print(f"  {scenario}: {len(events)} events from {path.name}")
             except Exception as exc:
                 print(f"WARNING: failed to parse {path}: {exc}", file=sys.stderr)
-                scenarios_out.append({
+                scenarios_out.append(
+                    {
+                        "name": scenario,
+                        "duration_s": 60.0,
+                        "events": _synthetic_events(scenario),
+                    }
+                )
+        else:
+            print(
+                f"WARNING: no seed-42 run for {scenario}, using synthetic events", file=sys.stderr
+            )
+            scenarios_out.append(
+                {
                     "name": scenario,
                     "duration_s": 60.0,
                     "events": _synthetic_events(scenario),
-                })
-        else:
-            print(f"WARNING: no seed-42 run for {scenario}, using synthetic events", file=sys.stderr)
-            scenarios_out.append({
-                "name": scenario,
-                "duration_s": 60.0,
-                "events": _synthetic_events(scenario),
-            })
+                }
+            )
 
     payload = {"scenarios": scenarios_out, "generated_by": "scripts/build-replay.py", "seed": 42}
     OUT_FILE.write_text(json.dumps(payload, separators=(",", ":")))
@@ -161,7 +213,9 @@ def main() -> None:
     total_events = sum(len(s["events"]) for s in scenarios_out)
     size_kb = OUT_FILE.stat().st_size / 1024
     print(f"\nWrote {OUT_FILE}")
-    print(f"  scenarios: {len(scenarios_out)}, total events: {total_events}, size: {size_kb:.1f} KB")
+    print(
+        f"  scenarios: {len(scenarios_out)}, total events: {total_events}, size: {size_kb:.1f} KB"
+    )
 
 
 if __name__ == "__main__":

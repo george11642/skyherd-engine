@@ -1,0 +1,14 @@
+{
+  "id": "f1299e83-4c80-4d2c-ab0c-45d636a18625",
+  "agent_name": "FenceLineDispatcher",
+  "state": "checkpointed",
+  "last_active_ts": 1776838809.3396306,
+  "wake_events_consumed": [],
+  "checkpoint_path": "runtime/sessions/f1299e83-4c80-4d2c-ab0c-45d636a18625.json",
+  "system_prompt_cached_hash": null,
+  "cumulative_tokens_in": 0,
+  "cumulative_tokens_out": 0,
+  "cumulative_cost_usd": 0.0,
+  "run_time_active_s": 0.0,
+  "run_time_idle_s": 0.0
+}

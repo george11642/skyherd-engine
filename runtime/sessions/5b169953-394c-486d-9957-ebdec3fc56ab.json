@@ -1,0 +1,14 @@
+{
+  "id": "5b169953-394c-486d-9957-ebdec3fc56ab",
+  "agent_name": "PredatorPatternLearner",
+  "state": "checkpointed",
+  "last_active_ts": 1776838809.3303418,
+  "wake_events_consumed": [],
+  "checkpoint_path": null,
+  "system_prompt_cached_hash": null,
+  "cumulative_tokens_in": 0,
+  "cumulative_tokens_out": 0,
+  "cumulative_cost_usd": 0.0,
+  "run_time_active_s": 0.0,
+  "run_time_idle_s": 0.0
+}

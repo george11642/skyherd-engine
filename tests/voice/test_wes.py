@@ -178,9 +178,7 @@ def test_sanitize_strips_ai_telltales(injected_phrase: str, description: str) ->
         f"AI telltale ({description}) survived _sanitize(): {result!r}"
     )
     # em/en dashes must not appear in the output
-    assert "—" not in result and "–" not in result, (
-        f"Dash survived sanitize in: {result!r}"
-    )
+    assert "—" not in result and "–" not in result, f"Dash survived sanitize in: {result!r}"
 
 
 def test_wes_script_sanitizes_injected_em_dash() -> None:
@@ -197,6 +195,4 @@ def test_wes_script_sanitizes_injected_ai_opener() -> None:
         subject="I just wanted to let you know about the coyote",
     )
     script = wes_script(msg)
-    assert "i just wanted" not in script.lower(), (
-        f"AI opener survived wes_script(): {script!r}"
-    )
+    assert "i just wanted" not in script.lower(), f"AI opener survived wes_script(): {script!r}"

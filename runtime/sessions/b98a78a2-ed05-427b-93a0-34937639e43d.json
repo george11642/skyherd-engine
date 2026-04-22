@@ -1,0 +1,14 @@
+{
+  "id": "b98a78a2-ed05-427b-93a0-34937639e43d",
+  "agent_name": "HerdHealthWatcher",
+  "state": "checkpointed",
+  "last_active_ts": 1776838035.0557077,
+  "wake_events_consumed": [],
+  "checkpoint_path": "runtime/sessions/b98a78a2-ed05-427b-93a0-34937639e43d.json",
+  "system_prompt_cached_hash": null,
+  "cumulative_tokens_in": 0,
+  "cumulative_tokens_out": 0,
+  "cumulative_cost_usd": 0.0,
+  "run_time_active_s": 0.0,
+  "run_time_idle_s": 0.0
+}

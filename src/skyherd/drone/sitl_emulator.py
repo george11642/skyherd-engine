@@ -141,16 +141,19 @@ def _pack(
     """
     length = len(payload)
     # Pack header as 7 bytes (STX..COMP_ID) then 3 bytes of msg_id
-    header = struct.pack(
-        "<BBBBBBB",
-        _MAVLINK2_STX,
-        length,
-        0,           # incompat_flags
-        0,           # compat_flags
-        seq & 0xFF,
-        sys_id,
-        comp_id,
-    ) + struct.pack("<I", msg_id)[:3]  # msg_id is 3 bytes LE (trim 4th byte)
+    header = (
+        struct.pack(
+            "<BBBBBBB",
+            _MAVLINK2_STX,
+            length,
+            0,  # incompat_flags
+            0,  # compat_flags
+            seq & 0xFF,
+            sys_id,
+            comp_id,
+        )
+        + struct.pack("<I", msg_id)[:3]
+    )  # msg_id is 3 bytes LE (trim 4th byte)
     crc_extra = _CRC_EXTRA.get(msg_id, 0)
     crc_data = header[1:] + payload + bytes([crc_extra])
     crc = _crc_accumulate(crc_data)
@@ -181,13 +184,19 @@ def _sys_status(battery_mv: int = 12600, battery_pct: int = 85) -> bytes:
     # uint16 errors_comm, uint16 errors_count[4]
     return struct.pack(
         "<IIIHHhbHHHHHH",
-        0, 0, 0,        # sensors (all OK)
-        0,              # load
-        battery_mv,     # voltage_battery (mV)
-        -1,             # current_battery (-1 = unknown)
-        battery_pct,    # battery_remaining (0-100, -1 unknown)
-        0, 0,           # drop_rate_comm, errors_comm
-        0, 0, 0, 0,     # errors_count[0..3]
+        0,
+        0,
+        0,  # sensors (all OK)
+        0,  # load
+        battery_mv,  # voltage_battery (mV)
+        -1,  # current_battery (-1 = unknown)
+        battery_pct,  # battery_remaining (0-100, -1 unknown)
+        0,
+        0,  # drop_rate_comm, errors_comm
+        0,
+        0,
+        0,
+        0,  # errors_count[0..3]
     )
 
 
@@ -195,15 +204,21 @@ def _gps_raw(lat_1e7: int, lon_1e7: int, alt_mm: int) -> bytes:
     return struct.pack(
         "<QiiiHHHHBB",
         int(time.time() * 1e6),
-        lat_1e7, lon_1e7, alt_mm,
-        100, 100, 0, 0, GPS_FIX_TYPE_3D_FIX, 10,
+        lat_1e7,
+        lon_1e7,
+        alt_mm,
+        100,
+        100,
+        0,
+        0,
+        GPS_FIX_TYPE_3D_FIX,
+        10,
     )
 
 
 def _global_pos(lat_1e7: int, lon_1e7: int, alt_mm: int, rel_alt_mm: int) -> bytes:
     t_ms = int(time.monotonic() * 1000) & 0xFFFFFFFF
-    return struct.pack("<IiiiihhhH", t_ms, lat_1e7, lon_1e7, alt_mm, rel_alt_mm,
-                       0, 0, 0, 18000)
+    return struct.pack("<IiiiihhhH", t_ms, lat_1e7, lon_1e7, alt_mm, rel_alt_mm, 0, 0, 0, 18000)
 
 
 def _home_position(lat_1e7: int, lon_1e7: int, alt_mm: int) -> bytes:
@@ -219,11 +234,20 @@ def _home_position(lat_1e7: int, lon_1e7: int, alt_mm: int) -> bytes:
     """
     return struct.pack(
         "<3i10fQ",
-        lat_1e7, lon_1e7, alt_mm,   # 3 ints
-        0.0, 0.0, 0.0,              # x, y, z
-        1.0, 0.0, 0.0, 0.0,         # q[4] identity
-        0.0, 0.0, 0.0,              # approach_x/y/z
-        int(time.time() * 1e6),     # time_usec
+        lat_1e7,
+        lon_1e7,
+        alt_mm,  # 3 ints
+        0.0,
+        0.0,
+        0.0,  # x, y, z
+        1.0,
+        0.0,
+        0.0,
+        0.0,  # q[4] identity
+        0.0,
+        0.0,
+        0.0,  # approach_x/y/z
+        int(time.time() * 1e6),  # time_usec
     )
 
 
@@ -254,14 +278,14 @@ def _autopilot_version() -> bytes:
     return struct.pack(
         "<QQIIIIHHxxxxxxxx8s8s8s",
         capabilities,
-        0,          # uid
-        0x04050700, # flight_sw_version (ArduCopter 4.5.7)
-        0,          # middleware
-        0,          # os
-        0,          # board
-        0x026D,     # vendor_id (3DR = 0x3DR → use ArduPilot 0x026D)
-        0x0011,     # product_id
-        b"SkyHerd\x00",   # flight_custom_version
+        0,  # uid
+        0x04050700,  # flight_sw_version (ArduCopter 4.5.7)
+        0,  # middleware
+        0,  # os
+        0,  # board
+        0x026D,  # vendor_id (3DR = 0x3DR → use ArduPilot 0x026D)
+        0x0011,  # product_id
+        b"SkyHerd\x00",  # flight_custom_version
         b"\x00" * 8,
         b"\x00" * 8,
     )
@@ -336,8 +360,12 @@ class _State:
     @property
     def armed(self) -> bool:
         return self.phase in (
-            _Phase.ARMING, _Phase.ARMED, _Phase.TAKING_OFF,
-            _Phase.IN_AIR, _Phase.ON_MISSION, _Phase.RETURNING,
+            _Phase.ARMING,
+            _Phase.ARMED,
+            _Phase.TAKING_OFF,
+            _Phase.IN_AIR,
+            _Phase.ON_MISSION,
+            _Phase.RETURNING,
         )
 
 
@@ -403,7 +431,8 @@ class MavlinkSitlEmulator:
 
         logger.info(
             "MavlinkSitlEmulator vehicle_port=%d → gcs %s:%d",
-            self._vehicle_port, *self._gcs_addr,
+            self._vehicle_port,
+            *self._gcs_addr,
         )
 
     def stop(self) -> None:
@@ -471,18 +500,21 @@ class MavlinkSitlEmulator:
             alt_mm = int((s.home_alt_m + s.rel_alt_m) * 1000)
             rel_mm = int(s.rel_alt_m * 1000)
             self._send(MAVLINK_MSG_ID_GPS_RAW_INT, _gps_raw(lat_1e7, lon_1e7, alt_mm))
-            self._send(MAVLINK_MSG_ID_GLOBAL_POSITION_INT,
-                       _global_pos(lat_1e7, lon_1e7, alt_mm, rel_mm))
-            self._send(MAVLINK_MSG_ID_SYS_STATUS,
-                       _sys_status(battery_mv=int(12600 * s.battery_pct / 100),
-                                   battery_pct=s.battery_pct))
+            self._send(
+                MAVLINK_MSG_ID_GLOBAL_POSITION_INT, _global_pos(lat_1e7, lon_1e7, alt_mm, rel_mm)
+            )
+            self._send(
+                MAVLINK_MSG_ID_SYS_STATUS,
+                _sys_status(battery_mv=int(12600 * s.battery_pct / 100), battery_pct=s.battery_pct),
+            )
             # Every 1 s: send EKF_STATUS_REPORT + HOME_POSITION so
             # mavsdk_server sets is_global_position_ok + is_home_position_ok
             if _telem_tick % 4 == 0:
                 try:
                     self._send(MAVLINK_MSG_ID_EKF_STATUS_REPORT, _ekf_status_report())
-                    self._send(MAVLINK_MSG_ID_HOME_POSITION,
-                               _home_position(lat_1e7, lon_1e7, home_alt_mm))
+                    self._send(
+                        MAVLINK_MSG_ID_HOME_POSITION, _home_position(lat_1e7, lon_1e7, home_alt_mm)
+                    )
                 except Exception:
                     pass  # non-critical; skip on pack error
             _telem_tick += 1
@@ -512,13 +544,18 @@ class MavlinkSitlEmulator:
                 if s.mission_current < s.mission_total and elapsed >= 2.0:
                     logger.info(
                         "Emulator mission item %d/%d",
-                        s.mission_current, s.mission_total,
+                        s.mission_current,
+                        s.mission_total,
                     )
-                    self._send(MAVLINK_MSG_ID_MISSION_ITEM_REACHED,
-                               _mission_item_reached(s.mission_current))
+                    self._send(
+                        MAVLINK_MSG_ID_MISSION_ITEM_REACHED,
+                        _mission_item_reached(s.mission_current),
+                    )
                     s.mission_current += 1
-                    self._send(MAVLINK_MSG_ID_MISSION_CURRENT,
-                               _mission_current(s.mission_current, s.mission_total))
+                    self._send(
+                        MAVLINK_MSG_ID_MISSION_CURRENT,
+                        _mission_current(s.mission_current, s.mission_total),
+                    )
                     s.enter(_Phase.ON_MISSION)  # reset timer
                 elif s.mission_current >= s.mission_total and s.mission_total > 0:
                     logger.info("Emulator mission complete")
@@ -597,8 +634,9 @@ class MavlinkSitlEmulator:
             lon_1e7 = int(s.lon_deg * 1e7)
             home_alt_mm = int(s.home_alt_m * 1000)
             if requested_id == MAVLINK_MSG_ID_HOME_POSITION:
-                self._send(MAVLINK_MSG_ID_HOME_POSITION,
-                           _home_position(lat_1e7, lon_1e7, home_alt_mm))
+                self._send(
+                    MAVLINK_MSG_ID_HOME_POSITION, _home_position(lat_1e7, lon_1e7, home_alt_mm)
+                )
             elif requested_id == MAVLINK_MSG_ID_AUTOPILOT_VERSION:
                 try:
                     self._send(MAVLINK_MSG_ID_AUTOPILOT_VERSION, _autopilot_version())
@@ -634,8 +672,9 @@ class MavlinkSitlEmulator:
             self._state.enter(_Phase.ON_MISSION)
             self._state.flight_mode = COPTER_MODE_AUTO
             self._ack(command)
-            self._send(MAVLINK_MSG_ID_MISSION_CURRENT,
-                       _mission_current(0, self._state.mission_total))
+            self._send(
+                MAVLINK_MSG_ID_MISSION_CURRENT, _mission_current(0, self._state.mission_total)
+            )
 
         else:
             self._ack(command)

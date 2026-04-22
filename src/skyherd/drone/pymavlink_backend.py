@@ -97,9 +97,7 @@ class PymavlinkBackend(DroneBackend):
         """Bind UDP port and wait for a vehicle heartbeat."""
         loop = asyncio.get_running_loop()
         try:
-            conn = await loop.run_in_executor(
-                None, self._blocking_connect
-            )
+            conn = await loop.run_in_executor(None, self._blocking_connect)
         except Exception as exc:
             raise DroneUnavailable(
                 f"PymavlinkBackend: cannot connect on {self._host}:{self._port}: {exc}"
@@ -107,8 +105,9 @@ class PymavlinkBackend(DroneBackend):
         self._conn = conn
         self._connected = True
         logger.info("PymavlinkBackend connected on %s:%d", self._host, self._port)
-        _log_event({"ts": time.time(), "event": "connected",
-                    "port": self._port, "backend": "pymavlink"})
+        _log_event(
+            {"ts": time.time(), "event": "connected", "port": self._port, "backend": "pymavlink"}
+        )
 
     def _blocking_connect(self) -> mavutil.mavfile:
         """Blocking: bind UDP socket and wait for vehicle heartbeat."""
@@ -122,14 +121,10 @@ class PymavlinkBackend(DroneBackend):
         while time.monotonic() < deadline:
             msg = conn.recv_match(type="HEARTBEAT", blocking=True, timeout=2.0)
             if msg:
-                logger.info(
-                    "PymavlinkBackend heartbeat from sysid=%d", conn.target_system
-                )
+                logger.info("PymavlinkBackend heartbeat from sysid=%d", conn.target_system)
                 conn.wait_heartbeat(timeout=2.0)
                 return conn
-        raise DroneUnavailable(
-            f"No heartbeat received within {_CONNECT_TIMEOUT_S:.0f} s"
-        )
+        raise DroneUnavailable(f"No heartbeat received within {_CONNECT_TIMEOUT_S:.0f} s")
 
     async def takeoff(self, alt_m: float = 30.0) -> None:
         conn = self._assert_connected()
@@ -138,10 +133,17 @@ class PymavlinkBackend(DroneBackend):
         def _arm_and_takeoff() -> None:
             # ARM
             conn.mav.command_long_send(
-                conn.target_system, conn.target_component,
+                conn.target_system,
+                conn.target_component,
                 MAV_CMD_COMPONENT_ARM_DISARM,
                 0,
-                1, 0, 0, 0, 0, 0, 0,
+                1,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
             )
             ack = conn.recv_match(type="COMMAND_ACK", blocking=True, timeout=_ARM_TIMEOUT_S)
             if ack and ack.command == MAV_CMD_COMPONENT_ARM_DISARM:
@@ -151,10 +153,17 @@ class PymavlinkBackend(DroneBackend):
 
             # TAKEOFF
             conn.mav.command_long_send(
-                conn.target_system, conn.target_component,
+                conn.target_system,
+                conn.target_component,
                 MAV_CMD_NAV_TAKEOFF,
                 0,
-                0, 0, 0, 0, 0, 0, alt_m,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                alt_m,
             )
             ack = conn.recv_match(type="COMMAND_ACK", blocking=True, timeout=_ARM_TIMEOUT_S)
             if ack and ack.command == MAV_CMD_NAV_TAKEOFF:
@@ -179,8 +188,7 @@ class PymavlinkBackend(DroneBackend):
 
         await loop.run_in_executor(None, _arm_and_takeoff)
         logger.info("PymavlinkBackend takeoff to %.1f m complete", alt_m)
-        _log_event({"ts": time.time(), "event": "takeoff", "alt_m": alt_m,
-                    "backend": "pymavlink"})
+        _log_event({"ts": time.time(), "event": "takeoff", "alt_m": alt_m, "backend": "pymavlink"})
 
     async def patrol(self, waypoints: list[Waypoint]) -> None:
         if not waypoints:
@@ -192,7 +200,9 @@ class PymavlinkBackend(DroneBackend):
             n = len(waypoints)
             # Upload mission count
             conn.mav.mission_count_send(
-                conn.target_system, conn.target_component, n,
+                conn.target_system,
+                conn.target_component,
+                n,
                 mavutil.mavlink.MAV_MISSION_TYPE_MISSION,
             )
 
@@ -202,7 +212,8 @@ class PymavlinkBackend(DroneBackend):
             while items_sent < n and time.monotonic() < deadline:
                 msg = conn.recv_match(
                     type=["MISSION_REQUEST", "MISSION_REQUEST_INT"],
-                    blocking=True, timeout=3.0,
+                    blocking=True,
+                    timeout=3.0,
                 )
                 if not msg:
                     continue
@@ -211,15 +222,17 @@ class PymavlinkBackend(DroneBackend):
                     break
                 wp = waypoints[seq]
                 conn.mav.mission_item_int_send(
-                    conn.target_system, conn.target_component,
+                    conn.target_system,
+                    conn.target_component,
                     seq,
                     MAV_FRAME_GLOBAL_RELATIVE_ALT,
                     MAV_CMD_NAV_WAYPOINT,
-                    0,   # current
-                    1,   # autocontinue
+                    0,  # current
+                    1,  # autocontinue
                     wp.hold_s if wp.hold_s > 0 else 0.0,
                     5.0,  # accept_radius_m
-                    0.0, 0.0,
+                    0.0,
+                    0.0,
                     int(wp.lat * 1e7),
                     int(wp.lon * 1e7),
                     wp.alt_m,
@@ -235,10 +248,17 @@ class PymavlinkBackend(DroneBackend):
 
             # Start mission
             conn.mav.command_long_send(
-                conn.target_system, conn.target_component,
+                conn.target_system,
+                conn.target_component,
                 MAV_CMD_MISSION_START,
                 0,
-                0, n - 1, 0, 0, 0, 0, 0,
+                0,
+                n - 1,
+                0,
+                0,
+                0,
+                0,
+                0,
             )
             ack = conn.recv_match(type="COMMAND_ACK", blocking=True, timeout=5.0)
             if ack:
@@ -250,7 +270,8 @@ class PymavlinkBackend(DroneBackend):
             while len(reached) < n and time.monotonic() < deadline:
                 msg = conn.recv_match(
                     type=["MISSION_ITEM_REACHED", "MISSION_CURRENT"],
-                    blocking=True, timeout=2.0,
+                    blocking=True,
+                    timeout=2.0,
                 )
                 if msg and msg.get_type() == "MISSION_ITEM_REACHED":
                     reached.add(msg.seq)
@@ -261,11 +282,14 @@ class PymavlinkBackend(DroneBackend):
 
         await loop.run_in_executor(None, _run_mission)
         logger.info("PymavlinkBackend patrol complete (%d WPs)", len(waypoints))
-        _log_event({
-            "ts": time.time(), "event": "patrol_complete",
-            "waypoints": [wp.model_dump() for wp in waypoints],
-            "backend": "pymavlink",
-        })
+        _log_event(
+            {
+                "ts": time.time(),
+                "event": "patrol_complete",
+                "waypoints": [wp.model_dump() for wp in waypoints],
+                "backend": "pymavlink",
+            }
+        )
 
     async def return_to_home(self) -> None:
         conn = self._assert_connected()
@@ -273,9 +297,17 @@ class PymavlinkBackend(DroneBackend):
 
         def _rtl() -> None:
             conn.mav.command_long_send(
-                conn.target_system, conn.target_component,
+                conn.target_system,
+                conn.target_component,
                 MAV_CMD_NAV_RETURN_TO_LAUNCH,
-                0, 0, 0, 0, 0, 0, 0, 0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
             )
             ack = conn.recv_match(type="COMMAND_ACK", blocking=True, timeout=10.0)
             if ack:
@@ -284,8 +316,7 @@ class PymavlinkBackend(DroneBackend):
             # Wait until altitude drops to near zero
             deadline = time.monotonic() + _RTL_TIMEOUT_S
             while time.monotonic() < deadline:
-                msg = conn.recv_match(type="GLOBAL_POSITION_INT",
-                                      blocking=True, timeout=1.0)
+                msg = conn.recv_match(type="GLOBAL_POSITION_INT", blocking=True, timeout=1.0)
                 if msg and msg.relative_alt <= 500:  # < 0.5 m
                     logger.info("Landed (rel_alt=%d mm)", msg.relative_alt)
                     return
@@ -298,9 +329,15 @@ class PymavlinkBackend(DroneBackend):
     async def play_deterrent(self, tone_hz: int = 12000, duration_s: float = 6.0) -> None:
         self._assert_connected()
         await asyncio.sleep(min(duration_s, 2.0))
-        _log_event({"ts": time.time(), "event": "deterrent",
-                    "tone_hz": tone_hz, "duration_s": duration_s,
-                    "backend": "pymavlink"})
+        _log_event(
+            {
+                "ts": time.time(),
+                "event": "deterrent",
+                "tone_hz": tone_hz,
+                "duration_s": duration_s,
+                "backend": "pymavlink",
+            }
+        )
 
     async def get_thermal_clip(self, duration_s: float = 10.0) -> Path:
         self._assert_connected()
@@ -309,9 +346,16 @@ class PymavlinkBackend(DroneBackend):
         out_path = _THERMAL_DIR / f"{ts}_pymav.png"
         # Import the same thermal generator from sitl.py
         from skyherd.drone.sitl import _generate_synthetic_thermal  # noqa: PLC0415
+
         _generate_synthetic_thermal(out_path)
-        _log_event({"ts": time.time(), "event": "thermal_clip",
-                    "path": str(out_path), "backend": "pymavlink"})
+        _log_event(
+            {
+                "ts": time.time(),
+                "event": "thermal_clip",
+                "path": str(out_path),
+                "backend": "pymavlink",
+            }
+        )
         return out_path
 
     async def state(self) -> DroneState:
@@ -342,10 +386,13 @@ class PymavlinkBackend(DroneBackend):
                 battery_pct = float(msg.battery_remaining)
 
             return DroneState(
-                armed=armed, in_air=in_air,
-                altitude_m=alt_m, battery_pct=battery_pct,
+                armed=armed,
+                in_air=in_air,
+                altitude_m=alt_m,
+                battery_pct=battery_pct,
                 mode="AUTO" if in_air else "STABILIZE",
-                lat=lat, lon=lon,
+                lat=lat,
+                lon=lon,
             )
 
         return await loop.run_in_executor(None, _read)
@@ -366,7 +413,5 @@ class PymavlinkBackend(DroneBackend):
 
     def _assert_connected(self) -> mavutil.mavfile:
         if not self._connected or self._conn is None:
-            raise DroneUnavailable(
-                "PymavlinkBackend not connected — call connect() first."
-            )
+            raise DroneUnavailable("PymavlinkBackend not connected — call connect() first.")
         return self._conn

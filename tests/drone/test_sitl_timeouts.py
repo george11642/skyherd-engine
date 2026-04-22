@@ -101,6 +101,7 @@ async def test_return_to_home_land_timeout_raises_drone_timeout_error() -> None:
     backend, drone = _make_connected_backend()
 
     drone.action.return_to_launch = AsyncMock()
+
     # in_air() yields True forever (never lands)
     async def _always_in_air():
         while True:
