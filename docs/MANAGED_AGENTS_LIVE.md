@@ -117,3 +117,110 @@ reachable; beta enrolled; 5 real agent objects and 5 real session objects
 exist on the platform; full send+stream round-trip verified with live
 token-generating agent response. Webhooks path is the only deferred piece
 and it is a George-side install step, not a code gap.
+
+---
+
+## Webhook registration — 2026-04-22T16:02Z
+
+**cloudflared**: `2026.3.0` (installed to `~/.local/bin/cloudflared`, no sudo
+required — pulled `cloudflared-linux-amd64` from the latest GitHub release).
+
+**Tunnel URL (ephemeral)**:
+```
+https://adam-berkeley-filtering-sbjct.trycloudflare.com
+→ 127.0.0.1:8765 (uvicorn, SKYHERD_MOCK=0)
+```
+
+Webhook endpoint: `https://adam-berkeley-filtering-sbjct.trycloudflare.com/webhooks/managed-agents`
+
+### Code change — webhook router mounted
+
+`src/skyherd/server/app.py` previously did not mount
+`skyherd.agents.webhook.webhook_router`. Now it does, immediately after the
+CORS middleware. `POST /webhooks/managed-agents` is live in the FastAPI
+OpenAPI spec.
+
+### End-to-end tunnel verification
+
+| Probe | Status |
+| --- | --- |
+| `GET /health` via tunnel | **200** `{"status":"ok",...}` |
+| `POST /webhooks/managed-agents` via tunnel, **no signature** | **401** `Invalid or missing X-SkyHerd-Signature` (HMAC enforcement working) |
+| `POST /webhooks/managed-agents` via tunnel, **valid HMAC-SHA256** using `SKYHERD_WEBHOOK_SECRET` | **204 No Content** (mesh routed the event) |
+
+Round-trip from the public internet → Cloudflare edge → WSL tunnel →
+uvicorn → `webhook_router.managed_agents_event` → `AgentMesh.on_webhook()`
+is end-to-end functional.
+
+### Webhook registration API — NOT AVAILABLE in `managed-agents-2026-04-01`
+
+Attempted to register webhook URLs on the 5 agents programmatically.
+**Result: the API does not currently expose webhook registration in this
+beta.** Direct evidence (all with header
+`anthropic-beta: managed-agents-2026-04-01`, valid `x-api-key`):
+
+1. **SDK surface** — `anthropic.Anthropic().beta.{agents,sessions,environments}.{create,update}` signatures contain **no** `webhook_url`, `webhook_secret`, or `webhooks` parameter. (Inspected via `inspect.signature` on SDK 0.x installed in `uv` env.)
+2. **Endpoint probes (all 404)**:
+   - `GET /v1/webhooks`
+   - `GET /v1/organizations/webhooks`
+   - `GET /v1/agents/{agent_id}/webhooks`
+   - `GET /v1/environments/{env_id}/webhooks`
+   - `GET /v1/webhook_endpoints`
+   - `GET /v1/event_subscriptions`
+3. **POST rejections (400 `invalid_request_error`)**:
+   - `POST /v1/agents/{id}` with `{"webhook_url": "..."}` → `webhook_url: Extra inputs are not permitted`
+   - `POST /v1/agents/{id}` with `{"webhooks": [...]}` → `webhooks: Extra inputs are not permitted`
+   - `POST /v1/environments/{id}` with `{"webhook_url": "..."}` → `webhook_url: Extra inputs are not permitted`
+4. **Docs** — `https://platform.claude.com/docs/en/agents/managed-agents/webhooks`
+   returns a "Not Found" page. Platform docs for this beta do not yet
+   document a programmatic webhook registration flow.
+
+Per-agent registration table (API attempt):
+
+| Agent name | Agent ID prefix | API reg HTTP | Status |
+| --- | --- | --- | --- |
+| FenceLineDispatcher    | `agent_011CaK` | 400 | UNSUPPORTED (field rejected) |
+| HerdHealthWatcher      | `agent_011CaK` | 400 | UNSUPPORTED (field rejected) |
+| PredatorPatternLearner | `agent_011CaK` | 400 | UNSUPPORTED (field rejected) |
+| GrazingOptimizer       | `agent_011CaK` | 400 | UNSUPPORTED (field rejected) |
+| CalvingWatch           | `agent_011CaK` | 400 | UNSUPPORTED (field rejected) |
+
+**Fallback path**: webhook delivery on this beta is currently configured
+through the Anthropic Console UI (organization → agent → webhooks).
+George can paste the tunnel URL there. Until then, platform events do not
+reach our endpoint — but our endpoint is **verified receiving signed POSTs
+correctly** from the open internet, so the only remaining wire is
+console-side.
+
+State file written (gitignored): `runtime/webhook_registration.json`.
+
+### Restarting the tunnel after reboot
+
+```bash
+# One line:
+bash /home/george/projects/active/skyherd-engine/scripts/cloudflared-setup.sh 8765
+# Or:
+~/.local/bin/cloudflared tunnel --url http://127.0.0.1:8765 --no-autoupdate
+```
+
+### Persistent URL (if desired)
+
+The `trycloudflare.com` URL **rotates every restart**. For a stable URL:
+
+```bash
+cloudflared tunnel login                # browser one-time auth
+cloudflared tunnel create skyherd       # creates named tunnel
+cloudflared tunnel route dns skyherd webhook.skyherd.dev
+cloudflared tunnel run skyherd
+```
+
+That requires a Cloudflare account + a domain — not set up yet; deferred.
+
+### End-to-end wake round-trip from the platform
+
+**Not observed** — because registration is console-only on this beta, the
+platform is not currently pushing any events to our tunnel URL. The tunnel
+round-trip is **proven from the public internet** (curl with HMAC → 204
+via the mesh handler). Once George pastes the URL in console, platform
+`agent.custom_tool_use` events will land at this endpoint with no further
+code changes needed.

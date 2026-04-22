@@ -109,6 +109,16 @@ def create_app(
         allow_headers=["Content-Type", "Accept", "Cache-Control", "Last-Event-ID"],
     )
 
+    # Managed Agents webhook router — POST /webhooks/managed-agents
+    try:
+        from skyherd.agents.webhook import webhook_router, set_mesh as _set_webhook_mesh
+        app.include_router(webhook_router)
+        if mesh is not None:
+            _set_webhook_mesh(mesh)
+        logger.info("Mounted Managed Agents webhook router at /webhooks/managed-agents")
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("Webhook router not mounted: %s", exc)
+
     # ------------------------------------------------------------------
     # Health
     # ------------------------------------------------------------------
