@@ -2,14 +2,14 @@
 
 > Fresh Claude sessions read this **after CLAUDE.md**. Update atomically with every commit.
 
-**Last updated**: 2026-04-21 (H1 edge software-ready — Pi camera + MegaDetector + bus-compatible MQTT + systemd + runbook)
+**Last updated**: 2026-04-21 (Cross-Ranch Mesh green — NeighborBroadcaster + NeighborListener + CrossRanchMesh + 39 tests passing)
 **Plan**: v5.1 at `/home/george/.claude/plans/update-ur-memory-project-context-splendid-swan.md`
 **Submission**: due 2026-04-26 8pm EST
 **External blockers**: see [GitHub Issues](https://github.com/george11642/skyherd-engine/issues)
 
 ## Summary
 
-- Green / Total: **71 / 80**
+- Green / Total: **72 / 80**
 - Tier MVP status: 🟡 agents layer complete
 - Sim Completeness Gate: 🟡 9/10 (fresh-clone boot now green; only SITL/voice/dashboard-dist remain)
 - Hardware tiers: 🟡 H1 software-ready (awaits Pi); H3 software-ready (awaits flash/install); H4 software-ready (awaits parts); Two-Pi-4 fleet software-ready; iOS + Android companion software-ready
@@ -109,7 +109,7 @@
 
 ## Extended Vision (7 — MVP-eligible if slack, else Tier 5)
 
-- [ ] Cross-Ranch Mesh Network (2 sim ranches + agent-to-agent mesh)
+- [x] Cross-Ranch Mesh Network (2 sim ranches + agent-to-agent mesh)
 - [x] Insurance Attestation Chain (SQLite + Ed25519 Merkle log + dashboard panel)
 - [ ] Wildfire Thermal Early-Warning
 - [ ] Rustling / Theft Detection
