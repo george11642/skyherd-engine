@@ -2,7 +2,7 @@
 
 > Fresh Claude sessions read this **after CLAUDE.md**. Update atomically with every commit.
 
-**Last updated**: 2026-04-21 (ruff clean + coverage ≥80% — server/voice/world/demo CLIs covered, vision env guards)
+**Last updated**: 2026-04-22 (Dashboard redesign — Gotham/Lattice/Bloomberg ops-console aesthetic live)
 **Plan**: v5.1 at `/home/george/.claude/plans/update-ur-memory-project-context-splendid-swan.md`
 **Submission**: due 2026-04-26 8pm EST
 **External blockers**: see [GitHub Issues](https://github.com/george11642/skyherd-engine/issues)
@@ -138,6 +138,7 @@
 - [x] `docs/ONE_PAGER.pdf` — judge one-pager (md + pdf, weasyprint, 24 KB)
 - [x] `skills/README.md` — 33-file skills inventory
 - [x] Vercel deploy live — https://skyherd-engine.vercel.app (replay-mode SPA, 5 scenarios, 646 events)
+- [x] Dashboard redesign (Gotham/Lattice/Bloomberg feel) — Fraunces/Inter/JetBrains Mono, brand palette, StatBand chips, Agent Mesh lanes, framer-motion CostTicker, attestation table, scenario strip, /rancher Wes call screen, /cross-ranch handoff view
 - [ ] 100–200 word written submission summary
 - [ ] Submission form filled at cerebralvalley.ai
 
