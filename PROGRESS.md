@@ -127,6 +127,7 @@
 - [x] **Two-Pi-4 fleet provisioning + heartbeat** — edge-house + edge-barn; per-Pi configs; heartbeat on `edge_status` topic; /healthz; Coral path documented; one-command `provision-edge.sh`
 - [x] **iOS companion app (software ready)** — SkyHerdCompanion Swift app (DJI SDK V5 + CocoaMQTT + XcodeGen); WebSocket bridge to MavicBackend; safety guards; protocol schema tests (52 passing)
 - [x] **Android companion app (software ready)** — SkyHerdCompanion Android (DJI SDK V5 + Paho MQTT); MavicBackend + F3InavBackend; GeofenceChecker + BatteryGuard + WindGuard; 55 new tests green
+- [x] **Hardware-only demo runbook (2 Pi + Mavic, no collar required)** — `HardwareOnlyDemo` orchestrator; HARDWARE_OVERRIDES registry suppression; 180s fallback guard; `skyherd-demo-hw play --prop combo`; `make hardware-demo`; 37 tests green; shot list + coyote SVG cutout template
 
 ## Deliverables (6)
 
