@@ -13,38 +13,38 @@ authors = [{ name = "George Teifel" }]
 
 dependencies = [
     # Anthropic
-    "anthropic>=0.69",
+    "anthropic>=0.69,<1",
     "claude-agent-sdk",
     # MQTT
-    "aiomqtt>=2",
+    "aiomqtt>=2,<3",
     "amqtt",
     # Drone
-    "mavsdk>=3",
+    "mavsdk>=3,<4",
     "pymavlink",
     # Web / API
-    "fastapi",
-    "uvicorn[standard]",
-    "sse-starlette",
-    "httpx",
+    "fastapi>=0.110,<1",
+    "uvicorn[standard]>=0.29,<1",
+    "sse-starlette>=2,<3",
+    "httpx>=0.27,<1",
     # Data / config
-    "pydantic>=2",
-    "pyyaml",
-    "cryptography",
+    "pydantic>=2,<3",
+    "pyyaml>=6,<7",
+    "cryptography>=42,<45",
     # Vision
-    "pillow",
-    "numpy",
-    "supervision",
+    "pillow>=10,<12",
+    "numpy>=1.26,<3",
+    "supervision>=0.20,<1",
     # DX
-    "python-dotenv",
-    "rich",
-    "typer",
-    "twilio>=9.10.5",
+    "python-dotenv>=1,<2",
+    "rich>=13,<14",
+    "typer>=0.12,<1",
+    "twilio>=9.10.5,<10",
 ]
 
 [project.optional-dependencies]
 voice = [
     "elevenlabs>=1.9",
-    "twilio>=9.10.5",
+    "twilio>=9.10.5,<10",
 ]
 docs = [
     "weasyprint>=62",
@@ -58,11 +58,24 @@ dev = [
     "pyright",
     "pre-commit",
     "mypy",
+    # obs extras available in dev for testing
+    "structlog>=24,<26",
+    "prometheus-client>=0.20,<1",
+    "opentelemetry-api>=1.24,<2",
+    "opentelemetry-sdk>=1.24,<2",
 ]
 edge = [
     # picamera2 is installed via apt on Pi OS: sudo apt install python3-picamera2
     # Not listed here — requires libcap dev headers unavailable in CI wheel builds.
     "PytorchWildlife",
+]
+obs = [
+    # Observability extras — loaded when SKYHERD_OBS=1 or imported directly.
+    # Install with: uv sync --extra obs
+    "structlog>=24,<26",
+    "prometheus-client>=0.20,<1",
+    "opentelemetry-api>=1.24,<2",
+    "opentelemetry-sdk>=1.24,<2",
 ]
 
 [project.scripts]
@@ -97,7 +110,7 @@ omit = ["tests/*"]
 
 [tool.coverage.report]
 show_missing = true
-fail_under = 0
+fail_under = 80
 
 # ---------------------------------------------------------------------------
 # ruff
