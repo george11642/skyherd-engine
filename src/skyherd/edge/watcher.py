@@ -10,6 +10,7 @@ import signal
 import socket
 import time
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 
@@ -179,6 +180,9 @@ class EdgeWatcher:
         self._published: list[dict] = []  # type: ignore[type-arg]
         # Heartbeat payloads list — populated for testing introspection
         self._heartbeats: list[dict] = []  # type: ignore[type-arg]
+        # Persistent MQTT client — opened once per run(), reused by all publish paths
+        self._mqtt_client: Any = None
+        self._mqtt_client_lock: asyncio.Lock = asyncio.Lock()
 
     # ------------------------------------------------------------------
     # Public API
@@ -209,6 +213,8 @@ class EdgeWatcher:
             self._capture_interval_s,
             self._heartbeat_interval_s,
         )
+        # Open the persistent MQTT client for the lifetime of this run
+        await self._open_mqtt_client()
         # Start heartbeat and optional healthz concurrently with capture loop
         tasks: list[asyncio.Task] = []  # type: ignore[type-arg]
         try:
@@ -230,6 +236,7 @@ class EdgeWatcher:
                     await task
                 except asyncio.CancelledError:
                     pass
+            await self._close_mqtt_client()
             self._camera.close()
             logger.info("EdgeWatcher stopped")
 
@@ -260,14 +267,13 @@ class EdgeWatcher:
                 break
             payload = self.heartbeat_payload()
             raw = _canonical_json(payload)
-            try:
-                import aiomqtt  # type: ignore[import-untyped]
-
-                async with aiomqtt.Client(hostname=self._mqtt_host, port=self._mqtt_port) as client:
+            client = await self._ensure_mqtt_connected()
+            if client is not None:
+                try:
                     await client.publish(self._status_topic, payload=raw.encode(), qos=0)
-                logger.debug("Heartbeat → %s", self._status_topic)
-            except Exception as exc:  # noqa: BLE001
-                logger.debug("Heartbeat publish failed: %s", exc)
+                    logger.debug("Heartbeat → %s", self._status_topic)
+                except Exception as exc:  # noqa: BLE001
+                    logger.debug("Heartbeat publish failed: %s", exc)
             self._heartbeats.append(payload)
 
     async def _healthz_server(self) -> None:
@@ -349,16 +355,22 @@ class EdgeWatcher:
         }
 
     async def _publish(self, payload: dict) -> None:  # type: ignore[type-arg]
-        """Publish *payload* to MQTT; record in ``self._published`` for tests."""
-        raw = _canonical_json(payload)
-        try:
-            import aiomqtt  # type: ignore[import-untyped]
+        """Publish *payload* to MQTT via the persistent client; record for tests.
 
-            async with aiomqtt.Client(hostname=self._mqtt_host, port=self._mqtt_port) as client:
+        Best-effort: if the client is not connected the payload is still
+        recorded in ``_published`` for test introspection but the MQTT send
+        is skipped.
+        """
+        raw = _canonical_json(payload)
+        client = await self._ensure_mqtt_connected()
+        if client is not None:
+            try:
                 await client.publish(self._topic, payload=raw.encode(), qos=0)
-            logger.debug("Published to %s (%d bytes)", self._topic, len(raw))
-        except Exception as exc:  # noqa: BLE001
-            logger.warning("MQTT publish failed: %s", exc)
+                logger.debug("Published to %s (%d bytes)", self._topic, len(raw))
+            except Exception as exc:  # noqa: BLE001
+                logger.warning("MQTT publish failed: %s", exc)
+        else:
+            logger.debug("MQTT client not connected — payload buffered locally only")
         self._published.append(payload)
 
     def _annotate_and_save(self, frame: np.ndarray, detections: list[Detection], ts: float) -> None:
@@ -401,18 +413,59 @@ class EdgeWatcher:
         }
         motion_topic = f"skyherd/{self._ranch_id}/events/camera.motion"
         raw = _canonical_json(event)
-        try:
-            import aiomqtt  # type: ignore[import-untyped]
-
-            async with aiomqtt.Client(hostname=self._mqtt_host, port=self._mqtt_port) as client:
+        client = await self._ensure_mqtt_connected()
+        if client is not None:
+            try:
                 await client.publish(motion_topic, payload=raw.encode(), qos=0)
-            logger.debug("camera.motion event → %s", motion_topic)
+                logger.debug("camera.motion event → %s", motion_topic)
+            except Exception as exc:  # noqa: BLE001
+                logger.debug("camera.motion publish failed: %s", exc)
+
+    # ------------------------------------------------------------------
+    # Persistent MQTT connection helpers
+    # ------------------------------------------------------------------
+
+    async def _open_mqtt_client(self) -> None:
+        """Open and enter a fresh aiomqtt.Client for the lifetime of run().
+
+        Passes ``timeout=5.0`` to aiomqtt so unreachable brokers fail fast
+        (critical for tests using a stub port that is never bound).
+        """
+        try:
+            import aiomqtt as _aiomqtt  # type: ignore[import-untyped]
+
+            client = _aiomqtt.Client(
+                hostname=self._mqtt_host,
+                port=self._mqtt_port,
+                timeout=5.0,
+            )
+            await client.__aenter__()
+            self._mqtt_client = client
+            logger.debug("EdgeWatcher: persistent MQTT client connected")
         except Exception as exc:  # noqa: BLE001
-            logger.debug("camera.motion publish failed: %s", exc)
+            logger.warning("EdgeWatcher: could not open MQTT client: %s", exc)
+
+    async def _close_mqtt_client(self) -> None:
+        """Exit the aiomqtt.Client context if open."""
+        if self._mqtt_client is not None:
+            try:
+                await self._mqtt_client.__aexit__(None, None, None)
+            except Exception:  # noqa: BLE001
+                pass
+            self._mqtt_client = None
+
+    async def _ensure_mqtt_connected(self) -> Any:
+        """Return the live persistent client.
+
+        Returns ``None`` if the client is not yet open (e.g. broker unreachable
+        during startup).  Callers are expected to handle ``None`` gracefully.
+        """
+        async with self._mqtt_client_lock:
+            return self._mqtt_client
 
     def _install_signal_handlers(self) -> None:
         """Register SIGINT / SIGTERM for graceful shutdown."""
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
 
         def _handle(signum: int, _: object) -> None:
             logger.info("Signal %s received — stopping EdgeWatcher", signum)
