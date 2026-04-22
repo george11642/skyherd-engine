@@ -1,3 +1,4 @@
+T25: stable — ruff clean, 1106 tests at 87.42% (80% passed), 16/16 demo PASSes (seed 42), HTTP 200. 2026-04-21.
 T24: stable — ruff clean, 1106 tests at 87.42% (80% passed), 16/16 demo PASSes (seed 42), HTTP 200. 2026-04-21.
 T23: stable — ruff clean, 1106 tests at 87.41% (80% passed), 16/16 demo PASSes (seed 42), HTTP 200. 2026-04-21.
 T22: stable — ruff clean, 1106 tests at 87.42% (80% passed), 16/16 demo PASSes (seed 42), HTTP 200. 2026-04-21.
