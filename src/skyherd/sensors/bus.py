@@ -18,6 +18,7 @@ import asyncio
 import json
 import logging
 import os
+from collections import deque
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from typing import TYPE_CHECKING, Any
@@ -36,6 +37,20 @@ _DEFAULT_MQTT_URL = f"mqtt://{_DEFAULT_BROKER_HOST}:{_DEFAULT_BROKER_PORT}"
 # Reconnect back-off: 1 s → 2 s → 4 s → 8 s → … capped at 30 s
 _BACKOFF_BASE_S = 1.0
 _BACKOFF_CAP_S = 30.0
+
+# Module-level in-memory ring buffer keyed by sensor kind.
+# Each deque holds the last 256 published payloads for that kind.
+_BUS_STATE: dict[str, deque[dict[str, Any]]] = {}
+
+
+def get_bus_state() -> dict[str, deque[dict[str, Any]]]:
+    """Return a live reference to the module-level sensor bus state.
+
+    The dict is keyed by sensor kind (e.g. ``"water.tank"``, ``"fence.breach"``).
+    Each value is a :class:`collections.deque` capped at 256 entries (newest last).
+    Callers that need a snapshot should copy: ``dict(get_bus_state())``.
+    """
+    return _BUS_STATE
 
 
 def _canonical_json(payload: dict[str, Any]) -> str:
@@ -155,8 +170,13 @@ class SensorBus:
         client = await self._ensure_connected()
         await client.publish(topic, payload=raw.encode(), qos=qos)
 
+        # Accumulate in module-level ring buffer for MCP sensor tool access.
+        kind = payload.get("kind", "sensor.reading")
+        if kind not in _BUS_STATE:
+            _BUS_STATE[kind] = deque(maxlen=256)
+        _BUS_STATE[kind].append(payload)
+
         if ledger is not None:
-            kind = payload.get("kind", "sensor.reading")
             # Mirror into ledger — synchronous call (SQLite is fast enough)
             ledger.append(source=topic, kind=kind, payload=payload)
 
