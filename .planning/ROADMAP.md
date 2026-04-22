@@ -67,7 +67,10 @@ Phase 3 (HYG) — fully parallel with 1, 2, 4 (no shared files)
   3. All 5 agents have at least one test assertion across the scenario suite proving they actually ran (`AgentDispatched ≥ 1` per agent).
   4. The SSE stream emits `rate_per_hr_usd: 0.0` and `all_idle: True` after N seconds of no routed events, demonstrating real idle-pause billing.
   5. `PredatorPatternLearner` retains context across sim-day boundaries within a scenario run (checkpoint persistence observable in session state).
-**Plans**: TBD
+**Plans**: 3 plans (2 waves)
+  - Wave 1: 01-01-PLAN — _DemoMesh session registry refactor (MA-01, MA-02, MA-03, ROUT-01)
+  - Wave 2: 01-02-PLAN — Routing table + PredatorPatternLearner dispatch verification (ROUT-02, ROUT-03, ROUT-04)
+  - Wave 2: 01-03-PLAN — Idle-pause aggregation + checkpoint round-trip tests (MA-04, MA-05)
 
 ### Phase 2: Vision Pixel Inference
 **Goal**: The pinkeye disease head performs real pixel-level inference on rendered PNG frames using an MIT/BSD-licensed backbone, sharing the `DiseaseHead` ABC with the other 6 rule-based heads.
@@ -135,7 +138,7 @@ Phase 3 (HYG) — fully parallel with 1, 2, 4 (no shared files)
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Agent Session Persistence & Routing | 0/TBD | Not started | - |
+| 1. Agent Session Persistence & Routing | 0/3 | Planned | - |
 | 2. Vision Pixel Inference | 0/TBD | Not started | - |
 | 3. Code Hygiene Sweep | 0/TBD | Not started | - |
 | 4. Build & Quickstart Health | 0/TBD | Not started | - |
