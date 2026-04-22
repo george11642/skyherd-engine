@@ -1,5 +1,46 @@
 # CLAUDE.md — Project Orientation
 
+## Reading Order (60-second orientation for new Claude sessions, contributors, and judges)
+
+1. `docs/ONE_PAGER.md` — what SkyHerd is in 500 words.
+2. `docs/ARCHITECTURE.md` — 5-layer nervous-system pattern + Skills-first + attestation chain.
+3. `docs/MANAGED_AGENTS.md` — why the 5-agent mesh wins the Managed Agents $5k.
+4. `PROGRESS.md` — live status + Sim Completeness Gate.
+5. `docs/HARDWARE_DEMO_RUNBOOK.md` — the 60-second hardware-only hero demo.
+6. `docs/verify-latest.md` — automated truth-check (regenerated every 30 min while the session is open).
+
+## Directory Map (high-level)
+
+- `src/skyherd/world/` — deterministic ranch simulator (seed=42 replays byte-identical).
+- `src/skyherd/sensors/` — MQTT bus + 7 sim sensor emitters.
+- `src/skyherd/agents/` — 5 Managed-Agents-compat mesh (FenceLineDispatcher, HerdHealthWatcher, PredatorPatternLearner, GrazingOptimizer, CalvingWatch).
+- `src/skyherd/mcp/` — drone/sensor/rancher/galileo MCP servers.
+- `src/skyherd/vision/` — scene renderer + 7 disease-detection heads.
+- `src/skyherd/drone/` — sitl / stub / mavic / f3_inav backends + shared safety guards.
+- `src/skyherd/edge/` — Pi 4 runtime (camera + detector + MQTT publisher + heartbeat).
+- `src/skyherd/attest/` — Ed25519 Merkle ledger (year-2 LRP underwriting artifact).
+- `src/skyherd/voice/` — Wes persona + TTS chain (ElevenLabs → piper → espeak → silent).
+- `src/skyherd/scenarios/` — 5 demo scenarios + cross-ranch variant.
+- `src/skyherd/server/` — FastAPI + SSE dashboard backend.
+- `src/skyherd/demo/` — hardware-only orchestrator (2 Pi + Mavic, no collar needed).
+- `web/` — Vite + React 19 + Tailwind v4 SPA + /rancher PWA.
+- `android/SkyHerdCompanion/` — Kotlin + DJI SDK V5 + MQTT companion.
+- `ios/SkyHerdCompanion/` — Swift + DJI SDK V5 + CocoaMQTT companion (XcodeGen).
+- `hardware/collar/` — optional DIY LoRa collar (PlatformIO firmware + 3D print + BOM).
+- `skills/` — 33-file ranch domain knowledge library (CrossBeam pattern).
+- `worlds/` — ranch YAML configs (ranch_a, ranch_b).
+- `docs/` — ARCHITECTURE, MANAGED_AGENTS, ONE_PAGER (+ PDF), HARDWARE_*, REPLAY_LOG, CROSS_RANCH_MESH, verify-latest.
+- `tests/` — 880+ tests, 80%+ coverage target.
+
+## Build commands
+
+- `make demo SEED=42 SCENARIO=all` — runs all 5 sim scenarios back-to-back, byte-identical across runs.
+- `make dashboard` — FastAPI + SSE + built SPA at `http://localhost:8000/`.
+- `make hardware-demo` — 60-second Pi + Mavic hero + sick-cow combo.
+- `make mesh-smoke` — 5-agent mesh smoke test (stubs SDK if no ANTHROPIC_API_KEY).
+- `make test` — full pytest suite with coverage.
+- `make ci` — lint + typecheck + test (what GitHub Actions runs).
+
 ## Judge Quickstart (3 commands)
 
 ```bash
@@ -8,8 +49,6 @@ uv sync && (cd web && pnpm install && pnpm run build)
 make demo SEED=42 SCENARIO=all         # 5 scenarios, deterministic replay
 make dashboard                          # http://localhost:8000
 ```
-
-Read in order: docs/ONE_PAGER.md → docs/ARCHITECTURE.md → docs/MANAGED_AGENTS.md.
 
 ---
 
@@ -36,10 +75,6 @@ SkyHerd is the "operating system for remote land assets" — a 5-layer nervous s
 - **Skills-first architecture.** Domain knowledge goes in `skills/*.md`, not in long agent system prompts. This is the CrossBeam $50k winner pattern.
 - **No Claude/Anthropic attribution in commits.** Global git config disables it.
 
-## What's in this repo right now
-
-Empty directory skeleton + README + LICENSE + .gitignore + this orientation. The fresh Claude session picking this up builds the MVP from here.
-
 ## The 5 demo scenarios to make playable
 
 1. **Coyote at fence** — FenceLineDispatcher → SITL drone → deterrent → Wes voice call
@@ -62,17 +97,18 @@ All share a `page_rancher(urgency, context)` tool → Twilio SMS or voice call v
 
 ## Sim Completeness Gate (from plan)
 
-No hardware touches the repo until all of these are green. **Target: Fri Apr 24 noon.**
+All 10 items are TRULY-GREEN as of Apr 22 2026 (see `docs/verify-latest.md`).
 
-- [ ] All 5 Managed Agents live and cross-talking via shared MQTT
-- [ ] All 7+ sim sensors emitting (water / trough cam / thermal / fence motion / collar GPS+IMU / acoustic emitter / weather)
-- [ ] Disease-detection heads running on synthetic frames (pinkeye / screwworm / foot rot / BRD / LSD / heat stress / BCS)
-- [ ] ArduPilot SITL drone executing real MAVLink missions from agent tool calls
-- [ ] Dashboard: ranch map + 5 agent log lanes + cost ticker + attestation panel + rancher phone PWA
-- [ ] Wes voice end-to-end: Twilio → ElevenLabs → cowboy persona lands
-- [ ] 5 scenarios playable back-to-back without intervention
-- [ ] Deterministic replay (`make sim SEED=42`)
-- [ ] Fresh-clone `make sim` boots on a second machine
+- [x] All 5 Managed Agents live and cross-talking via shared MQTT
+- [x] All 7+ sim sensors emitting (water / trough cam / thermal / fence motion / collar GPS+IMU / acoustic emitter / weather)
+- [x] Disease-detection heads running on synthetic frames (pinkeye / screwworm / foot rot / BRD / LSD / heat stress / BCS)
+- [x] ArduPilot SITL drone executing real MAVLink missions from agent tool calls
+- [x] Dashboard: ranch map + 5 agent log lanes + cost ticker + attestation panel + rancher phone PWA
+- [x] Wes voice end-to-end: Twilio → ElevenLabs → cowboy persona lands
+- [x] 5 scenarios playable back-to-back without intervention
+- [x] Deterministic replay (`make sim SEED=42`)
+- [x] Fresh-clone `make sim` boots on a second machine
+- [x] Cost ticker visibly pauses during idle stretches
 
 ## Stack decisions (from plan)
 
@@ -82,7 +118,7 @@ No hardware touches the repo until all of these are green. **Target: Fri Apr 24 
 - **ChirpStack** (LoRaWAN) + **Mosquitto** (MQTT broker)
 - **ArduPilot SITL + MAVSDK-Python** for drone (Tier 1 baseline)
 - **MegaDetector V6** for vision (MIT, NOT Ultralytics AGPL trap)
-- **Next.js + shadcn/Tailwind** for dashboard (CrossBeam aesthetic)
+- **Vite + React 19 + Tailwind v4** for dashboard
 - **Twilio + ElevenLabs** for Wes voice
 - **SQLite + Ed25519** for attestation chain (not blockchain — keep serious)
 
