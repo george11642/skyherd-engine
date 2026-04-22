@@ -2,17 +2,17 @@
 
 > Fresh Claude sessions read this **after CLAUDE.md**. Update atomically with every commit.
 
-**Last updated**: 2026-04-21 (H3 drone software-ready — Mavic + F3/iNav backends + Android companion)
+**Last updated**: 2026-04-21 (H1 edge software-ready — Pi camera + MegaDetector + bus-compatible MQTT + systemd + runbook)
 **Plan**: v5.1 at `/home/george/.claude/plans/update-ur-memory-project-context-splendid-swan.md`
 **Submission**: due 2026-04-26 8pm EST
 **External blockers**: see [GitHub Issues](https://github.com/george11642/skyherd-engine/issues)
 
 ## Summary
 
-- Green / Total: **70 / 80**
+- Green / Total: **71 / 80**
 - Tier MVP status: 🟡 agents layer complete
 - Sim Completeness Gate: 🟡 9/10 (fresh-clone boot now green; only SITL/voice/dashboard-dist remain)
-- Hardware tiers: 🟡 H3 software-ready (awaits flash/install); H4 software-ready (awaits parts); Two-Pi-4 fleet software-ready; iOS + Android companion software-ready
+- Hardware tiers: 🟡 H1 software-ready (awaits Pi); H3 software-ready (awaits flash/install); H4 software-ready (awaits parts); Two-Pi-4 fleet software-ready; iOS + Android companion software-ready
 
 ---
 
@@ -119,7 +119,7 @@
 
 ## Hardware tiers (5 — all stretch, sequential, only after Gate passes)
 
-- [ ] **H1** — One live sensor on MQTT bus (~2hr)
+- [x] **H1** — One live sensor on MQTT bus (software ready — awaits Pi hardware)
 - [ ] **H2** — One Managed Agent consuming real sensor (~2hr after H1)
 - [x] **H3** — One drone under agent command (software ready — awaits flash/install)
 - [x] **H4** — DIY LoRa GPS collar node (software ready — awaits parts)
