@@ -2,14 +2,14 @@
 
 > Fresh Claude sessions read this **after CLAUDE.md**. Update atomically with every commit.
 
-**Last updated**: 2026-04-21 (Production hardening green — security review, dep pinning, CI matrix, observability, perf baseline)
+**Last updated**: 2026-04-21 (ruff clean + coverage ≥80% — server/voice/world/demo CLIs covered, vision env guards)
 **Plan**: v5.1 at `/home/george/.claude/plans/update-ur-memory-project-context-splendid-swan.md`
 **Submission**: due 2026-04-26 8pm EST
 **External blockers**: see [GitHub Issues](https://github.com/george11642/skyherd-engine/issues)
 
 ## Summary
 
-- Green / Total: **83 / 91**
+- Green / Total: **84 / 92**
 - Tier MVP status: 🟡 agents layer complete
 - Sim Completeness Gate: 🟢 10/10 TRULY-GREEN (all items verified by execution — see docs/verify-latest.md)
 - Hardware tiers: 🟡 H1 software-ready (awaits Pi); H3 software-ready (awaits flash/install); H4 software-ready (awaits parts); Two-Pi-4 fleet software-ready; iOS + Android companion software-ready
@@ -27,6 +27,7 @@
 - [x] World sim core green (48 tests, 97% coverage, 0 pyright errors)
 - [x] MCP servers (drone/sensor/rancher/galileo) — 75 tests, ruff+pyright clean
 - [x] Dashboard + /rancher PWA (FastAPI SSE server + Vite React 19 Tailwind v4, 57 new tests)
+- [x] Coverage ≥80% across skyherd.* (83% total — server/voice/world/demo CLIs covered)
 
 ## Sim Completeness Gate (10 — target Fri Apr 24 noon)
 
