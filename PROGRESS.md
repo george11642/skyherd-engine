@@ -2,14 +2,14 @@
 
 > Fresh Claude sessions read this **after CLAUDE.md**. Update atomically with every commit.
 
-**Last updated**: 2026-04-22 (Vercel deploy live — replay-mode SPA at https://skyherd-engine.vercel.app)
+**Last updated**: 2026-04-21 (Production hardening green — security review, dep pinning, CI matrix, observability, perf baseline)
 **Plan**: v5.1 at `/home/george/.claude/plans/update-ur-memory-project-context-splendid-swan.md`
 **Submission**: due 2026-04-26 8pm EST
 **External blockers**: see [GitHub Issues](https://github.com/george11642/skyherd-engine/issues)
 
 ## Summary
 
-- Green / Total: **78 / 86**
+- Green / Total: **83 / 91**
 - Tier MVP status: 🟡 agents layer complete
 - Sim Completeness Gate: 🟢 10/10 TRULY-GREEN (all items verified by execution — see docs/verify-latest.md)
 - Hardware tiers: 🟡 H1 software-ready (awaits Pi); H3 software-ready (awaits flash/install); H4 software-ready (awaits parts); Two-Pi-4 fleet software-ready; iOS + Android companion software-ready
