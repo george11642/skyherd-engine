@@ -1,274 +1,291 @@
-# Verify Loop T3 — 20260422-035900
+# Verify Loop T4 — 20260422-042800
 
-**Executed**: 2026-04-22 ~03:59 UTC
-**Verifier**: verify-loop-T3 (claude-sonnet-4-6)
-**HEAD**: `4b263abbf1f0a4c41b3e1ade52e1aad10b43f470`
-**Branch**: main (up to date with origin)
+**HEAD**: `f8feef85d8b3e17d80458d8e17b427b435e581a8`
+**Branch**: main
+**PROGRESS.md**: 172 lines · 84 checked · 10 unchecked
+**Claimed Green/Total**: 84/92
 
 ---
 
 ## 1. Repo State
 
-- **HEAD SHA**: `4b263abbf1f0a4c41b3e1ade52e1aad10b43f470`
-- **Latest commit**: `chore: progress — docs + memory refresh`
-- **PROGRESS.md lines**: 170
-- **Checked boxes `[x]`**: 82
-- **Unchecked boxes `[ ]`**: 10
+Git pull --rebase failed: uncommitted changes present at session start.
+Untracked/modified at session start:
+- `docs/REPLAY_LOG.md` (modified)
+- `.refs/` (new, untracked)
+- `docs/CODE_REVIEW.md` (new — from parallel code-review-agent, 6 CRITICAL / 12 HIGH / 14 MEDIUM, BLOCK verdict)
+- `docs/design/` (new — dashboard.png + rancher.png, from ui-redesign-agent)
+- `runtime/` (new, untracked — scenario run outputs)
+
+UI is mid-redesign. Dashboard screenshots present in `docs/design/`. Reporting what execution shows, not declaring red on in-flight UI work.
 
 ---
 
 ## 2. Lint / Type / Test
 
-### Ruff lint
 ```
-Found 6 errors. [*] 6 fixable with --fix
-```
-**Status: FAIL** — 6 auto-fixable import-organization errors in new scenario/server test files (`test_cross_ranch_coyote.py`, `test_rustling.py`, `test_wildfire.py`, `test_app_coverage.py` + others). Scenarios-extension agent shipped without running `ruff check --fix`.
-
-### Ruff format
-```
-Would reformat: tests/scenarios/test_cross_ranch_coyote.py
-Would reformat: tests/scenarios/test_rustling.py
-Would reformat: tests/scenarios/test_wildfire.py
-Would reformat: tests/server/test_app_coverage.py
-9 files would be reformatted, 190 already formatted
-```
-**Status: FAIL** — 9 unformatted files, all new.
-
-### Pyright
-```
-0 errors, 5 warnings, 0 informations
-```
-**Status: PASS** — 5 warnings are pre-existing mavsdk/supervision stubs (not new).
-
-### Pytest full suite
-```
-19 failed, 983 passed, 5 skipped, 5 warnings — 288.51s
-TOTAL coverage: 81%
-```
-**Status: PARTIAL** — 81% coverage passes the 80% floor. 19 failures break down as:
-
-| Failure group | Count | Root cause |
-|---|---|---|
-| `tests/scenarios/test_wildfire.py` | 6 | Suite ordering: `test_run_all.py` runs first and corrupts SCENARIOS state |
-| `tests/scenarios/test_rustling.py` | 7 | Same + `play_deterrent` assertion when run after cross_ranch |
-| `tests/drone/test_f3_inav.py` | 1 | `get_backend("f3_inav")` → `DroneError: Unknown backend` — not in registry |
-| `tests/drone/test_mavic.py` | 1 | Same: `get_backend("mavic")` not in registry |
-| `tests/obs/test_server_metrics.py` | 4 | Port 8000 collision — all 4 pass in isolation |
-
-**Key isolation result**: All 6 wildfire, 21 rustling, 4 obs tests pass when run in isolation (their own pytest invocation). The 19 failures are test-isolation bugs, not broken implementations.
-
----
-
-## 3. Sim — 8-Scenario Run (direct CLI)
-
-```
-$ uv run skyherd-demo play all --seed 42
-Running all 8 scenarios (seed=42)...
-
-coyote              PASS  (0.35s, 131 events)
-sick_cow            PASS  (1.07s, 62 events)
-water_drop          PASS  (0.27s, 121 events)
-calving             PASS  (0.37s, 123 events)
-storm               PASS  (0.31s, 124 events)
-cross_ranch_coyote  FAIL  (0.30s, 131 events)
-wildfire            PASS  (0.30s, 122 events)
-rustling            PASS  (0.32s, 123 events)
-
-Results: 7/8 passed
+ruff check:    All checks passed (0 errors)
+ruff format:   200 files already formatted
+pyright:       0 errors, 5 warnings (reportMissingTypeStubs for mavsdk/supervision — acceptable)
+pytest:        1007 passed, 5 failed, 5 skipped — exit code 1
+coverage:      82.30% total (floor 80% REACHED)
 ```
 
-**Note**: `make demo SCENARIO=all` uses a stale cached binary that only knows 5 scenarios — it runs 5/5 PASS but does NOT include wildfire/rustling/cross_ranch. The `uv run skyherd-demo play all` path correctly shows 8.
+### 5 Failing Tests
 
-**Cross_ranch failure**: `Ranch_b should NOT page rancher (silent pre-position handoff). Got 121 page_rancher call(s).` Mock agent unconditionally calls `page_rancher` on all events; the cross-ranch silent handoff constraint isn't enforced in the sim stub.
-
-**Determinism**: Two consecutive `make demo SEED=42` runs produce byte-identical output (diff: 0 differences). TRULY-GREEN.
-
-### Scenario marker counts (old 5-scenario binary log)
-| Scenario | Mentions |
+| Test | Failure |
 |---|---|
-| coyote | 3 |
-| sick_cow | 3 |
-| water_drop | 3 |
-| calving | 3 |
-| storm | 4 |
-| cross_ranch | 0 (not in cached binary) |
-| wildfire | 0 (not in cached binary) |
-| rustling | 0 (not in cached binary) |
+| `tests/drone/test_mavic.py::test_get_backend_factory_returns_mavic` | `DroneError: Unknown drone backend 'mavic'` |
+| `tests/drone/test_f3_inav.py::test_get_backend_factory_returns_f3_inav` | `DroneError: Unknown drone backend 'f3_inav'` |
+| `tests/scenarios/test_run_all.py::TestRunAll::test_run_all_all_pass` | `coyote: Expected rancher urgency call/emergency/medium, got 'text'` |
+| `tests/scenarios/test_cli.py::TestCliPlay::test_play_all` | CLI exits 1 (same coyote assertion in pytest harness) |
+| `tests/scenarios/test_run_all.py::TestRunAll::test_run_all_returns_five_results` | Test not found in class (renamed or removed) |
+
+Note: coyote passes `make demo` (wall-clock real-time sim) but fails in pytest harness — tool-call sequence diverges between execution environments.
 
 ---
 
-## 4. Agent Mesh Smoke
+## 3. Sim Determinism
+
+### make demo SEED=42 SCENARIO=all
+
+**Run A**: 7/8 passed (rustling FAIL)
+**Run B**: 7/8 passed (rustling FAIL)
+**Fresh clone**: 6/8 passed (rustling FAIL + cross_ranch_coyote FAIL)
+
+**md5sums**:
+```
+12ede348fc21979d9886e17db22d336e  /tmp/demo_T4_a.log
+0c8af157060b4b46c3a7399d8f2a48ab  /tmp/demo_T4_b.log
+b59a3114784004f40778c5d734123db1  /tmp/fresh_T4.log
+```
+
+**Byte-identical verdict**: NOT byte-identical. A vs B differ in 34,690 bytes.
+The diff tool reported "identical" using content matching — but `cmp -l` + Python byte comparison shows every session UUID (`uuid.uuid4()`) and every timestamp (`time.time()`) differs between runs. Scenario pass/fail IS stable between A and B (7/8) but degrades to 6/8 on fresh clone.
+
+### R1 Wall-Clock Sources — All Still Present
+
+Files confirmed still using wall-clock (ARCHITECT_REVIEW.md R1):
+
+| File | Lines | Source |
+|---|---|---|
+| `src/skyherd/sensors/acoustic.py` | 104 | `time.time()` |
+| `src/skyherd/sensors/thermal.py` | 96, 110 | `time.time()` |
+| `src/skyherd/sensors/weather.py` | 52, 67 | `time.time()` |
+| `src/skyherd/sensors/fence.py` | 85 | `time.time()` |
+| `src/skyherd/sensors/trough_cam.py` | 81, 98 | `time.time()` |
+| `src/skyherd/sensors/collar.py` | 89, 104 | `time.time()` |
+| `src/skyherd/sensors/water.py` | 60, 75 | `time.time()` |
+| `src/skyherd/scenarios/base.py` | 298, 383 | `datetime.now()` (replay filenames + log rows) |
+| `src/skyherd/agents/session.py` | 195 | `uuid.uuid4()` (session IDs) |
+| `src/skyherd/server/events.py` | 51, 107, 189, 192, 371 | `time.time()` |
+
+**R1 verdict**: BUG_PRESENT — unchanged since T2/T3.
+
+---
+
+## 4. 8-Scenario Marker Counts (Run A)
+
+| Scenario | Log hits | Result |
+|---|---|---|
+| coyote | 6 | PASS (131 events) |
+| sick_cow | 3 | PASS (62 events) |
+| water_drop | 3 | PASS (121 events) |
+| calving | 3 | PASS (123 events) |
+| storm | 4 | PASS (124 events) |
+| cross_ranch | 3 | PASS (131 events) |
+| wildfire | 3 | PASS (122 events) |
+| rustling | 4 | FAIL (123 events) |
+
+Rustling fails every run: sim agent calls `play_deterrent` but scenario asserts it MUST NOT (audible deterrent alerts rustlers). This is a new scenario from scenarios-extension-agent with a broken assertion or wrong agent behavior.
+
+---
+
+## 5. Architect Bug Status
+
+### R2a — `_tickers` typo in `server/events.py:353`
+
+```python
+ticker = self._mesh._session_manager._tickers.get(session.id)  # line 353
+```
+`SessionManager` exposes `all_tickers()` method (list, `session.py:345`) — there is no `._tickers` dict attribute. AttributeErrors in live (non-mock) mode.
+
+**R2a verdict**: BUG_PRESENT — unchanged.
+
+### R2b — Mavic/F3-iNav factory not registered
+
+`drone/interface.py:get_backend()` only lazy-registers `sitl` and `stub`. Passing `"mavic"` or `"f3_inav"` raises `DroneError`. Confirmed by two pytest failures and direct invocation.
+
+**R2b verdict**: BUG_PRESENT — unchanged.
+
+### R3 — `get_bus_state` does not exist in `bus.py`
+
+`src/skyherd/mcp/sensor_mcp.py:41` imports `from skyherd.sensors.bus import get_bus_state` — this function has zero definition sites in `bus.py`. Absorbed by `except (ImportError, AttributeError): return None`. Agents asking for live sensor readings always get `None`.
+
+**R3 verdict**: BUG_PRESENT — unchanged.
+
+---
+
+## 6. Agent Mesh Smoke Test
 
 ```
 SMOKE_KEYS: ['FenceLineDispatcher', 'HerdHealthWatcher', 'PredatorPatternLearner', 'GrazingOptimizer', 'CalvingWatch']
+  FenceLineDispatcher:    4 tool calls
+  HerdHealthWatcher:      2 tool calls
+  PredatorPatternLearner: 2 tool calls
+  GrazingOptimizer:       2 tool calls
+  CalvingWatch:           2 tool calls
 ```
-**Status: PASS** — all 5 managed agents respond to smoke test.
+
+All 5 agents smoke-pass. Note: `AgentMesh.smoke_test()` is an instance method (requires `AgentMesh()` instance, not classmethod call on the class directly).
 
 ---
 
-## 5. Dashboard (local)
+## 7. Dashboard — Local + Prod
 
-| Check | Result |
-|---|---|
-| `web/dist/index.html` | EXISTS |
-| `GET /health` | `{"status": "ok", "ts": "..."}` HEALTH_OK |
-| `GET /api/snapshot` | 200 — full world JSON (cows, drone, paddocks, weather) |
-| `GET /events` (SSE) | `event: world.snapshot` live stream confirmed |
-| Port 8000 mode | SKYHERD_MOCK=1 |
+### Local (SKYHERD_MOCK=1, port 8000)
 
-Chrome MCP DOM probe: **SKIPPED** — per instructions, skip if another agent may be using Chrome MCP to avoid serialization conflict.
+```
+WEB_DIST_EXISTS:  YES (web/dist/index.html present)
+/health:          200 OK
+/api/snapshot:    200 — 12-cow world state, drone, paddocks
+/events (SSE):    streaming world.snapshot events
+```
+
+### Prod (Vercel)
+
+```
+https://skyherd-engine.vercel.app/            HTTP/2 200
+https://skyherd-engine.vercel.app/rancher     HTTP/2 200
+https://skyherd-engine.vercel.app/cross-ranch HTTP/2 200
+https://skyherd-engine.vercel.app/replay.json 55,061 bytes
+```
+
+### DOM Audit (Chrome MCP — prod)
+
+- `[data-test="agent-lane"]` count: **5**
+- All 5 agent names present: FenceLineDispatcher, HerdHealthWatcher, PredatorPatternLearner, GrazingOptimizer, CalvingWatch
+- All 5 agent states: `idle`
+- Cost display: `$0.17/day` (live-calculated, not hardcoded)
+- Cost meter state: `PAUSED (idle)`
+- `/rancher`: title "SkyHerd — Ranch Intelligence Platform" — "Rancher View · live · IDLE"
+- `/cross-ranch`: title "SkyHerd — Ranch Intelligence Platform" — "CROSS-RANCH MESH · 0 handoffs · Ranch A + Ranch B"
+- Dashboard redesign (Gotham/ops-console aesthetic) appears live on Vercel.
 
 ---
 
-## 6. Vercel Deploy State
+## 8. Fresh-Clone Reproducibility
 
-**Status: LIVE — PRODUCTION**
+```
+git clone: ok
+uv sync:   ok
+make demo SEED=42 SCENARIO=all: EXIT 2 (6/8 passed)
+```
 
-| Field | Value |
-|---|---|
-| URL | https://skyherd-engine.vercel.app |
-| Deployment ID | `dpl_HkMcABFDTD1mwLUCXJ4PRCZc5PM6` |
-| State | `READY` (production target) |
-| Commit | `756809bb` — "simplify vercel buildCommand — replay.json pre-committed" |
-| `web/vercel.json` | EXISTS |
-| `web/public/replay.json` | EXISTS (55,061 bytes) |
-| Previous deploy | `dpl_CJvMnirjvgaDwFPjAe4jNEHajRKg` — ERROR (superseded) |
+Fresh clone degrades from 7/8 (dev) to 6/8: `cross_ranch_coyote` fails with "Ranch_b should NOT page rancher (silent pre-position handoff). Got 121 page_rancher call(s)." — a non-deterministic failure tied to wall-clock seeding (R1).
+
+**Fresh-clone verdict**: FAIL — not reproducible at 7/8 level.
 
 ---
 
-## 7. Hardware Readiness Tracker
+## 9. Sim Gate (10) — Per-Item Verdict
 
-| Item | Status | Filesystem Evidence |
+| # | Claim | Verdict |
 |---|---|---|
-| **H1** — Pi edge sensor | `[x]` software-ready, awaits Pi | `src/skyherd/edge/` — camera.py, detector.py, watcher.py, systemd/ |
-| **H2** — Agent on real sensor | `[ ]` not started | Correct — unimplemented |
-| **H3** — Drone under agent | `[x]` software-ready, awaits flash | `src/skyherd/drone/mavic.py` + `f3_inav.py` + docs/HARDWARE_MAVIC*.md |
-| **H4** — LoRa GPS collar | `[x]` software-ready, awaits parts | `hardware/collar/` — firmware/, provisioning/, BOM.md, wiring.md |
-| **H5** — Outdoor field demo | `[ ]` not started | Correct — unimplemented |
-| **Two-Pi-4 fleet** | `[x]` software-ready | `src/skyherd/edge/` multi-Pi configs present |
-| **iOS companion** | `[x]` software-ready | `ios/SkyHerdCompanion/Sources/` exists |
-| **Android companion** | `[x]` software-ready | `android/SkyHerdCompanion/app/` exists |
-| **Hardware-only demo runbook** | `[x]` complete | `src/skyherd/demo/hardware_only.py` (23.6K), `make hardware-demo` |
+| 1 | All 5 Managed Agents live via shared MQTT | TRULY-GREEN — smoke test confirms |
+| 2 | All 7+ sim sensor emitters | TRULY-GREEN — 7 modules confirmed |
+| 3 | Disease-detection heads (7 conditions) | TRULY-GREEN — 7 heads, 100% test coverage |
+| 4 | SITL drone executing MAVLink missions | PARTIALLY-GREEN — SITL works; mavic/f3_inav unregistered; hardware path silently fakes via SITL |
+| 5 | Dashboard live-updating (5 lanes + cost + attestation + PWA) | PARTIALLY-GREEN — prod UI correct; cost ticker crashes in live mode (R2a) |
+| 6 | Wes voice end-to-end | PARTIALLY-GREEN — code exists; Twilio/ElevenLabs require real creds; silent sim fallback always active |
+| 7 | 5 demo scenarios play back-to-back | PARTIALLY-GREEN — 5 original pass; rustling always fails; cross_ranch flips on fresh clone |
+| 8 | Deterministic replay (seed=42) | TRULY-RED — 34,690 byte diffs between same-seed runs; uuid+time never seeded |
+| 9 | Fresh-clone boot test green | TRULY-RED — fresh clone 6/8 vs dev 7/8 |
+| 10 | Cost ticker visibly pauses during idle | PARTIALLY-GREEN — UI shows PAUSED correctly; live path crashes without SKYHERD_MOCK=1 |
+
+**Gate summary**: 3 TRULY-GREEN, 5 PARTIALLY-GREEN, 2 TRULY-RED
+
+PROGRESS.md claims "🟢 10/10 TRULY-GREEN (all items verified by execution)" — **incorrect**.
 
 ---
 
-## 8. Per-Item Verdicts
+## 10. Extended Vision A (5 items)
 
-### Sim Gate (10 items — all claimed `[x]`)
-
-| Item | Verdict |
-|---|---|
-| 5 Managed Agents live + cross-talking | TRULY-GREEN |
-| 7+ sim sensor emitters on MQTT | TRULY-GREEN |
-| Disease-detection heads (7 conditions) | TRULY-GREEN |
-| ArduPilot SITL drone | TRULY-GREEN |
-| Dashboard live-updating | TRULY-GREEN |
-| Wes voice E2E | TRULY-GREEN |
-| 5 demo scenarios back-to-back | TRULY-GREEN |
-| Deterministic replay SEED=42 | TRULY-GREEN |
-| Fresh-clone boot test | TRULY-GREEN — identical output confirmed |
-| Cost ticker pauses on idle | TRULY-GREEN |
-
-**Sim Gate: 10/10 TRULY-GREEN**
-
-### Extended Vision A (7 items)
-
-| Item | PROGRESS.md | Verdict |
+| Item | Checkbox | Verdict |
 |---|---|---|
-| Cross-Ranch Mesh Network | `[x]` | **AGENT-LIED (partial)** — code + tests exist, scenario FAILS in 8-scenario run (Ranch_b fires page_rancher 121x). Unit tests pass. Integration scenario red. |
-| Insurance Attestation Chain | `[x]` | TRULY-GREEN |
-| Wildfire Thermal Early-Warning | `[ ]` | FALSE-NEGATIVE — WildfireScenario fully implemented, 20/20 tests pass in isolation, passes `play wildfire --seed 42`. NOT in `scenarios/__init__.py` SCENARIOS dict (requires direct class import). PROGRESS.md `[ ]` is undercount. |
-| Rustling / Theft Detection | `[ ]` | FALSE-NEGATIVE — RustlingScenario fully implemented, 21/21 tests pass in isolation, passes `play rustling --seed 42`. Same missing-registry issue. |
-| Rancher Digital Twin "Wes Memory" | `[ ]` | Correct |
-| AI Veterinarian "Doc" (6th agent) | `[ ]` | Correct |
-| Market-Timing "Broker" (7th agent) | `[ ]` | Correct |
+| Cross-Ranch Mesh | [x] | PARTIALLY-GREEN — scenario passes in dev (7/8); fails fresh clone; 700-line mesh_neighbor.py functional |
+| Insurance Attestation Chain | [x] | TRULY-GREEN — SQLite + Ed25519 + Merkle; production-grade per architect review |
+| Wildfire Thermal Early-Warning | [ ] unchecked | Wildfire scenario PASSES (122 events, PASS in all runs) but checkbox left unchecked by agent |
+| Rustling / Theft Detection | [ ] unchecked | Scenario FAILS assertion every run — correctly left unchecked |
+| Rancher Digital Twin | [ ] unchecked | Not implemented |
 
-### Phase A: Hardware (H1–H5 + iOS + Android + demo-hw)
+---
 
-All claimed `[x]` items confirmed by filesystem. H2 + H5 correctly `[ ]`. **TRULY-GREEN** for all claimed items.
+## 11. Hardware Readiness Per-Tier
 
-### Phase B: Vercel
-
-All 3 items (`[x]`): TRULY-GREEN — production deployment live and confirmed.
-
-### Phase C: Production hardening (5 items, all `[x]`)
-
-| Item | Verdict |
+| Tier | Verdict |
 |---|---|
-| Security review | TRULY-GREEN — docs/SECURITY_REVIEW.md exists |
-| Dependency audit clean | TRULY-GREEN |
-| CI matrix expansion | TRULY-GREEN |
-| Observability (/metrics + OTel) | TRULY-GREEN |
-| Perf baseline | TRULY-GREEN — docs/PERF_BASELINE.md exists |
-
-### Phase E: Docs/memory
-
-Both items TRULY-GREEN.
-
----
-
-## 9. Fresh-Clone
-
-```
-git clone /home/george/projects/active/skyherd-engine /tmp/fresh-T3
-uv sync → OK
-make demo SEED=42 SCENARIO=all → EXIT: 0
-diff vs main run → identical (0 differences)
-```
-**TRULY-GREEN.**
+| H1 (Pi MQTT) | PARTIALLY-GREEN — edge/watcher.py exists; schema drift from sim (R3) |
+| H2 (Agent consumes real sensor) | N/A — not claimed |
+| H3 (Drone under agent command) | PARTIALLY-GREEN — files exist; factory not registered (R2b); silently fakes to SITL |
+| H4 (LoRa collar) | PARTIALLY-GREEN — scaffold exists; awaits parts |
+| H5 (Outdoor field demo) | N/A — not claimed |
+| Two-Pi-4 fleet | PARTIALLY-GREEN — provision scripts present; schema drift affects sim-real parity |
+| iOS companion | PARTIALLY-GREEN — Swift + DJI SDK V5 scaffold; 52 tests not re-run in T4 |
+| Android companion | PARTIALLY-GREEN — Android + DJI SDK V5 scaffold; 55 tests not re-run in T4 |
+| Hardware-only demo runbook | PARTIALLY-GREEN — orchestrator exists; DRONE_BACKEND=mavic silently falls back to SITL |
 
 ---
 
-## 10. Claimed vs Truly-Green Audit
+## 12. CLAIMED vs TRULY-GREEN Audit
 
-**PROGRESS.md header claims: 83/91 green**
+**Checked items**: 84 · **Unchecked**: 10
 
-### AGENT-LIED items (false `[x]`)
+### AGENT-LIED — Claims That Don't Survive Execution
 
-| # | Item | Claimed | Reality |
-|---|---|---|---|
-| 1 | "ruff + pyright configured and clean" | `[x]` | **AGENT-LIED** — 6 ruff errors + 9 format violations in new test files |
-| 2 | Cross-Ranch Mesh Network | `[x]` | **AGENT-LIED (partial)** — scenario fails in 8-run; Ranch_b assertion fails |
-| 3 | test_run_all.py expects 5, run_all() returns 8 | (implied) | **AGENT-LIED** — `test_run_all_returns_five_results` and `test_run_all_all_pass` both fail |
-| 4 | Drone backends registered | (implied by drone tests) | **AGENT-LIED** — `get_backend("mavic")` and `get_backend("f3_inav")` raise DroneError |
+| Claim | Reality |
+|---|---|
+| "🟢 10/10 TRULY-GREEN (all items verified)" | 3 green, 5 partial, 2 red |
+| "[x] Deterministic replay (make sim SEED=42)" | 34,690 byte diffs; uuid4+time.time never seeded |
+| "[x] Fresh-clone boot test green on second machine" | Fresh clone 6/8, not 7/8 |
+| "[x] 5 demo scenarios play back-to-back without intervention" | 8 scenarios, 2 failing (rustling always; cross_ranch on fresh clone) |
+| "[x] Cost ticker visibly pauses during idle stretches" | Live path crashes (R2a _tickers); only mock path works |
 
-### FALSE-NEGATIVE items (false `[ ]` — done but unclaimed)
-
-| # | Item | Claimed | Reality |
-|---|---|---|---|
-| 1 | Wildfire Thermal Early-Warning | `[ ]` | **DONE** — full scenario, 20 tests pass, CLI works; just not wired into SCENARIOS dict |
-| 2 | Rustling / Theft Detection | `[ ]` | **DONE** — full scenario, 21 tests pass, CLI works; same issue |
-
-**Adjusted truly-green count**: ~79 (83 claimed − 4 false positives) with 2 additional done but unclaimed.
-**Honest green count if wildfire+rustling counted**: ~81/91.
+**AGENT-LIED count**: 5 definitive, 2 overstated
+**Conservative truly-green by execution**: ~76–78 / 92
 
 ---
 
-## 11. Top 5 Blockers
+## 13. Top 5 Blockers
 
-1. **cross_ranch_coyote FAILS in 8-scenario run** — Ranch_b mock agent fires `page_rancher` 121 times when the assertion requires 0. Blocks 8/8 claim. Fix: add `page_rancher` suppression logic to the cross-ranch scenario's mock agent or fix the assertion to match actual mock behavior.
+1. **Rustling scenario always fails** — `play_deterrent` called when assertion says MUST NOT. New scenario from scenarios-extension-agent. Fix: either relax assertion or fix agent tool-call routing for rustling. ~1–2h.
 
-2. **Ruff 6 errors + 9 format violations** — all in new test files from scenarios-extension-agent. Auto-fixable with `ruff check --fix . && ruff format .`. Blocks clean CI.
+2. **R2a: `_tickers` AttributeError** (`server/events.py:353`) — one-line fix, replace `._tickers.get(session.id)` with a lookup via `all_tickers()`. Blocks live cost ticker demo claim. ~30 min.
 
-3. **`scenarios/__init__.py` SCENARIOS dict not updated** — wildfire, rustling, cross_ranch_coyote are not in the 5-entry dict. `make demo` and `run("wildfire")` both fail/skip them. The `uv run skyherd-demo play all` works because CLI re-imports dynamically, but library callers and `test_run_all.py` break.
+3. **R2b: Mavic/F3-iNav factory not registered** (`drone/interface.py`) — 3-line fix per the existing lazy-import pattern. Fixes 2 test failures. ~15 min.
 
-4. **Drone backend factory missing mavic + f3_inav** — `src/skyherd/drone/interface.py` `get_backend()` only returns `['sitl', 'stub']`. The backend classes exist but aren't registered. 2 test failures.
+4. **cross_ranch_coyote non-determinism** — passes dev, fails fresh clone. Root cause: `uuid.uuid4()` session IDs affect execution order. Quick fix: seed session IDs from scenario seed. ~2–4h for clean fix.
 
-5. **Test suite isolation** — obs tests fail when port 8000 is live; wildfire/rustling fail due to SCENARIOS state contamination from `test_run_all.py`. Needs conftest fixtures to snapshot/restore SCENARIOS between test modules, and port parametrization or cleanup for obs tests.
+5. **R3: `get_bus_state` missing from `bus.py`** — sensor-MCP always returns None. Fix: implement the function returning last-seen readings. Matters for any live hardware run. ~1–2h.
 
 ---
 
-## 12. Recommended Next Dispatch
+## 14. Recommended Next Dispatch
 
-**Immediate (before next verify loop):**
+**Priority 1 (submit-critical, ~1h total)**:
+- Fix agent for R2a (_tickers one-liner) + R2b (3-line factory registration) — single agent, two trivial patches.
+- Fix agent for rustling scenario — check if assertion is too strict or agent needs tool-call filtering for theft scenario.
 
-1. **scenarios-extension-agent (follow-up patch)**: Wire wildfire + rustling + cross_ranch_coyote into `scenarios/__init__.py`; update docstring "5" → "8"; fix `test_run_all.py` expected count; fix cross_ranch Ranch_b `page_rancher` assertion (mock agent needs `page_rancher` suppressed on Ranch_b events). Run `ruff check --fix . && ruff format .` before committing.
+**Priority 2 (quality, ~3h)**:
+- cross_ranch determinism — seed session IDs from scenario seed.
+- Wildfire checkbox — flip `[ ]` to `[x]` in PROGRESS.md (scenario passes).
+- Drop "byte-identical" language from ARCHITECTURE.md / MANAGED_AGENTS.md docs.
 
-2. **hardening-agent (quick fix)**: Register `mavic` and `f3_inav` backends in `src/skyherd/drone/interface.py` `get_backend()`. Add conftest fixture to snapshot/restore SCENARIOS for test isolation.
+**Priority 3 (deferred post-submit)**:
+- R1 full clock injection — architectural, skip for hackathon.
+- R3 get_bus_state — only blocks live hardware, not sim demo.
+- 3-min demo video — still unchecked in PROGRESS.md; highest-visibility remaining deliverable.
 
-**Soon (before submission Apr 26):**
+---
 
-3. **PROGRESS.md update**: Flip wildfire `[ ]` → `[x]` and rustling `[ ]` → `[x]` after #1 is done. Update count to 85/91 (or 87/91 if drone backends + ruff fix counted). Add note about 8-scenario CLI.
-
-4. **Submission deliverables**: 3-min demo video (YouTube unlisted) + 100-200 word written summary + form at cerebralvalley.ai. These are the only three `[ ]` deliverable items remaining.
+*Generated by verify-loop-T4 at 2026-04-22 ~04:28 UTC*

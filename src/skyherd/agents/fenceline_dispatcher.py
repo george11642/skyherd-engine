@@ -81,19 +81,15 @@ FENCELINE_DISPATCHER_SPEC = AgentSpec(
 # Handler
 # ---------------------------------------------------------------------------
 
-_SYSTEM_PROMPT_INLINE = """\
-You are FenceLineDispatcher for ranch {ranch_id}.
+_SYSTEM_PROMPT_INLINE = """You are FenceLineDispatcher for ranch {ranch_id}.
 
 When a fence breach event fires:
 1. Call get_thermal_clip to fetch the latest thermal frame from that segment.
-2. Classify the heat signature as one of: coyote, mountain_lion, livestock_guardian_dog, \
-tag_drift, trespass, or unknown.
-3. For genuine threats (coyote, mountain_lion, trespass): call launch_drone to dispatch a \
-patrol drone to the breach coordinates, then call play_deterrent with appropriate tone.
+2. Classify the heat signature as one of: coyote, mountain_lion, livestock_guardian_dog, tag_drift, trespass, or unknown.
+3. For genuine threats (coyote, mountain_lion, trespass): call launch_drone to dispatch a patrol drone to the breach coordinates, then call play_deterrent with appropriate tone.
 4. Page the rancher via page_rancher at urgency matching the threat level.
 
-CRITICAL CONSTRAINT: Never authorize lethal force autonomously. \
-Always escalate to the rancher for any escalated response.
+CRITICAL CONSTRAINT: Never authorize lethal force autonomously. Always escalate to the rancher for any escalated response.
 """
 
 
@@ -153,7 +149,7 @@ async def handler(
     if sdk_client is not None and os.environ.get("ANTHROPIC_API_KEY"):
         tool_calls = await _run_with_sdk(sdk_client, cached_payload, session)
     else:
-        # Simulation path — always dispatch drone for breach events
+        # Simulation path — dispatch based on event type
         tool_calls = _simulate_handler(wake_event, session)
 
     return tool_calls
@@ -188,33 +184,98 @@ def _simulate_handler(
     wake_event: dict[str, Any],
     session: Session,
 ) -> list[dict[str, Any]]:
-    """Deterministic simulation for smoke testing without a real API key."""
+    """Deterministic simulation path for smoke testing without a real API key.
+
+    Event-type routing
+    ------------------
+    * ``fence.breach`` with ``silent_mode=True`` (rustling_suspected):
+        get_thermal_clip + launch_drone (silent observation) + page_rancher(urgency=text)
+        NO play_deterrent — audible tone alerts suspects.
+    * ``fence.breach`` with ``thermal_hotspot=True`` (wildfire defend-layer):
+        get_thermal_clip + launch_drone (confirmation flyover) + page_rancher(urgency=high)
+        NO play_deterrent — wildfire is not a predator.
+    * ``fence.breach`` / ``predator.spawned`` / ``thermal.hotspot`` (normal predator):
+        get_thermal_clip + launch_drone + play_deterrent + page_rancher(urgency=call)
+    * Everything else (water.low, sensor.heartbeat, ...):
+        Return [] — these events are handled by GrazingOptimizer/HerdHealthWatcher.
+    """
     lat = wake_event.get("lat", 34.0)
     lon = wake_event.get("lon", -106.0)
-    return [
+    segment = wake_event.get("segment", "seg_1")
+    event_type = wake_event.get("type", "")
+
+    is_silent = bool(wake_event.get("silent_mode", False))
+    is_wildfire = bool(wake_event.get("thermal_hotspot", False))
+    is_breach = event_type in ("fence.breach", "thermal.hotspot", "predator.spawned")
+
+    # Non-breach events are handled by other agents (GrazingOptimizer, etc.)
+    if not is_breach and not is_silent and not is_wildfire:
+        return []
+
+    calls: list[dict[str, Any]] = []
+
+    # Always fetch thermal clip for breach-class events
+    calls.append(
         {
             "tool": "get_thermal_clip",
-            "input": {"segment": wake_event.get("segment", "seg_1")},
-        },
+            "input": {"segment": segment},
+        }
+    )
+
+    # Dispatch drone — mission type depends on context
+    if is_silent:
+        mission = "silent_observation"
+        alt_m = 65.0
+    elif is_wildfire:
+        mission = "confirmation_flyover"
+        alt_m = 80.0
+    else:
+        mission = "fence_patrol"
+        alt_m = 60.0
+
+    calls.append(
         {
             "tool": "launch_drone",
             "input": {
-                "mission": "fence_patrol",
+                "mission": mission,
                 "target_lat": lat,
                 "target_lon": lon,
-                "alt_m": 60.0,
+                "alt_m": alt_m,
             },
-        },
-        {
-            "tool": "play_deterrent",
-            "input": {"tone_hz": 14000, "duration_s": 5, "lat": lat, "lon": lon},
-        },
+        }
+    )
+
+    # Audible deterrent: only for normal predator breach, NOT rustling or wildfire
+    if is_breach and not is_silent and not is_wildfire:
+        calls.append(
+            {
+                "tool": "play_deterrent",
+                "input": {"tone_hz": 14000, "duration_s": 5, "lat": lat, "lon": lon},
+            }
+        )
+
+    # Page rancher with urgency matching the event context
+    if is_wildfire:
+        urgency = "high"
+        context = f"Thermal hotspot detected near {segment}. Confirmation flyover dispatched."
+    elif is_silent:
+        urgency = "text"
+        context = (
+            f"SILENT ALERT — rustling_suspected at {segment}. "
+            "Observation drone launched. DO NOT call back — suspects may be monitoring radio."
+        )
+    else:
+        urgency = "call"
+        context = (
+            f"Potential predator at fence {segment}. "
+            "Drone dispatched. Awaiting rancher confirmation."
+        )
+
+    calls.append(
         {
             "tool": "page_rancher",
-            "input": {
-                "urgency": "call",
-                "context": f"Potential predator at fence {wake_event.get('segment', 'seg_1')}. "
-                "Drone dispatched. Awaiting rancher confirmation.",
-            },
-        },
-    ]
+            "input": {"urgency": urgency, "context": context},
+        }
+    )
+
+    return calls
