@@ -76,6 +76,10 @@ class FootRot(Head):
     def name(self) -> str:
         return "foot_rot"
 
+    def should_evaluate(self, cow: Cow, frame_meta: dict[str, Any]) -> bool:  # noqa: ARG002
+        """Skip cows with lameness score below threshold."""
+        return cow.lameness_score >= 2
+
     def classify(self, cow: Cow, frame_meta: dict[str, Any]) -> DetectionResult | None:
         score = cow.lameness_score
 

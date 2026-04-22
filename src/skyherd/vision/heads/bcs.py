@@ -128,6 +128,14 @@ class BCS(Head):
     def name(self) -> str:
         return "bcs"
 
+    def should_evaluate(self, cow: Cow, frame_meta: dict[str, Any]) -> bool:  # noqa: ARG002
+        """Skip cows whose BCS is clearly within all target windows."""
+        bcs = cow.bcs
+        # Fast reject: clearly healthy range (4.0–6.5 covers all stage windows)
+        if 4.0 <= bcs <= 6.5:
+            return False
+        return True
+
     def classify(self, cow: Cow, frame_meta: dict[str, Any]) -> DetectionResult | None:
         result = _classify_bcs(cow)
         if result is None:

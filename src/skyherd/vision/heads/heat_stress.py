@@ -55,6 +55,12 @@ class HeatStress(Head):
     def name(self) -> str:
         return "heat_stress"
 
+    def should_evaluate(self, cow: Cow, frame_meta: dict[str, Any]) -> bool:
+        """Skip cows where neither the ambient nor panting trigger can fire."""
+        temp_f: float = frame_meta.get("temp_f", 72.0)
+        ambient_possible = temp_f > _TEMP_THRESHOLD_F and cow.health_score < _HEALTH_THRESHOLD
+        return ambient_possible or "panting" in cow.disease_flags
+
     def classify(self, cow: Cow, frame_meta: dict[str, Any]) -> DetectionResult | None:
         temp_f: float = frame_meta.get("temp_f", 72.0)
         has_panting = "panting" in cow.disease_flags

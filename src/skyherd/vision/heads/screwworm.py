@@ -26,6 +26,11 @@ class Screwworm(Head):
     def name(self) -> str:
         return "screwworm"
 
+    def should_evaluate(self, cow: Cow, frame_meta: dict[str, Any]) -> bool:  # noqa: ARG002
+        """Skip cows with no wound or screwworm disease flags."""
+        flags = cow.disease_flags
+        return "screwworm" in flags or ("open_wound" in flags and "larvae" in flags)
+
     def classify(self, cow: Cow, frame_meta: dict[str, Any]) -> DetectionResult | None:
         has_screwworm = "screwworm" in cow.disease_flags
         has_larvae_in_wound = "open_wound" in cow.disease_flags and "larvae" in cow.disease_flags

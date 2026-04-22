@@ -132,16 +132,14 @@ def render_trough_frame(
     out_path = Path(out_path)
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
-    img = Image.new("RGB", (_TROUGH_W, _TROUGH_H), _BG_TOP)
+    # Vectorized gradient background — build with numpy, convert once to PIL
+    _ts = np.linspace(0, 1, _TROUGH_H, dtype=np.float32)[:, None]  # (H,1)
+    _bg_top = np.array(_BG_TOP, dtype=np.float32)
+    _bg_bot = np.array(_BG_BOT, dtype=np.float32)
+    _rows = (_bg_top * (1 - _ts) + _bg_bot * _ts).astype(np.uint8)  # (H,3)
+    _bg_arr = np.tile(_rows[:, None, :], (1, _TROUGH_W, 1))  # (H,W,3)
+    img = Image.fromarray(_bg_arr)
     draw = ImageDraw.Draw(img)
-
-    # Gradient background — draw horizontal bands top→bottom
-    for y in range(_TROUGH_H):
-        t = y / _TROUGH_H
-        r = int(_BG_TOP[0] * (1 - t) + _BG_BOT[0] * t)
-        g = int(_BG_TOP[1] * (1 - t) + _BG_BOT[1] * t)
-        b = int(_BG_TOP[2] * (1 - t) + _BG_BOT[2] * t)
-        draw.line([(0, y), (_TROUGH_W, y)], fill=(r, g, b))
 
     # Trough rectangle (centred horizontally, lower third)
     tx0, ty0 = _TROUGH_W // 4, _TROUGH_H * 2 // 3
@@ -230,11 +228,12 @@ def render_thermal_frame(
         # Map world position into thermal frame
         fx = int((dx / fov_radius_m + 1.0) / 2.0 * _THERMAL_W)
         fy = int((1.0 - (dy / fov_radius_m + 1.0) / 2.0) * _THERMAL_H)
-        # Gaussian splat
-        for py in range(max(0, fy - 20), min(_THERMAL_H, fy + 21)):
-            for px in range(max(0, fx - 20), min(_THERMAL_W, fx + 21)):
-                d2 = (px - fx) ** 2 + (py - fy) ** 2
-                arr[py, px] += heat * math.exp(-d2 / (2.0 * sigma_px**2))
+        # Gaussian splat — vectorized with numpy broadcasting
+        y0, y1 = max(0, fy - 20), min(_THERMAL_H, fy + 21)
+        x0, x1 = max(0, fx - 20), min(_THERMAL_W, fx + 21)
+        yy, xx = np.mgrid[y0:y1, x0:x1]
+        d2 = (xx - fx) ** 2 + (yy - fy) ** 2
+        arr[y0:y1, x0:x1] += heat * np.exp(-d2 / (2.0 * sigma_px**2))
 
     # Cows — warm blobs (heat 0.5–0.8)
     for cow in world.herd.cows:
@@ -250,7 +249,7 @@ def render_thermal_frame(
     if max_val > 0:
         arr = arr / max_val
     gray = (arr * 255).astype(np.uint8)
-    img = Image.fromarray(gray, mode="L")
+    img = Image.fromarray(gray)
     img.save(str(out_path), "PNG")
     return out_path
 

@@ -60,6 +60,10 @@ class BRD(Head):
     def name(self) -> str:
         return "brd"
 
+    def should_evaluate(self, cow: Cow, frame_meta: dict[str, Any]) -> bool:
+        """Skip cows with healthy scores and no respiratory signal."""
+        return cow.health_score < _HEALTH_THRESHOLD and _has_respiratory_signal(cow, frame_meta)
+
     def classify(self, cow: Cow, frame_meta: dict[str, Any]) -> DetectionResult | None:
         if cow.health_score >= _HEALTH_THRESHOLD:
             return None

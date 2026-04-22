@@ -29,6 +29,10 @@ HEADS: list[Head] = [
 def classify(cow: Cow, frame_meta: dict[str, Any]) -> list[DetectionResult]:
     """Run all detection heads against *cow* and return non-None results.
 
+    Each head's :meth:`~skyherd.vision.heads.base.Head.should_evaluate` gate
+    is checked first.  Heads that return ``False`` from their gate are skipped
+    entirely, reducing evaluations from O(herd × heads) to O(sick × heads).
+
     Parameters
     ----------
     cow:
@@ -43,6 +47,8 @@ def classify(cow: Cow, frame_meta: dict[str, Any]) -> list[DetectionResult]:
     """
     results: list[DetectionResult] = []
     for head in HEADS:
+        if not head.should_evaluate(cow, frame_meta):
+            continue
         result = head.classify(cow, frame_meta)
         if result is not None:
             results.append(result)

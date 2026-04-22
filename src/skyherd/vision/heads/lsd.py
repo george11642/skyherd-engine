@@ -29,6 +29,10 @@ class LSD(Head):
     def name(self) -> str:
         return "lsd"
 
+    def should_evaluate(self, cow: Cow, frame_meta: dict[str, Any]) -> bool:  # noqa: ARG002
+        """Skip cows without the LSD nodule flag."""
+        return "lsd_nodules" in cow.disease_flags
+
     def classify(self, cow: Cow, frame_meta: dict[str, Any]) -> DetectionResult | None:
         if "lsd_nodules" not in cow.disease_flags:
             return None

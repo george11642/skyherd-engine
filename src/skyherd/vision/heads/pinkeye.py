@@ -27,6 +27,10 @@ class Pinkeye(Head):
     def name(self) -> str:
         return "pinkeye"
 
+    def should_evaluate(self, cow: Cow, frame_meta: dict[str, Any]) -> bool:  # noqa: ARG002
+        """Skip cows with no ocular discharge and no disease flag."""
+        return cow.ocular_discharge > 0.4 or "pinkeye" in cow.disease_flags
+
     def classify(self, cow: Cow, frame_meta: dict[str, Any]) -> DetectionResult | None:
         discharge = cow.ocular_discharge
         has_flag = "pinkeye" in cow.disease_flags
