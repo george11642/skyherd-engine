@@ -54,3 +54,22 @@ class TestRunAll:
         result_names = [r.name for r in results]
         expected_order = list(SCENARIOS.keys())
         assert result_names == expected_order
+
+    def test_every_agent_dispatched_at_least_once_across_suite(self) -> None:
+        """ROUT-04: All 5 agents must be dispatched at least once across the 8-scenario suite."""
+        results = run_all(seed=42)
+        dispatched: set[str] = set()
+        for r in results:
+            dispatched.update(r.agent_tool_calls.keys())
+        required = {
+            "FenceLineDispatcher",
+            "HerdHealthWatcher",
+            "PredatorPatternLearner",
+            "GrazingOptimizer",
+            "CalvingWatch",
+        }
+        missing = required - dispatched
+        assert not missing, (
+            f"Agents never dispatched anywhere in the 8-scenario suite: {missing}. "
+            f"Agents dispatched: {dispatched}"
+        )

@@ -213,3 +213,92 @@ class TestDemoMesh:
             assert hasattr(t, "_current_state"), (
                 "agent_tickers() must return CostTicker-shaped objects"
             )
+
+    # ------------------------------------------------------------------
+    # Routing-table unit tests (ROUT-02 — Plan 02)
+    # ------------------------------------------------------------------
+
+    def _run_route_event_sync(self, event: dict[str, Any]) -> Any:
+        """Helper: run one _route_event call synchronously via asyncio.run.
+
+        Builds the same 5-agent registry used by _run_async and a fresh
+        _DemoMesh (no ledger needed — _route_event never accesses ledger at
+        runtime, and _DemoMesh tolerates ledger=None).
+        """
+        import asyncio
+
+        from skyherd.agents.calving_watch import CALVING_WATCH_SPEC
+        from skyherd.agents.calving_watch import handler as calving_handler
+        from skyherd.agents.fenceline_dispatcher import (
+            FENCELINE_DISPATCHER_SPEC,
+        )
+        from skyherd.agents.fenceline_dispatcher import (
+            handler as fenceline_handler,
+        )
+        from skyherd.agents.grazing_optimizer import GRAZING_OPTIMIZER_SPEC
+        from skyherd.agents.grazing_optimizer import handler as grazing_handler
+        from skyherd.agents.herd_health_watcher import (
+            HERD_HEALTH_WATCHER_SPEC,
+        )
+        from skyherd.agents.herd_health_watcher import (
+            handler as herd_handler,
+        )
+        from skyherd.agents.predator_pattern_learner import (
+            PREDATOR_PATTERN_LEARNER_SPEC,
+        )
+        from skyherd.agents.predator_pattern_learner import (
+            handler as predator_handler,
+        )
+        from skyherd.scenarios.base import _DemoMesh, _route_event
+
+        mesh = _DemoMesh(ledger=None)
+        registry = {
+            "FenceLineDispatcher": (FENCELINE_DISPATCHER_SPEC, fenceline_handler),
+            "HerdHealthWatcher": (HERD_HEALTH_WATCHER_SPEC, herd_handler),
+            "PredatorPatternLearner": (
+                PREDATOR_PATTERN_LEARNER_SPEC,
+                predator_handler,
+            ),
+            "GrazingOptimizer": (GRAZING_OPTIMIZER_SPEC, grazing_handler),
+            "CalvingWatch": (CALVING_WATCH_SPEC, calving_handler),
+        }
+
+        async def _go() -> None:
+            # _route_event types ledger as Ledger but never accesses it at
+            # runtime (it is threaded through to mesh, which guards None).
+            await _route_event(event, mesh, registry, ledger=None)  # type: ignore[arg-type]
+
+        asyncio.run(_go())
+        return mesh
+
+    def test_routing_table_thermal_anomaly(self) -> None:
+        """ROUT-02: thermal.anomaly must fan out to FenceLineDispatcher + PredatorPatternLearner."""
+        event = {
+            "type": "thermal.anomaly",
+            "ranch_id": "ranch_a",
+            "topic": "skyherd/ranch_a/thermal/cam_1",
+            "shapes_detected": ["human_shape"],
+        }
+        mesh = self._run_route_event_sync(event)
+        agents_called = set(mesh._tool_call_log.keys())
+        assert "FenceLineDispatcher" in agents_called, (
+            f"thermal.anomaly must dispatch FenceLineDispatcher; got {agents_called}"
+        )
+        assert "PredatorPatternLearner" in agents_called, (
+            f"thermal.anomaly must dispatch PredatorPatternLearner (ROUT-02); "
+            f"got {agents_called}"
+        )
+
+    def test_routing_table_nightly_analysis(self) -> None:
+        """ROUT-02: nightly.analysis must dispatch only PredatorPatternLearner."""
+        event = {
+            "type": "nightly.analysis",
+            "ranch_id": "ranch_a",
+            "topic": "skyherd/ranch_a/cron/nightly",
+        }
+        mesh = self._run_route_event_sync(event)
+        agents_called = set(mesh._tool_call_log.keys())
+        assert agents_called == {"PredatorPatternLearner"}, (
+            f"nightly.analysis must dispatch ONLY PredatorPatternLearner (ROUT-02); "
+            f"got {agents_called}"
+        )

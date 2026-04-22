@@ -168,3 +168,19 @@ class TestRustlingScenarioIntegration:
         assert result.jsonl_path.exists()
         lines = result.jsonl_path.read_text().splitlines()
         assert len(lines) > 0
+
+    def test_predator_pattern_learner_dispatched(self) -> None:
+        """ROUT-03: Rustling scenario must dispatch PredatorPatternLearner, not just log the event."""
+        result = run("rustling", seed=42)
+        assert "PredatorPatternLearner" in result.agent_tool_calls, (
+            f"PredatorPatternLearner never dispatched in rustling scenario. "
+            f"Agents with tool calls: {list(result.agent_tool_calls)}"
+        )
+        learner_calls = result.agent_tool_calls["PredatorPatternLearner"]
+        tool_names = {c.get("tool") for c in learner_calls}
+        # Per src/skyherd/agents/simulate.py lines 313-327, the simulate path always
+        # returns these two tool calls for PredatorPatternLearner.
+        assert "get_thermal_history" in tool_names or "log_pattern_analysis" in tool_names, (
+            f"Expected learner tool calls (get_thermal_history / log_pattern_analysis); "
+            f"got: {tool_names}"
+        )
