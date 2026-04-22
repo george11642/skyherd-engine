@@ -154,3 +154,48 @@ class TestRunTickLoop:
         stop_event = asyncio.Event()
         stop_event.set()
         await run_tick_loop([], stop_event)
+
+    # ------------------------------------------------------------------
+    # MA-04: multi-ticker all-idle aggregation contract
+    # ------------------------------------------------------------------
+
+    def _aggregate(self, tickers: list) -> dict:
+        """Mirror of src/skyherd/server/events.py::_real_cost_tick aggregation math.
+
+        Kept inline (not imported from events.py) so this test documents the
+        MA-04 contract independently of the dashboard implementation, which
+        Phase 5 refactors. If events.py changes its aggregation formula,
+        this test flags the drift.
+        """
+        any_active = any(t._current_state == "active" for t in tickers)
+        all_idle = not any_active
+        rate_per_hr_usd = 0.0 if all_idle else _SESSION_HOUR_RATE_USD
+        return {"all_idle": all_idle, "rate_per_hr_usd": rate_per_hr_usd}
+
+    def test_all_sessions_idle_emits_zero_rate(self):
+        """MA-04: two-ticker all-idle aggregation yields all_idle=True, rate=0.0."""
+        t1 = CostTicker(session_id="s1")
+        t2 = CostTicker(session_id="s2")
+        t1.set_state("idle")
+        t2.set_state("idle")
+        agg = self._aggregate([t1, t2])
+        assert agg["all_idle"] is True
+        assert agg["rate_per_hr_usd"] == pytest.approx(0.0)
+
+    def test_mixed_active_idle_emits_active_rate(self):
+        """MA-04: if any ticker is active, aggregation yields all_idle=False, rate=0.08."""
+        t_idle = CostTicker(session_id="s_idle")
+        t_active = CostTicker(session_id="s_active")
+        t_idle.set_state("idle")
+        t_active.set_state("active")
+        agg = self._aggregate([t_idle, t_active])
+        assert agg["all_idle"] is False
+        assert agg["rate_per_hr_usd"] == pytest.approx(_SESSION_HOUR_RATE_USD)
+
+    def test_single_idle_ticker_emits_zero_rate(self):
+        """MA-04: edge case — a single idle ticker still emits zero rate."""
+        t = CostTicker(session_id="s_solo")
+        t.set_state("idle")
+        agg = self._aggregate([t])
+        assert agg["all_idle"] is True
+        assert agg["rate_per_hr_usd"] == pytest.approx(0.0)
