@@ -26,8 +26,8 @@
 
 ### Vision Credibility (the Keep Thinking $5k pattern-match)
 
-- [ ] **VIS-01**: At least one disease head (target: pinkeye — most visually obvious for a judge-facing demo) is rewritten to perform real pixel-level inference on the rendered PNG frame. Not threshold classification on `Cow.ocular_discharge`.
-- [ ] **VIS-02**: The pixel-head uses a MIT/BSD-licensed backbone (e.g. MegaDetector V6 as animal detector + small task-specific head, or a distilled CNN on rendered frames). No Ultralytics / AGPL imports.
+- [x] **VIS-01**: At least one disease head (target: pinkeye — most visually obvious for a judge-facing demo) is rewritten to perform real pixel-level inference on the rendered PNG frame. Not threshold classification on `Cow.ocular_discharge`.
+- [x] **VIS-02**: The pixel-head uses a MIT/BSD-licensed backbone (e.g. MegaDetector V6 as animal detector + small task-specific head, or a distilled CNN on rendered frames). No Ultralytics / AGPL imports.
 - [ ] **VIS-03**: The pixel-head and the remaining 6 rule-based heads share the same `DiseaseHead` ABC interface; pipeline output format unchanged.
 - [ ] **VIS-04**: Pixel-head inference runs on synthetic frames in under 500ms per frame on CPU (dev-box baseline) — cannot slow the sim below 2× real time.
 - [ ] **VIS-05**: One scenario (e.g. sick_cow) has a visible dashboard panel showing the pixel-head's detection with bounding box + confidence — real, not faked.
@@ -130,8 +130,8 @@ Every v1 requirement maps to exactly one phase. 32/32 mapped. Zero orphans. Zero
 | ROUT-02 | Phase 1: Agent Session Persistence & Routing | Pending |
 | ROUT-03 | Phase 1: Agent Session Persistence & Routing | Pending |
 | ROUT-04 | Phase 1: Agent Session Persistence & Routing | Pending |
-| VIS-01 | Phase 2: Vision Pixel Inference | Pending |
-| VIS-02 | Phase 2: Vision Pixel Inference | Pending |
+| VIS-01 | Phase 2: Vision Pixel Inference | Complete |
+| VIS-02 | Phase 2: Vision Pixel Inference | Complete |
 | VIS-03 | Phase 2: Vision Pixel Inference | Pending |
 | VIS-04 | Phase 2: Vision Pixel Inference | Pending |
 | VIS-05 | Phase 2: Vision Pixel Inference | Pending |
