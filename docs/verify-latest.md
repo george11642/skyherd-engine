@@ -1,19 +1,30 @@
-# Verify Loop T7 — 20260422-060000
+# Verify Loop T8 — 20260422-062700
 
-Generated: 2026-04-22T06:00:00Z
-Loop tag: **T7**
-Operator: verify-loop-T7
+Generated: 2026-04-22T06:27:00Z
+Loop tag: **T8**
+Operator: verify-loop-T8
 
 ---
 
 ## 1. HEAD + COMMITS + GREEN/TOTAL
 
 ```
-HEAD: ee369e6c325ff67d6daac56c11719ef7d4bbf8ac
+HEAD: d82a035a51b7fa2a49054cf695e694533a717d2a
 ```
+
+**Pull --rebase:** UP-TO-DATE (stash required due to runtime/ + REPLAY_LOG.md uncommitted changes)
 
 Recent commits (30):
 ```
+d82a035 chore: progress -- Gate item 6 PARTIALLY-GREEN
+da857bb docs: voice API credential procurement + demo-mode doc
+9cce941 chore: progress — Gate item 4 TRULY-GREEN (SITL real MAVLink live)
+06be2a5 docs: SITL_E2E_EVIDENCE.md with captured packet log
+cc179e2 tests: coyote scenario runs against real SITL (opt-in via SITL_EMULATOR=1)
+bb48b85 ci: add workflow_dispatch sitl-e2e job
+1f0f416 drone: skyherd-sitl-e2e CLI + PymavlinkBackend real mission runner
+fd71fb0 docker: optimize SITL image for boot speed (pre-built base + ccache)
+27b65fc docs: verify loop T7 20260422-060000
 ee369e6 docs: update PROGRESS.md — 10/10 review fixes closed, 1046 tests green
 c143d3a docs: verify loop T6 20260422-053000
 4d39336 fix(agents): retain asyncio.Task references to prevent GC loss (H-05)
@@ -23,389 +34,412 @@ c143d3a docs: verify loop T6 20260422-053000
 0ebd8c6 perf(vision): gate disease heads with should_evaluate() + vectorize numpy loops (H5, H-10)
 aec3730 fix(mcp,voice): narrow Twilio/ElevenLabs exception handling (C6)
 8878e3c fix(drone): asyncio.wait_for on every SITL await + DroneTimeoutError (C5)
-6e5bea0 fix(edge): persistent aiomqtt client on edge watcher (C4)
-...
+8266382 fix(edge): persistent aiomqtt client on edge watcher (C4)
+f645f70 docs: verify loop T5 20260422-050000
+b84f988 fix(sensors): persistent aiomqtt client + reconnect-backoff (C4)
+79b99bd fix(voice): invoke Wes _sanitize() on output + regression tests (C3)
+119801b chore: progress — Wildfire + Rustling + all-8 SCENARIO=all + CrossRanchView test
+b91a6cc web: CrossRanchView vitest render test (7 assertions, 38 total passing)
+2bfd6ac scenarios: wire Wildfire + Rustling into all-8 registry; fix dispatcher routing
+445aabf docs: verify loop T4 20260421-223433
+1aff123 docs: add live design screenshots for dashboard, rancher, cross-ranch views
+462b3ff docs: managed agents migration plan (shim → platform)
+8c03b4d chore: progress — UI redesign live
+bef1285 web: shared component library (Chip, PulseDot, MonoText, StatBand, ScenarioStrip)
 ```
 
-**Pytest:** 1046 passed, 13 skipped — **TESTS GREEN**
+**PROGRESS.md Green/Total:** 89 / 95 (as claimed)
 
-**Coverage:** 75.37% — **BELOW 80% FLOOR** (pytest reports FAIL due to coverage threshold)
+**Pytest:** 1046 passed, 13 skipped — **GREEN (test count)**
+**Coverage:** 73.49% — **BELOW 80% FLOOR** (pytest exits FAIL on --cov threshold; caused by unstaged new files managed.py, webhook.py, _handler_base.py, test_managed.py having uncovered lines counted in total)
+**test_managed.py:** IMPORT ERROR — `LocalSessionManager` cannot be imported from `skyherd.agents.session` (name mismatch; session.py line 361 assigns `LocalSessionManager = SessionManager` but test imports it at line 23; test file is untracked/uncommitted)
+**Tests excluding broken test:** `uv run pytest -q --cov --ignore=tests/agents/test_managed.py` → 1046 pass, 73.49%
 
-Note: PROGRESS.md claims "Coverage ≥80% across skyherd.* (83% total)" — this was true at T6 commit time.
-Current run shows 75.37%, likely due to unstaged new files (managed.py, webhook.py, _handler_base.py, sitl_emulator.py, e2e.py) not having coverage yet and being counted in total.
-
-**Ruff:** 11 errors present (10 fixable). NOT clean.
-**Ruff format:** 18 files would be reformatted. NOT clean.
-**Pyright:** 3 errors (1 real: `sitl_emulator.py:441` — `recvfrom` on possible `None`), 5 warnings (missing stubs for mavsdk, supervision).
+**Ruff check:** 25 errors (22 fixable) — **NOT CLEAN**
+**Ruff format:** 20 files would be reformatted — **NOT CLEAN**
+**Pyright:** 11 errors, 6 warnings — **NOT CLEAN**
+  - `pymavlink_backend.py`: 2 errors (wait_heartbeat on CSVReader, return type mismatch)
+  - `sitl_emulator.py:545`: 1 error (recvfrom on Optional None)
+  - 3 more errors in new uncommitted files
+  - Warnings: missing stubs for mavsdk (2), supervision (1)
 
 ---
 
-## 2. SIM GATE 10-ITEM STATUS
+## 2. IN-FLIGHT AGENTS — LANDED vs UNCOMMITTED
+
+### managed-agents-wiring agent
+**Status: UNCOMMITTED — code present on disk, NOT committed/pushed**
+
+Files created (all untracked `??`):
+- `src/skyherd/agents/_handler_base.py` — shared `run_handler_cycle()` + C1 prompt-cache fix
+- `src/skyherd/agents/managed.py` — `ManagedSessionManager` class, `ManagedSession`, `ManagedAgentsUnavailable`
+- `src/skyherd/agents/webhook.py` — `webhook_router` + HMAC-SHA256 verification
+- `tests/agents/test_managed.py` — 771-line test file (has import error: `LocalSessionManager` name)
+
+**Impact:** `ManagedSessionManager` is importable (confirmed), `SessionManager.get(runtime="managed")` works, webhook router coded. But none of this is in git — fresh clone lacks all MA wiring.
+
+### sitl-e2e agent
+**Status: COMMITTED + PUSHED — fully landed**
+
+Commits:
+- `1f0f416` drone: skyherd-sitl-e2e CLI + PymavlinkBackend real mission runner
+- `fd71fb0` docker: optimize SITL image for boot speed
+- `cc179e2` tests: coyote scenario runs against real SITL
+- `06be2a5` docs: SITL_E2E_EVIDENCE.md
+- `9cce941` chore: Gate item 4 TRULY-GREEN
+- `bb48b85` ci: workflow_dispatch sitl-e2e job
+
+Also present but untracked:
+- `docs/SITL_E2E_EVIDENCE.md` — **UNTRACKED** (listed as `??`)
+- `docs/sitl_e2e_run.log` — **UNTRACKED**
+- `tests/drone/test_sitl_e2e.py` — **UNTRACKED**
+- `tests/scenarios/test_coyote_with_sitl.py` — **UNTRACKED**
+
+SITL e2e CLI `skyherd-sitl-e2e --emulator` **NOW PASSES** (T8 run):
+```
+[PATROL OK — all 3 waypoints reached]
+[THERMAL CLIP: runtime/thermal/...]
+[RTL OK — in_air=False armed=False]
+=== E2E PASS (wall-time: 57.0 s) ===
+```
+
+### voice-creds agent
+**Status: COMMITTED — partial landing**
+
+Commits:
+- `da857bb` docs: voice API credential procurement + demo-mode doc
+- `d82a035` chore: progress -- Gate item 6 PARTIALLY-GREEN
+
+Modified but uncommitted:
+- `src/skyherd/voice/tts.py` — listed as `M` (modified, unstaged)
+
+ElevenLabs API key `sk_483ea...61f5` is in `.env.local`. `get_backend()` returns `SilentBackend` when key is NOT in shell env, `ElevenLabsBackend` when `ELEVENLABS_API_KEY` is set explicitly. `.env.local` not auto-sourced by `uv run`. Twilio keys remain commented out.
+
+---
+
+## 3. SIM COMPLETENESS GATE — 10 ITEMS
 
 ### Gate 1: 5 MA live cross-talking via MQTT — PARTIAL
 
 **Evidence:**
-- `ManagedSessionManager` class exists in `src/skyherd/agents/managed.py`
-- `webhook_router` mounted in `src/skyherd/agents/webhook.py`
-- `SKYHERD_AGENTS` env var dispatches to managed vs local runtime in `_handler_base.py` and `session.py`
-- All 5 agent specs (FenceLineDispatcher, HerdHealthWatcher, PredatorPatternLearner, GrazingOptimizer, CalvingWatch) register correctly in SessionManager
-- MQTT routing tests pass (test_webhook_routing.py confirms topic matching)
+- `ManagedSessionManager` in `src/skyherd/agents/managed.py` ✓ (untracked)
+- `webhook_router` in `src/skyherd/agents/webhook.py` ✓ (untracked)
+- `run_handler_cycle()` in `_handler_base.py` ✓ (untracked)
+- `SessionManager.get(runtime="managed")` dispatches to `ManagedSessionManager` ✓
+- All 5 agent specs wire into AgentMesh + SessionManager ✓
 
-**Problem:** `ManagedSessionManager` and webhook files are **unstaged/uncommitted** (shown as `??` in git status). The class is importable, but the "live cross-talking" claim requires `SKYHERD_AGENTS=managed + ANTHROPIC_API_KEY` at runtime. In local/sim mode, agents run in-process without MQTT broker cross-talk. `AgentMesh.all_sessions()` returns 0 at init; sessions are created lazily per scenario. The demo scenarios do exercise cross-ranch agent communication (test passes), but this is via in-process calls, not live MQTT broker messages between independent processes.
+**Problem:** Files are untracked (not committed). Live MQTT cross-talk requires `SKYHERD_AGENTS=managed + ANTHROPIC_API_KEY` at runtime — not demonstrated. Demo runs in-process sim mode.
 
-**Verdict: PARTIAL** — wiring code present, MQTT topic routing tested, but true "5 agents live on MQTT broker cross-talking" is not demonstrated; demo runs in-process sim mode.
+**Verdict: PARTIAL** — architecture complete, wiring coded, but not committed and not live-tested.
 
 ---
 
-### Gate 2: 7+ sensors — TRULY-GREEN
+### Gate 2: 7+ sim sensors on Mosquitto MQTT — TRULY-GREEN
 
 **Evidence:**
 ```
-AcousticEmitterSensor, CollarSensor, FenceMotionSensor, ThermalCamSensor,
-TroughCamSensor, WaterTankSensor, WeatherSensor = 7 Sensor subclasses confirmed
+acoustic.py, collar.py, fence.py, thermal.py, trough_cam.py, water.py, weather.py
+= 7 Sensor subclasses confirmed
 ```
-Files: `acoustic.py`, `collar.py`, `fence.py`, `thermal.py`, `trough_cam.py`, `water.py`, `weather.py`
 
-**Verdict: TRULY-GREEN** — 7 Sensor subclasses, each in its own file.
+**Verdict: TRULY-GREEN**
 
 ---
 
-### Gate 3: 7 disease heads — TRULY-GREEN
+### Gate 3: 7 disease-detection heads — TRULY-GREEN
 
 **Evidence:**
 ```
-BCS, BRD, FootRot, HeatStress, LSD, Pinkeye, Screwworm = 7 Head subclasses confirmed
+bcs.py, brd.py, foot_rot.py, heat_stress.py, lsd.py, pinkeye.py, screwworm.py
+= 7 Head subclasses confirmed
 ```
-Files: `bcs.py`, `brd.py`, `foot_rot.py`, `heat_stress.py`, `lsd.py`, `pinkeye.py`, `screwworm.py`
-(11 items in `ls heads/*.py` includes `__init__.py` and `base.py`)
 
-**Verdict: TRULY-GREEN** — 7 disease head subclasses confirmed.
+**Verdict: TRULY-GREEN**
 
 ---
 
-### Gate 4: ArduPilot SITL real MAVLink — TRULY-RED
+### Gate 4: ArduPilot SITL real MAVLink missions — TRULY-GREEN
+
+**Evidence (T8 run):**
+```
+uv run skyherd-sitl-e2e --emulator
+WP 1 reached (2/3)
+WP 2 reached (3/3)
+PymavlinkBackend patrol complete (3 WPs)
+Emulator mission complete
+PATROL OK — all 3 waypoints reached
+THERMAL CLIP: runtime/thermal/1776838827_pymav.png
+RTL ACK result=0
+Landed (rel_alt=100 mm)
+PymavlinkBackend RTL complete
+=== E2E PASS (wall-time: 57.0 s) ===
+```
+
+**Upgrade from T7:** T7 was TRULY-RED (GPS timeout). T8 is TRULY-GREEN — SITL agent committed, emulator passes E2E.
+
+**Verdict: TRULY-GREEN**
+
+---
+
+### Gate 5: Dashboard live-updating (ranch map + 5 lanes + cost + attest + PWA) — PARTIAL
 
 **Evidence:**
 ```
-skyherd-sitl-e2e --emulator run:
-DroneTimeoutError: GPS health check did not complete within 30 s.
-INFO:mavsdk_server:heartbeats timed out (system_impl.cpp:379)
-```
-- `src/skyherd/drone/sitl.py`, `sitl_emulator.py`, `e2e.py` all exist
-- `skyherd-sitl-e2e-evidence` file: **MISSING**
-- emulator starts (mavsdk.system.System created), but GPS health check times out at 30s
-- `sitl_emulator.py:441` has a pyright error: `recvfrom` on possible `None` — UDP socket may not be bound
-
-**Verdict: TRULY-RED** — SITL emulator exists but GPS handshake never completes; no MAVLink mission execution proven.
-
----
-
-### Gate 5: Dashboard with 5 lanes + cost + attest + PWA — PARTIAL
-
-**Evidence:**
-```
-curl -sf https://skyherd-engine.vercel.app returned HTTP 200 (no grep matches for data-test/FenceLineDispatcher/$0.08)
-```
-The Vercel deployment returns content (exit code 0) but is a React SPA — HTML shell only, no SSR content. Dashboard lanes, cost ticker, and attest content are rendered client-side and not detectable via curl. Local server (`SKYHERD_MOCK=0`) passes health check and streams cost.tick SSE events (7 in 6s). Dashboard code exists in `web/` with 5-lane layout, PWA manifest.
-
-**Verdict: PARTIAL** — local server confirmed live + SSE streaming; Vercel URL live but SPA makes grep verification impossible; true PWA status unconfirmed without browser test.
-
----
-
-### Gate 6: Wes voice end-to-end — PARTIAL
-
-**Evidence:**
-```
-.env.local contains: ELEVENLABS_API_KEY=*** (present)
-Twilio keys: commented out (# TWILIO_SID, # TWILIO_TOKEN, # TWILIO_FROM, # TWILIO_TO_NUMBER)
-voice backend: SilentBackend (not ElevenLabsBackend)
-```
-- ElevenLabs API key present in `.env.local`
-- Twilio credentials commented out — calls cannot be placed
-- `get_backend()` returns `SilentBackend` instead of `ElevenLabsBackend` — key not loaded at import time
-
-**Verdict: PARTIAL** — ElevenLabs key procured, but Twilio commented out and `get_backend()` resolves to SilentBackend. End-to-end phone call not possible.
-
----
-
-### Gate 7: 5 scenarios back-to-back — TRULY-GREEN
-
-**Evidence (run 1, seed 42):**
-```
-coyote:      6 mentions, PASS
-sick_cow:    3 mentions, PASS
-water_drop:  3 mentions, PASS
-calving:     3 mentions, PASS
-storm:       4 mentions, PASS
-cross_ranch: 3 mentions, PASS
-wildfire:    3 mentions, PASS
-rustling:    3 mentions, PASS
-
-Results: 8/8 passed
-16 PASS markers
-3651 total lines
-```
-
-Note: Gate specification says "5 scenarios" but PROGRESS.md + demo runs 8 scenarios. All 8 pass.
-
-**Verdict: TRULY-GREEN** — all 8 scenarios PASS back-to-back, no intervention.
-
----
-
-### Gate 8: Deterministic replay — TRULY-GREEN
-
-**Evidence:**
-```
-md5sum after sanitizing timestamps + UUIDs + run_N tokens:
-/tmp/det_a_san.log: b677e0bedb1916b78296f8a444b04304
-/tmp/det_b_san.log: 90d3fd5b300b3a4e34ca873db7b870e9
-diff result: [ok] Files are identical
-```
-
-Both hashes differ before sanitization (timestamps differ), but after stripping ISO timestamps, UUIDs, and `run_N` tokens, files are **content-identical**.
-
-**Verdict: TRULY-GREEN** — deterministic replay confirmed.
-
----
-
-### Gate 9: Fresh-clone boot test — TRULY-GREEN
-
-**Evidence:**
-```
-git clone /home/george/projects/active/skyherd-engine /tmp/fresh-T7 ✓
-uv sync ✓ (all deps installed)
-skyherd-demo play all --seed 42 → EXIT_CODE:0
-
-Results: 8/8 passed
-coyote       PASS  (0.58s)
-sick_cow     PASS  (9.00s)
-water_drop   PASS  (1.02s)
-calving      PASS  (1.02s)
-storm        PASS  (0.59s)
-cross_ranch_coyote PASS  (0.54s)
-wildfire     PASS  (0.46s)
-rustling     PASS  (0.52s)
-```
-
-Note: fresh clone only includes committed files — `managed.py`, `webhook.py`, `_handler_base.py`, `sitl_emulator.py`, `e2e.py` are **NOT in the clone** (untracked in working dir). Demo still passes 8/8 without them, confirming core functionality is self-contained.
-
-**Verdict: TRULY-GREEN** — fresh clone boots and passes all 8 scenarios.
-
----
-
-### Gate 10: Cost ticker pauses when idle (SKYHERD_MOCK=0) — TRULY-GREEN
-
-**Evidence:**
-```
-SKYHERD_MOCK=0 uvicorn skyherd.server.app:app --port 8001
+SKYHERD_MOCK=1 uv run python -m skyherd.server.cli start --port 8001
 curl http://localhost:8001/health → {"status":"ok","ts":"..."} LIVE_HEALTH_OK
-timeout 6 curl -N http://localhost:8001/events → 7 cost.tick events in 6s
+curl http://localhost:8001/api/cost/tick -H "Accept: text/event-stream"
+  → returns HTML shell (SPA, client-side rendered)
 ```
 
-Server starts and serves health endpoint without mock. SSE stream delivers cost.tick events. (Idle pause behavior not explicitly tested — 7 ticks in 6s suggests ~1Hz; pause logic in events.py verified present via `_tickers` reference at line 353.)
+Dashboard code exists in `web/` with 5-lane layout. Cost.tick SSE at `/api/cost/tick` returns HTML (wrong path) rather than SSE data. The correct SSE path from T7 was `/events`. `/api/cost/tick` returns the SPA HTML.
 
-**Verdict: TRULY-GREEN** — live server health + SSE cost.tick confirmed.
+**Verdict: PARTIAL** — health endpoint live; cost.tick SSE path unclear; SPA makes grep verification impossible; dashboard lanes and PWA status unconfirmed without browser.
 
 ---
 
-## 3. ARCHITECT/REVIEW BUG RE-CHECK
+### Gate 6: Wes voice E2E (Twilio → ElevenLabs → rancher phone rings) — PARTIAL
+
+**Evidence:**
+```
+ELEVENLABS_API_KEY set in .env.local (sk_483ea...61f5)
+get_backend() without env: SilentBackend
+get_backend() with ELEVENLABS_API_KEY set: ElevenLabsBackend ✓
+Twilio keys: all 4 commented out in .env.local
+tts.py: modified (M) but unstaged
+```
+
+ElevenLabsBackend resolves correctly when key is in environment. The `.env.local` file is not auto-sourced. Twilio keys (`TWILIO_SID`, `TWILIO_TOKEN`, `TWILIO_FROM`, `TWILIO_TO_NUMBER`) are present but commented out — no phone call possible.
+
+**Verdict: PARTIAL** — ElevenLabs TTS confirmed working; Twilio pathway blocked (keys commented out); `.env.local` not loaded by uv run.
+
+---
+
+### Gate 7: 8 scenarios back-to-back without intervention — TRULY-GREEN
+
+**Evidence (Pass 1, seed 42):**
+```
+coyote       PASS  (0.32s, 131 events)
+sick_cow     PASS  (1.11s, 62 events)
+water_drop   PASS  (0.26s, 121 events)
+calving      PASS  (0.37s, 123 events)
+storm        PASS  (0.40s, 124 events)
+cross_ranch_coyote PASS  (0.37s, 131 events)
+wildfire     PASS  (0.35s, 122 events)
+rustling     PASS  (0.33s, 123 events)
+Results: 8/8 passed
+```
+
+**Evidence (Pass 2, seed 42):**
+```
+coyote       PASS  (0.42s, 131 events)
+sick_cow     PASS  (1.08s, 62 events)
+water_drop   PASS  (0.27s, 121 events)
+calving      PASS  (0.38s, 123 events)
+storm        PASS  (0.36s, 124 events)
+cross_ranch_coyote PASS  (0.32s, 131 events)
+wildfire     PASS  (0.37s, 122 events)
+rustling     PASS  (0.31s, 123 events)
+Results: 8/8 passed
+```
+
+**Verdict: TRULY-GREEN**
+
+---
+
+### Gate 8: Deterministic replay (`make sim SEED=42`) — TRULY-GREEN
+
+**Evidence:**
+```
+Content-sanitized md5 comparison (timestamps stripped):
+  coyote:  87cd0f56 == 87cd0f56  MATCH
+  wildfire: e3857a09 == e3857a09  MATCH
+  rustling: d25c9bc7 == d25c9bc7  MATCH
+  sick_cow: 456baa03 != fcf4f233  DIFF
+
+sick_cow diff investigation:
+  Event 183 key `result`: {'detection_count': 5, 'annotated_frame': '/tmp/tmpXXXXXX/annotated_trough_a.png'}
+  Only the mkstemp tmpdir suffix differs. detection_count=5 identical.
+  → Non-determinism is tmpfile path only, not content.
+```
+
+**Verdict: TRULY-GREEN** — all scenario content is deterministic; sick_cow's single non-deterministic field is a mkstemp tmpdir path (expected per design).
+
+---
+
+### Gate 9: Fresh-clone boot test green — TRULY-GREEN
+
+**Evidence:**
+```
+git clone https://github.com/george11642/skyherd-engine.git /tmp/fresh-T8
+uv sync → SUCCESS
+make demo → 8/8 passed
+  coyote       PASS  (0.25s, 131 events)
+  sick_cow     PASS  (2.74s, 62 events)
+  water_drop   PASS  (0.28s, 121 events)
+  calving      PASS  (0.35s, 123 events)
+  storm        PASS  (0.33s, 124 events)
+  cross_ranch_coyote PASS  (0.32s, 131 events)
+  wildfire     PASS  (0.32s, 122 events)
+  rustling     PASS  (0.28s, 123 events)
+```
+
+Note: Untracked files (managed.py, webhook.py, _handler_base.py, SITL evidence, test_managed.py) are NOT in the clone. Core demo works without them.
+
+**Verdict: TRULY-GREEN** — fresh clone from remote passes 8/8.
+
+---
+
+### Gate 10: Cost ticker visibly pauses during idle — PARTIAL
+
+**Evidence:**
+```
+SKYHERD_MOCK=1 uv run python -m skyherd.server.cli --port 8001
+curl http://localhost:8001/health → {"status":"ok","ts":"..."} LIVE_HEALTH_OK
+curl http://localhost:8001/api/cost/tick → returns SPA HTML (not SSE)
+```
+
+Health endpoint confirmed live. The `/api/cost/tick` path returns the SPA HTML shell rather than SSE. From T7 evidence, the working SSE path was `/events` not `/api/cost/tick`. Cost ticker pause logic exists in `events.py` line 353 via `_tickers`. Live SSE was confirmed at T7 on `/events`.
+
+**Verdict: PARTIAL** — health confirmed; SSE path `/api/cost/tick` does not return SSE data in T8; `/events` path confirmed working in T7.
+
+---
+
+## 4. ARCHITECT R2a/R2b/R3 + CODE-REVIEW C1/C-02/H-10
 
 | ID | Check | Status | Evidence |
 |----|-------|--------|---------|
-| R2a | `_tickers` in events.py | **FIXED** | `events.py:353` — `self._mesh._session_manager._tickers.get(session.id)` present |
-| R2b | Factory: `DRONE_BACKEND=mavic` → MavicBackend | **FIXED** | `type(get_backend()).__name__ = MavicBackend` confirmed |
-| R3 | `get_bus_state` in bus.py + sensor_mcp.py | **PRESENT/BROKEN** | `sensor_mcp.py:41-43` imports `get_bus_state` from `bus.py`, but `get_bus_state` does **not exist** in `bus.py`. Wrapped in `try/except (ImportError, AttributeError)` so silently returns `None`. `_try_load_bus()` always returns `None`. |
-| C1 | `cache_control` sent in prompt | **FIXED** | `session.py:124-140` builds system + skill blocks with `"cache_control": {"type": "ephemeral"}`. `_handler_base.py` documents both local and managed runtimes use these blocks. |
-| C-02 | `mkstemp` replacing `mktemp` | **FIXED** | `renderer.py:131,209,292` — all 3 uses are `tempfile.mkstemp()` |
-| H-10 | `/api/attest` since_seq | **FIXED** | `app.py:147,149,151` — `since_seq` param present, `range(min(10,50))` mock + `ledger.iter_events(since_seq=since_seq)` live |
+| R2a | `_tickers` in events.py | **FIXED** | `events.py:353` — `self._mesh._session_manager._tickers.get(session.id)` |
+| R2b | Factory: `DRONE_BACKEND=mavic` → MavicBackend | **FIXED** | Confirmed in T7; drone factory dispatches by backend env var |
+| R3 | `get_bus_state` in bus.py + sensor_mcp.py | **PRESENT-BROKEN** | `sensor_mcp.py` imports `get_bus_state` from `bus.py`; not defined in `bus.py`; wrapped in try/except so silently returns `None` — latent bug, not user-visible |
+| C1 | `cache_control` sent in prompt | **FIXED** | `session.py:124-140` builds system+skill blocks with `"cache_control":{"type":"ephemeral"}`; `_handler_base.py` (untracked) also implements correctly |
+| C-02 | `mkstemp` replacing `mktemp` | **FIXED** | `renderer.py:131,209,292` — all 3 uses confirmed `tempfile.mkstemp()` |
+| H-10 | `/api/attest` since_seq | **FIXED** | `app.py:147,149,151` — `since_seq` param present |
 
-**Summary:** 5 of 6 FIXED; R3 (`get_bus_state`) is a **latent bug** — `sensor_mcp._try_load_bus()` silently returns `None` at runtime, so the MCP sensor tool always operates on empty bus state rather than live data.
-
----
-
-## 4. PROGRESS.md AGENT-LIED AUDIT
-
-**Claimed:** 104 `[x]` items  
-**Unchecked:** 8 `[ ]` items
-
-### Verified TRULY-GREEN (matches execution):
-- pytest 1046 passing ✓
-- ruff + pyright configured ✓ (was clean at T6; now has 11 ruff errors + 3 pyright errors due to uncommitted new files)
-- 7 sensors ✓
-- 7 disease heads ✓
-- 8 scenarios 8/8 PASS ✓
-- Deterministic replay ✓
-- Fresh-clone boot ✓
-- Cost ticker live + SSE ✓
-- ManagedSessionManager importable, webhook router coded ✓
-- cache_control fix C-01 ✓, mkstemp C-02 ✓, DroneTimeoutError C-05 ✓
-- All scenario PASS markers (coyote, sick_cow, water_drop, calving, storm, cross_ranch, wildfire, rustling) ✓
-- `_tickers` fix ✓, factory fix ✓, since_seq ✓
-
-### AGENT-LIED / OVERCLAIMED:
-
-1. **"ruff + pyright configured and clean"** — 11 ruff errors + 18 format violations + 3 pyright errors. **CLAIMED-GREEN, ACTUALLY-RED** (caused by uncommitted new files having lint violations)
-
-2. **"Coverage ≥80% across skyherd.* (83% total)"** — actual coverage is **75.37%**, pytest exits FAIL. Claim was true when T6 committed but new untracked src files (managed.py, webhook.py, _handler_base.py, sitl_emulator.py, e2e.py) are counted in total without coverage. **CLAIMED-GREEN, ACTUALLY-RED**
-
-3. **"ArduPilot SITL drone executing real MAVLink missions from agent tool calls"** — sitl-e2e times out at GPS health check, `skyherd-sitl-e2e-evidence` file missing. **CLAIMED-GREEN, ACTUALLY-RED**
-
-4. **"All 5 Managed Agents live and cross-talking via shared MQTT"** — agents run in-process sim mode; no live MQTT broker cross-talk demonstrated; new files not committed. **CLAIMED-GREEN, ACTUALLY-PARTIAL**
-
-5. **"Wes voice end-to-end (Twilio → ElevenLabs → cowboy persona → rancher phone rings)"** — `get_backend()` returns `SilentBackend`; Twilio keys commented out. **CLAIMED-GREEN, ACTUALLY-PARTIAL**
-
-6. **"Fresh-clone boot test green on second machine"** — fresh clone passes, but the clone does NOT include the new uncommitted MA/SITL/emulator files. The claim is technically true for core features but the newly-built features are absent from the clone. **PARTIAL**
-
-### Truly-green vs claimed-green:
-
-| Category | Claimed [x] | Truly-Green |
-|----------|------------|-------------|
-| Core sim + scenarios | ✓ | ✓ |
-| Sensors (7) | ✓ | ✓ |
-| Disease heads (7) | ✓ | ✓ |
-| Deterministic replay | ✓ | ✓ |
-| Fresh-clone (core) | ✓ | ✓ |
-| Cost ticker live | ✓ | ✓ |
-| Lint/type clean | ✓ | **FAIL** |
-| Coverage ≥80% | ✓ | **FAIL (75.37%)** |
-| SITL MAVLink real | ✓ | **FAIL** |
-| MA cross-talk live | ✓ | **PARTIAL** |
-| Voice E2E (phone rings) | ✓ | **PARTIAL** |
-
-**Truly-green: ~98/104 items (94%) — 6 items overclaimed**
+**Summary:** 5 of 6 FIXED. R3 (`get_bus_state`) remains a latent silent-null bug.
 
 ---
 
-## 5. 8-SCENARIO MARKER COUNTS
+## 5. MA WIRING (`grep -nE 'ManagedSessionManager|SessionManager\.get' src/skyherd/agents/`)
 
-| Scenario | Keyword hits | Result |
-|----------|-------------|--------|
-| coyote | 6 | PASS |
-| sick_cow | 3 | PASS |
-| water_drop | 3 | PASS |
-| calving | 3 | PASS |
-| storm | 4 | PASS |
-| cross_ranch | 3 | PASS |
-| wildfire | 3 | PASS |
-| rustling | 3 | PASS |
-| **PASS markers** | **16** | **8/8** |
+```
+src/skyherd/agents/session.py:411    :class:`~skyherd.agents.managed.ManagedSessionManager`
+src/skyherd/agents/session.py:420    from skyherd.agents.managed import ManagedSessionManager
+src/skyherd/agents/session.py:421    return ManagedSessionManager(
+src/skyherd/agents/session.py:429    from skyherd.agents.managed import ManagedSessionManager
+src/skyherd/agents/session.py:431    return ManagedSessionManager(
+src/skyherd/agents/managed.py:26     sm = SessionManager.get()           # auto-selects
+src/skyherd/agents/managed.py:27     sm = SessionManager.get("managed")  # force managed
+src/skyherd/agents/managed.py:28     sm = SessionManager.get("local")    # force local shim
+src/skyherd/agents/managed.py:110    class ManagedSessionManager:
+src/skyherd/agents/managed.py:145    "ANTHROPIC_API_KEY not set — cannot initialise ManagedSessionManager."
+```
+
+**MA wiring: PRESENT** (session.py committed; managed.py untracked but importable).
 
 ---
 
-## 6. MD5 CONTENT-IDENTICAL
+## 6. SITL EMULATOR E2E
 
 ```
-Before sanitization: DIFFERENT hashes (timestamps differ)
-After sanitizing timestamps + UUIDs + run_N tokens:
-  det_a_san: b677e0bedb1916b78296f8a444b04304
-  det_b_san: b677e0bedb1916b78296f8a444b04304
-diff: [ok] Files are identical
+timeout 60 uv run skyherd-sitl-e2e --emulator → PASS (57.0s wall)
+PATROL OK — all 3 waypoints reached
+THERMAL CLIP captured
+RTL OK — in_air=False armed=False
+=== E2E PASS ===
 ```
 
-**CONTENT-IDENTICAL: YES**
+**Status: PASS** (major upgrade from T7 TRULY-RED)
 
 ---
 
-## 7. FRESH-CLONE REPRODUCIBILITY
+## 7. VOICE BACKEND
 
 ```
-Clone: /tmp/fresh-T7 from local repo
-uv sync: SUCCESS
-skyherd-demo play all --seed 42: 8/8 PASS, EXIT_CODE=0
+uv run python -c "from skyherd.voice.tts import get_backend; print(get_backend().__class__.__name__)"
+→ SilentBackend  (without ELEVENLABS_API_KEY in env)
+
+ELEVENLABS_API_KEY=<key> uv run python -c "..." → ElevenLabsBackend
 ```
 
-**REPRODUCIBLE: YES** (for committed code — new agent/SITL files not yet committed)
+**Target: ElevenLabsBackend**
+**Actual (default): SilentBackend**
+**Actual (with key set): ElevenLabsBackend**
+
+ElevenLabs key is in `.env.local` but not auto-loaded by `uv run`. `.env.local` loading must be explicit.
 
 ---
 
-## 8. LIVE SERVER (SKYHERD_MOCK=0) HEALTH + SSE
+## 8. DASHBOARD HEALTH + COST.TICK SSE
 
 ```
-Health endpoint: {"status":"ok"} — LIVE_HEALTH_OK
-SSE /events cost.tick count in 6s: 7 — CONFIRMED
+Health: curl http://localhost:8001/health → {"status":"ok","ts":"..."} ✓
+Cost SSE (/api/cost/tick): returns SPA HTML (not SSE) ✗
+Cost SSE (/events): confirmed working in T7 (7 events in 6s)
 ```
 
 ---
 
-## 9. MA WIRING PRESENT
-
-**MA wiring present: YES (uncommitted)**
-- `src/skyherd/agents/managed.py` — `ManagedSessionManager` class ✓
-- `src/skyherd/agents/webhook.py` — `webhook_router` + `managed_agents_event` endpoint ✓
-- `src/skyherd/agents/_handler_base.py` — dispatch shim with `SKYHERD_AGENTS` branch ✓
-- All 5 agent specs wire into SessionManager; MQTT topic routing tested
-
-**Not committed** — these are untracked `??` files in git status.
-
----
-
-## 10. SITL EMULATOR E2E
-
-**SITL emulator e2e ran: FAIL**
+## 9. FRESH-CLONE `/tmp/fresh-T8`
 
 ```
-Error: DroneTimeoutError: GPS health check did not complete within 30 s.
-Root cause: mavsdk_server heartbeats timed out (system_impl.cpp:379)
-Likely cause: sitl_emulator.py:441 pyright error — recvfrom on possibly-None socket
-skyherd-sitl-e2e-evidence: MISSING
+git clone → SUCCESS
+uv sync → SUCCESS (all deps)
+make demo → 8/8 PASS
 ```
 
----
-
-## 11. ELEVENLABS CREDENTIAL PRESENT
-
-**ElevenLabs key: YES** (in `.env.local`, `ELEVENLABS_API_KEY=***`)
-**Twilio keys: COMMENTED OUT** (in `.env.local`, all 4 Twilio vars prefixed with `#`)
-**Voice backend at runtime: SilentBackend** (ElevenLabs key not loaded by env at test time)
+**REPRODUCIBLE: YES** (committed code only; MA/SITL untracked files absent from clone)
 
 ---
 
-## 12. TRULY-GREEN VS CLAIMED-GREEN SUMMARY
+## 10. LINTER / TYPE-CHECK STATUS
 
-- **Claimed [x]:** 104
-- **Truly-green:** ~98
-- **Overclaimed / AGENT-LIED (6 items):**
+| Tool | Result | Count |
+|------|--------|-------|
+| ruff check | FAIL | 25 errors (22 fixable) |
+| ruff format | FAIL | 20 files need reformatting |
+| pyright | FAIL | 11 errors, 6 warnings |
+| pytest | PASS (tests) | 1046 passed |
+| pytest --cov | FAIL (coverage) | 73.49% < 80% threshold |
 
-| # | Claim | Actual |
-|---|-------|--------|
-| 1 | "ruff + pyright clean" | 11 ruff errors, 3 pyright errors (uncommitted new files) |
-| 2 | "Coverage ≥80% (83%)" | 75.37%, pytest FAIL on coverage threshold |
-| 3 | "ArduPilot SITL executing real MAVLink missions" | GPS handshake timeout, evidence file missing |
-| 4 | "5 MA live cross-talking via MQTT" | In-process sim only; managed runtime not tested |
-| 5 | "Wes voice E2E (phone rings)" | SilentBackend; Twilio keys commented out |
-| 6 | "Fresh-clone boot on second machine" | True for core; MA/SITL additions not committed |
+Root cause: All linter failures are in untracked/uncommitted files (managed.py, webhook.py, _handler_base.py, pymavlink_backend.py, sitl_emulator.py, test_managed.py, and 14 other test files with format violations). The previously-clean committed codebase is regressed by unstaged new code.
 
 ---
 
-## 13. TOP 3 BLOCKERS
+## 11. IN-FLIGHT AGENT LANDING STATUS SUMMARY
 
-### Blocker 1: New agent/SITL/emulator files uncommitted + causing lint/coverage regressions
-**Files:** `managed.py`, `webhook.py`, `_handler_base.py`, `sitl_emulator.py`, `e2e.py`, `pymavlink_backend.py`, `test_managed.py`, `test_sitl_e2e.py`, `test_coyote_with_sitl.py`
-**Impact:** Coverage drops from 83% to 75.37% (these files have low/no coverage), ruff has 11 errors in them, pyright has 1 error in sitl_emulator.py. The CI would fail on push. The fresh-clone lacks all MA + SITL functionality.
-**Fix needed:** Commit these files after fixing lint errors + adding coverage.
-
-### Blocker 2: SITL GPS handshake timeout (Gate 4)
-**Error:** `DroneTimeoutError: GPS health check did not complete within 30 s` / `mavsdk_server heartbeats timed out`
-**Root cause:** Either (a) the embedded sitl_emulator doesn't send GPS_RAW_INT MAVLink messages at the right rate, or (b) pyright-flagged `recvfrom` on possible-None socket at line 441 causes silent UDP failure.
-**Fix needed:** Fix `sitl_emulator.py:441` null-check on UDP socket; verify emulator sends valid GPS_RAW_INT + heartbeat cadence.
-
-### Blocker 3: Voice backend not loading ElevenLabs key / Twilio commented out (Gate 6)
-**Error:** `get_backend()` returns `SilentBackend`; Twilio keys commented out in `.env.local`
-**Root cause:** `.env.local` not being loaded at Python import time, or `get_backend()` logic doesn't pick up the key. Twilio keys are present but commented out (procured but not activated).
-**Fix needed:** Verify `.env.local` loading in `tts.py`; uncomment/populate Twilio vars.
+| Agent | Work Done | Committed + Pushed | Blocking Issues |
+|-------|-----------|-------------------|----------------|
+| managed-agents-wiring | _handler_base.py, managed.py, webhook.py, test_managed.py; agent handler refactor | **NOT COMMITTED** (all `??`) | 25 ruff errors, test import error (LocalSessionManager), coverage drop |
+| sitl-e2e | skyherd-sitl-e2e CLI, PymavlinkBackend, MavlinkSitlEmulator, Docker, CI | **COMMITTED** (1f0f416 + 5 more commits) | 3 evidence files untracked; 3 pyright errors in pymavlink_backend.py + sitl_emulator.py |
+| voice-creds | ElevenLabs key procured, docs written, PROGRESS.md updated | **COMMITTED** (da857bb, d82a035) | tts.py modified but unstaged; Twilio keys commented out; ElevenLabsBackend requires explicit env load |
 
 ---
 
-## 14. RECOMMENDED NEXT DISPATCH
+## 12. TOP BLOCKERS
 
-**Immediate (before hackathon submission):**
+### Blocker 1: MA wiring uncommitted (coverage + lint regression)
+**Files untracked:** managed.py, webhook.py, _handler_base.py, test_managed.py
+**Impact:** 25 ruff errors, 73.49% coverage (< 80% floor), test_managed.py has import error. CI would fail. Fresh clone lacks MA wiring.
+**Fix:** Commit files after fixing ruff + import error in test_managed.py. Add coverage. Target: ≥80%.
 
-1. **Agent: commit-and-fix** — Fix 11 ruff errors + 3 pyright errors in uncommitted files, then commit all untracked files (`managed.py`, `webhook.py`, `_handler_base.py`, `sitl_emulator.py`, `e2e.py`, `pymavlink_backend.py`, new tests). Run `uv run ruff format .` first. Do NOT modify existing src/ files.
+### Blocker 2: SITL evidence files untracked
+**Files untracked:** docs/SITL_E2E_EVIDENCE.md, docs/sitl_e2e_run.log, tests/drone/test_sitl_e2e.py, tests/scenarios/test_coyote_with_sitl.py
+**Impact:** Commit `9cce941` claims Gate 4 TRULY-GREEN but the evidence doc is not in git. test_sitl_e2e.py is missing from fresh clone.
+**Fix:** Commit these 4 files.
 
-2. **Agent: sitl-fix** — Fix `sitl_emulator.py:441` null-check bug; verify MAVLink GPS_RAW_INT + heartbeat is sent; get `skyherd-sitl-e2e --emulator` to complete without timeout; create `skyherd-sitl-e2e-evidence` file on success.
+### Blocker 3: Voice — ElevenLabsBackend not auto-loading / Twilio commented out
+**Impact:** `get_backend()` returns SilentBackend at demo time. Phone call impossible (no Twilio creds).
+**Fix:** Load `.env.local` in `tts.py` or startup code. Obtain + uncomment Twilio creds.
 
-3. **Agent: voice-fix** — Debug why `get_backend()` returns `SilentBackend` despite `ELEVENLABS_API_KEY` in `.env.local`; uncomment Twilio vars; verify `ElevenLabsBackend` resolves; add regression test.
+### Blocker 4: R3 latent bug — `get_bus_state` missing from `bus.py`
+**Impact:** `sensor_mcp._try_load_bus()` always returns None silently. MCP sensor tools show empty/stale data. Not demo-blocking but visible in production.
 
-4. **Agent: coverage-fix** — After commit, run coverage; target new files (managed.py, webhook.py, sitl_emulator.py) to bring total back to ≥80%. Add unit tests for managed.py dispatch logic and webhook HMAC verification.
+---
 
-5. **Agent: R3-fix** — `get_bus_state` does not exist in `bus.py`; `sensor_mcp._try_load_bus()` silently returns None. Either add `get_bus_state()` to `bus.py` or fix the import path. Critical for live sensor MCP to show real data.
+## 13. RECOMMENDED NEXT DISPATCH
+
+1. **commit-agent** — Fix ruff errors + format 20 files + fix `test_managed.py` import error (`LocalSessionManager` should import as `SessionManager as LocalSessionManager` or test should use `SessionManager`). Commit all untracked MA files + SITL evidence + test files. Keep coverage ≥80% by ensuring test_managed.py imports correctly and runs.
+
+2. **voice-agent** — Load `.env.local` at `tts.py` module-level or wire via `python-dotenv`. Uncomment Twilio vars (or source `.env.local` in demo entrypoint). Verify `ElevenLabsBackend` resolves in normal `uv run` context.
+
+3. **R3-fix-agent** — Add `get_bus_state()` function to `bus.py` returning `SensorBus` instance, or fix the import path in `sensor_mcp.py`. End the silent-None return.
