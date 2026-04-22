@@ -26,6 +26,7 @@ subsequent wake cycle, slashing per-wake cost.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import logging
 import time
@@ -242,7 +243,7 @@ class SessionManager:
         if session.system_prompt_cached_hash is None:
             sp_path = session.agent_spec.system_prompt_template_path
             sp_text = _load_text(sp_path)
-            session.system_prompt_cached_hash = str(hash(sp_text))
+            session.system_prompt_cached_hash = hashlib.sha256(sp_text.encode()).hexdigest()[:16]
 
         logger.info(
             "session %s → active (wake_event topic=%s)",
