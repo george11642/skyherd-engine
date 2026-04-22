@@ -23,11 +23,36 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from skyherd.agents.calving_watch import CALVING_WATCH_SPEC
+from skyherd.agents.calving_watch import handler as calving_handler
+from skyherd.agents.fenceline_dispatcher import FENCELINE_DISPATCHER_SPEC
+from skyherd.agents.fenceline_dispatcher import handler as fenceline_handler
+from skyherd.agents.grazing_optimizer import GRAZING_OPTIMIZER_SPEC
+from skyherd.agents.grazing_optimizer import handler as grazing_handler
+from skyherd.agents.herd_health_watcher import HERD_HEALTH_WATCHER_SPEC
+from skyherd.agents.herd_health_watcher import handler as herd_handler
+from skyherd.agents.predator_pattern_learner import PREDATOR_PATTERN_LEARNER_SPEC
+from skyherd.agents.predator_pattern_learner import handler as predator_handler
+from skyherd.agents.session import Session, SessionManager
+from skyherd.agents.spec import AgentSpec
 from skyherd.attest.ledger import Ledger
 from skyherd.attest.signer import Signer
 from skyherd.world.world import World, make_world
 
 logger = logging.getLogger(__name__)
+
+# Canonical agent registry — spec, handler pairs in mesh.py order.
+# Mirrors src/skyherd/agents/mesh.py::_AGENT_REGISTRY so the scenario driver
+# stays aligned with the live mesh. PredatorPatternLearner is included here
+# (ROUT-01); the scenario routing table (line ~326) gains the wake-event
+# types for it in Plan 02.
+_SCENARIO_AGENT_REGISTRY: list[tuple[AgentSpec, Any]] = [
+    (FENCELINE_DISPATCHER_SPEC, fenceline_handler),
+    (HERD_HEALTH_WATCHER_SPEC, herd_handler),
+    (PREDATOR_PATTERN_LEARNER_SPEC, predator_handler),
+    (GRAZING_OPTIMIZER_SPEC, grazing_handler),
+    (CALVING_WATCH_SPEC, calving_handler),
+]
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -158,29 +183,92 @@ class Scenario(ABC):
 class _DemoMesh:
     """Lightweight scenario driver that replays agent responses without API keys.
 
-    Bridges world events → agent handler simulation paths and records tool
-    calls for assertion in assert_outcome().
+    Holds ONE SessionManager and FIVE persistent Session objects (one per agent)
+    for the lifetime of a scenario run — mirrors the production AgentMesh pattern
+    in src/skyherd/agents/mesh.py. Dispatching an event looks up the existing
+    session by name and drives wake/handle/sleep through the shared manager.
+
+    Public accessors (stable API for Phase 5 dashboard live-mode):
+      - agent_sessions() -> dict[str, Session]
+      - agent_tickers()  -> list[CostTicker]
     """
 
     def __init__(self, ledger: Ledger | None = None) -> None:
         self._tool_call_log: dict[str, list[dict[str, Any]]] = {}
         self._ledger = ledger
 
+        # ONE SessionManager per scenario run (was 241 before this refactor).
+        self._session_manager = SessionManager()
+
+        # Eagerly create one session per agent, mirroring AgentMesh.start().
+        # create_session is sync and ~microseconds — safe to call 5x in __init__.
+        self._sessions: dict[str, Session] = {}
+        self._handlers: dict[str, Any] = {}
+        for spec, handler_fn in _SCENARIO_AGENT_REGISTRY:
+            session = self._session_manager.create_session(spec)
+            self._sessions[spec.name] = session
+            self._handlers[spec.name] = handler_fn
+            logger.debug(
+                "_DemoMesh: registered %s (session %s)", spec.name, session.id[:8]
+            )
+
+    # ------------------------------------------------------------------
+    # Public accessors — stable API consumed by Phase 5 dashboard live-mode.
+    # DO NOT reach into self._sessions / self._session_manager from outside
+    # this class; use these instead.
+    # ------------------------------------------------------------------
+
+    def agent_sessions(self) -> dict[str, Session]:
+        """Return a shallow copy of the agent-name -> Session registry."""
+        return dict(self._sessions)
+
+    def agent_tickers(self) -> list:
+        """Return the list of CostTicker objects for cost aggregation.
+
+        Phase 5 (DASH-03 cost ticker live-mode) consumes this to avoid the
+        deprecated ``_mesh._session_manager._tickers`` path that no longer
+        exists on SessionManager.
+        """
+        return self._session_manager.all_tickers()
+
+    # ------------------------------------------------------------------
+    # Dispatch
+    # ------------------------------------------------------------------
+
     async def dispatch(
         self,
         agent_name: str,
         wake_event: dict[str, Any],
-        spec: Any,
-        handler_fn: Any,
+        spec: Any,  # accepted for API compat with _route_event; unused after refactor
+        handler_fn: Any,  # accepted for API compat; resolved via self._handlers
     ) -> list[dict[str, Any]]:
-        """Invoke one agent handler simulation path; record and return tool calls."""
-        from skyherd.agents.session import SessionManager  # local import — avoids circular
+        """Wake the named agent's existing session, run its handler, sleep on exit.
 
-        manager = SessionManager()
-        session = manager.create_session(spec)
-        manager.wake(session.id, wake_event)
-        calls = await handler_fn(session, wake_event, sdk_client=None)
-        manager.sleep(session.id)
+        Reuses the session created at __init__ time — does NOT instantiate a fresh
+        SessionManager (that was the 241-leak pre-fix). ``sleep()`` is guaranteed
+        by ``finally:`` so the cost ticker idle-pauses even on handler exception.
+        """
+        session = self._sessions.get(agent_name)
+        if session is None:
+            logger.warning(
+                "dispatch: unknown agent %r — not in scenario registry", agent_name
+            )
+            return []
+
+        # Prefer the handler registered at __init__ (stable), fall back to the
+        # handler_fn argument for callers still passing it explicitly.
+        effective_handler = self._handlers.get(agent_name, handler_fn)
+
+        self._session_manager.wake(session.id, wake_event)
+        calls: list[dict[str, Any]] = []
+        try:
+            calls = await effective_handler(session, wake_event, sdk_client=None)
+        except Exception as exc:  # noqa: BLE001
+            logger.error("handler error for %s: %s", agent_name, exc)
+            calls = []
+        finally:
+            # Idle-pause ticker — MUST fire even on exception (Pitfall 3).
+            self._session_manager.sleep(session.id)
 
         if agent_name not in self._tool_call_log:
             self._tool_call_log[agent_name] = []
@@ -210,15 +298,6 @@ async def _run_async(
     """Async inner implementation of run()."""
     import tempfile
 
-    from skyherd.agents.calving_watch import CALVING_WATCH_SPEC
-    from skyherd.agents.calving_watch import handler as calving_handler
-    from skyherd.agents.fenceline_dispatcher import FENCELINE_DISPATCHER_SPEC
-    from skyherd.agents.fenceline_dispatcher import handler as fenceline_handler
-    from skyherd.agents.grazing_optimizer import GRAZING_OPTIMIZER_SPEC
-    from skyherd.agents.grazing_optimizer import handler as grazing_handler
-    from skyherd.agents.herd_health_watcher import HERD_HEALTH_WATCHER_SPEC
-    from skyherd.agents.herd_health_watcher import handler as herd_handler
-
     config_path = world_config or _WORLD_CONFIG
     world = make_world(seed=seed, config_path=config_path)
 
@@ -230,10 +309,11 @@ async def _run_async(
 
     mesh = _DemoMesh(ledger=ledger)
 
-    # Agent registry for event routing
+    # Agent registry for event routing (ROUT-01: PredatorPatternLearner included).
     _registry = {
         "FenceLineDispatcher": (FENCELINE_DISPATCHER_SPEC, fenceline_handler),
         "HerdHealthWatcher": (HERD_HEALTH_WATCHER_SPEC, herd_handler),
+        "PredatorPatternLearner": (PREDATOR_PATTERN_LEARNER_SPEC, predator_handler),
         "GrazingOptimizer": (GRAZING_OPTIMIZER_SPEC, grazing_handler),
         "CalvingWatch": (CALVING_WATCH_SPEC, calving_handler),
     }
