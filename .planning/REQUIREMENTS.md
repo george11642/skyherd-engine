@@ -117,48 +117,49 @@ Deferred to subsequent milestones per George's direction: "the next gsd mileston
 
 ## Traceability
 
-Filled in by the roadmapper. Every v1 requirement must map to exactly one phase.
+Every v1 requirement maps to exactly one phase. 32/32 mapped. Zero orphans. Zero duplicates.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| MA-01 | TBD | Pending |
-| MA-02 | TBD | Pending |
-| MA-03 | TBD | Pending |
-| MA-04 | TBD | Pending |
-| MA-05 | TBD | Pending |
-| ROUT-01 | TBD | Pending |
-| ROUT-02 | TBD | Pending |
-| ROUT-03 | TBD | Pending |
-| ROUT-04 | TBD | Pending |
-| VIS-01 | TBD | Pending |
-| VIS-02 | TBD | Pending |
-| VIS-03 | TBD | Pending |
-| VIS-04 | TBD | Pending |
-| VIS-05 | TBD | Pending |
-| BLD-01 | TBD | Pending |
-| BLD-02 | TBD | Pending |
-| BLD-03 | TBD | Pending |
-| BLD-04 | TBD | Pending |
-| DASH-01 | TBD | Pending |
-| DASH-02 | TBD | Pending |
-| DASH-03 | TBD | Pending |
-| DASH-04 | TBD | Pending |
-| DASH-05 | TBD | Pending |
-| DASH-06 | TBD | Pending |
-| SCEN-01 | TBD | Pending |
-| SCEN-02 | TBD | Pending |
-| SCEN-03 | TBD | Pending |
-| HYG-01 | TBD | Pending |
-| HYG-02 | TBD | Pending |
-| HYG-03 | TBD | Pending |
-| HYG-04 | TBD | Pending |
-| HYG-05 | TBD | Pending |
+| MA-01 | Phase 1: Agent Session Persistence & Routing | Pending |
+| MA-02 | Phase 1: Agent Session Persistence & Routing | Pending |
+| MA-03 | Phase 1: Agent Session Persistence & Routing | Pending |
+| MA-04 | Phase 1: Agent Session Persistence & Routing | Pending |
+| MA-05 | Phase 1: Agent Session Persistence & Routing | Pending |
+| ROUT-01 | Phase 1: Agent Session Persistence & Routing | Pending |
+| ROUT-02 | Phase 1: Agent Session Persistence & Routing | Pending |
+| ROUT-03 | Phase 1: Agent Session Persistence & Routing | Pending |
+| ROUT-04 | Phase 1: Agent Session Persistence & Routing | Pending |
+| VIS-01 | Phase 2: Vision Pixel Inference | Pending |
+| VIS-02 | Phase 2: Vision Pixel Inference | Pending |
+| VIS-03 | Phase 2: Vision Pixel Inference | Pending |
+| VIS-04 | Phase 2: Vision Pixel Inference | Pending |
+| VIS-05 | Phase 2: Vision Pixel Inference | Pending |
+| HYG-01 | Phase 3: Code Hygiene Sweep | Pending |
+| HYG-02 | Phase 3: Code Hygiene Sweep | Pending |
+| HYG-03 | Phase 3: Code Hygiene Sweep | Pending |
+| HYG-04 | Phase 3: Code Hygiene Sweep | Pending |
+| HYG-05 | Phase 3: Code Hygiene Sweep | Pending |
+| BLD-01 | Phase 4: Build & Quickstart Health | Pending |
+| BLD-02 | Phase 4: Build & Quickstart Health | Pending |
+| BLD-03 | Phase 4: Build & Quickstart Health | Pending |
+| BLD-04 | Phase 6: SITL-CI & Determinism Gate | Pending |
+| DASH-01 | Phase 5: Dashboard Live-Mode & Vet-Intake | Pending |
+| DASH-02 | Phase 5: Dashboard Live-Mode & Vet-Intake | Pending |
+| DASH-03 | Phase 5: Dashboard Live-Mode & Vet-Intake | Pending |
+| DASH-04 | Phase 5: Dashboard Live-Mode & Vet-Intake | Pending |
+| DASH-05 | Phase 5: Dashboard Live-Mode & Vet-Intake | Pending |
+| DASH-06 | Phase 5: Dashboard Live-Mode & Vet-Intake | Pending |
+| SCEN-01 | Phase 5: Dashboard Live-Mode & Vet-Intake | Pending |
+| SCEN-02 | Every phase (milestone-wide acceptance criterion; verified in Phase 6) | Pending |
+| SCEN-03 | Phase 6: SITL-CI & Determinism Gate | Pending |
 
 **Coverage:**
 - v1 requirements: 32 total
-- Mapped to phases: 0 (pre-roadmap)
-- Unmapped: 32 ⚠️ (resolves when ROADMAP.md is written)
+- Mapped to phases: 32 ✓
+- Unmapped: 0 ✓
+- Milestone-wide criteria: SCEN-02 (zero-regression) applies to every phase
 
 ---
 *Requirements defined: 2026-04-22*
-*Last updated: 2026-04-22 after initial definition post-audit*
+*Last updated: 2026-04-22 after roadmap traceability population*
