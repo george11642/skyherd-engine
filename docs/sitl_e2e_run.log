@@ -1,0 +1,53 @@
+[00:02:29] === SkyHerd SITL E2E Mission Runner ===
+[00:02:29] Port        : 14552
+[00:02:29] Backend     : pymavlink+emulator
+[00:02:29] Takeoff alt : 15.0 m
+[00:02:29] Waypoints   : 3
+[00:02:29] 
+[00:02:29] Starting MavlinkSitlEmulator vehicle_port=14553 → gcs_port=14552
+INFO:skyherd.drone.sitl_emulator:MavlinkSitlEmulator vehicle_port=14553 → gcs 127.0.0.1:14552
+[00:02:30] Emulator running (vehicle UDP 14553)
+[00:02:30] Connecting to MAVLink vehicle...
+INFO:skyherd.drone.pymavlink_backend:PymavlinkBackend heartbeat from sysid=1
+INFO:skyherd.drone.pymavlink_backend:PymavlinkBackend connected on 127.0.0.1:14552
+[00:02:33] CONNECTED: armed=False in_air=False battery=0% mode=STABILIZE lat=47.3977 lon=8.5456
+[00:02:33] Arming + takeoff to 15.0 m AGL...
+INFO:skyherd.drone.sitl_emulator:Emulator COMMAND_LONG cmd=400 p1=1.0
+INFO:skyherd.drone.pymavlink_backend:ARM ACK: result=0
+INFO:skyherd.drone.sitl_emulator:Emulator COMMAND_LONG cmd=22 p1=0.0
+INFO:skyherd.drone.pymavlink_backend:TAKEOFF ACK: result=0 alt=15.0
+INFO:skyherd.drone.sitl_emulator:Emulator airborne at 14.5 m
+INFO:skyherd.drone.pymavlink_backend:Airborne at 14.5 m
+INFO:skyherd.drone.pymavlink_backend:PymavlinkBackend takeoff to 15.0 m complete
+[00:02:37] TAKEOFF OK — altitude=14.5 m in_air=True
+[00:02:37] Uploading + starting 3-waypoint patrol...
+[00:02:37]   WP0: lat=47.3977 lon=8.5456 alt=50.0 m hold=5.0 s
+[00:02:37]   WP1: lat=47.398 lon=8.546 alt=60.0 m hold=5.0 s
+[00:02:37]   WP2: lat=47.3977 lon=8.5464 alt=50.0 m hold=5.0 s
+INFO:skyherd.drone.sitl_emulator:Emulator MISSION_COUNT=3
+WARNING:skyherd.drone.pymavlink_backend:Mission upload: unexpected ACK None
+INFO:skyherd.drone.sitl_emulator:Emulator COMMAND_LONG cmd=300 p1=0.0
+INFO:skyherd.drone.pymavlink_backend:MISSION_START ACK result=0
+INFO:skyherd.drone.sitl_emulator:Emulator mission item 0/3
+INFO:skyherd.drone.pymavlink_backend:WP 0 reached (1/3)
+INFO:skyherd.drone.sitl_emulator:Emulator mission item 1/3
+INFO:skyherd.drone.pymavlink_backend:WP 1 reached (2/3)
+INFO:skyherd.drone.sitl_emulator:Emulator mission item 2/3
+INFO:skyherd.drone.pymavlink_backend:WP 2 reached (3/3)
+INFO:skyherd.drone.pymavlink_backend:PymavlinkBackend patrol complete (3 WPs)
+INFO:skyherd.drone.sitl_emulator:Emulator mission complete
+[00:03:13] PATROL OK — all 3 waypoints reached
+[00:03:13] Capturing thermal clip (5 s)...
+[00:03:13] THERMAL CLIP: runtime/thermal/1776837793_pymav.png
+[00:03:13] Commanding Return-to-Launch...
+INFO:skyherd.drone.sitl_emulator:Emulator COMMAND_LONG cmd=20 p1=0.0
+INFO:skyherd.drone.pymavlink_backend:RTL ACK result=0
+INFO:skyherd.drone.pymavlink_backend:Landed (rel_alt=500 mm)
+INFO:skyherd.drone.pymavlink_backend:PymavlinkBackend RTL complete
+INFO:skyherd.drone.sitl_emulator:Emulator landed
+[00:03:21] RTL OK — in_air=False armed=False
+[00:03:21] 
+[00:03:21] === E2E PASS (wall-time: 47.9 s) ===
+[00:03:21] Stopping emulator...
+INFO:skyherd.drone.sitl_emulator:MavlinkSitlEmulator stopped
+[00:03:22] Emulator stopped
