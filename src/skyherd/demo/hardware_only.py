@@ -40,10 +40,11 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-# Top-level imports so tests can patch via skyherd.demo.hardware_only.<name>
-from skyherd.drone.interface import get_backend  # noqa: F401 — re-exported for patching
-from skyherd.sensors.bus import SensorBus  # noqa: F401 — re-exported for patching
-from skyherd.scenarios.base import _run_async  # noqa: F401 — re-exported for patching
+# Top-level imports — required at module level so that tests can patch
+# via "skyherd.demo.hardware_only.<name>" without AttributeError.
+from skyherd.drone.interface import DroneError, DroneUnavailable, Waypoint, get_backend
+from skyherd.scenarios.base import _run_async
+from skyherd.sensors.bus import SensorBus
 
 logger = logging.getLogger(__name__)
 
@@ -238,7 +239,7 @@ class HardwareOnlyDemo:
         )
         self._result.wes_called = True
 
-    async def _fallback_coyote_sim(self, world: Any) -> None:
+    async def _fallback_coyote_sim(self, world: Any) -> None:  # noqa: ARG002
         """180s elapsed without Pi detection — run sim coyote scenario."""
         logger.warning(
             "PROP_NOT_DETECTED: no Pi detection after %.0fs — falling back to sim",
@@ -255,7 +256,6 @@ class HardwareOnlyDemo:
         )
 
         try:
-            from skyherd.scenarios.base import _run_async
             from skyherd.scenarios.coyote import CoyoteScenario
 
             scenario = CoyoteScenario()
@@ -278,11 +278,10 @@ class HardwareOnlyDemo:
     # Sick cow secondary prop
     # ------------------------------------------------------------------
 
-    async def _run_sick_cow_prop(self, world: Any) -> None:
+    async def _run_sick_cow_prop(self, world: Any) -> None:  # noqa: ARG002
         """Run sick-cow scenario (sim-driven, Pi #2 provides frame if available)."""
         logger.info("Sick-cow prop: running health check cascade…")
         try:
-            from skyherd.scenarios.base import _run_async
             from skyherd.scenarios.sick_cow import SickCowScenario
 
             scenario = SickCowScenario()
@@ -318,8 +317,6 @@ class HardwareOnlyDemo:
 
         Returns the payload dict on match, or None on timeout.
         """
-        from skyherd.sensors.bus import SensorBus
-
         bus = SensorBus()
         try:
             await bus.start()
@@ -359,8 +356,6 @@ class HardwareOnlyDemo:
 
     async def _launch_drone(self, lat: float, lon: float) -> bool:
         """Connect drone backend and execute takeoff + patrol + deterrent."""
-        from skyherd.drone.interface import DroneError, DroneUnavailable, Waypoint, get_backend
-
         backend_name = os.environ.get("DRONE_BACKEND", "sitl")
         logger.info("Launching drone via backend=%s", backend_name)
 
@@ -401,8 +396,6 @@ class HardwareOnlyDemo:
 
     async def _launch_drone_sitl(self, lat: float, lon: float) -> bool:
         """SITL fallback when Mavic is unavailable."""
-        from skyherd.drone.interface import DroneError, DroneUnavailable, Waypoint
-
         try:
             from skyherd.drone.sitl import SitlBackend
 
@@ -467,22 +460,18 @@ class HardwareOnlyDemo:
             await self._wes_dashboard_ring(urgency, message)
 
     async def _wes_twilio(self, urgency: str, message: str) -> None:
-        """Real Twilio voice call via the existing voice CLI / TTS + Twilio path."""
+        """Real Twilio voice call via TTS + Twilio REST."""
         try:
-            # Use the TTS backend to synthesize, then trigger a Twilio call
-            # via the same flow as skyherd-voice CLI.  If Twilio is not
-            # configured the call silently falls back to dashboard ring.
             from skyherd.voice.tts import get_backend as get_tts_backend
-            from skyherd.voice.wes import wes_script, WesMessage
+            from skyherd.voice.wes import WesMessage, wes_script
 
             wes_msg = WesMessage(urgency=urgency, subject=message)  # type: ignore[call-arg]
             script = wes_script(wes_msg)
-            backend = get_tts_backend()
-            wav_path = backend.synthesize(script, voice="wes")
+            tts = get_tts_backend()
+            wav_path = tts.synthesize(script, voice="wes")
 
-            # Trigger Twilio call if creds are present
-            twilio_sid = os.environ.get("TWILIO_SID", "")
             twilio_token = os.environ.get("TWILIO_TOKEN", "")
+            twilio_sid = os.environ.get("TWILIO_SID", "")
             from_num = os.environ.get("TWILIO_FROM_NUMBER", "")
             to_num = os.environ.get("TWILIO_TO_NUMBER", "")
             if twilio_sid and twilio_token and from_num and to_num:
@@ -490,12 +479,8 @@ class HardwareOnlyDemo:
                     from twilio.rest import Client as TwilioClient  # type: ignore[import-untyped]
 
                     client = TwilioClient(twilio_sid, twilio_token)
-                    twiml = f'<Response><Play>{wav_path.as_posix()}</Play></Response>'
-                    client.calls.create(
-                        twiml=twiml,
-                        to=to_num,
-                        from_=from_num,
-                    )
+                    twiml = f"<Response><Play>{wav_path.as_posix()}</Play></Response>"
+                    client.calls.create(twiml=twiml, to=to_num, from_=from_num)
                     logger.info("Twilio call placed to %s — urgency=%s", to_num, urgency)
                 except Exception as exc:  # noqa: BLE001
                     logger.warning("Twilio call failed: %s", exc)
@@ -509,7 +494,7 @@ class HardwareOnlyDemo:
                     "ts": time.time(),
                 }
             )
-            logger.info("Wes Twilio call placed — urgency=%s", urgency)
+            logger.info("Wes Twilio path complete — urgency=%s", urgency)
         except Exception as exc:  # noqa: BLE001
             logger.warning("Wes Twilio call failed: %s — falling back to dashboard ring", exc)
             await self._wes_dashboard_ring(urgency, message)
@@ -518,13 +503,13 @@ class HardwareOnlyDemo:
         """Write .wav via TTS backend + emit dashboard phone-ring event."""
         _RUNS_DIR.mkdir(parents=True, exist_ok=True)
         ts = int(time.time())
-        wav_path = _RUNS_DIR / f"wes_{ts}.wav"
+        wav_path: Path = _RUNS_DIR / f"wes_{ts}.wav"
 
         try:
             from skyherd.voice.tts import get_backend as get_tts_backend
 
-            backend = get_tts_backend()
-            wav_path = backend.synthesize(message, voice="wes")
+            tts = get_tts_backend()
+            wav_path = tts.synthesize(message, voice="wes")
             logger.info("Wes .wav written: %s", wav_path)
         except Exception as exc:  # noqa: BLE001
             logger.debug("TTS render failed (wav not written): %s", exc)
