@@ -191,18 +191,44 @@ _FORBIDDEN_PATTERNS = [
     r"The system has",
     r"I have detected",
     r"Based on available",
-    r"anomaly",
-    r"alert",
-    r"alarm",
-    r"warning",
+    r"anomaly detected",
+    r"anomaly identified",
 ]
 
 _FORBIDDEN_RE = re.compile("|".join(_FORBIDDEN_PATTERNS), re.IGNORECASE)
 
+# Map each forbidden pattern (lower-case key) to a plain-English replacement.
+# Keys must match the patterns above (minus regex anchors) in lower-case.
+_FORBIDDEN_REPLACEMENTS: dict[str, str] = {
+    "—": ",",
+    "–": ",",
+    "i just wanted": "heads up,",
+    "just to let you know": "heads up,",
+    "just to be sure": "",
+    "i wanted to reach out": "calling",
+    "it is important": "",
+    "please be advised": "heads up,",
+    "the system has": "we've got a",
+    "i have detected": "i've got eyes on",
+    "based on available": "looks like",
+    "anomaly detected": "something off",
+    "anomaly identified": "something off",
+}
+
 
 def _sanitize(text: str) -> str:
-    """Strip any residual AI telltales.  Replace em/en dashes with commas."""
+    """Replace AI telltales with plain ranch English; strip em/en dashes.
+
+    Applied to every public output path so no AI-generated phrasing slips
+    through, regardless of which template or LLM augmentation was used.
+    """
+    # Apply each forbidden-pattern substitution in sequence
+    for pattern_text, replacement in _FORBIDDEN_REPLACEMENTS.items():
+        text = re.sub(re.escape(pattern_text), replacement, text, flags=re.IGNORECASE)
+    # Belt-and-suspenders: catch any stray em/en dashes not covered above
     text = re.sub(r"[—–]", ",", text)
+    # Collapse double-spaces from removals
+    text = re.sub(r"  +", " ", text)
     return text.strip()
 
 

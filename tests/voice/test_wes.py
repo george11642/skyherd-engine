@@ -6,7 +6,7 @@ import re
 
 import pytest
 
-from skyherd.voice.wes import WesMessage, wes_script
+from skyherd.voice.wes import WesMessage, _sanitize, wes_script
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -145,4 +145,58 @@ def test_scenario_scripts(urgency, subject, ctx_key, ctx_val, expected_fragment)
     script = wes_script(msg)
     assert expected_fragment.lower() in script.lower(), (
         f"Fragment {expected_fragment!r} missing from: {script!r}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# C3 regression — _sanitize() is invoked on every output path
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "injected_phrase,description",
+    [
+        ("I just wanted to let you know", "AI soft opener"),
+        ("Just to let you know,", "AI soft opener variant"),
+        ("I have detected an anomaly", "AI detection language"),
+        ("Based on available data,", "AI hedge phrase"),
+        ("The system has flagged", "AI system language"),
+        ("Please be advised that", "AI corporate opener"),
+        ("It is important to note", "AI hedge"),
+        ("I wanted to reach out because", "AI reach-out"),
+        ("anomaly detected in sector 4", "AI anomaly phrase"),
+        ("anomaly identified near fence", "AI anomaly phrase 2"),
+        ("em—dash test", "em-dash"),
+        ("en–dash test", "en-dash"),
+    ],
+)
+def test_sanitize_strips_ai_telltales(injected_phrase: str, description: str) -> None:
+    """_sanitize() must rewrite or remove every known AI telltale phrase."""
+    result = _sanitize(injected_phrase)
+    # The original phrase should not survive intact (case-insensitive)
+    assert injected_phrase.lower() not in result.lower(), (
+        f"AI telltale ({description}) survived _sanitize(): {result!r}"
+    )
+    # em/en dashes must not appear in the output
+    assert "—" not in result and "–" not in result, (
+        f"Dash survived sanitize in: {result!r}"
+    )
+
+
+def test_wes_script_sanitizes_injected_em_dash() -> None:
+    """wes_script() output must never contain an em-dash even if subject contains one."""
+    msg = WesMessage(urgency="call", subject="fence—breached near calving pen")
+    script = wes_script(msg)
+    assert "—" not in script, f"em-dash in wes_script output: {script!r}"
+
+
+def test_wes_script_sanitizes_injected_ai_opener() -> None:
+    """wes_script() output must not pass through AI opener phrases from subject."""
+    msg = WesMessage(
+        urgency="call",
+        subject="I just wanted to let you know about the coyote",
+    )
+    script = wes_script(msg)
+    assert "i just wanted" not in script.lower(), (
+        f"AI opener survived wes_script(): {script!r}"
     )
