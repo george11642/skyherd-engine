@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "cd .. && python3 scripts/build-replay.py && cd web && pnpm install && pnpm run build",
+  "buildCommand": "pnpm install && pnpm run build",
   "outputDirectory": "dist",
   "devCommand": "pnpm run dev",
   "framework": "vite",
