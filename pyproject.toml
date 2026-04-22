@@ -85,6 +85,7 @@ skyherd-demo = "skyherd.scenarios.cli:main"
 skyherd-voice = "skyherd.voice.cli:main"
 skyherd-demo-hw = "skyherd.demo.cli:main"
 skyherd-edge = "skyherd.edge.cli:main"
+skyherd-sitl-e2e = "skyherd.drone.e2e:app"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/skyherd"]
