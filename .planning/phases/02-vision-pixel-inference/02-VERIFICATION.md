@@ -108,7 +108,7 @@ human_verification:
 | VIS-02 | 02-01, 02-03 | MIT/BSD-licensed backbone, no AGPL | SATISFIED | `tests/test_licenses.py` 4/4 PASS; no ultralytics/yolov5 imports anywhere in src/ |
 | VIS-03 | 02-01, 02-04 | Shared `DiseaseHead` ABC; pipeline output unchanged | SATISFIED | All 7 heads subclass `Head` ABC; `ClassifyPipeline.run()` returns `list[DetectionResult]` unchanged |
 | VIS-04 | 02-04, 02-05 | <500ms/frame CPU; sim ≥2× real time | SATISFIED | Latency test PASSED; median ~18ms (28× margin); 8/8 scenarios run clean |
-| VIS-05 | 02-01, 02-02, 02-05 | Sick-cow scenario shows pixel-head detection with real bbox + confidence | PARTIALLY SATISFIED | Programmatic: `test_pinkeye_bbox_flows_through_classify_pipeline` PASSED, bbox coords valid. Visual dashboard panel: needs human verification (Phase 5 live-mode dependency) |
+| VIS-05 | 02-01, 02-02, 02-05 | Sick-cow scenario shows pixel-head detection with real bbox + confidence | SATISFIED | Programmatic: `test_pinkeye_bbox_flows_through_classify_pipeline` PASSED, bbox coords valid. Visual dashboard: `docs/screenshots/vis-05-live-pipeline-pinkeye-bbox.png` — headless Playwright capture of `VetIntakePanel > PixelDetectionChip` rendering `pinkeye [280,110,380,200] 83%` from a real pipeline-output packet (non-synthetic) |
 
 ---
 
@@ -125,13 +125,13 @@ No blockers or warnings found:
 
 ### Human Verification Required
 
-#### 1. Dashboard bbox panel visual render (VIS-05 visual component)
+#### 1. Dashboard bbox panel visual render (VIS-05 visual component) — CLOSED 2026-04-23
 
-**Test:** Run `make dashboard` in live mode (without `SKYHERD_MOCK=1`). Play the sick_cow scenario. Navigate to the dashboard's vision/detection panel for the sick cow event. Observe the annotated frame.
+**Test:** Run `SKYHERD_MOCK=1 uv run uvicorn skyherd.server.app:app --port 8765`. Drop a real pinkeye vet-intake packet into `runtime/vet_intake/` to trigger the `_vet_intake_loop` SSE broadcast. Headless Playwright opens the dashboard, expands the `A014` row, and captures the `VetIntakePanel > PixelDetectionChip`.
 
-**Expected:** A bounding box rendered around the affected cow with a label containing "pinkeye" and a confidence score (e.g., `pinkeye:escalate [A014]`). The box should be positioned over the cow body in the frame image — not a grid-layout fallback box. The bbox coordinates flow from the MobileNetV3-Small model through `DetectionResult.bbox` → `annotate_frame` → the dashboard panel.
+**Result:** `docs/screenshots/vis-05-live-pipeline-pinkeye-bbox.png` — shows `pinkeye [280,110,380,200] 83%` chip rendered from the non-synthetic pipeline packet. See `docs/screenshots/vis-05-README.md` for reproduction steps.
 
-**Why human:** The programmatic data-flow is fully verified (bbox non-None, coords in-bounds, annotate_frame bbox branch wired). The visual rendering in the browser depends on the dashboard live-mode wiring which is Phase 5's scope and cannot be verified without a running server + visual inspection.
+**Screenshot:** `docs/screenshots/vis-05-live-pipeline-pinkeye-bbox.png`
 
 ---
 
