@@ -226,15 +226,21 @@ export function AttestationPanel({ collapsed = false, onToggle }: AttestationPan
             </thead>
             <tbody>
               {entries.length === 0 && (
-                <tr>
-                  <td
-                    colSpan={5}
-                    className="px-3 py-4 text-center italic"
-                    style={{ color: "var(--color-text-2)" }}
-                  >
-                    no ledger entries yet
-                  </td>
-                </tr>
+                <>
+                  {[0, 1, 2].map((i) => (
+                    <tr
+                      key={`skel-${i}`}
+                      data-testid="attest-skeleton-row"
+                      style={{ borderBottom: `1px solid var(--color-line)` }}
+                    >
+                      <td className="px-3 py-1.5"><div className="skeleton" style={{ height: 8, width: 20 }} /></td>
+                      <td className="px-3 py-1.5"><div className="skeleton" style={{ height: 8, width: 56 }} /></td>
+                      <td className="px-3 py-1.5"><div className="skeleton" style={{ height: 8, width: 80 }} /></td>
+                      <td className="px-3 py-1.5"><div className="skeleton" style={{ height: 8, width: 64 }} /></td>
+                      <td className="px-3 py-1.5"><div className="skeleton" style={{ height: 8, width: 72 }} /></td>
+                    </tr>
+                  ))}
+                </>
               )}
               {entries.map((entry) => (
                 <Fragment key={entry.seq}>

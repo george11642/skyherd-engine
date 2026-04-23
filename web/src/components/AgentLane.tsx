@@ -123,12 +123,17 @@ export function AgentLane({ agentName, state, lastWake, events, className }: Age
         aria-live="polite"
       >
         {events.length === 0 ? (
-          <p
-            className="text-xs italic"
-            style={{ fontFamily: "var(--font-mono)", color: "var(--color-text-2)" }}
+          <div
+            data-testid="agent-lane-skeleton"
+            className="flex flex-col"
+            style={{ gap: "6px", paddingTop: "2px" }}
+            aria-label="waiting for events"
           >
-            waiting for events
-          </p>
+            <div className="skeleton" style={{ height: 10, width: "70%" }} />
+            <div className="skeleton" style={{ height: 10, width: "45%" }} />
+            <div className="skeleton" style={{ height: 10, width: "60%" }} />
+            <span className="sr-only">waiting for events</span>
+          </div>
         ) : (
           events.slice(-20).map((ev, idx) => (
             <div

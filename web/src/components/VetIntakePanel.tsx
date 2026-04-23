@@ -254,10 +254,16 @@ export function VetIntakePanel({ fetchIntake }: VetIntakePanelProps = {}) {
       <div className="flex-1 overflow-auto" style={{ fontFamily: "var(--font-mono)", fontSize: "0.6875rem" }}>
         {intakes.length === 0 && (
           <div
-            className="px-3 py-4 text-center italic"
-            style={{ color: "var(--color-text-2)" }}
+            data-testid="vet-intake-skeleton"
+            className="px-3 py-3 flex flex-col"
+            style={{ gap: "6px" }}
+            aria-label="waiting for vet intakes"
           >
-            no vet intakes yet
+            <div className="skeleton" style={{ height: 10, width: "60%" }} />
+            <span className="chip chip-muted" style={{ alignSelf: "flex-start" }}>
+              watching HerdHealthWatcher · live
+            </span>
+            <span className="sr-only">no vet intakes yet</span>
           </div>
         )}
         {intakes.map((row) => {
