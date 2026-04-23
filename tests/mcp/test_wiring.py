@@ -29,7 +29,7 @@ _SENSOR_TOOLS = {
     "get_thermal_clip",
     "subscribe_anomalies",
 }
-_RANCHER_TOOLS = {"page_rancher", "page_vet", "get_rancher_preferences"}
+_RANCHER_TOOLS = {"page_rancher", "page_vet", "get_rancher_preferences", "draft_vet_intake"}
 _GALILEO_TOOLS = {"get_drone_position", "get_cattle_positions", "distance_between"}
 
 

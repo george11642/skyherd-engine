@@ -8,7 +8,14 @@ Handler flow
 1. Load cattle-behavior and disease skills.
 2. Run ``ClassifyPipeline.run()`` on the relevant trough.
 3. Consolidate per-cow findings.
-4. If any finding severity >= escalate → call ``page_rancher``.
+4. If any finding severity >= escalate → call ``draft_vet_intake`` (SCEN-01) to
+   produce a rancher-readable markdown packet. Extract pixel-head DetectionResult.bbox
+   (Phase 2 VIS-05) into ``signals_structured`` for DASH-06 when available.
+5. Call ``page_rancher`` to alert rancher/vet.
+
+The live path (``run_handler_cycle``) calls ``draft_vet_intake`` via the MCP tool
+registered in ``rancher_mcp.py``. The deterministic sim path calls it directly via
+``skyherd.agents.simulate.herd_health_watcher`` → ``_try_draft_vet_intake``.
 """
 
 from __future__ import annotations
@@ -20,6 +27,7 @@ from typing import Any
 from skyherd.agents._handler_base import run_handler_cycle
 from skyherd.agents.session import Session, _load_text, build_cached_messages
 from skyherd.agents.spec import AgentSpec
+from skyherd.server.vet_intake import draft_vet_intake as _draft_vet_intake  # noqa: F401
 
 logger = logging.getLogger(__name__)
 

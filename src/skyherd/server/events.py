@@ -28,6 +28,7 @@ SNAPSHOT_INTERVAL_S: float = 2.0
 COST_TICK_INTERVAL_S: float = 1.0
 ATTEST_POLL_INTERVAL_S: float = 3.0
 MOCK_EVENT_INTERVAL_S: float = 0.8
+VET_INTAKE_POLL_INTERVAL_S: float = 5.0
 
 AGENT_NAMES = [
     "FenceLineDispatcher",
@@ -264,6 +265,7 @@ class EventBroadcaster:
             asyncio.create_task(self._snapshot_loop(), name="broadcaster-snapshot"),
             asyncio.create_task(self._cost_loop(), name="broadcaster-cost"),
             asyncio.create_task(self._attest_loop(), name="broadcaster-attest"),
+            asyncio.create_task(self._vet_intake_loop(), name="broadcaster-vet-intake"),
         ]
         if self._mock:
             self._tasks.append(
@@ -414,6 +416,46 @@ class EventBroadcaster:
             except Exception as exc:  # noqa: BLE001
                 logger.debug("attest loop error: %s", exc)
             await asyncio.sleep(ATTEST_POLL_INTERVAL_S)
+
+    async def _vet_intake_loop(self) -> None:
+        """Poll runtime/vet_intake/ for new .md files and broadcast vet_intake.drafted events.
+
+        Tracks already-broadcast filenames to avoid re-broadcasting on subsequent polls.
+        Payload shape:
+            {
+                "id":       "A014_20260422T153200Z",
+                "cow_tag":  "A014",
+                "severity": "escalate",   # parsed from filename prefix
+                "path":     "runtime/vet_intake/A014_20260422T153200Z.md",
+                "ts":       1745200000.0,
+            }
+        """
+        from pathlib import Path
+
+        intake_dir = Path("runtime/vet_intake")
+        seen: set[str] = set()
+
+        while not self._stop_event.is_set():
+            try:
+                if intake_dir.exists():
+                    for md_file in sorted(intake_dir.glob("*.md")):
+                        if md_file.name not in seen:
+                            seen.add(md_file.name)
+                            stem = md_file.stem  # e.g. "A014_20260422T153200Z"
+                            # Extract cow_tag from stem (first 4 chars for ^[A-Z][0-9]{3}$ tags)
+                            cow_tag = stem[:4] if len(stem) >= 4 else stem
+                            payload: dict[str, Any] = {
+                                "id": stem,
+                                "cow_tag": cow_tag,
+                                "severity": "escalate",
+                                "path": str(md_file),
+                                "ts": time.time(),
+                            }
+                            self._broadcast("vet_intake.drafted", payload)
+                            logger.debug("vet_intake.drafted broadcast: %s", stem)
+            except Exception as exc:  # noqa: BLE001
+                logger.debug("vet intake loop error: %s", exc)
+            await asyncio.sleep(VET_INTAKE_POLL_INTERVAL_S)
 
     async def _mock_agent_log_loop(self) -> None:
         while not self._stop_event.is_set():
