@@ -60,6 +60,27 @@ interface VerifyResult {
   reason?: string | null;
 }
 
+function rowVerifyStatus(
+  seq: number,
+  result: VerifyResult | null,
+  state: VerifyState,
+): "unknown" | "valid" | "invalid" {
+  if (state !== "valid" && state !== "invalid") return "unknown";
+  if (!result) return "unknown";
+  if (result.valid) return "valid";
+  if (result.first_bad_seq == null) return "invalid";
+  if (seq < result.first_bad_seq) return "valid";
+  return "invalid";
+}
+
+function navigateToAttest(hash: string): void {
+  const path = `/attest/${encodeURIComponent(hash)}`;
+  if (typeof window !== "undefined" && window.history?.pushState) {
+    window.history.pushState({}, "", path);
+    window.dispatchEvent(new PopStateEvent("popstate"));
+  }
+}
+
 export function AttestationPanel({ collapsed = false, onToggle }: AttestationPanelProps) {
   const [entries, setEntries] = useState<LedgerEntry[]>([]);
   const [expanded, setExpanded] = useState<number | null>(null);
@@ -276,7 +297,51 @@ export function AttestationPanel({ collapsed = false, onToggle }: AttestationPan
                         }
                       }}
                     >
-                      <HashChip hash={entry.event_hash} />
+                      <span className="inline-flex items-center gap-1">
+                        <HashChip hash={entry.event_hash} />
+                        {(() => {
+                          const status = rowVerifyStatus(
+                            entry.seq,
+                            verifyResult,
+                            verifyState,
+                          );
+                          if (status === "valid") {
+                            return (
+                              <span
+                                className="chip chip-sage tabnum"
+                                data-testid={`row-verified-${entry.seq}`}
+                                title="Signature + hash verified"
+                              >
+                                ✓
+                              </span>
+                            );
+                          }
+                          if (status === "invalid") {
+                            return (
+                              <span
+                                className="chip chip-danger tabnum"
+                                data-testid={`row-invalid-${entry.seq}`}
+                              >
+                                ✗
+                              </span>
+                            );
+                          }
+                          return null;
+                        })()}
+                        <button
+                          type="button"
+                          className="chip chip-muted tabnum"
+                          style={{ cursor: "pointer", padding: "0 4px" }}
+                          aria-label={`Open /attest/${entry.event_hash}`}
+                          data-testid={`row-viewer-link-${entry.seq}`}
+                          onClick={(ev) => {
+                            ev.stopPropagation();
+                            navigateToAttest(entry.event_hash);
+                          }}
+                        >
+                          ↗
+                        </button>
+                      </span>
                     </td>
                   </tr>
                   {expanded === entry.seq && (

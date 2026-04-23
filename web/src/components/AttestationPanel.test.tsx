@@ -233,6 +233,59 @@ describe("AttestationPanel — Verify Chain button (DASH-04)", () => {
     expect(writeText).toHaveBeenCalledWith(fullHash);
   });
 
+  it("shows per-row Verified ✓ badge after verify succeeds (ATT-06)", async () => {
+    const fullHash = "deadbeef00000001" + "0".repeat(48);
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockImplementation((url: string, init?: RequestInit) => {
+        if (
+          typeof url === "string" &&
+          url.includes("/api/attest/verify") &&
+          init?.method === "POST"
+        ) {
+          return Promise.resolve({
+            ok: true,
+            json: () => Promise.resolve({ valid: true, total: 1 }),
+          });
+        }
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ entries: [], ts: Date.now() / 1000 }),
+        });
+      }),
+    );
+    await act(async () => {
+      render(<AttestationPanel />);
+    });
+    act(() => {
+      triggerSSE("attest.append", { ...SAMPLE_ENTRY, seq: 1, event_hash: fullHash });
+    });
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: /verify/i }));
+    });
+    await waitFor(() => expect(screen.getByTestId("row-verified-1")).toBeTruthy());
+  });
+
+  it("row has viewer link button that pushes /attest/<hash> (ATT-01)", async () => {
+    const fullHash = "aabbccdd00000002" + "0".repeat(48);
+    const pushSpy = vi.spyOn(window.history, "pushState");
+    await act(async () => {
+      render(<AttestationPanel />);
+    });
+    act(() => {
+      triggerSSE("attest.append", { ...SAMPLE_ENTRY, seq: 2, event_hash: fullHash });
+    });
+    const link = screen.getByTestId("row-viewer-link-2");
+    await act(async () => {
+      fireEvent.click(link);
+    });
+    const pushed = pushSpy.mock.calls.find(
+      ([, , url]) => typeof url === "string" && url.startsWith("/attest/"),
+    );
+    expect(pushed).toBeTruthy();
+    pushSpy.mockRestore();
+  });
+
   it("shows INVALID chip when verify returns valid:false", async () => {
     vi.stubGlobal(
       "fetch",

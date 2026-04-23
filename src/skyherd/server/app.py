@@ -207,6 +207,156 @@ def create_app(
         result = ledger.verify()
         return JSONResponse(content=result.model_dump())
 
+    @app.get("/api/attest/by-hash/{hash_hex}")
+    async def api_attest_by_hash(hash_hex: str) -> JSONResponse:
+        """Return one ledger entry + its chain back to genesis (ATT-01).
+
+        Mock mode: synthesise a 3-row chain ending at ``hash_hex`` so the SPA
+        viewer can render without a live ledger.
+        Live mode: walk the ledger, find the matching row, collect all rows
+        with seq <= target seq (the prev-chain).
+        """
+        # Input validation — hash is hex string, bounded length.
+        if not hash_hex or len(hash_hex) > 128 or not all(
+            c in "0123456789abcdefABCDEF" for c in hash_hex
+        ):
+            raise HTTPException(status_code=400, detail="invalid hash format")
+
+        if use_mock or ledger is None:
+            return JSONResponse(
+                content={
+                    "target": hash_hex,
+                    "chain": [
+                        {
+                            **_mock_attest_entry(),
+                            "seq": i + 1,
+                            "prev_hash": "GENESIS" if i == 0 else f"parent{i:08x}",
+                            "event_hash": hash_hex if i == 2 else f"chain{i:08x}",
+                        }
+                        for i in range(3)
+                    ],
+                    "ts": time.time(),
+                }
+            )
+
+        # Live: iterate until we find the target, keep everything up to it.
+        chain: list[dict[str, Any]] = []
+        found = False
+        for event in ledger.iter_events():
+            entry = event.model_dump()
+            chain.append(entry)
+            if event.event_hash == hash_hex:
+                found = True
+                break
+
+        if not found:
+            raise HTTPException(
+                status_code=404,
+                detail=f"no ledger entry with event_hash={hash_hex}",
+            )
+
+        return JSONResponse(
+            content={"target": hash_hex, "chain": chain, "ts": time.time()}
+        )
+
+    @app.get("/api/attest/pair/{memver_id}")
+    async def api_attest_pair(memver_id: str) -> JSONResponse:
+        """Return the ledger entry paired with a memory version (ATT-04).
+
+        The two-independent-receipts-agree demo beat: the Phase 1 Claude
+        Managed Agents memory version (``memver_...``) matches a signed
+        ledger row whose canonical payload binds the same id.
+
+        Mock mode: synthesise a matched pair.
+        Live mode: scan recent events for a row with payload containing
+        ``"_memver_id": "<memver_id>"`` OR legacy ``"memory_version_id":
+        "<memver_id>"``.
+        """
+        # memver_ ids are base62 — validate tightly to avoid SQLi-ish concerns
+        # (even though we never concatenate into SQL; defence in depth).
+        if not memver_id or len(memver_id) > 128 or not memver_id.replace("_", "").isalnum():
+            raise HTTPException(status_code=400, detail="invalid memver_id format")
+
+        if use_mock or ledger is None:
+            mock_entry = _mock_attest_entry()
+            mock_entry["memver_id"] = memver_id
+            mock_entry["payload_json"] = json.dumps(
+                {
+                    "agent": "HerdHealthWatcher",
+                    "memory_version_id": memver_id,
+                    "_memver_id": memver_id,
+                },
+                separators=(",", ":"),
+                sort_keys=True,
+            )
+            mock_entry["kind"] = "memver.written"
+            return JSONResponse(
+                content={
+                    "memver_id": memver_id,
+                    "ledger_entry": mock_entry,
+                    "memver": {
+                        "id": memver_id,
+                        "agent": "HerdHealthWatcher",
+                        "content_sha256": "sha256:mock_content",
+                        "path": "notes.md",
+                    },
+                    "ts": time.time(),
+                }
+            )
+
+        # Live: linear scan (OK for demo; chain stays small).
+        match_entry: dict[str, Any] | None = None
+        match_memver: dict[str, Any] = {"id": memver_id}
+        for event in ledger.iter_events():
+            # Primary path: dedicated memver_id field (Phase 4).
+            if event.memver_id == memver_id:
+                match_entry = event.model_dump()
+                try:
+                    parsed = json.loads(event.payload_json)
+                    if isinstance(parsed, dict):
+                        match_memver.update(
+                            {
+                                "agent": parsed.get("agent"),
+                                "content_sha256": parsed.get("content_sha256"),
+                                "path": parsed.get("path"),
+                            }
+                        )
+                except (ValueError, TypeError):
+                    pass
+                break
+            # Legacy path: payload field "memory_version_id" (pre-Phase-4).
+            try:
+                parsed = json.loads(event.payload_json)
+                if (
+                    isinstance(parsed, dict)
+                    and parsed.get("memory_version_id") == memver_id
+                ):
+                    match_entry = event.model_dump()
+                    match_memver.update(
+                        {
+                            "agent": parsed.get("agent"),
+                            "content_sha256": parsed.get("content_sha256"),
+                            "path": parsed.get("path"),
+                        }
+                    )
+                    break
+            except (ValueError, TypeError):
+                continue
+
+        if match_entry is None:
+            raise HTTPException(
+                status_code=404, detail=f"no ledger entry for memver_id={memver_id}"
+            )
+
+        return JSONResponse(
+            content={
+                "memver_id": memver_id,
+                "ledger_entry": match_entry,
+                "memver": match_memver,
+                "ts": time.time(),
+            }
+        )
+
     @app.get("/api/vet-intake/{intake_id}")
     async def api_vet_intake(intake_id: str) -> PlainTextResponse:
         """Return the markdown body for a vet-intake artifact (SCEN-01).
