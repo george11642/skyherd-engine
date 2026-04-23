@@ -256,7 +256,21 @@ def get_backend() -> TTSBackend:
     return backend
 
 
+# SKYHERD_VOICE env flag values that force SilentBackend regardless of chain.
+_VOICE_MODE_MOCK = {"mock", "silent"}
+_VOICE_MODE_LIVE = {"live", ""}
+
+
 def _resolve_backend() -> TTSBackend:
+    # 0 -- SKYHERD_VOICE=mock|silent forces SilentBackend (CI-safe + determinism).
+    voice_mode = os.environ.get("SKYHERD_VOICE", "").lower()
+    if voice_mode in _VOICE_MODE_MOCK:
+        return SilentBackend()
+    if voice_mode and voice_mode not in _VOICE_MODE_LIVE:
+        logger.warning(
+            "SKYHERD_VOICE=%r ignored; expected live|mock|silent", voice_mode
+        )
+
     # 1 -- ElevenLabs
     api_key = os.environ.get("ELEVENLABS_API_KEY", "")
     if api_key:

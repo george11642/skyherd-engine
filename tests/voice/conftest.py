@@ -9,10 +9,24 @@ subsequent tests in the same process — causing false negatives in any test
 that asserts the warning IS emitted.  Clearing before and after each test
 restores the per-test isolation guarantee without changing production behavior
 (production has a single long-lived process, so once-per-process remains true).
+
+Also includes an autouse ``default_voice_mock`` fixture that sets
+``SKYHERD_VOICE=mock`` by default for every voice test, forcing SilentBackend
+and skipping Twilio.  Tests that need live-chain behavior override with
+``monkeypatch.setenv("SKYHERD_VOICE", "live")`` in their own body — this works
+because pytest's ``monkeypatch`` acts on the live ``os.environ`` dict, so a
+later setenv overrides the earlier one, and the fixture's teardown still
+reverts the environment at the end of the test.
 """
 from __future__ import annotations
 
 import pytest
+
+
+@pytest.fixture(autouse=True)
+def default_voice_mock(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Default SKYHERD_VOICE=mock for every voice test; tests override as needed."""
+    monkeypatch.setenv("SKYHERD_VOICE", "mock")
 
 
 @pytest.fixture(autouse=True)

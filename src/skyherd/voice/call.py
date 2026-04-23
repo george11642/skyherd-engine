@@ -47,6 +47,18 @@ def _twilio_available() -> bool:
     )
 
 
+def _voice_mode_is_mock() -> bool:
+    """Return True if SKYHERD_VOICE=mock|silent — forces dashboard-ring path."""
+    return os.environ.get("SKYHERD_VOICE", "").lower() in {"mock", "silent"}
+
+
+def _should_attempt_twilio() -> bool:
+    """Twilio attempt gate: creds present AND not in mock voice mode."""
+    if _voice_mode_is_mock():
+        return False
+    return _twilio_available()
+
+
 def _demo_mode() -> bool:
     return os.environ.get("DEMO_PHONE_MODE", "dashboard") == "dashboard"
 
@@ -139,16 +151,27 @@ def render_urgency_call(message: WesMessage) -> dict:
             _write_ring(record)
         return {**record, "wav_path": None}
 
-    # Synthesize wav
+    # Synthesize wav -- with graceful fallback if the chosen backend raises.
     backend = get_backend()
-    wav_path: Path = backend.synthesize(script)
+    try:
+        wav_path: Path = backend.synthesize(script)
+    except Exception as exc:  # noqa: BLE001
+        logger.warning(
+            "TTS backend %s failed: %s: %s -- falling back to SilentBackend",
+            type(backend).__name__,
+            type(exc).__name__,
+            exc,
+        )
+        from skyherd.voice.tts import SilentBackend
+
+        wav_path = SilentBackend().synthesize(script)
 
     rancher_phone = os.environ.get("RANCHER_PHONE", "+15055550100")
     delivered_to = "dashboard-ring"
     twilio_sid: str | None = None
 
-    # Attempt real Twilio call if configured and not in demo mode
-    if _twilio_available() and not _demo_mode() and message.urgency in ("call", "emergency"):
+    # Attempt real Twilio call if configured and not in demo mode / mock voice mode
+    if _should_attempt_twilio() and not _demo_mode() and message.urgency in ("call", "emergency"):
         twilio_sid = _try_twilio_call(script, wav_path, to=rancher_phone)
         if twilio_sid:
             delivered_to = "twilio"

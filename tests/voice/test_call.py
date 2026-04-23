@@ -180,10 +180,135 @@ class TestTryTwilioCall:
         monkeypatch.setenv("TWILIO_FROM", "+15550001111")
         monkeypatch.setenv("CLOUDFLARE_TUNNEL_URL", "https://example.trycloudflare.com")
         monkeypatch.setenv("DEMO_PHONE_MODE", "live")
+        monkeypatch.setenv("SKYHERD_VOICE", "live")
 
         result = render_urgency_call(_msg("call", "coyote"))
         assert result["delivered_to"] == "twilio"
         assert result["call_id"] == "CA_LIVE"
+
+
+class TestSkyherdVoiceSkipsTwilio:
+    """SKYHERD_VOICE=mock short-circuits Twilio even with full creds set."""
+
+    def _make_crashing_twilio_mock(self, monkeypatch):
+        """Inject a twilio.rest.Client that raises if .calls.create is invoked."""
+        import sys
+        import types
+
+        called = {"count": 0}
+
+        def _crash(**kw):
+            called["count"] += 1
+            raise AssertionError("Twilio must not be called in mock mode")
+
+        fake_twilio = types.ModuleType("twilio")
+        fake_twilio_rest = types.ModuleType("twilio.rest")
+        fake_calls = type("FakeCalls", (), {"create": lambda self, **kw: _crash(**kw)})()
+        fake_client_inst = type("FakeClient", (), {"calls": fake_calls})()
+        fake_twilio_rest.Client = lambda sid, token: fake_client_inst
+        fake_twilio.rest = fake_twilio_rest
+        monkeypatch.setitem(sys.modules, "twilio", fake_twilio)
+        monkeypatch.setitem(sys.modules, "twilio.rest", fake_twilio_rest)
+        return called
+
+    def test_skyherd_voice_mock_skips_twilio_even_with_creds(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        monkeypatch.setenv("TWILIO_SID", "ACxxx")
+        monkeypatch.setenv("TWILIO_AUTH_TOKEN", "tok")
+        monkeypatch.setenv("TWILIO_FROM", "+15550001111")
+        monkeypatch.setenv("CLOUDFLARE_TUNNEL_URL", "https://example.trycloudflare.com")
+        monkeypatch.setenv("DEMO_PHONE_MODE", "live")
+        monkeypatch.setenv("SKYHERD_VOICE", "mock")
+
+        call_tracker = self._make_crashing_twilio_mock(monkeypatch)
+
+        result = render_urgency_call(_msg("call", "coyote at fence"))
+        assert result["delivered_to"] == "dashboard-ring"
+        assert call_tracker["count"] == 0
+
+    def test_skyherd_voice_silent_skips_twilio(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        monkeypatch.setenv("TWILIO_SID", "ACxxx")
+        monkeypatch.setenv("TWILIO_AUTH_TOKEN", "tok")
+        monkeypatch.setenv("TWILIO_FROM", "+15550001111")
+        monkeypatch.setenv("CLOUDFLARE_TUNNEL_URL", "https://example.trycloudflare.com")
+        monkeypatch.setenv("DEMO_PHONE_MODE", "live")
+        monkeypatch.setenv("SKYHERD_VOICE", "silent")
+
+        call_tracker = self._make_crashing_twilio_mock(monkeypatch)
+
+        result = render_urgency_call(_msg("emergency", "predator inside herd"))
+        assert result["delivered_to"] == "dashboard-ring"
+        assert call_tracker["count"] == 0
+
+    def test_skyherd_voice_live_still_attempts_twilio(self, tmp_path, monkeypatch):
+        """With SKYHERD_VOICE=live, Twilio path still fires when creds present."""
+        import sys
+        import types
+
+        monkeypatch.chdir(tmp_path)
+        fake_call = type("FakeCall", (), {"sid": "CA_REAL_LIVE"})()
+        fake_calls = type("FakeCalls", (), {"create": lambda self, **kw: fake_call})()
+        fake_client_inst = type("FakeClient", (), {"calls": fake_calls})()
+        fake_twilio = types.ModuleType("twilio")
+        fake_twilio_rest = types.ModuleType("twilio.rest")
+        fake_twilio_rest.Client = lambda sid, token: fake_client_inst
+        fake_twilio.rest = fake_twilio_rest
+        monkeypatch.setitem(sys.modules, "twilio", fake_twilio)
+        monkeypatch.setitem(sys.modules, "twilio.rest", fake_twilio_rest)
+
+        monkeypatch.setenv("TWILIO_SID", "ACxxx")
+        monkeypatch.setenv("TWILIO_AUTH_TOKEN", "tok")
+        monkeypatch.setenv("TWILIO_FROM", "+15550001111")
+        monkeypatch.setenv("CLOUDFLARE_TUNNEL_URL", "https://example.trycloudflare.com")
+        monkeypatch.setenv("DEMO_PHONE_MODE", "live")
+        monkeypatch.setenv("SKYHERD_VOICE", "live")
+
+        result = render_urgency_call(_msg("call", "coyote at fence"))
+        assert result["delivered_to"] == "twilio"
+        assert result["call_id"] == "CA_REAL_LIVE"
+
+
+class TestSynthesizeFailureFallback:
+    """When the chosen backend raises in synthesize(), fall back to SilentBackend."""
+
+    def test_synthesize_failure_falls_back_to_silent(self, tmp_path, monkeypatch):
+        from skyherd.voice import tts as tts_module
+
+        monkeypatch.chdir(tmp_path)
+        monkeypatch.delenv("TWILIO_SID", raising=False)
+        monkeypatch.setenv("SKYHERD_VOICE", "live")
+
+        class ExplodingBackend(tts_module.TTSBackend):
+            def synthesize(self, text, voice="wes"):  # noqa: ARG002
+                raise RuntimeError("boom: elevenlabs 429")
+
+        monkeypatch.setattr(tts_module, "_BACKEND_LOGGED", False)
+        monkeypatch.setattr("skyherd.voice.call.get_backend", lambda: ExplodingBackend())
+
+        result = render_urgency_call(_msg("call", "coyote"))
+        assert result["delivered_to"] == "dashboard-ring"
+        # wav should exist (from SilentBackend fallback)
+        wav = Path(result["wav_path"])
+        assert wav.exists()
+
+    def test_synthesize_failure_logs_warning(self, tmp_path, monkeypatch, caplog):
+        from skyherd.voice import tts as tts_module
+
+        monkeypatch.chdir(tmp_path)
+        monkeypatch.delenv("TWILIO_SID", raising=False)
+
+        class ExplodingBackend(tts_module.TTSBackend):
+            def synthesize(self, text, voice="wes"):  # noqa: ARG002
+                raise RuntimeError("boom: piper process died")
+
+        monkeypatch.setattr("skyherd.voice.call.get_backend", lambda: ExplodingBackend())
+
+        with caplog.at_level(logging.WARNING, logger="skyherd.voice.call"):
+            render_urgency_call(_msg("call", "water tank"))
+
+        warnings = [r for r in caplog.records if "falling back to SilentBackend" in r.message]
+        assert len(warnings) >= 1
 
 
 class TestWesSay:
