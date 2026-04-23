@@ -111,6 +111,50 @@ The 3-min video MUST show Memory Panel populating live during `coyote` scenario 
 
 </specifics>
 
+<spike_findings>
+## REST API Spike — 2026-04-23 20:10 UTC
+
+**Critical finding:** `anthropic==0.96.0` (installed, latest on PyPI) does **NOT** expose `client.beta.memory_stores`. The SDK ships with `beta.{agents, environments, files, messages, models, sessions, skills, user_profiles, vaults}` only — no `memory_stores`. Memory is REST-only for Python today.
+
+**Workaround confirmed:** Raw HTTP via `client.post()` / `client.get()` on the existing Anthropic client (reuses auth, retries, rate-limit handling). No new dependencies needed.
+
+### Verified REST surface (end-to-end live test against api.anthropic.com)
+
+Required headers on every call:
+- `x-api-key: $ANTHROPIC_API_KEY`
+- `anthropic-version: 2023-06-01`
+- `anthropic-beta: managed-agents-2026-04-01`
+- `content-type: application/json` (writes only)
+
+| Op | Method + Path | Request body | Response fields |
+|---|---|---|---|
+| Create store | `POST /v1/memory_stores` | `{name, description}` | `id: memstore_*, name, description, metadata, type, created_at, updated_at` |
+| Archive store | `POST /v1/memory_stores/{id}/archive` | `{}` | full store object w/ `archived_at` |
+| List stores | `GET /v1/memory_stores` | — | `{data: [...]}` (archived excluded by default) |
+| Create memory | `POST /v1/memory_stores/{id}/memories` | `{path, content}` | `id: mem_*, memory_version_id: memver_*, content_sha256, content_size_bytes, path, created_at, updated_at` |
+| List memories | `GET /v1/memory_stores/{id}/memories` | — (optional `path_prefix`, `depth`, `order_by`) | `{data: [...], prefixes: [...]}` |
+| List versions | `GET /v1/memory_stores/{id}/memory_versions` | — (optional `memory_id`) | `{data: [{id: memver_*, operation: "created"\|"updated"\|"deleted"\|"redacted", created_by: {type, api_key_id}, path, redacted_by, ...}]}` |
+
+### ID formats
+
+- Memstore: `memstore_018S1WJAA5mpXW9mTH3YXqzE`
+- Memory: `mem_0126mdrYVnARX4Q9iteMiNaB`
+- Version: `memver_01XRSVdKC1McTbhVbVF5T47E`
+
+### Attribution chain
+
+Every `memory_version` object includes `created_by: {type: "api_actor", api_key_id: "apikey_..."}`. That `api_key_id` is the attestation anchor for the dashboard's Memory Panel — pair it with the Ed25519 ledger entry for the "two independent receipts agree" demo moment.
+
+### Implementation implication
+
+`MemoryStoreManager` implementation: a ~200-line module wrapping `client.post()` / `client.get()` with strong typing via Pydantic models that mirror the REST shapes above. Keep it separate from `managed.py` so when the SDK ships `beta.memory_stores`, it's a drop-in swap.
+
+### Spike artifact cleanup
+
+Spike memstore `memstore_018S1WJAA5mpXW9mTH3YXqzE` archived at 2026-04-23T20:11:15Z. No residual state.
+
+</spike_findings>
+
 <deferred>
 ## Deferred Ideas
 
