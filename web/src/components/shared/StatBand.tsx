@@ -3,8 +3,23 @@
  */
 
 import { useState, useEffect, useCallback } from "react";
+import { motion, useSpring, useTransform } from "framer-motion";
 import { Chip } from "./Chip";
 import { getSSE } from "@/lib/sse";
+
+/**
+ * AnimatedCount — 400ms tween across an integer/float value.
+ * Reuses the spring stiffness from CostTicker.AnimatedCost so chip
+ * transitions stay visually consistent across the dashboard.
+ */
+function AnimatedCount({ value, format }: { value: number; format: (v: number) => string }) {
+  const spring = useSpring(value, { stiffness: 60, damping: 20, duration: 0.4 });
+  const display = useTransform(spring, (v) => format(v));
+  useEffect(() => {
+    spring.set(value);
+  }, [value, spring]);
+  return <motion.span className="tabnum">{display}</motion.span>;
+}
 
 interface BandStats {
   meshSessions: number;
@@ -134,16 +149,28 @@ export function StatBand() {
         aria-label="System status"
       >
         <Chip variant="sage" dot pulse={!stats.allIdle}>
-          MESH: {stats.meshSessions} sessions
+          MESH:{" "}
+          <AnimatedCount
+            value={stats.meshSessions}
+            format={(v) => `${Math.round(v)} sessions`}
+          />
         </Chip>
         <Chip variant="sky" dot>
           BUS: {stats.busTopics} topics
         </Chip>
         <Chip variant="muted" dot>
-          LEDGER: {stats.ledgerEvents.toLocaleString()} events
+          LEDGER:{" "}
+          <AnimatedCount
+            value={stats.ledgerEvents}
+            format={(v) => `${Math.round(v).toLocaleString()} events`}
+          />
         </Chip>
         <Chip variant={stats.allIdle ? "muted" : "dust"} dot pulse={!stats.allIdle}>
-          COST: ${(stats.costPerDay || 0.17).toFixed(2)}/day
+          COST: $
+          <AnimatedCount
+            value={stats.costPerDay || 0.17}
+            format={(v) => `${v.toFixed(2)}/day`}
+          />
         </Chip>
         <Chip variant="muted">
           UPTIME: {stats.uptime}
