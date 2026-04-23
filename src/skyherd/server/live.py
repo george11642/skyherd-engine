@@ -99,29 +99,37 @@ def start(
     live_app = create_app(mock=False, mesh=mesh, world=world, ledger=ledger)
 
     if ambient_on:
+        from contextlib import asynccontextmanager  # noqa: PLC0415
+
         from skyherd.server import app as _app_module  # noqa: PLC0415
         from skyherd.server.ambient import AmbientDriver  # noqa: PLC0415
 
-        @live_app.on_event("startup")
-        async def _start_ambient() -> None:
-            broadcaster = getattr(_app_module, "_broadcaster", None)
-            driver = AmbientDriver(
-                mesh=mesh,
-                world=world,
-                ledger=ledger,
-                broadcaster=broadcaster,
-                speed=ambient_speed,
-            )
-            live_app.state.ambient_driver = driver
-            await driver.start()
-            logger.info("AmbientDriver started @ %.2fx", ambient_speed)
+        # create_app() already installs its own lifespan (broadcaster start/stop),
+        # so FastAPI's @on_event("startup") hooks are ignored. Wrap the existing
+        # lifespan to attach the ambient driver while the broadcaster is alive.
+        original_lifespan = live_app.router.lifespan_context
 
-        @live_app.on_event("shutdown")
-        async def _stop_ambient() -> None:
-            driver = getattr(live_app.state, "ambient_driver", None)
-            if driver is not None:
-                await driver.stop()
-                logger.info("AmbientDriver stopped")
+        @asynccontextmanager
+        async def _ambient_lifespan(fastapi_app):  # type: ignore[no-untyped-def]
+            async with original_lifespan(fastapi_app):
+                broadcaster = getattr(_app_module, "_broadcaster", None)
+                driver = AmbientDriver(
+                    mesh=mesh,
+                    world=world,
+                    ledger=ledger,
+                    broadcaster=broadcaster,
+                    speed=ambient_speed,
+                )
+                live_app.state.ambient_driver = driver
+                await driver.start()
+                logger.info("AmbientDriver started @ %.2fx", ambient_speed)
+                try:
+                    yield
+                finally:
+                    await driver.stop()
+                    logger.info("AmbientDriver stopped")
+
+        live_app.router.lifespan_context = _ambient_lifespan
 
     uvicorn.run(live_app, host=host, port=port, log_level=log_level)
 

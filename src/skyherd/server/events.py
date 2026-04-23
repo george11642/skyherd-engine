@@ -411,7 +411,24 @@ class EventBroadcaster:
                         self._broadcast("attest.append", entry)
                 else:
                     for event in self._ledger.iter_events(since_seq=last_seq):
-                        self._broadcast("attest.append", event.model_dump())
+                        payload = event.model_dump()
+                        self._broadcast("attest.append", payload)
+                        # Mirror tool-call attestations as agent.log so live-mode
+                        # AgentLanes populates without the mock loop.
+                        kind = payload.get("kind", "")
+                        if isinstance(kind, str) and kind.startswith("tool_call."):
+                            tool = kind.split(".", 1)[1]
+                            inner = payload.get("payload") or {}
+                            self._broadcast(
+                                "agent.log",
+                                {
+                                    "agent": payload.get("source", "unknown"),
+                                    "ts": payload.get("ts", time.time()),
+                                    "tool": tool,
+                                    "line": f"{tool}({inner.get('args', '') if isinstance(inner, dict) else ''})",
+                                    "seq": payload.get("seq"),
+                                },
+                            )
                         last_seq = event.seq
             except Exception as exc:  # noqa: BLE001
                 logger.debug("attest loop error: %s", exc)
