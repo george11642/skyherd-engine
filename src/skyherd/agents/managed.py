@@ -36,7 +36,7 @@ import time
 import uuid
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 logger = logging.getLogger(__name__)
 
@@ -245,7 +245,7 @@ class ManagedSessionManager:
             name=agent_spec.name,
             model=agent_spec.model,
             system=system_prompt or f"You are {agent_spec.name} for SkyHerd.",
-            tools=[_build_tools_config(agent_spec)],
+            tools=cast(Any, [_build_tools_config(agent_spec)]),
         )
 
         self._agent_ids[agent_spec.name] = agent.id

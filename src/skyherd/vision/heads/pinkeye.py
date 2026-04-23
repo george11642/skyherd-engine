@@ -13,7 +13,7 @@ import functools
 import importlib.resources
 import logging
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import torch
 import torch.nn as nn
@@ -50,7 +50,7 @@ def _get_model() -> nn.Module | None:
         weights_ref = importlib.resources.files("skyherd.vision._models") / "pinkeye_mbv3s.pth"
         with importlib.resources.as_file(weights_ref) as weights_path:
             model = mobilenet_v3_small(weights=MobileNet_V3_Small_Weights.IMAGENET1K_V1)
-            model.classifier[3] = nn.Linear(model.classifier[3].in_features, 4)
+            model.classifier[3] = nn.Linear(cast(int, model.classifier[3].in_features), 4)
             state = torch.load(str(weights_path), map_location="cpu", weights_only=True)
             model.load_state_dict(state)
             model.eval()
