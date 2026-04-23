@@ -1,5 +1,21 @@
 # SkyHerd Engine
 
+## Current State
+
+**v1.0 MVP shipped 2026-04-23** — 32/32 v1 requirements satisfied, 10/10 Sim Completeness Gate GREEN, 1106+ tests passing at ≥87% coverage, all 8 scenarios pass `make demo SEED=42 SCENARIO=all` deterministically. Six phases closed across ~36 hours wall time: agent session persistence (241 → 5 sessions per scenario), real pixel-level pinkeye vision head, dashboard live-mode + vet-intake packet, fresh-clone quickstart, code hygiene sweep, SITL-CI + determinism gate. Archive: `.planning/milestones/v1.0-ROADMAP.md`, `.planning/milestones/v1.0-REQUIREMENTS.md`, `.planning/milestones/v1.0-MILESTONE-AUDIT.md`. Summary: `.planning/MILESTONES.md`.
+
+## Next Milestone Goals
+
+_To be scoped via `/gsd-new-milestone`. Candidate cycles per v5.1 plan and PROJECT.md Out-of-Scope list:_
+
+- Hardware tier H1+H2 (Pi 4 + PiCamera + desk-coyote → SITL drone takeoff)
+- Hardware tier H3 (Mavic Air 2 via DJI SDK V5 or F3 iNav under agent command)
+- Hardware tier H4 (DIY LoRa GPS collar into ChirpStack)
+- Demo video + submission (3-min unlisted YouTube + submission form + LinkedIn launch)
+- Voice hardening (Wes live Twilio call with credentials, voice-clone QA)
+- Cross-ranch mesh promoted to first-class
+- Attestation year-2 LRP-rider hardening
+
 ## What This Is
 
 SkyHerd Engine is George's submission for the **"Built with Opus 4.7" Claude Code hackathon** (Apr 21–26 2026). It's a deterministic ranch simulator wrapped around a 5-agent **Claude Managed Agents** mesh that monitors a simulated American ranch 24/7 — coyote at the fence, sick cow flagged, water tank drop, calving detected, storm incoming — driving an ArduPilot SITL drone, a "Wes" cowboy voice persona, and an Ed25519-attested event ledger. The submission is 100% sim-first; hardware (Pi + Mavic + DIY LoRa collar) integrates one-piece-at-a-time in later milestones only after the Sim Completeness Gate passes.
@@ -124,4 +140,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-22 after initialization (post-audit of existing brownfield)*
+*Last updated: 2026-04-23 after v1.0 milestone*
