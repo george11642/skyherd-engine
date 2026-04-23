@@ -224,6 +224,36 @@ def _mock_attest_entry() -> dict[str, Any]:
 
 
 # ---------------------------------------------------------------------------
+# Memory event mock generators (Plan 01-05 MEM-08)
+# ---------------------------------------------------------------------------
+
+_mock_memory_seq = 0
+
+
+def _mock_memory_written_entry() -> dict[str, Any]:
+    """Deterministic sample 'memory.written' SSE payload for mock mode."""
+    global _mock_memory_seq
+    _mock_memory_seq += 1
+    agent = AGENT_NAMES[_mock_memory_seq % len(AGENT_NAMES)]
+    h = f"{_mock_memory_seq:08x}"
+    return {
+        "agent": agent,
+        "memory_store_id": f"memstore_{agent.lower()}_ranch_a",
+        "memory_id": f"mem_{h}",
+        "memory_version_id": f"memver_{h}",
+        "content_sha256": h.ljust(64, "0"),
+        "path": f"/patterns/{agent.lower()}-sample.md",
+    }
+
+
+def _mock_memory_read_entry() -> dict[str, Any]:
+    """Deterministic sample 'memory.read' SSE payload for mock mode."""
+    entry = _mock_memory_written_entry()
+    # memory.read carries the same shape but explicitly no content_sha256 diff.
+    return entry
+
+
+# ---------------------------------------------------------------------------
 # EventBroadcaster
 # ---------------------------------------------------------------------------
 
@@ -315,6 +345,18 @@ class EventBroadcaster:
                     q.put_nowait((event_type, payload))
                 except (asyncio.QueueEmpty, asyncio.QueueFull) as exc:
                     logger.debug("sse queue rotation race on slow consumer: %s", exc)
+
+    # ------------------------------------------------------------------
+    # Memory event emit wrappers (Plan 01-05 MEM-08)
+    # ------------------------------------------------------------------
+
+    async def emit_memory_written(self, payload: dict[str, Any]) -> None:
+        """Async wrapper around _broadcast for 'memory.written'."""
+        self._broadcast("memory.written", payload)
+
+    async def emit_memory_read(self, payload: dict[str, Any]) -> None:
+        """Async wrapper around _broadcast for 'memory.read'."""
+        self._broadcast("memory.read", payload)
 
     # ------------------------------------------------------------------
     # Producer loops

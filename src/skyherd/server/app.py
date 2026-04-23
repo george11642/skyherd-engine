@@ -127,6 +127,21 @@ def create_app(
     except Exception as exc:  # noqa: BLE001
         logger.warning("Webhook router not mounted: %s", exc)
 
+    # Memory API router — GET /api/memory/{agent} (+ /versions) (Plan 01-05).
+    try:
+        from skyherd.server.memory_api import attach_memory_api  # noqa: PLC0415
+        memory_store_manager = getattr(mesh, "_memory_store_manager", None) if mesh else None
+        store_id_map = getattr(mesh, "_memory_store_ids", None) if mesh else None
+        attach_memory_api(
+            app,
+            memory_store_manager=memory_store_manager,
+            store_id_map=store_id_map,
+            use_mock=use_mock,
+        )
+        logger.info("Mounted Memory API router at /api/memory")
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("Memory API router not mounted: %s", exc)
+
     # ------------------------------------------------------------------
     # Health
     # ------------------------------------------------------------------
