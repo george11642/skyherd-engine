@@ -2,7 +2,7 @@
 render_urgency_call — full pipeline: WesMessage → wav → deliver.
 
 Delivery priority:
-  1. Twilio voice call (if TWILIO_SID + TWILIO_TOKEN + TWILIO_FROM are set
+  1. Twilio voice call (if TWILIO_SID + TWILIO_AUTH_TOKEN + TWILIO_FROM are set
      AND DEMO_PHONE_MODE != "dashboard").
   2. Dashboard ring — writes to runtime/phone_rings.jsonl; SSE event
      "rancher.ringing" is picked up by the /rancher PWA.
@@ -18,6 +18,7 @@ import uuid
 from datetime import UTC, datetime
 from pathlib import Path
 
+from skyherd.voice._twilio_env import _get_twilio_auth_token
 from skyherd.voice.tts import get_backend
 from skyherd.voice.wes import WesMessage, wes_script
 
@@ -41,7 +42,7 @@ def _write_ring(record: dict) -> None:
 def _twilio_available() -> bool:
     return bool(
         os.environ.get("TWILIO_SID")
-        and os.environ.get("TWILIO_TOKEN")
+        and _get_twilio_auth_token()
         and os.environ.get("TWILIO_FROM")
     )
 
@@ -65,7 +66,7 @@ def _try_twilio_call(script: str, wav_path: Path, to: str) -> str | None:
         return None
 
     sid = os.environ.get("TWILIO_SID", "")
-    token = os.environ.get("TWILIO_TOKEN", "")
+    token = _get_twilio_auth_token()
     from_num = os.environ.get("TWILIO_FROM", "")
     tunnel_base = os.environ.get("CLOUDFLARE_TUNNEL_URL", "").rstrip("/")
 
@@ -197,5 +198,5 @@ def _maybe_emit_sse(record: dict) -> None:
                 )
                 + "\n"
             )
-    except OSError:
-        pass  # non-fatal
+    except OSError as exc:
+        logger.debug("sse events.jsonl write failed (non-fatal): %s", exc)

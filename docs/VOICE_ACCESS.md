@@ -32,7 +32,7 @@ Not yet obtained. To enable real phone calls on demo day:
 4. Paste into `.env.local`:
    ```
    TWILIO_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-   TWILIO_TOKEN=your_auth_token
+   TWILIO_AUTH_TOKEN=your_auth_token
    TWILIO_FROM=+1xxxxxxxxxx
    TWILIO_TO_NUMBER=+1xxxxxxxxxx  # George's cell
    ```

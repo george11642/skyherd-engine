@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import logging
 from pathlib import Path
 
 from skyherd.voice.call import render_urgency_call
@@ -32,7 +33,7 @@ class TestRenderUrgencyCall:
     def test_no_twilio_env_gives_dashboard_ring(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
         monkeypatch.delenv("TWILIO_SID", raising=False)
-        monkeypatch.delenv("TWILIO_TOKEN", raising=False)
+        monkeypatch.delenv("TWILIO_AUTH_TOKEN", raising=False)
         monkeypatch.delenv("TWILIO_FROM", raising=False)
         result = render_urgency_call(_msg("call", "coyote at the fence"))
         assert result["delivered_to"] == "dashboard-ring"
@@ -87,7 +88,7 @@ class TestRenderUrgencyCall:
         """DEMO_PHONE_MODE=dashboard should prevent Twilio call even when keys set."""
         monkeypatch.chdir(tmp_path)
         monkeypatch.setenv("TWILIO_SID", "ACxxx")
-        monkeypatch.setenv("TWILIO_TOKEN", "fake_token")
+        monkeypatch.setenv("TWILIO_AUTH_TOKEN", "fake_token")
         monkeypatch.setenv("TWILIO_FROM", "+15551234567")
         monkeypatch.setenv("DEMO_PHONE_MODE", "dashboard")
         result = render_urgency_call(_msg("call", "coyote"))
@@ -116,7 +117,7 @@ class TestTryTwilioCall:
         monkeypatch.chdir(tmp_path)
         self._make_twilio_mock(monkeypatch, call_sid="CA_SUCCESS")
         monkeypatch.setenv("TWILIO_SID", "ACxxx")
-        monkeypatch.setenv("TWILIO_TOKEN", "tok")
+        monkeypatch.setenv("TWILIO_AUTH_TOKEN", "tok")
         monkeypatch.setenv("TWILIO_FROM", "+15550001111")
         monkeypatch.setenv("CLOUDFLARE_TUNNEL_URL", "https://example.trycloudflare.com")
 
@@ -130,7 +131,7 @@ class TestTryTwilioCall:
     def test_returns_none_without_tunnel_url(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
         monkeypatch.setenv("TWILIO_SID", "ACxxx")
-        monkeypatch.setenv("TWILIO_TOKEN", "tok")
+        monkeypatch.setenv("TWILIO_AUTH_TOKEN", "tok")
         monkeypatch.setenv("TWILIO_FROM", "+15550001111")
         monkeypatch.delenv("CLOUDFLARE_TUNNEL_URL", raising=False)
 
@@ -159,7 +160,7 @@ class TestTryTwilioCall:
         monkeypatch.setitem(sys.modules, "twilio", fake_twilio)
         monkeypatch.setitem(sys.modules, "twilio.rest", fake_twilio_rest)
         monkeypatch.setenv("TWILIO_SID", "ACxxx")
-        monkeypatch.setenv("TWILIO_TOKEN", "tok")
+        monkeypatch.setenv("TWILIO_AUTH_TOKEN", "tok")
         monkeypatch.setenv("TWILIO_FROM", "+15550001111")
         monkeypatch.setenv("CLOUDFLARE_TUNNEL_URL", "https://example.trycloudflare.com")
 
@@ -175,7 +176,7 @@ class TestTryTwilioCall:
         monkeypatch.chdir(tmp_path)
         self._make_twilio_mock(monkeypatch, call_sid="CA_LIVE")
         monkeypatch.setenv("TWILIO_SID", "ACxxx")
-        monkeypatch.setenv("TWILIO_TOKEN", "tok")
+        monkeypatch.setenv("TWILIO_AUTH_TOKEN", "tok")
         monkeypatch.setenv("TWILIO_FROM", "+15550001111")
         monkeypatch.setenv("CLOUDFLARE_TUNNEL_URL", "https://example.trycloudflare.com")
         monkeypatch.setenv("DEMO_PHONE_MODE", "live")
@@ -230,3 +231,63 @@ class TestWesSay:
 
         # Should complete without raising
         wes_say("All clear.")
+
+
+class TestTwilioAuthTokenMigration:
+    """Verify that call.py reads TWILIO_AUTH_TOKEN (not legacy TWILIO_TOKEN)."""
+
+    def test_twilio_available_prefers_auth_token(self, tmp_path, monkeypatch):
+        """_twilio_available() returns True when TWILIO_AUTH_TOKEN is set; no warning."""
+        import warnings
+
+        monkeypatch.chdir(tmp_path)
+        monkeypatch.setenv("TWILIO_SID", "ACxxx")
+        monkeypatch.setenv("TWILIO_AUTH_TOKEN", "auth_token_value")
+        monkeypatch.setenv("TWILIO_FROM", "+15550001111")
+        monkeypatch.delenv("TWILIO_TOKEN", raising=False)
+
+        from skyherd.voice.call import _twilio_available
+
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            result = _twilio_available()
+
+        assert result is True
+        dep_warnings = [x for x in w if issubclass(x.category, DeprecationWarning)]
+        assert dep_warnings == [], "No DeprecationWarning expected when TWILIO_AUTH_TOKEN set"
+
+    def test_twilio_available_accepts_legacy_with_warning(self, tmp_path, monkeypatch):
+        """_twilio_available() returns True for legacy TWILIO_TOKEN AND emits DeprecationWarning."""
+        monkeypatch.chdir(tmp_path)
+        monkeypatch.setenv("TWILIO_SID", "ACxxx")
+        monkeypatch.setenv("TWILIO_TOKEN", "legacy_token_value")
+        monkeypatch.setenv("TWILIO_FROM", "+15550001111")
+        monkeypatch.delenv("TWILIO_AUTH_TOKEN", raising=False)
+
+        from skyherd.voice.call import _twilio_available
+
+        import pytest as _pytest
+        with _pytest.warns(DeprecationWarning):
+            result = _twilio_available()
+
+        assert result is True
+
+    def test_sse_write_oserror_logs_debug(self, tmp_path, monkeypatch, caplog):
+        """OSError on SSE events.jsonl write is logged at DEBUG, not silently swallowed."""
+        monkeypatch.chdir(tmp_path)
+        monkeypatch.delenv("TWILIO_SID", raising=False)
+
+        # Patch Path.open to raise OSError only for the sse_events file
+        original_open = Path.open
+
+        def _patched_open(self, *args, **kwargs):
+            if "sse_events" in str(self):
+                raise OSError("disk full")
+            return original_open(self, *args, **kwargs)
+
+        monkeypatch.setattr(Path, "open", _patched_open)
+
+        with caplog.at_level(logging.DEBUG, logger="skyherd.voice.call"):
+            render_urgency_call(_msg("call", "coyote at fence"))
+
+        assert "sse events.jsonl write failed" in caplog.text

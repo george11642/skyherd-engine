@@ -22,7 +22,7 @@ DRONE_BACKEND        — "mavic" (real) | "sitl" (default) | "stub" (tests)
 MAVIC_WS_URL         — ws://192.168.x.x:8765  (companion app WebSocket)
 HARDWARE_OVERRIDES   — trough_cam:trough_1:edge-fence,trough_cam:trough_2:edge-barn
 TWILIO_SID           — Twilio Account SID for real Wes call
-TWILIO_TOKEN         — Twilio Auth Token
+TWILIO_AUTH_TOKEN    — Twilio Auth Token
 TWILIO_FROM_NUMBER   — Twilio caller number (+1...)
 TWILIO_TO_NUMBER     — George's phone number (+1...)
 MQTT_URL             — mqtt://host:1883 (defaults to embedded broker)
@@ -45,6 +45,7 @@ from typing import Any
 from skyherd.drone.interface import DroneError, DroneUnavailable, Waypoint, get_backend
 from skyherd.scenarios.base import _run_async
 from skyherd.sensors.bus import SensorBus
+from skyherd.voice._twilio_env import _get_twilio_auth_token
 
 logger = logging.getLogger(__name__)
 
@@ -483,7 +484,7 @@ class HardwareOnlyDemo:
             tts = get_tts_backend()
             wav_path = tts.synthesize(script, voice="wes")
 
-            twilio_token = os.environ.get("TWILIO_TOKEN", "")
+            twilio_token = _get_twilio_auth_token()
             twilio_sid = os.environ.get("TWILIO_SID", "")
             from_num = os.environ.get("TWILIO_FROM_NUMBER", "")
             to_num = os.environ.get("TWILIO_TO_NUMBER", "")

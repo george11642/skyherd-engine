@@ -17,6 +17,8 @@ from typing import Any
 
 from claude_agent_sdk import McpSdkServerConfig, create_sdk_mcp_server, tool
 
+from skyherd.voice._twilio_env import _get_twilio_auth_token
+
 # ---------------------------------------------------------------------------
 # Constants
 # ---------------------------------------------------------------------------
@@ -74,7 +76,7 @@ def _try_send_sms(to: str, body: str) -> bool:
     _log = _logging.getLogger(__name__)
 
     sid = os.environ.get("TWILIO_SID", "")
-    token = os.environ.get("TWILIO_AUTH_TOKEN", "")
+    token = _get_twilio_auth_token()
     from_num = os.environ.get("TWILIO_FROM", "")
 
     if not (sid and token and from_num):
