@@ -6,6 +6,7 @@
 import { useState, useEffect, useCallback, Fragment } from "react";
 import { cn } from "@/lib/cn";
 import { getSSE } from "@/lib/sse";
+import { Tooltip } from "@/components/ui/tooltip";
 
 interface LedgerEntry {
   seq: number;
@@ -33,6 +34,82 @@ const KIND_CHIP: Record<string, KindVariant> = {
 function shortHash(h: string): string {
   if (!h || h.length < 12) return h ?? "—";
   return h.slice(0, 8) + "…" + h.slice(-4);
+}
+
+/**
+ * HashChip — Part B / B5.
+ *
+ * Renders a 4-swatch fingerprint derived from the first 16 hex chars of the
+ * hash (4 x 6-hex-char color groups), followed by the short hash.
+ *
+ * Click copies the FULL hash via navigator.clipboard; tooltip content swaps
+ * to "copied!" for 1s on success, otherwise shows the full hex hash.
+ */
+function HashChip({ hash }: { hash: string }) {
+  const [copied, setCopied] = useState(false);
+
+  if (!hash || hash.length < 12) {
+    return <span>{hash ?? "—"}</span>;
+  }
+
+  // Derive 4 color swatches from 4 x 6-hex-char groups (bytes 0-3, 4-7, 8-11, 12-15).
+  // Plan calls out bytes but specifies "6 hex chars" per swatch so we honor the
+  // visual spec: each swatch is hash[0:6], hash[6:12], hash[12:18], hash[18:24].
+  const swatches: string[] = [];
+  for (let i = 0; i < 4; i++) {
+    const start = i * 6;
+    const chunk = hash.slice(start, start + 6);
+    if (chunk.length === 6) swatches.push(`#${chunk}`);
+  }
+
+  const handleCopy = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    try {
+      await navigator.clipboard.writeText(hash);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1000);
+    } catch {
+      // Clipboard API unavailable — silently ignore; tooltip still shows the hash.
+    }
+  };
+
+  const tooltipContent = copied ? "copied!" : hash;
+
+  return (
+    <Tooltip content={tooltipContent} className={copied ? "chip-sage" : undefined}>
+      <button
+        type="button"
+        onClick={handleCopy}
+        data-testid="hash-chip"
+        className="inline-flex items-center gap-1.5 cursor-pointer"
+        style={{
+          background: "transparent",
+          border: "none",
+          padding: 0,
+          fontFamily: "var(--font-mono)",
+          fontSize: "0.6875rem",
+          color: "var(--color-text-2)",
+        }}
+        aria-label={`Copy hash ${hash}`}
+      >
+        <span className="inline-flex shrink-0" aria-hidden="true">
+          {swatches.map((c, i) => (
+            <span
+              key={i}
+              data-testid="hash-swatch"
+              style={{
+                display: "inline-block",
+                width: 8,
+                height: 12,
+                backgroundColor: c,
+              }}
+            />
+          ))}
+        </span>
+        <span className="tabnum">{shortHash(hash)}</span>
+      </button>
+    </Tooltip>
+  );
 }
 
 function formatTime(iso: string): string {
@@ -273,8 +350,17 @@ export function AttestationPanel({ collapsed = false, onToggle }: AttestationPan
                         {entry.kind}
                       </span>
                     </td>
-                    <td className="px-3 py-1 tabnum" style={{ color: "var(--color-text-2)" }}>
-                      {shortHash(entry.event_hash)}
+                    <td
+                      className="px-3 py-1"
+                      style={{ color: "var(--color-text-2)" }}
+                      onClick={(e) => {
+                        // Prevent row-expand when clicking the copy button.
+                        if ((e.target as HTMLElement).closest("[data-testid='hash-chip']")) {
+                          e.stopPropagation();
+                        }
+                      }}
+                    >
+                      <HashChip hash={entry.event_hash} />
                     </td>
                   </tr>
                   {expanded === entry.seq && (
