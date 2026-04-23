@@ -8,7 +8,7 @@
  * Subscribes to "world.snapshot" SSE events, 60fps RAF loop.
  */
 
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback, useState } from "react";
 import { getSSE } from "@/lib/sse";
 
 interface Cow {
@@ -421,13 +421,81 @@ export function RanchMap({ snapshot: snapshotProp }: RanchMapProps = {}) {
   }, []);
 
   return (
-    <canvas
-      ref={canvasRef}
-      className="w-full h-full block"
-      style={{ imageRendering: "crisp-edges" }}
-      aria-label="Ranch map showing cattle positions, drone, water tanks, and predators"
-      role="img"
-      data-testid="ranch-map-canvas"
-    />
+    <div className="relative w-full h-full">
+      <canvas
+        ref={canvasRef}
+        className="w-full h-full block"
+        style={{ imageRendering: "crisp-edges" }}
+        aria-label="Ranch map showing cattle positions, drone, water tanks, and predators"
+        role="img"
+        data-testid="ranch-map-canvas"
+      />
+      <ScenarioBreadcrumb />
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// ScenarioBreadcrumb — Plan v1.1 Part B / B4
+// ---------------------------------------------------------------------------
+
+interface ScenarioActivePayload {
+  name?: string;
+  pass_idx?: number;
+  speed?: number;
+  started_at?: string;
+}
+
+/**
+ * ScenarioBreadcrumb — subscribes to scenario.active / scenario.ended SSE
+ * events (Part A contract) and renders a top-right chip showing the
+ * current scenario name + mm:ss since `started_at`. Hidden when no
+ * scenario is active, so the map stays clean until Part A lands.
+ */
+export function ScenarioBreadcrumb() {
+  const [active, setActive] = useState<ScenarioActivePayload | null>(null);
+  const [now, setNow] = useState<number>(() => Date.now());
+
+  useEffect(() => {
+    const sse = getSSE();
+    const onActive = (p: ScenarioActivePayload) => {
+      if (p && typeof p.name === "string") setActive(p);
+    };
+    const onEnded = () => setActive(null);
+    sse.on("scenario.active", onActive);
+    sse.on("scenario.ended", onEnded);
+    return () => {
+      sse.off("scenario.active", onActive);
+      sse.off("scenario.ended", onEnded);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!active) return;
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, [active]);
+
+  if (!active || !active.name) return null;
+
+  let elapsedS = 0;
+  if (active.started_at) {
+    const started = Date.parse(active.started_at);
+    if (!Number.isNaN(started)) {
+      elapsedS = Math.max(0, Math.floor((now - started) / 1000));
+    }
+  }
+  const mm = String(Math.floor(elapsedS / 60)).padStart(2, "0");
+  const ss = String(elapsedS % 60).padStart(2, "0");
+
+  return (
+    <div
+      data-testid="scenario-breadcrumb"
+      className="chip chip-sage tabnum absolute top-2 right-2"
+      style={{ pointerEvents: "none" }}
+      aria-label={`Active scenario: ${active.name}`}
+    >
+      SCENARIO: {active.name.toUpperCase()} · {mm}:{ss}
+    </div>
   );
 }
