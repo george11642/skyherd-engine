@@ -137,7 +137,8 @@ def create_app(
         if use_mock or world is None:
             data = _mock_world_snapshot()
         else:
-            data = world.snapshot().model_dump()
+            # mode="json" converts set/tuple to list for JSON serialization
+            data = world.snapshot().model_dump(mode="json")
         return JSONResponse(content=data)
 
     @app.get("/api/agents")
