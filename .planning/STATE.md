@@ -32,23 +32,20 @@ progress:
 
 ## Current Position
 
-Phase: 06 (sitl-ci-determinism-gate) — EXECUTING
-Plan: 1 of 3
-**Phase:** (not started — Phase 1 next)
-**Plan:** —
-**Status:** v1.0 milestone complete
-**Progress:** [██░░░░░░░░] 23%
+**v1.0 milestone shipped 2026-04-23** (6/6 phases, 22/22 plans, 32/32 requirements). Archived at `.planning/milestones/v1.0-*`.
+
+**Post-v1.0 standalone phase (pre-milestone):**
+
+Phase: 1 (memory-powered-agent-mesh) — NOT PLANNED
+Plan: —
+**Status:** Phase added via `/gsd-add-phase`; scope written to ROADMAP.md.
+**Next action:** `/gsd-plan-phase 1` to decompose into executable plans.
 
 ### Phase Status Board
 
 | Phase | Status | Depends On | Can Parallelize With |
 |-------|--------|------------|----------------------|
-| 1. Agent Session Persistence & Routing | Not started | — | 2, 3, 4 |
-| 2. Vision Pixel Inference | Not started | — | 1, 3, 4 |
-| 3. Code Hygiene Sweep | Not started | — | 1, 2, 4 |
-| 4. Build & Quickstart Health | Not started | — | 1, 2, 3 |
-| 5. Dashboard Live-Mode & Vet-Intake | Not started | 1, 2 | — |
-| 6. SITL-CI & Determinism Gate | Not started | 1–5 | — (final gate) |
+| 1. Memory-Powered Agent Mesh | Not planned | v1.0 (shipped) | — (standalone post-v1.0) |
 
 ---
 
@@ -90,6 +87,10 @@ Plan: 1 of 3
 | BLD-04 (SITL-CI) isolated to Phase 6 with failure-tolerant wiring | Docker SITL image build is infra-risky; isolation prevents infra flakiness from masking real regressions | 2026-04-22 |
 | SCEN-02 = milestone-wide acceptance criterion, not a standalone plan | Every phase must leave the 8-scenario suite passing; verified in Phase 6 | 2026-04-22 |
 
+### Roadmap Evolution
+
+- 2026-04-23: Phase 1 added (Memory-Powered Agent Mesh) — post-v1.0 standalone phase to adopt the Claude Managed Agents Memory public beta across the 5-agent mesh before the 2026-04-26 submission.
+
 ### Todos Carried Across Sessions
 
 *(populated as phases execute)*
@@ -124,9 +125,9 @@ None.
 - `.planning/config.json` — granularity: standard, model: quality, parallelization: true, YOLO mode
 - `.planning/STATE.md` — this file
 
-**Next action:** `/gsd-plan-phase 1` to decompose Phase 1 (Agent Session Persistence & Routing) into executable plans.
+**Next action:** `/gsd-plan-phase 1` to decompose Phase 1 (Memory-Powered Agent Mesh) into executable plans.
 
-**Parallel opportunity:** After Phase 1 plan exists, Phases 2, 3, 4 can be planned and executed in parallel worktrees (disjoint file surfaces — see ROADMAP.md "Shared file watch-list").
+**Parallel opportunity:** N/A — single standalone post-v1.0 phase.
 
 ---
 
