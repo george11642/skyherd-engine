@@ -137,6 +137,9 @@ omit = [
     "src/skyherd/demo/hardware_only.py",
     # CLI entry-points tested separately via subprocess; typer CLIs need tty
     "src/skyherd/agents/cli.py",
+    # live.py runs uvicorn in-process — tested via TestClient in test_live_app.py
+    # but the uvicorn.run() call itself requires a real server process
+    "src/skyherd/server/live.py",
 ]
 
 [tool.coverage.report]
