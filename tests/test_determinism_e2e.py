@@ -27,6 +27,12 @@ DETERMINISM_SANITIZE: list[tuple[str, str]] = [
     (r"\b[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]+)?\b", ""),
     # Short-hash session IDs (session-deadbeef style)
     (r"\bsession-[a-f0-9]{8}\b", "session-XXXXXXXX"),
+    # Memory IDs — sanitize when SKYHERD_AGENTS=managed is used in replay
+    # (LocalMemoryStore produces content-derived IDs which are deterministic,
+    # but real-API runs return fresh base62 suffixes every call).
+    (r"memver_[A-Za-z0-9]+", "memver_XXXXXX"),
+    (r"\bmem_[A-Za-z0-9]+", "mem_XXXXXX"),
+    (r"memstore_[A-Za-z0-9]+", "memstore_XXXXXX"),
 ]
 
 
