@@ -157,7 +157,7 @@ export function CostTicker(props: CostTickerProps = {}) {
             >
               <AnimatedCost value={totalCost} />
             </motion.span>
-            <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.6875rem", color: "var(--color-text-2)" }}>
+            <span className="text-mono-xs" style={{ color: "var(--color-text-2)" }}>
               cumulative
             </span>
           </div>
@@ -179,8 +179,8 @@ export function CostTicker(props: CostTickerProps = {}) {
 
         {/* Rate line */}
         <div
-          className="mt-1 tabnum"
-          style={{ fontFamily: "var(--font-mono)", fontSize: "0.6875rem", color: "var(--color-text-2)" }}
+          className="mt-1 tabnum text-mono-xs"
+          style={{ color: "var(--color-text-2)" }}
         >
           {allIdle ? (
             <>Rate: <span style={{ color: "var(--color-text-1)" }}>$0.00/hr</span> — <span style={{ color: "var(--color-warn)" }}>paused</span></>

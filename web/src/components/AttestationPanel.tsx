@@ -277,10 +277,7 @@ export function AttestationPanel({ collapsed = false, onToggle }: AttestationPan
       {/* Table */}
       {!collapsed && (
         <div id="attest-body" className="flex-1 overflow-auto">
-          <table
-            className="w-full text-left border-collapse"
-            style={{ fontFamily: "var(--font-mono)", fontSize: "0.6875rem" }}
-          >
+          <table className="w-full text-left border-collapse text-mono-xs">
             <thead>
               <tr style={{ borderBottom: `1px solid var(--color-line)` }}>
                 {["SEQ", "TIME", "SOURCE", "KIND", "HASH"].map((h) => (

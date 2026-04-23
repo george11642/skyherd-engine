@@ -251,7 +251,7 @@ export function VetIntakePanel({ fetchIntake }: VetIntakePanelProps = {}) {
       </div>
 
       {/* List */}
-      <div className="flex-1 overflow-auto" style={{ fontFamily: "var(--font-mono)", fontSize: "0.6875rem" }}>
+      <div className="flex-1 overflow-auto text-mono-xs">
         {intakes.length === 0 && (
           <div
             data-testid="vet-intake-skeleton"
