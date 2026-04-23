@@ -119,17 +119,21 @@ export function RancherPhone() {
         style={{ borderColor: "var(--color-line)", backgroundColor: "var(--color-bg-1)" }}
       >
         <div>
-          <h1
-            className="leading-none"
-            style={{
-              fontFamily: "var(--font-display)",
-              fontSize: "1.25rem",
-              fontWeight: 600,
-              letterSpacing: "-0.02em",
-              color: "var(--color-text-0)",
-            }}
-          >
-            Sky<span style={{ color: "var(--color-accent-sage)" }}>Herd</span>
+          <h1 className="leading-none">
+            <a
+              href="/"
+              className="no-underline"
+              aria-label="SkyHerd — return to dashboard"
+              style={{
+                fontFamily: "var(--font-display)",
+                fontSize: "1.25rem",
+                fontWeight: 600,
+                letterSpacing: "-0.02em",
+                color: "var(--color-text-0)",
+              }}
+            >
+              Sky<span style={{ color: "var(--color-accent-sage)" }}>Herd</span>
+            </a>
           </h1>
           <p
             className="mt-0.5"
