@@ -194,6 +194,45 @@ describe("AttestationPanel — Verify Chain button (DASH-04)", () => {
     expect((postCall as [string, RequestInit])[1]?.method).toBe("POST");
   });
 
+  it("renders HashChip with 4 swatches in HASH column (B5)", async () => {
+    await act(async () => {
+      render(<AttestationPanel />);
+    });
+    // Provide a full 64-char hex hash so all 4 swatches have 6 hex chars each.
+    const fullHash = "cafebabedeadbeef12345678aabbccdd99887766554433221100ffeeddccbbaa";
+    act(() => {
+      triggerSSE("attest.append", { ...SAMPLE_ENTRY, event_hash: fullHash });
+    });
+    const chips = document.querySelectorAll("[data-testid='hash-chip']");
+    expect(chips.length).toBeGreaterThanOrEqual(1);
+    const swatches = chips[0].querySelectorAll("[data-testid='hash-swatch']");
+    expect(swatches.length).toBe(4);
+  });
+
+  it("HashChip click copies FULL hash to clipboard (B5)", async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    // jsdom: stub the clipboard API
+    Object.defineProperty(navigator, "clipboard", {
+      value: { writeText },
+      writable: true,
+      configurable: true,
+    });
+
+    const fullHash = "cafebabe00000001deadbeef12345678aabbccdd99887766";
+    await act(async () => {
+      render(<AttestationPanel />);
+    });
+    act(() => {
+      triggerSSE("attest.append", { ...SAMPLE_ENTRY, event_hash: fullHash });
+    });
+    const chip = document.querySelector("[data-testid='hash-chip']") as HTMLElement;
+    expect(chip).toBeTruthy();
+    await act(async () => {
+      fireEvent.click(chip);
+    });
+    expect(writeText).toHaveBeenCalledWith(fullHash);
+  });
+
   it("shows INVALID chip when verify returns valid:false", async () => {
     vi.stubGlobal(
       "fetch",

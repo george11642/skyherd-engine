@@ -71,6 +71,46 @@ describe("AgentLane", () => {
     render(<AgentLane agentName="CalvingWatch" state="idle" events={[]} />);
     expect(screen.getByText(/waiting for events/i)).toBeTruthy();
   });
+
+  it("renders skeleton loader rows when no events (B1)", () => {
+    const { container, getByTestId } = render(
+      <AgentLane agentName="CalvingWatch" state="idle" events={[]} />,
+    );
+    // The wrapper marker is present
+    expect(getByTestId("agent-lane-skeleton")).toBeTruthy();
+    // 3 skeleton rows inside
+    const skeletons = container.querySelectorAll(
+      "[data-testid='agent-lane-skeleton'] .skeleton",
+    );
+    expect(skeletons.length).toBe(3);
+  });
+
+  it("renders sparkline when eventRate has >= 2 values (B3)", () => {
+    const { container } = render(
+      <AgentLane
+        agentName="HerdHealthWatcher"
+        state="active"
+        events={[{ ts: 1, message: "ok", level: "INFO" }]}
+        eventRate={[0, 1, 2, 1, 0, 3, 2]}
+      />,
+    );
+    const svg = container.querySelector("svg");
+    expect(svg).toBeTruthy();
+    expect(svg?.getAttribute("width")).toBe("48");
+    expect(svg?.getAttribute("height")).toBe("16");
+  });
+
+  it("hides sparkline when eventRate is empty (B3)", () => {
+    const { container } = render(
+      <AgentLane
+        agentName="HerdHealthWatcher"
+        state="idle"
+        events={[]}
+        eventRate={[]}
+      />,
+    );
+    expect(container.querySelector("svg")).toBeNull();
+  });
 });
 
 describe("All 5 agent names render", () => {

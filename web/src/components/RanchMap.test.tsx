@@ -1,14 +1,26 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render } from "@testing-library/react";
-import { RanchMap } from "./RanchMap";
+import { render, act } from "@testing-library/react";
+import { RanchMap, ScenarioBreadcrumb } from "./RanchMap";
 
-// Mock SSE client
+// Mock SSE client — shared across both RanchMap and ScenarioBreadcrumb suites.
+// A mutable handler map lets the breadcrumb tests re-emit scenario.active /
+// scenario.ended to drive state transitions.
+let sseHandlers: Record<string, ((payload: unknown) => void)[]> = {};
 vi.mock("@/lib/sse", () => ({
   getSSE: () => ({
-    on: vi.fn(),
-    off: vi.fn(),
+    on: (eventType: string, handler: (payload: unknown) => void) => {
+      if (!sseHandlers[eventType]) sseHandlers[eventType] = [];
+      sseHandlers[eventType].push(handler);
+    },
+    off: (eventType: string, handler: (payload: unknown) => void) => {
+      sseHandlers[eventType] = (sseHandlers[eventType] ?? []).filter((h) => h !== handler);
+    },
   }),
 }));
+
+function triggerSSE(eventType: string, payload: unknown) {
+  (sseHandlers[eventType] ?? []).forEach((h) => h(payload));
+}
 
 // Mock ResizeObserver
 class MockResizeObserver {
@@ -21,6 +33,7 @@ vi.stubGlobal("ResizeObserver", MockResizeObserver);
 describe("RanchMap", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    sseHandlers = {};
   });
 
   it("renders a canvas element", () => {
@@ -46,6 +59,48 @@ describe("RanchMap", () => {
     const canvas = container.querySelector("canvas");
     expect(canvas?.className).toContain("w-full");
     expect(canvas?.className).toContain("h-full");
+  });
+});
+
+describe("ScenarioBreadcrumb (B4)", () => {
+  beforeEach(() => {
+    sseHandlers = {};
+  });
+
+  it("renders nothing when no scenario is active", () => {
+    const { queryByTestId } = render(<ScenarioBreadcrumb />);
+    expect(queryByTestId("scenario-breadcrumb")).toBeNull();
+  });
+
+  it("renders SCENARIO chip after scenario.active SSE", () => {
+    const { queryByTestId } = render(<ScenarioBreadcrumb />);
+    act(() => {
+      triggerSSE("scenario.active", {
+        name: "coyote",
+        pass_idx: 0,
+        speed: 1,
+        started_at: new Date().toISOString(),
+      });
+    });
+    const chip = queryByTestId("scenario-breadcrumb");
+    expect(chip).toBeTruthy();
+    expect(chip?.textContent).toContain("SCENARIO");
+    expect(chip?.textContent).toContain("COYOTE");
+  });
+
+  it("hides again after scenario.ended SSE", () => {
+    const { queryByTestId } = render(<ScenarioBreadcrumb />);
+    act(() => {
+      triggerSSE("scenario.active", {
+        name: "sick_cow",
+        started_at: new Date().toISOString(),
+      });
+    });
+    expect(queryByTestId("scenario-breadcrumb")).toBeTruthy();
+    act(() => {
+      triggerSSE("scenario.ended", { name: "sick_cow", outcome: "passed" });
+    });
+    expect(queryByTestId("scenario-breadcrumb")).toBeNull();
   });
 });
 
