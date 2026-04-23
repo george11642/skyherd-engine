@@ -58,6 +58,8 @@ class SickCowScenario(Scenario):
             self._check_injected = True
 
             # Find A014's trough cam vicinity
+            # disease_flags + severity included so the simulate path can detect
+            # pinkeye escalation and call draft_vet_intake (SCEN-01)
             events.append(
                 {
                     "type": "camera.motion",
@@ -66,6 +68,10 @@ class SickCowScenario(Scenario):
                     "ranch_id": "ranch_a",
                     "anomaly": True,
                     "cow_tag": "A014",
+                    "ocular_discharge": 0.7,
+                    "disease_flags": ["pinkeye"],
+                    "severity": "escalate",
+                    "health_score": 0.55,
                     "schedule": "daily_health_check",
                     "sim_time_s": sim_time_s,
                 }
@@ -116,8 +122,21 @@ class SickCowScenario(Scenario):
         assert "page_rancher" in tool_names, (
             f"Expected page_rancher tool call after pinkeye detection. Got: {tool_names}"
         )
+        assert "draft_vet_intake" in tool_names, (
+            f"Expected draft_vet_intake tool call after pinkeye escalation. Got: {tool_names}"
+        )
 
-        # 4. World setup correctly stamped A014 (verified via injected event)
+        # 4. Vet intake artifact on disk (SCEN-01)
+        from pathlib import Path
+
+        intake_files = list(Path("runtime/vet_intake").glob("A014_*.md"))
+        assert intake_files, "Expected runtime/vet_intake/A014_*.md to exist after sick_cow run"
+        intake_content = intake_files[0].read_text(encoding="utf-8")
+        assert "pinkeye" in intake_content.lower(), (
+            "Expected vet-intake artifact to mention pinkeye"
+        )
+
+        # 5. World setup correctly stamped A014 (verified via injected event)
         assert health_check.get("severity") == "escalate", (
             f"Expected severity=escalate for A014 pinkeye, got {health_check.get('severity')!r}"
         )

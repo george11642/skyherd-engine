@@ -192,8 +192,20 @@ def herd_health_watcher(
     wake_event: dict[str, Any],
     session: Session,
 ) -> list[dict[str, Any]]:
-    """Deterministic simulation path — invokes ClassifyPipeline stub."""
+    """Deterministic simulation path — invokes ClassifyPipeline stub.
+
+    When the wake event indicates a pinkeye escalation (anomaly=True + cow_tag + disease_flags
+    containing 'pinkeye'), this path also calls draft_vet_intake to produce the SCEN-01
+    artifact.  A synthetic pixel-head bbox signal is injected for DASH-06 coverage
+    (signals_structured).
+    """
     trough_id = wake_event.get("trough_id", "trough_a")
+    cow_tag = wake_event.get("cow_tag", "")
+    is_pinkeye_escalation = (
+        (wake_event.get("anomaly", False) or wake_event.get("type") == "camera.motion")
+        and bool(cow_tag)
+        and "pinkeye" in wake_event.get("disease_flags", [])
+    )
 
     pipeline_result = _try_run_classify_pipeline(wake_event)
 
@@ -207,6 +219,12 @@ def herd_health_watcher(
 
     # Simulate an escalation if the wake event signals anomaly
     if wake_event.get("anomaly", False) or wake_event.get("type") == "camera.motion":
+        if is_pinkeye_escalation:
+            # Draft vet intake packet (SCEN-01) with synthetic pixel bbox (DASH-06)
+            intake_call = _try_draft_vet_intake(wake_event, session)
+            if intake_call is not None:
+                calls.append(intake_call)
+
         calls.append(
             {
                 "tool": "page_rancher",
@@ -219,6 +237,76 @@ def herd_health_watcher(
         )
 
     return calls
+
+
+def _try_draft_vet_intake(
+    wake_event: dict[str, Any],
+    session: Session,
+) -> dict[str, Any] | None:
+    """Attempt to call draft_vet_intake; return tool-call dict or None on failure.
+
+    Injects a synthetic pixel-head bbox signal for DASH-06 test coverage
+    in scenarios that run without an Anthropic API key.
+    """
+    import re
+
+    try:
+        from skyherd.server.vet_intake import draft_vet_intake
+
+        cow_tag = wake_event.get("cow_tag", "")
+        # Validate tag shape before calling (must be ^[A-Z][0-9]{3}$)
+        if not re.match(r"^[A-Z][0-9]{3}$", cow_tag):
+            logger.debug("_try_draft_vet_intake: invalid cow_tag %r — skipping", cow_tag)
+            return None
+
+        disease_flags: list[str] = list(wake_event.get("disease_flags", []))
+        primary_disease = disease_flags[0] if disease_flags else "unknown"
+
+        # Synthetic pixel bbox for DASH-06 coverage (simulate what Phase 2 VIS-05 would produce)
+        signals_structured = [
+            {
+                "kind": "pixel_detection",
+                "head": primary_disease,
+                "bbox": [280, 110, 380, 200],  # synthetic but plausible trough-cam crop
+                "confidence": 0.83,
+            }
+        ]
+
+        session_id = getattr(session, "id", "sim_session")
+        rec = draft_vet_intake(
+            cow_tag=cow_tag,
+            severity="escalate",
+            disease=primary_disease,
+            signals=[
+                f"ocular_discharge={wake_event.get('ocular_discharge', 0.7):.2f}",
+                f"disease_flags={disease_flags}",
+            ],
+            cow_snapshot={
+                "tag": cow_tag,
+                "bcs": 5.2,
+                "health_score": wake_event.get("health_score", 0.55),
+            },
+            session_id=str(session_id),
+            herd_context=(
+                f"Ranch {wake_event.get('ranch_id', 'ranch_a')} · "
+                f"trough {wake_event.get('trough_id', 'trough_a')} · "
+                "sim deterministic path"
+            ),
+            signals_structured=signals_structured,
+        )
+        return {
+            "tool": "draft_vet_intake",
+            "input": {
+                "cow_tag": cow_tag,
+                "severity": "escalate",
+                "disease": primary_disease,
+                "signals_structured": signals_structured,
+            },
+            "output": rec.model_dump(),
+        }
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("draft_vet_intake failed in simulate path: %s", exc)
+        return None
 
 
 def _try_run_classify_pipeline(wake_event: dict[str, Any]) -> dict[str, Any]:
