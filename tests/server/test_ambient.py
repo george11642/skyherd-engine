@@ -19,7 +19,6 @@ from skyherd.server import ambient as ambient_mod
 from skyherd.server.ambient import AmbientDriver
 from skyherd.world.world import make_world
 
-
 # ---------------------------------------------------------------------------
 # Lightweight test doubles
 # ---------------------------------------------------------------------------
