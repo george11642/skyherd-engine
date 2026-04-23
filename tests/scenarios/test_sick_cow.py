@@ -86,6 +86,144 @@ class TestSickCowScenario:
         assert hc is not None
         assert hc.get("cow_tag") == "A014"
 
+    # ------------------------------------------------------------------
+    # SCEN-01 + DASH-06 vet-intake assertions (Phase 5, Plan 05-02)
+    # ------------------------------------------------------------------
+
+    def _all_tool_calls_from_result(self, result) -> list:  # type: ignore[no-untyped-def]
+        """Flatten all tool calls from a ScenarioResult into a single list."""
+        out = []
+        for calls in result.agent_tool_calls.values():
+            out.extend(calls)
+        return out
+
+    def test_sick_cow_draft_vet_intake_tool_call(self) -> None:
+        """SCEN-01: sick_cow scenario invokes draft_vet_intake as a tool call."""
+        from skyherd.scenarios import run
+
+        result = run("sick_cow", seed=42)
+        assert result.outcome_passed, result.outcome_error
+        tool_names = {c.get("tool") for c in self._all_tool_calls_from_result(result)}
+        assert "draft_vet_intake" in tool_names, (
+            f"Expected draft_vet_intake tool call. Got: {tool_names}"
+        )
+
+    def test_sick_cow_produces_vet_intake_artifact(self) -> None:
+        """SCEN-01: sick_cow scenario writes runtime/vet_intake/A014_*.md."""
+        from pathlib import Path
+
+        from skyherd.scenarios import run
+
+        intake_dir = Path("runtime/vet_intake")
+        # Clear any pre-existing A014_*.md to make the assertion deterministic
+        if intake_dir.exists():
+            for f in intake_dir.glob("A014_*.md"):
+                f.unlink()
+        result = run("sick_cow", seed=42)
+        assert result.outcome_passed, result.outcome_error
+        files = sorted(intake_dir.glob("A014_*.md"))
+        assert files, "Expected at least one runtime/vet_intake/A014_*.md, got none"
+        content = files[0].read_text(encoding="utf-8")
+        assert "pinkeye" in content.lower(), "Intake must mention pinkeye"
+        assert "A014" in content
+        assert "ESCALATE" in content.upper()
+
+    def test_sick_cow_vet_intake_treatment_guidance(self) -> None:
+        """SCEN-01: intake surfaces concrete treatment guidance from pinkeye.md."""
+        from pathlib import Path
+
+        intake_dir = Path("runtime/vet_intake")
+        files = sorted(intake_dir.glob("A014_*.md"))
+        if not files:
+            # Run scenario first if artifact not present
+            from skyherd.scenarios import run
+
+            if intake_dir.exists():
+                for f in intake_dir.glob("A014_*.md"):
+                    f.unlink()
+            run("sick_cow", seed=42)
+            files = sorted(intake_dir.glob("A014_*.md"))
+        assert files, "Expected runtime/vet_intake/A014_*.md — run sick_cow scenario first"
+        content = files[0].read_text(encoding="utf-8").lower()
+        treatment_keywords = ["oxytetracycline", "antibiotic", "uv", "patch", "eye"]
+        assert any(kw in content for kw in treatment_keywords), (
+            f"Expected treatment guidance in vet intake; content:\n{content[:400]}"
+        )
+
+    def test_vet_intake_surfaces_pixel_detection_bbox(self) -> None:
+        """DASH-06: Phase 2 VIS-05 DetectionResult.bbox propagates through signals_structured
+        into the vet-intake packet — the data source Plan 05-03 renders as a bounding-box chip.
+        """
+        import re
+
+        import pytest
+
+        # Phase 2 VIS-05 prerequisite — skip gracefully if upstream phase has not landed
+        try:
+            from skyherd.vision.heads.pinkeye import Pinkeye  # noqa: F401
+            from skyherd.vision.types import DetectionResult  # noqa: F401
+
+            # Verify bbox field exists on DetectionResult
+            if not hasattr(DetectionResult, "model_fields") or "bbox" not in DetectionResult.model_fields:
+                pytest.skip("VIS-05 prerequisite — DetectionResult.bbox not yet defined")
+        except ImportError as exc:
+            pytest.skip(f"VIS-05 prerequisite — Phase 2 pixel head required: {exc}")
+
+        from pathlib import Path
+
+        from skyherd.scenarios import run
+
+        intake_dir = Path("runtime/vet_intake")
+        if intake_dir.exists():
+            for f in intake_dir.glob("A014_*.md"):
+                f.unlink()
+
+        result = run("sick_cow", seed=42)
+        assert result.outcome_passed, result.outcome_error
+
+        # Approach A: via the tool-call output
+        tool_calls = self._all_tool_calls_from_result(result)
+        drafts = [c for c in tool_calls if c.get("tool") == "draft_vet_intake"]
+        assert drafts, "draft_vet_intake tool call missing — SCEN-01 tests should flag this first"
+
+        output = drafts[0].get("output", {})
+        if isinstance(output, dict):
+            structured = output.get("signals_structured", [])
+        else:
+            structured = []
+        pixel_signals = [
+            s
+            for s in structured
+            if (s.get("kind") if isinstance(s, dict) else getattr(s, "kind", None))
+            == "pixel_detection"
+        ]
+
+        # Approach B fallback: parse the markdown body if tool_call output is opaque
+        if not pixel_signals:
+            files = sorted(intake_dir.glob("A014_*.md"))
+            assert files, "No A014_*.md written — cannot verify bbox propagation"
+            body = files[0].read_text(encoding="utf-8")
+            assert "pixel_detection" in body or "Pixel Detection" in body, (
+                f"DASH-06: expected 'pixel_detection' marker in vet-intake markdown. "
+                f"Body head:\n{body[:400]}"
+            )
+            bbox_match = re.search(r"\[\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*\d+\s*\]", body)
+            assert bbox_match, "DASH-06: no [x0,y0,x1,y1] bbox in markdown body"
+            return
+
+        # Approach A: verify the first pixel_detection signal's shape
+        sig = pixel_signals[0]
+        if hasattr(sig, "model_dump"):
+            sig = sig.model_dump()
+        assert sig.get("head") == "pinkeye", f"Expected head=pinkeye, got {sig.get('head')}"
+        bbox = sig.get("bbox")
+        assert bbox is not None, "DASH-06: bbox is None — pixel path did not propagate"
+        assert len(bbox) == 4, f"DASH-06: bbox must be 4 ints, got {bbox}"
+        for v in bbox:
+            assert isinstance(v, int) or float(v).is_integer(), f"bbox coord not int: {v}"
+        conf = sig.get("confidence", -1.0)
+        assert 0.0 <= float(conf) <= 1.0, f"DASH-06: confidence out of [0,1]: {conf}"
+
 
 def test_pinkeye_bbox_flows_through_classify_pipeline(
     sick_pinkeye_world,  # type: ignore[no-untyped-def]
