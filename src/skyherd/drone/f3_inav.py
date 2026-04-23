@@ -366,15 +366,17 @@ class F3InavBackend(DroneBackend):
             async for is_armed in drone.telemetry.armed():
                 armed = is_armed
                 break
-        except Exception:
-            pass
+        except Exception as exc:  # noqa: BLE001
+            # mavsdk telemetry stream may not be ready on first poll — safe default used
+            logger.debug("mavsdk telemetry read for armed failed: %s", exc)
 
         try:
             async for is_in_air in drone.telemetry.in_air():
                 in_air = is_in_air
                 break
-        except Exception:
-            pass
+        except Exception as exc:  # noqa: BLE001
+            # mavsdk telemetry stream may not be ready on first poll — safe default used
+            logger.debug("mavsdk telemetry read for in_air failed: %s", exc)
 
         try:
             async for pos in drone.telemetry.position():
@@ -382,22 +384,25 @@ class F3InavBackend(DroneBackend):
                 lon = pos.longitude_deg
                 alt_m = pos.relative_altitude_m
                 break
-        except Exception:
-            pass
+        except Exception as exc:  # noqa: BLE001
+            # mavsdk telemetry stream may not be ready on first poll — safe default used
+            logger.debug("mavsdk telemetry read for position failed: %s", exc)
 
         try:
             async for bat in drone.telemetry.battery():
                 battery_pct = bat.remaining_percent * 100.0
                 break
-        except Exception:
-            pass
+        except Exception as exc:  # noqa: BLE001
+            # mavsdk telemetry stream may not be ready on first poll — safe default used
+            logger.debug("mavsdk telemetry read for battery failed: %s", exc)
 
         try:
             async for fm in drone.telemetry.flight_mode():
                 mode = str(fm)
                 break
-        except Exception:
-            pass
+        except Exception as exc:  # noqa: BLE001
+            # mavsdk telemetry stream may not be ready on first poll — safe default used
+            logger.debug("mavsdk telemetry read for flight_mode failed: %s", exc)
 
         return DroneState(
             armed=armed,

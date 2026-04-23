@@ -441,8 +441,8 @@ class MavlinkSitlEmulator:
         if self._sock:
             try:
                 self._sock.close()
-            except OSError:
-                pass
+            except OSError as exc:
+                logger.debug("sitl emulator socket close race (non-fatal): %s", exc)
         for t in self._threads:
             t.join(timeout=2.0)
         self._threads.clear()
@@ -462,8 +462,8 @@ class MavlinkSitlEmulator:
         try:
             frame = _pack(msg_id, payload, self._state.next_seq())
             self._sock.sendto(frame, self._gcs_addr)
-        except OSError:
-            pass
+        except OSError as exc:
+            logger.debug("sitl emulator sendto failed (GCS not listening): %s", exc)
 
     def _ack(self, command: int, result: int = MAV_RESULT_ACCEPTED) -> None:
         logger.debug("ACK cmd=%d result=%d", command, result)
@@ -579,6 +579,7 @@ class MavlinkSitlEmulator:
         buf = b""
         while self._running:
             try:
+                assert self._sock is not None  # bound in start(); never None when _running is True
                 data, _addr = self._sock.recvfrom(4096)
             except OSError:
                 continue
@@ -738,6 +739,7 @@ def main() -> None:
     try:
         while True:
             time.sleep(1.0)
+    # Intentional: CLI main-loop signal handler — Ctrl-C graceful shutdown.
     except KeyboardInterrupt:
         pass
     finally:

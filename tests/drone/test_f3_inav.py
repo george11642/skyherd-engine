@@ -293,3 +293,26 @@ async def test_get_backend_factory_returns_f3_inav() -> None:
 
     backend = get_backend("f3_inav")
     assert isinstance(backend, F3InavBackend)
+
+
+# ---------------------------------------------------------------------------
+# Telemetry DEBUG log on transient failure (HYG-01)
+# ---------------------------------------------------------------------------
+
+
+async def test_telemetry_debug_log_on_transient_failure(caplog) -> None:  # type: ignore[no-untyped-def]
+    """Transient mavsdk telemetry read failure logs at DEBUG with field name."""
+    import logging
+
+    async def _armed_raise():
+        raise RuntimeError("stream not ready")
+        yield  # make it an async generator  # noqa: unreachable
+
+    backend, mock_sdk = await _connected_backend(battery_pct=80.0)
+    # Replace the armed() stream with one that raises immediately
+    mock_sdk.System.return_value.telemetry.armed = _armed_raise
+
+    with caplog.at_level(logging.DEBUG, logger="skyherd.drone.f3_inav"):
+        await backend.state()
+
+    assert "mavsdk telemetry read for armed" in caplog.text
