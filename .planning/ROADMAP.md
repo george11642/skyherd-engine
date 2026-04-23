@@ -22,14 +22,20 @@ Post-v1.0 autonomous track targeting the 2026-04-26 20:00 EST submission — Mem
 4. **Toolset determinism** — `agent_toolset_20260401` selective disable (no `web_search` / `web_fetch`) on CalvingWatch + GrazingOptimizer; preserves `make demo SEED=42 SCENARIO=all` byte-identical.
 5. **Runtime guard** — Memory reads/writes stubbed in LocalSessionManager; real `client.beta.memory_stores.*` calls gated on `SKYHERD_AGENTS=managed`.
 
-**Requirements:** (to be derived by `/gsd-plan-phase 1`)
+**Requirements:** MEM-01, MEM-02, MEM-03, MEM-04, MEM-05, MEM-06, MEM-07, MEM-08, MEM-09, MEM-10, MEM-11, MEM-12 (defined in .planning/phases/01-memory-powered-agent-mesh/01-RESEARCH.md §Phase Requirements)
 
 **Depends on:** v1.0 milestone (shipped 2026-04-23).
 
-**Plans:** 0 plans (run `/gsd-plan-phase 1`)
+**Plans:** 7 plans
 
 Plans:
-- [ ] TBD (run /gsd-plan-phase 1 to break down)
+- [ ] 01-01-PLAN.md — Wave 0 foundation: A1 live probe, HashChip extraction, memory_paths pure module, determinism sanitizer extension, Wave 0 test stubs
+- [ ] 01-02-PLAN.md — MemoryStoreBase / MemoryStoreManager (REST wrapper) / LocalMemoryStore (deterministic JSONL shim) / factory + ≥90% coverage
+- [ ] 01-03-PLAN.md — ManagedSessionManager wiring: memory_store_ids plumbing + extra_body resources attach + selective toolset disable for deterministic agents
+- [ ] 01-04-PLAN.md — Post-cycle memory_hook + _handler_base integration + AgentMesh startup store creation + ledger + SSE pairing
+- [ ] 01-05-PLAN.md — /api/memory/{agent} endpoints + events.py SSE event registration + app factory wiring
+- [ ] 01-06-PLAN.md — MemoryPanel.tsx (5-agent tabs + HashChip rows + flash animation) + sse.ts eventTypes + App.tsx mount + human-verify checkpoint
+- [ ] 01-07-PLAN.md — Determinism regression + end-to-end scenario + coverage + mesh-smoke + v1.0 scenario non-regression audit
 
 **Evidence base:**
 - Memory docs: https://platform.claude.com/docs/en/managed-agents/memory
