@@ -14,10 +14,12 @@ import { RanchMap } from "@/components/RanchMap";
 import { AgentLanes } from "@/components/AgentLanes";
 import { CostTicker } from "@/components/CostTicker";
 import { AttestationPanel } from "@/components/AttestationPanel";
+import { MemoryPanel } from "@/components/MemoryPanel";
 import { VetIntakePanel } from "@/components/VetIntakePanel";
 
 export default function App() {
   const [attestCollapsed, setAttestCollapsed] = useState(false);
+  const [memoryCollapsed, setMemoryCollapsed] = useState(false);
 
   return (
     <div
@@ -58,6 +60,12 @@ export default function App() {
           <AttestationPanel
             collapsed={attestCollapsed}
             onToggle={() => setAttestCollapsed((v) => !v)}
+          />
+
+          {/* Memory Panel — judge-visible per-agent memory feed (Phase 01 Plan 06) */}
+          <MemoryPanel
+            collapsed={memoryCollapsed}
+            onToggle={() => setMemoryCollapsed((v) => !v)}
           />
         </aside>
       </div>

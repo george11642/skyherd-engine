@@ -77,6 +77,8 @@ export class SkyHerdSSE {
       "neighbor.handoff",
       "scenario.active",
       "scenario.ended",
+      "memory.written",
+      "memory.read",
     ];
 
     for (const type of eventTypes) {
