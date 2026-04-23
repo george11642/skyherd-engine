@@ -1,4 +1,4 @@
-.PHONY: setup sim demo dashboard test lint format typecheck clean ci sitl-up sitl-down bus-up bus-down mesh-smoke one-pager hardware-demo mavic-bridge f3-bridge drone-smoke
+.PHONY: setup sim demo dashboard dashboard-mock test lint format typecheck clean ci sitl-up sitl-down bus-up bus-down mesh-smoke one-pager hardware-demo mavic-bridge f3-bridge drone-smoke
 
 SEED ?= 42
 SCENARIO ?= all
@@ -16,7 +16,11 @@ demo:
 		uv run skyherd-demo play $(SCENARIO) --seed $(SEED); \
 	fi
 
-dashboard:
+dashboard:  ## Build web assets and start live dashboard (real mesh/world/ledger)
+	(cd web && (pnpm install --frozen-lockfile || pnpm install) && pnpm run build) && \
+	uv run python -m skyherd.server.live --port 8000 --host 127.0.0.1 --seed 42
+
+dashboard-mock:  ## Legacy mock-only dashboard (synthetic events, no sim required)
 	(cd web && (pnpm install --frozen-lockfile || pnpm install) && pnpm run build) && \
 	SKYHERD_MOCK=1 uv run uvicorn skyherd.server.app:app --port 8000
 
