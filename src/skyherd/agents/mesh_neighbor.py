@@ -41,6 +41,7 @@ import hashlib
 import json
 import logging
 import time
+from collections import deque
 from typing import Any
 
 from skyherd.agents.mesh import AgentMesh
@@ -103,6 +104,13 @@ class NeighborBroadcaster:
         self._neighbor_map = neighbor_map  # fence_id → to_ranch
         self._publish = publish_callback
         self._published_count: int = 0
+        # CRM-04: ring buffer of recent outbound events for /api/neighbors feed.
+        self._recent: deque[dict[str, Any]] = deque(maxlen=100)
+
+    @property
+    def recent_events(self) -> list[dict[str, Any]]:
+        """Return recent outbound neighbor alerts (oldest first)."""
+        return list(self._recent)
 
     async def on_fenceline_decision(
         self,
@@ -168,6 +176,17 @@ class NeighborBroadcaster:
             )
 
         self._published_count += 1
+        # CRM-04: record outbound event for /api/neighbors feed.
+        self._recent.append({
+            "direction": "outbound",
+            "from_ranch": self._from_ranch,
+            "to_ranch": to_ranch,
+            "species": species,
+            "confidence": confidence,
+            "shared_fence": fence_id,
+            "ts": ts,
+            "attestation_hash": base_payload["attestation_hash"],
+        })
         logger.info(
             "NeighborBroadcaster[%s → %s]: broadcast predator_confirmed (fence=%s, species=%s, "
             "confidence=%.2f)",
@@ -221,6 +240,13 @@ class NeighborListener:
         self._dedup: dict[tuple[str, str], float] = {}
         self._received_count: int = 0
         self._deduped_count: int = 0
+        # CRM-04: ring buffer of recent inbound events for /api/neighbors feed.
+        self._recent: deque[dict[str, Any]] = deque(maxlen=100)
+
+    @property
+    def recent_events(self) -> list[dict[str, Any]]:
+        """Return recent inbound neighbor alerts (oldest first)."""
+        return list(self._recent)
 
     def _is_duplicate(self, from_ranch: str, shared_fence: str) -> bool:
         """Return True if this alert was recently seen and should be suppressed."""
@@ -281,6 +307,18 @@ class NeighborListener:
                 shared_fence,
             )
             return False
+
+        # CRM-04: record inbound event for /api/neighbors feed (after dedup).
+        self._recent.append({
+            "direction": "inbound",
+            "from_ranch": from_ranch,
+            "to_ranch": self._this_ranch,
+            "species": species,
+            "confidence": confidence,
+            "shared_fence": shared_fence,
+            "ts": ts,
+            "attestation_hash": attestation_hash,
+        })
 
         # Build a synthetic neighbor_alert wake event for FenceLineDispatcher
         wake_event: dict[str, Any] = {
@@ -450,6 +488,20 @@ class CrossRanchMesh:
         """Internal publish: enqueue onto the shared in-memory event bus."""
         await self._event_bus.put((topic, payload))
         logger.debug("CrossRanchMesh bus: enqueued %s", topic)
+
+    def recent_events(self) -> list[dict[str, Any]]:
+        """Phase 02 CRM-04: combined in/out neighbor log for /api/neighbors.
+
+        Returns up to 100 most-recent events across all broadcasters + listeners,
+        sorted by ts descending. Safe for sync-callers (no asyncio required).
+        """
+        out: list[dict[str, Any]] = []
+        for b in self._broadcasters.values():
+            out.extend(b.recent_events)
+        for listener in self._listeners.values():
+            out.extend(listener.recent_events)
+        out.sort(key=lambda e: float(e.get("ts", 0.0)), reverse=True)
+        return out[:100]
 
     async def _event_router_loop(self) -> None:
         """Route events from the shared bus to the correct NeighborListener."""

@@ -533,6 +533,28 @@ class EventBroadcaster:
                 logger.debug("mock log loop error: %s", exc)
             await asyncio.sleep(MOCK_EVENT_INTERVAL_S)
 
+    def broadcast_neighbor_alert(self, payload: dict[str, Any]) -> None:
+        """Publish a ``neighbor.alert`` SSE event (inbound ingress — CRM-05).
+
+        Distinct from ``neighbor.handoff``: ``neighbor.alert`` fires when
+        CrossRanchCoordinator WAKES on an inbound cross-ranch event. The
+        ``neighbor.handoff`` event fires AFTER the pre-position drone mission
+        uploads.
+
+        Payload shape::
+
+            {
+                "from_ranch": "ranch_a",
+                "to_ranch":   "ranch_b",
+                "species":    "coyote",
+                "shared_fence": "fence_west",
+                "confidence": 0.91,
+                "ts": 1745200000.0,
+                "attestation_hash": "sha256:...",
+            }
+        """
+        self._broadcast("neighbor.alert", payload)
+
     def broadcast_neighbor_handoff(self, payload: dict[str, Any]) -> None:
         """Publish a ``neighbor.handoff`` SSE event to all subscribers.
 

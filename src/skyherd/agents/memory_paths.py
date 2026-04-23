@@ -38,6 +38,7 @@ _KNOWN_AGENTS: frozenset[str] = frozenset({
     "PredatorPatternLearner",
     "GrazingOptimizer",
     "CalvingWatch",
+    "CrossRanchCoordinator",
 })
 
 
@@ -124,12 +125,37 @@ def _grazing_optimizer(event: dict[str, Any], tool_calls: list[dict[str, Any]]) 
     return path, content
 
 
+def _cross_ranch_coordinator(
+    event: dict[str, Any], tool_calls: list[dict[str, Any]]
+) -> tuple[str, str]:
+    """Phase 02 CRM-03 — write neighbor-pattern summary to shared store.
+
+    Path shape: ``neighbors/<from_ranch>/<shared_fence>.md`` (caller prepends /).
+    """
+    from_ranch = str(event.get("from_ranch", "unknown"))
+    shared_fence = str(event.get("shared_fence", "unknown"))
+    species = str(event.get("species", "unknown"))
+    confidence = float(event.get("confidence", 0.0))
+    ts = str(event.get("ts", ""))
+    path = f"neighbors/{from_ranch}/{shared_fence}.md"
+    content = (
+        f"# Neighbor alert — {from_ranch} → {shared_fence}\n\n"
+        f"- species: {species}\n"
+        f"- confidence: {confidence:.2f}\n"
+        f"- tool_calls: {len(tool_calls)}\n"
+        f"- response_mode: pre_position\n"
+        f"- ts: {ts}\n"
+    )
+    return path, content
+
+
 _DISPATCH = {
     "PredatorPatternLearner": _predator_pattern_learner,
     "HerdHealthWatcher": _herd_health_watcher,
     "CalvingWatch": _calving_watch,
     "FenceLineDispatcher": _fenceline_dispatcher,
     "GrazingOptimizer": _grazing_optimizer,
+    "CrossRanchCoordinator": _cross_ranch_coordinator,
 }
 
 

@@ -112,3 +112,67 @@ class TestUnknownAgent:
     def test_raises_value_error_on_unknown_agent(self) -> None:
         with pytest.raises(ValueError, match="unknown agent"):
             decide_write_path("NonexistentAgent", {}, [])
+
+
+# ---------------------------------------------------------------------------
+# Phase 02 CRM-03: CrossRanchCoordinator branch
+# ---------------------------------------------------------------------------
+
+
+class TestCrossRanchCoordinator:
+    def _event(self, **overrides) -> dict[str, object]:
+        base: dict[str, object] = {
+            "from_ranch": "ranch_a",
+            "shared_fence": "fence_west",
+            "species": "coyote",
+            "confidence": 0.91,
+            "ts": 1745200000.0,
+        }
+        base.update(overrides)
+        return base
+
+    def test_path_prefix(self) -> None:
+        path, _content = decide_write_path(
+            "CrossRanchCoordinator", self._event(), []
+        )
+        assert path.startswith("neighbors/ranch_a/")
+        assert path.endswith(".md")
+
+    def test_content_includes_species_and_confidence(self) -> None:
+        _path, content = decide_write_path(
+            "CrossRanchCoordinator", self._event(), []
+        )
+        assert "- species: coyote" in content
+        assert "- confidence: 0.91" in content
+        assert "response_mode: pre_position" in content
+
+    def test_deterministic(self) -> None:
+        evt = self._event()
+        a = decide_write_path("CrossRanchCoordinator", evt, [])
+        b = decide_write_path("CrossRanchCoordinator", evt, [])
+        assert a == b
+
+    def test_respects_redaction_for_phone_leak(self) -> None:
+        evt = self._event()
+        evt["rancher_phone"] = "+15551112222"
+        _path, content = decide_write_path("CrossRanchCoordinator", evt, [])
+        # Phone number should NOT appear in content (redacted upstream).
+        assert "5551112222" not in content
+        assert "[REDACTED]" not in content  # not in content body either
+
+    def test_known_agents_includes_cross_ranch_coordinator(self) -> None:
+        # If we can call decide_write_path without ValueError, CRC is registered.
+        path, content = decide_write_path(
+            "CrossRanchCoordinator", self._event(), []
+        )
+        assert path
+        assert content
+
+    def test_different_shared_fence_changes_path(self) -> None:
+        a, _ = decide_write_path(
+            "CrossRanchCoordinator", self._event(shared_fence="fence_west"), []
+        )
+        b, _ = decide_write_path(
+            "CrossRanchCoordinator", self._event(shared_fence="fence_east"), []
+        )
+        assert a != b

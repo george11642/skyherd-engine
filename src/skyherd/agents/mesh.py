@@ -23,6 +23,12 @@ from typing import Any
 from skyherd.agents.calving_watch import CALVING_WATCH_SPEC
 from skyherd.agents.calving_watch import handler as calving_handler
 from skyherd.agents.cost import run_tick_loop
+from skyherd.agents.cross_ranch_coordinator import (
+    CROSS_RANCH_COORDINATOR_SPEC,
+)
+from skyherd.agents.cross_ranch_coordinator import (
+    handler as cross_ranch_handler,
+)
 from skyherd.agents.fenceline_dispatcher import (
     FENCELINE_DISPATCHER_SPEC,
 )
@@ -59,6 +65,7 @@ _AGENT_REGISTRY: list[tuple[AgentSpec, Any]] = [
     (PREDATOR_PATTERN_LEARNER_SPEC, predator_handler),
     (GRAZING_OPTIMIZER_SPEC, grazing_handler),
     (CALVING_WATCH_SPEC, calving_handler),
+    (CROSS_RANCH_COORDINATOR_SPEC, cross_ranch_handler),
 ]
 
 # Synthetic smoke-test wake events (one per agent)
@@ -93,6 +100,15 @@ _SMOKE_WAKE_EVENTS: list[dict[str, Any]] = [
         "type": "collar.activity_spike",
         "ranch_id": "ranch_a",
         "tag": "tag_007",
+    },
+    {
+        "topic": "skyherd/neighbor/ranch_a/ranch_b/predator_confirmed",
+        "type": "neighbor_alert",
+        "ranch_id": "ranch_b",
+        "from_ranch": "ranch_a",
+        "shared_fence": "fence_west",
+        "species": "coyote",
+        "confidence": 0.91,
     },
 ]
 

@@ -440,3 +440,129 @@ class TestAttestationHash:
     def test_hash_starts_with_sha256(self):
         h = _attestation_hash({"x": "y"})
         assert h.startswith("sha256:")
+
+
+# ---------------------------------------------------------------------------
+# Phase 02 CRM-04: recent_events ring buffer on broadcaster + listener
+# ---------------------------------------------------------------------------
+
+
+class TestRecentEventsRingBuffer:
+    async def test_broadcaster_records_recent_outbound_event(self, monkeypatch):
+        """After on_fenceline_decision fires, broadcaster.recent_events has 1 outbound entry."""
+        monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+
+        async def fake_publish(topic: str, payload: dict) -> None:
+            return None
+
+        broadcaster = NeighborBroadcaster(
+            from_ranch="ranch_a",
+            shared_fence_ids={"fence_east"},
+            neighbor_map={"fence_east": "ranch_b"},
+            publish_callback=fake_publish,
+        )
+        await broadcaster.on_fenceline_decision(
+            {"fence_id": "fence_east", "species": "coyote", "confidence": 0.91}
+        )
+        assert len(broadcaster.recent_events) == 1
+        entry = broadcaster.recent_events[0]
+        assert entry["direction"] == "outbound"
+        assert entry["from_ranch"] == "ranch_a"
+        assert entry["to_ranch"] == "ranch_b"
+        assert entry["shared_fence"] == "fence_east"
+        assert entry["species"] == "coyote"
+
+    async def test_broadcaster_skips_non_shared_does_not_record(self, monkeypatch):
+        monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+        broadcaster = NeighborBroadcaster(
+            from_ranch="ranch_a",
+            shared_fence_ids={"fence_east"},
+            neighbor_map={"fence_east": "ranch_b"},
+            publish_callback=None,
+        )
+        await broadcaster.on_fenceline_decision(
+            {"fence_id": "fence_internal_v", "species": "coyote", "confidence": 0.91}
+        )
+        assert broadcaster.recent_events == []
+
+    async def test_listener_records_recent_inbound_event(self, monkeypatch):
+        """After on_neighbor_event fires, listener.recent_events has 1 inbound entry."""
+        monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+
+        sm, fid = _make_session_manager()
+        listener = NeighborListener(
+            this_ranch="ranch_b",
+            session_manager=sm,
+            fenceline_session_id=fid,
+        )
+        topic = "skyherd/neighbor/ranch_a/ranch_b/predator_confirmed"
+        payload = {
+            "from_ranch": "ranch_a",
+            "to_ranch": "ranch_b",
+            "species": "coyote",
+            "confidence": 0.91,
+            "shared_fence": "fence_west",
+            "ts": 1745200000.0,
+            "attestation_hash": "sha256:deadbeef",
+        }
+        forwarded = await listener.on_neighbor_event(topic, payload)
+        assert forwarded is True
+        assert len(listener.recent_events) == 1
+        entry = listener.recent_events[0]
+        assert entry["direction"] == "inbound"
+        assert entry["from_ranch"] == "ranch_a"
+        assert entry["to_ranch"] == "ranch_b"
+        assert entry["shared_fence"] == "fence_west"
+
+    async def test_listener_deduped_events_not_recorded_twice(self, monkeypatch):
+        """Deduped inbound events (same from_ranch + shared_fence within TTL)
+        should only record ONCE in recent_events."""
+        monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+
+        sm, fid = _make_session_manager()
+        listener = NeighborListener(
+            this_ranch="ranch_b",
+            session_manager=sm,
+            fenceline_session_id=fid,
+        )
+        topic = "skyherd/neighbor/ranch_a/ranch_b/predator_confirmed"
+        payload = {
+            "from_ranch": "ranch_a",
+            "to_ranch": "ranch_b",
+            "species": "coyote",
+            "confidence": 0.91,
+            "shared_fence": "fence_west",
+            "ts": time.time(),
+            "attestation_hash": "sha256:deadbeef",
+        }
+        await listener.on_neighbor_event(topic, payload)
+        await listener.on_neighbor_event(topic, payload)  # dedup
+        assert len(listener.recent_events) == 1
+
+    async def test_cross_ranch_mesh_recent_events_combines_in_out(self, monkeypatch):
+        """CrossRanchMesh.recent_events() returns union (inbound + outbound) sorted by ts desc."""
+        monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+        mesh_a = AgentMesh()
+        mesh_b = AgentMesh()
+        cross = CrossRanchMesh(
+            meshes={"ranch_a": mesh_a, "ranch_b": mesh_b},
+            neighbor_config={
+                "ranch_a": {"fence_east": "ranch_b"},
+                "ranch_b": {"fence_west": "ranch_a"},
+            },
+        )
+        await cross.start()
+        try:
+            await cross.simulate_coyote_at_shared_fence(
+                from_ranch="ranch_a",
+                shared_fence_id="fence_east",
+            )
+            events = cross.recent_events()
+            directions = {e["direction"] for e in events}
+            assert "outbound" in directions
+            assert "inbound" in directions
+            # Should be sorted by ts desc — verify non-increasing
+            ts_list = [float(e["ts"]) for e in events]
+            assert ts_list == sorted(ts_list, reverse=True)
+        finally:
+            await cross.stop()

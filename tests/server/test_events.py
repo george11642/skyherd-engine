@@ -286,3 +286,41 @@ async def test_broadcaster_no_mock_world_uses_mock_fallback():
         bc.stop()
 
     assert len(snapshots) >= 1
+
+
+# ---------------------------------------------------------------------------
+# Phase 02 CRM-05: broadcast_neighbor_alert
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_broadcast_neighbor_alert_fans_out_to_subscribers():
+    """broadcast_neighbor_alert must publish 'neighbor.alert' to all SSE subscribers."""
+    bc = EventBroadcaster(mock=True)
+    bc.start()
+    payload = {
+        "from_ranch": "ranch_a",
+        "to_ranch": "ranch_b",
+        "species": "coyote",
+        "shared_fence": "fence_west",
+        "confidence": 0.91,
+        "ts": 1745200000.0,
+        "attestation_hash": "sha256:deadbeef",
+    }
+    received: list = []
+
+    async def collect():
+        async for event_type, p in bc.subscribe():
+            if event_type == "neighbor.alert":
+                received.append(p)
+                break
+
+    collector = asyncio.create_task(collect())
+    # Let subscriber register before we broadcast.
+    await asyncio.sleep(0.1)
+    bc.broadcast_neighbor_alert(payload)
+    try:
+        await asyncio.wait_for(collector, timeout=5.0)
+    finally:
+        bc.stop()
+    assert received == [payload]
