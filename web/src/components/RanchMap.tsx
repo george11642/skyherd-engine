@@ -97,12 +97,29 @@ function cowColor(cow: Cow): string {
 
 const TRAIL_LEN = 8;
 
-export function RanchMap() {
+/**
+ * RanchMapProps — optional snapshot override for tests & storybook fixtures.
+ *
+ * Production callers use `<RanchMap />` with no props and the SSE subscription
+ * drives the canvas. Tests can inject a `snapshot` directly to exercise the
+ * draw path deterministically (see Plan 05-04 DASH-05 predator ring motion).
+ */
+interface RanchMapProps {
+  snapshot?: WorldSnapshot;
+}
+
+export function RanchMap({ snapshot: snapshotProp }: RanchMapProps = {}) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const snapshotRef = useRef<WorldSnapshot | null>(null);
+  const snapshotRef = useRef<WorldSnapshot | null>(snapshotProp ?? null);
   const animFrameRef = useRef<number>(0);
   const droneTrailRef = useRef<Array<[number, number]>>([]);
   const prevDroneRef = useRef<[number, number] | null>(null);
+
+  // Keep snapshotRef in sync with the snapshot prop across re-renders so tests
+  // (and any future prop-driven callers) can re-render with new data.
+  if (snapshotProp !== undefined && snapshotRef.current !== snapshotProp) {
+    snapshotRef.current = snapshotProp;
+  }
 
   const draw = useCallback(() => {
     const canvas = canvasRef.current;

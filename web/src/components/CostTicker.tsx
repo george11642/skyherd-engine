@@ -90,7 +90,24 @@ function AnimatedCost({ value }: { value: number }) {
   );
 }
 
-export function CostTicker() {
+/**
+ * CostTickerProps — all optional; when provided, override the SSE-derived state.
+ *
+ * This is the test-injection seam used by CostTicker.test.tsx (Plan 05-04 DASH-03).
+ * Production callers use `<CostTicker />` with no props and the SSE subscription
+ * drives the ticker. Tests (and future storybook fixtures) can bypass SSE by
+ * passing `all_idle` / `total_cumulative_usd` / `rate_per_hr_usd` / `agents` /
+ * `sparkline` directly.
+ */
+interface CostTickerProps {
+  all_idle?: boolean;
+  total_cumulative_usd?: number;
+  rate_per_hr_usd?: number;
+  agents?: AgentCost[];
+  sparkline?: number[];
+}
+
+export function CostTicker(props: CostTickerProps = {}) {
   const [tick, setTick] = useState<CostTickPayload | null>(null);
   const sparkRef = useRef<number[]>([]);
   const [sparkline, setSparkline] = useState<number[]>([]);
@@ -107,9 +124,12 @@ export function CostTicker() {
     return () => sse.off("cost.tick", handleTick);
   }, [handleTick]);
 
-  const allIdle = tick?.all_idle ?? true;
-  const totalCost = tick?.total_cumulative_usd ?? 0;
-  const rateUsd = tick?.rate_per_hr_usd ?? 0;
+  // Prop overrides win over SSE-derived state; falls back to tick payload.
+  const allIdle = props.all_idle ?? tick?.all_idle ?? true;
+  const totalCost = props.total_cumulative_usd ?? tick?.total_cumulative_usd ?? 0;
+  const rateUsd = props.rate_per_hr_usd ?? tick?.rate_per_hr_usd ?? 0;
+  const effectiveAgents = props.agents ?? tick?.agents;
+  const effectiveSparkline = props.sparkline ?? sparkline;
 
   return (
     <section
@@ -152,7 +172,7 @@ export function CostTicker() {
               cumulative
             </span>
           </div>
-          <Sparkline values={sparkline} />
+          <Sparkline values={effectiveSparkline} />
         </div>
 
         {/* Rate line */}
@@ -168,9 +188,9 @@ export function CostTicker() {
         </div>
 
         {/* Per-agent strip */}
-        {tick?.agents && (
+        {effectiveAgents && (
           <div className="grid grid-cols-5 gap-1 mt-2" role="list" aria-label="Agent cost breakdown">
-            {tick.agents.map((a) => (
+            {effectiveAgents.map((a) => (
               <div
                 key={a.name}
                 role="listitem"

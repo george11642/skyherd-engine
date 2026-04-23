@@ -111,3 +111,78 @@ describe("CostTicker", () => {
     expect(screen.getByText(/cost meter/i)).toBeTruthy();
   });
 });
+
+describe("CostTicker — paused state visual treatment (DASH-03)", () => {
+  beforeEach(() => {
+    sseHandlers = {};
+  });
+
+  it("dims the cumulative cost with opacity<0.5 or grayscale when all_idle=true", () => {
+    render(
+      <CostTicker
+        all_idle={true}
+        total_cumulative_usd={0.123456}
+        rate_per_hr_usd={0.0}
+        agents={[]}
+        sparkline={[0.01, 0.02, 0.03, 0.04]}
+      />,
+    );
+    const dollar = screen.getByText(/\$0\.12/);
+    let el: HTMLElement | null = dollar;
+    let foundDim = false;
+    while (el && el.parentElement) {
+      const op = parseFloat((el.style.opacity as string) || "1");
+      const filter = el.style.filter || "";
+      if (op < 0.5 || filter.includes("grayscale")) {
+        foundDim = true;
+        break;
+      }
+      el = el.parentElement;
+    }
+    expect(foundDim).toBe(true);
+  });
+
+  it("leaves the cumulative cost at full opacity when all_idle=false", () => {
+    render(
+      <CostTicker
+        all_idle={false}
+        total_cumulative_usd={0.123456}
+        rate_per_hr_usd={0.08}
+        agents={[]}
+        sparkline={[0.01, 0.02, 0.03, 0.04]}
+      />,
+    );
+    const dollar = screen.getByText(/\$0\.12/);
+    let el: HTMLElement | null = dollar;
+    let dimmed = false;
+    while (el && el.parentElement) {
+      const op = parseFloat((el.style.opacity as string) || "1");
+      const filter = el.style.filter || "";
+      if (op < 0.9 || filter.includes("grayscale(1)")) {
+        dimmed = true;
+        break;
+      }
+      el = el.parentElement;
+    }
+    expect(dimmed).toBe(false);
+  });
+
+  it("freezes the sparkline to a flat line when all_idle=true", () => {
+    const { container } = render(
+      <CostTicker
+        all_idle={true}
+        total_cumulative_usd={0.1}
+        rate_per_hr_usd={0.0}
+        agents={[]}
+        sparkline={[0.01, 0.02, 0.03, 0.04, 0.05]}
+      />,
+    );
+    const poly = container.querySelector("polyline, path[d]");
+    if (poly) {
+      const pts = poly.getAttribute("points") || poly.getAttribute("d") || "";
+      const ys = Array.from(pts.matchAll(/[,\s](\d+(?:\.\d+)?)/g)).map((m) => m[1]);
+      const uniqueY = new Set(ys);
+      expect(uniqueY.size).toBeLessThanOrEqual(2);
+    }
+  });
+});
