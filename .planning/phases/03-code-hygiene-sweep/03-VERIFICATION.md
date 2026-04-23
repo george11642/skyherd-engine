@@ -1,28 +1,13 @@
 ---
 phase: 03-code-hygiene-sweep
 verified: 2026-04-23T01:11:03Z
-status: gaps_found
-score: 4/5
+reverified: 2026-04-23
+status: passed
+score: 5/5
 overrides_applied: 0
-gaps:
-  - truth: "uv run ruff check src/ tests/ exits clean"
-    status: failed
-    reason: "12 ruff errors remain in tests/: 8 pre-existing in tests/vision/ (documented as out-of-scope in SUMMARY 04, confirmed pre-Phase-3), plus 3 NEW errors in Phase-3-created/modified test files (N814 tests/sensors/test_bus.py:127, F401 tests/voice/_twilio_env/test_twilio_env.py:15, I001 tests/voice/test_call.py:267) not present before Phase 3 and not documented as acceptable. src/ itself is clean (0 errors)."
-    artifacts:
-      - path: "tests/sensors/test_bus.py"
-        issue: "N814 Camelcase SensorBus imported as constant _SB at line 127 — introduced in Phase 3 commit 2d16deb"
-      - path: "tests/voice/_twilio_env/test_twilio_env.py"
-        issue: "F401 _DEPRECATION_EMITTED imported but never referenced in test body (conftest handles it via lazy import) — Phase 3 created this file"
-      - path: "tests/voice/test_call.py"
-        issue: "I001 import block un-sorted at line 267 (inline import + separate pytest import in same block) — Phase 3 modified this file"
-      - path: "tests/vision/test_heads/test_pinkeye_pixel.py"
-        issue: "F401 x2, E402 x3, F811 x1 — 6 errors; PRE-EXISTING before Phase 3, documented in SUMMARY 04 as deferred to Phase 5 (Vision scope)"
-      - path: "tests/vision/test_preprocess_detector.py"
-        issue: "I001, F401 — 2 errors; PRE-EXISTING before Phase 3, documented in SUMMARY 04 as deferred to Phase 5"
-    missing:
-      - "Fix N814 in tests/sensors/test_bus.py:127: rename alias to snake_case (e.g. _sensor_bus = SensorBus)"
-      - "Fix F401 in tests/voice/_twilio_env/test_twilio_env.py:15: remove _DEPRECATION_EMITTED from import (already handled by conftest)"
-      - "Fix I001 in tests/voice/test_call.py:267: reorder inline import block to sort pytest import before or with other imports"
+gaps: []
+closure_notes:
+  - "HYG-04 closed in commit 8c13f73 (2026-04-23): 15 ruff errors cleared across tests/. `ruff check src/` + `ruff check tests/` both pass. 1253/1253 pytest green."
 ---
 
 # Phase 3: Code Hygiene Sweep — Verification Report
@@ -93,7 +78,7 @@ Not applicable for this phase — no components rendering dynamic data to UI. Al
 | HYG-01 | Plans 01, 02, 04 | Replace silent-except blocks with logged warnings | SATISFIED | Zero bare-pass catches for non-shutdown exceptions; 19 FIX sites converted; 9 typed CancelledError/KeyboardInterrupt WONTFIX documented |
 | HYG-02 | Plan 01 | Twilio auth env var standardized on TWILIO_AUTH_TOKEN | SATISFIED | `_twilio_env.py` helper exists; 3 consumers migrated; deprecation warning fires once per process |
 | HYG-03 | Plan 03 | cost.py ≥90% coverage | SATISFIED | 100% coverage verified by pytest-cov gate |
-| HYG-04 | Plan 04 | ruff + pyright run clean | BLOCKED | Pyright (Phase-3-owned scope) PASSES; `ruff check src/` PASSES; `ruff check src/ tests/` FAILS with 12 errors (3 in Phase-3 files, 8 pre-existing in tests/vision/) |
+| HYG-04 | Plan 04 | ruff + pyright run clean | SATISFIED | `ruff check src/` + `ruff check tests/` both PASS (cleared in commit 8c13f73, 2026-04-23); pyright (Phase-3-owned scope) PASSES |
 | HYG-05 | Plans 03, 04 | Project-wide coverage ≥87% | SATISFIED | 88.17% coverage measured |
 
 ### Anti-Patterns Found
