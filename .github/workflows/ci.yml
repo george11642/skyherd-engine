@@ -51,6 +51,17 @@ jobs:
           --cov-report=term-missing
           --cov-fail-under=80
 
+      - name: Server live-path coverage gate (DASH-02)
+        # Separate gate on src/skyherd/server/ — must stay >=85% so the
+        # live dashboard surface (SSE, /api/*, vet-intake) keeps judge-worthy
+        # coverage on every PR. Counts only executed lines; skipped tests do
+        # not inflate the numerator.
+        run: >
+          uv run pytest tests/server/ -q
+          --cov=src/skyherd/server
+          --cov-report=term-missing
+          --cov-fail-under=85
+
   # ---------------------------------------------------------------------------
   # Web build + test
   # ---------------------------------------------------------------------------
