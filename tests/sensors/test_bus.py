@@ -7,8 +7,10 @@ back, verifies the payload, and optionally mirrors to the ledger.
 from __future__ import annotations
 
 import asyncio
+import logging
 import os
 from pathlib import Path
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
@@ -92,3 +94,40 @@ async def test_ledger_mirror_on_publish(ledger: Ledger) -> None:
     assert ev.kind == "fence.breach"
     result = ledger.verify()
     assert result.valid
+
+
+# ---------------------------------------------------------------------------
+# HYG-01 caplog RED tests (Task 1 — will fail until Task 2 source edits land)
+# ---------------------------------------------------------------------------
+
+
+async def test_close_client_warns_on_exit_error(caplog: pytest.LogCaptureFixture) -> None:
+    """_close_client logs WARNING when aiomqtt __aexit__ raises."""
+    caplog.set_level(logging.WARNING, logger="skyherd.sensors.bus")
+
+    bus = SensorBus.__new__(SensorBus)
+    bus._client_lock = asyncio.Lock()
+
+    # Fake aiomqtt client whose __aexit__ raises
+    fake_client = MagicMock()
+    fake_client.__aexit__ = AsyncMock(side_effect=RuntimeError("broker RST"))
+    bus._client = fake_client
+
+    await bus._close_client()
+
+    assert "aiomqtt client close failed" in caplog.text
+    assert "broker RST" in caplog.text
+
+
+async def test_parse_payload_debug_log_on_malformed_json(caplog: pytest.LogCaptureFixture) -> None:
+    """_parse_url with bad port logs DEBUG (exercises the ValueError path)."""
+    caplog.set_level(logging.DEBUG, logger="skyherd.sensors.bus")
+
+    # Call _parse_url with a non-integer port to trigger the ValueError branch
+    from skyherd.sensors.bus import SensorBus as _SB
+
+    result = _SB._parse_url("mqtt://localhost:notaport")
+
+    # Returns default port silently right now — after Task 2, it will log DEBUG
+    assert result[1] == 1883  # default port used
+    assert "mqtt URL port unparseable" in caplog.text

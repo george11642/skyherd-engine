@@ -7,7 +7,10 @@ TroughCamSensor schema consumed by the sim agents.
 
 from __future__ import annotations
 
+import asyncio
 import json
+import logging
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
@@ -202,3 +205,25 @@ class TestMotionEvent:
         watcher = _make_watcher(detector=NoDetector())
         payload = await watcher.run_once()
         assert payload["cows_present"] == 0
+
+
+# ---------------------------------------------------------------------------
+# HYG-01 caplog RED tests (Task 1 — will fail until Task 2 source edits land)
+# ---------------------------------------------------------------------------
+
+
+async def test_mqtt_close_warns_on_exit_error(caplog: pytest.LogCaptureFixture) -> None:
+    """_close_mqtt_client logs WARNING when aiomqtt __aexit__ raises."""
+    caplog.set_level(logging.WARNING, logger="skyherd.edge.watcher")
+
+    watcher = EdgeWatcher.__new__(EdgeWatcher)
+    watcher._mqtt_client_lock = asyncio.Lock()
+
+    # Fake aiomqtt client whose __aexit__ raises
+    fake_client = MagicMock()
+    fake_client.__aexit__ = AsyncMock(side_effect=RuntimeError("broker RST"))
+    watcher._mqtt_client = fake_client
+
+    await watcher._close_mqtt_client()
+
+    assert "mqtt client close failed during EdgeWatcher shutdown" in caplog.text

@@ -219,3 +219,38 @@ class TestMp3ToWav:
         _mp3_to_wav(b"fake-mp3", out)
         data = out.read_bytes()
         assert data[:4] == b"RIFF"
+
+
+# ---------------------------------------------------------------------------
+# HYG-01 caplog RED test (Task 1 — will fail until Task 2 source edits land)
+# ---------------------------------------------------------------------------
+
+
+class TestHygieneLogs:
+    def test_mp3_decode_debug_log_on_pydub_failure(
+        self, tmp_path, monkeypatch, caplog
+    ) -> None:
+        """_mp3_to_wav logs DEBUG when pydub raises, then falls back to raw bytes."""
+        import logging
+        import types
+
+        caplog.set_level(logging.DEBUG, logger="skyherd.voice.tts")
+
+        # Build a fake pydub module whose from_mp3 raises
+        fake_pydub = types.ModuleType("pydub")
+
+        class FailingSegment:
+            @classmethod
+            def from_mp3(cls, fp):
+                raise Exception("bad codec")
+
+        fake_pydub.AudioSegment = FailingSegment
+        monkeypatch.setitem(__import__("sys").modules, "pydub", fake_pydub)
+
+        out = tmp_path / "out.wav"
+        _mp3_to_wav(b"fake-mp3-data", out)
+
+        # Fallback should still write the raw bytes
+        assert out.read_bytes() == b"fake-mp3-data"
+        # After Task 2, this assertion will pass:
+        assert "pydub mp3 decode failed" in caplog.text

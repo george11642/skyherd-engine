@@ -139,3 +139,36 @@ async def test_trough_cam_frame_uri_in_payload(world, mock_bus) -> None:
     topic = "skyherd/ranch_a/trough_cam/cam_2"
     msgs = mock_bus.all_payloads(topic)
     assert "runtime/frames" in msgs[0]["frame_uri"]
+
+
+# ---------------------------------------------------------------------------
+# HYG-01 caplog RED test (Task 1 — will fail until Task 2 source edits land)
+# ---------------------------------------------------------------------------
+
+
+class TestHygieneLogs:
+    async def test_frame_render_debug_log_on_import_error(
+        self, world, mock_bus, monkeypatch, caplog
+    ) -> None:
+        """TroughCamSensor logs DEBUG when vision renderer import fails."""
+        import logging
+        import sys
+
+        caplog.set_level(logging.DEBUG, logger="skyherd.sensors.trough_cam")
+
+        # Make skyherd.vision.renderer raise ImportError on import
+        monkeypatch.setitem(sys.modules, "skyherd.vision.renderer", None)
+
+        trough_cfg = world.terrain.config.troughs[0]
+        sensor = TroughCamSensor(
+            world=world,
+            bus=mock_bus,
+            ranch_id="ranch_a",
+            trough_cfg=trough_cfg,
+            cam_id="cam_hyg_01",
+            period_s=10.0,
+        )
+        await sensor.tick()
+
+        # After Task 2, this assertion will pass:
+        assert "vision renderer unavailable" in caplog.text
