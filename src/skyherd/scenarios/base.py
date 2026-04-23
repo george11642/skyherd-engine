@@ -289,28 +289,9 @@ class _DemoMesh:
 # ---------------------------------------------------------------------------
 
 
-async def _run_async(
-    scenario: Scenario,
-    seed: int = 42,
-    dry_run: bool = False,
-    world_config: Path | None = None,
-) -> ScenarioResult:
-    """Async inner implementation of run()."""
-    import tempfile
-
-    config_path = world_config or _WORLD_CONFIG
-    world = make_world(seed=seed, config_path=config_path)
-
-    # Build an in-memory ledger
-    tmp = tempfile.NamedTemporaryFile(suffix=".db", delete=False)
-    tmp.close()
-    signer = Signer.generate()
-    ledger = Ledger.open(tmp.name, signer)
-
-    mesh = _DemoMesh(ledger=ledger)
-
-    # Agent registry for event routing (ROUT-01: PredatorPatternLearner included).
-    _registry = {
+def _build_registry() -> dict[str, tuple[Any, Any]]:
+    """Return a fresh (spec, handler) registry used by the event router."""
+    return {
         "FenceLineDispatcher": (FENCELINE_DISPATCHER_SPEC, fenceline_handler),
         "HerdHealthWatcher": (HERD_HEALTH_WATCHER_SPEC, herd_handler),
         "PredatorPatternLearner": (PREDATOR_PATTERN_LEARNER_SPEC, predator_handler),
@@ -318,11 +299,51 @@ async def _run_async(
         "CalvingWatch": (CALVING_WATCH_SPEC, calving_handler),
     }
 
+
+async def _run_async_shared(
+    scenario: Scenario,
+    *,
+    world: World,
+    ledger: Ledger,
+    mesh: _DemoMesh,
+    seed: int = 42,
+    speed: float = 15.0,
+    assert_outcome: bool = False,
+    dry_run: bool = False,
+) -> ScenarioResult:
+    """Run *scenario* against caller-provided ``world`` / ``ledger`` / ``mesh``.
+
+    Never mints deps - callers own them. Used by the in-process ambient
+    driver in ``src/skyherd/server/ambient.py`` so scenario activity lands
+    in the live dashboard's mesh/world/ledger and feeds the SSE broadcaster
+    naturally.
+
+    Parameters
+    ----------
+    scenario:
+        Instantiated scenario.
+    world, ledger, mesh:
+        Externally owned - this function neither creates nor closes them.
+    seed:
+        Recorded on the result; the world is expected to already be seeded.
+    speed:
+        Sim-to-wall ratio. ``speed > 0`` sleeps ``_STEP_DT / speed`` between
+        steps; ``speed <= 0`` means no throttle (preserves the byte-identical
+        fast path used by ``_run_async``).
+    assert_outcome:
+        When True, runs ``scenario.assert_outcome()`` after the loop. Ambient
+        playback passes False - this is a heartbeat, not a test.
+    dry_run:
+        Skip the playback loop entirely (scenario setup still runs).
+    """
     # Setup pre-conditions
     scenario.setup(world)
 
     all_events: list[dict[str, Any]] = []
     wall_start = time.monotonic()
+    registry = _build_registry()
+    throttle = speed > 0
+    sleep_dt = _STEP_DT / speed if throttle else 0.0
 
     if not dry_run:
         elapsed = 0.0
@@ -345,7 +366,10 @@ async def _run_async(
 
             # Route events to agents
             for ev in step_events + injected:
-                await _route_event(ev, mesh, _registry, ledger)
+                await _route_event(ev, mesh, registry, ledger)
+
+            if throttle:
+                await asyncio.sleep(sleep_dt)
 
     wall_time_s = time.monotonic() - wall_start
 
@@ -362,16 +386,58 @@ async def _run_async(
         wall_time_s=wall_time_s,
     )
 
-    # Assert outcome (skip in dry_run — no events were collected)
     if dry_run:
         result.outcome_passed = True
-    else:
+    elif assert_outcome:
         try:
             scenario.assert_outcome(all_events, mesh)  # type: ignore[arg-type]
             result.outcome_passed = True
         except AssertionError as exc:
             result.outcome_error = str(exc)
             logger.warning("Scenario %r assertion failed: %s", scenario.name, exc)
+    else:
+        # Ambient / heartbeat mode - no verdict.
+        result.outcome_passed = True
+
+    return result
+
+
+async def _run_async(
+    scenario: Scenario,
+    seed: int = 42,
+    dry_run: bool = False,
+    world_config: Path | None = None,
+) -> ScenarioResult:
+    """Async inner implementation of run().
+
+    Thin wrapper around :func:`_run_async_shared`: mints a fresh world,
+    ledger, and :class:`_DemoMesh` (preserving the byte-identical seed=42
+    fast path), then delegates. Afterwards writes the JSONL replay log and
+    appends to ``docs/REPLAY_LOG.md``.
+    """
+    import tempfile
+
+    config_path = world_config or _WORLD_CONFIG
+    world = make_world(seed=seed, config_path=config_path)
+
+    # Build an in-memory ledger
+    tmp = tempfile.NamedTemporaryFile(suffix=".db", delete=False)
+    tmp.close()
+    signer = Signer.generate()
+    ledger = Ledger.open(tmp.name, signer)
+
+    mesh = _DemoMesh(ledger=ledger)
+
+    result = await _run_async_shared(
+        scenario,
+        world=world,
+        ledger=ledger,
+        mesh=mesh,
+        seed=seed,
+        speed=0.0,  # byte-identical fast path - no sleep between steps
+        assert_outcome=True,
+        dry_run=dry_run,
+    )
 
     # Write JSONL replay log
     _RUNTIME_DIR.mkdir(parents=True, exist_ok=True)

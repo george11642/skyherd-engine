@@ -37,6 +37,7 @@ from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, PlainTextResponse, Response
 from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel, Field
 from sse_starlette.sse import EventSourceResponse
 
 from skyherd.server.events import (
@@ -57,6 +58,12 @@ _sse_semaphore: asyncio.Semaphore | None = None
 
 # Shared broadcaster instance (module-level, created at startup)
 _broadcaster: EventBroadcaster | None = None
+
+
+class AmbientSpeedRequest(BaseModel):
+    """Body of POST /api/ambient/speed - bounds validated at parse time."""
+
+    speed: float = Field(..., ge=0.0, le=120.0)
 
 
 def _cors_origins() -> list[str]:
@@ -193,6 +200,29 @@ def create_app(
         except OSError as exc:  # pragma: no cover — defensive, filesystem failure
             raise HTTPException(status_code=500, detail="read error") from exc
         return PlainTextResponse(content=body, media_type="text/markdown; charset=utf-8")
+
+    # ------------------------------------------------------------------
+    # Ambient driver control (v1.1 Part A) - POST only, gated on driver attach.
+    # No UI affordance in the shipped dashboard; operator tools for video
+    # capture. See src/skyherd/server/ambient.py and src/skyherd/server/live.py.
+    # ------------------------------------------------------------------
+
+    @app.post("/api/ambient/speed")
+    async def api_ambient_speed(body: AmbientSpeedRequest) -> JSONResponse:
+        driver = getattr(app.state, "ambient_driver", None)
+        if driver is None:
+            raise HTTPException(status_code=404, detail="ambient driver not attached")
+        driver.set_speed(body.speed)
+        return JSONResponse(content={"speed": driver.speed})
+
+    @app.post("/api/ambient/next")
+    async def api_ambient_next() -> JSONResponse:
+        driver = getattr(app.state, "ambient_driver", None)
+        if driver is None:
+            raise HTTPException(status_code=404, detail="ambient driver not attached")
+        skipped = driver.active_scenario
+        driver.skip()
+        return JSONResponse(content={"skipped": skipped})
 
     # ------------------------------------------------------------------
     # SSE endpoint — connection-limited (SECURITY_REVIEW F-02)
