@@ -296,7 +296,7 @@ class EventBroadcaster:
             try:
                 self._subscribers.remove(q)
             except ValueError:
-                pass
+                logger.debug("sse subscriber already removed (concurrent removal race)")
 
     # ------------------------------------------------------------------
     # Internal broadcast
@@ -311,8 +311,8 @@ class EventBroadcaster:
                 try:
                     q.get_nowait()
                     q.put_nowait((event_type, payload))
-                except (asyncio.QueueEmpty, asyncio.QueueFull):
-                    pass
+                except (asyncio.QueueEmpty, asyncio.QueueFull) as exc:
+                    logger.debug("sse queue rotation race on slow consumer: %s", exc)
 
     # ------------------------------------------------------------------
     # Producer loops

@@ -90,8 +90,8 @@ class TroughCamSensor(Sensor):
 
             render_trough_frame(self.world, self._trough_id, frame_path)
             frame_written = True
-        except ImportError:
-            pass
+        except ImportError as exc:
+            logger.debug("vision renderer unavailable â skipping trough frame render: %s", exc)
 
         if not frame_written:
             _write_placeholder_png(frame_path, len(nearby_ids))

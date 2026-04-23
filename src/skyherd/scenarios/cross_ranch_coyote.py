@@ -304,7 +304,7 @@ async def run_cross_ranch_async(seed: int = 42) -> dict[str, Any]:
     try:
         _os.unlink(tmp.name)
     except OSError:
-        pass
+        logger.debug("tmp ledger file already gone (cleanup race â non-fatal): %s", tmp.name)
 
     return {
         "name": scenario.name,

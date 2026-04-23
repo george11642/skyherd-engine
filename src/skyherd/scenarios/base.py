@@ -389,7 +389,7 @@ async def _run_async(
     try:
         _os.unlink(tmp.name)
     except OSError:
-        pass
+        logger.debug("tmp ledger file already gone (cleanup race â non-fatal): %s", tmp.name)
 
     return result
 

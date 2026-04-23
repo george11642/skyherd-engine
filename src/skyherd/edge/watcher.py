@@ -107,8 +107,8 @@ def _parse_mqtt_url(url: str) -> tuple[str, int]:
         host, port_str = without_scheme.rsplit(":", 1)
         try:
             return host, int(port_str)
-        except ValueError:
-            pass
+        except ValueError as exc:
+            logger.debug("mqtt URL port unparseable in %r â using default 1883: %s", url, exc)
     return without_scheme, 1883
 
 
@@ -450,8 +450,9 @@ class EdgeWatcher:
         if self._mqtt_client is not None:
             try:
                 await self._mqtt_client.__aexit__(None, None, None)
-            except Exception:  # noqa: BLE001
-                pass
+            except Exception as exc:  # noqa: BLE001
+                # aiomqtt.Client.__aexit__ may raise on broker disconnect during watcher shutdown
+                logger.warning("mqtt client close failed during EdgeWatcher shutdown: %s", exc)
             self._mqtt_client = None
 
     async def _ensure_mqtt_connected(self) -> Any:
@@ -475,6 +476,6 @@ class EdgeWatcher:
         try:
             loop.add_signal_handler(signal.SIGINT, _handle, signal.SIGINT, None)
             loop.add_signal_handler(signal.SIGTERM, _handle, signal.SIGTERM, None)
-        except (NotImplementedError, RuntimeError):
-            # Windows / test environments may not support add_signal_handler
-            pass
+        except (NotImplementedError, RuntimeError) as exc:
+            # Windows / test environments may not support loop.add_signal_handler
+            logger.debug("signal handler unavailable on this platform: %s", exc)

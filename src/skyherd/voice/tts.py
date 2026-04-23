@@ -191,8 +191,9 @@ def _mp3_to_wav(mp3_data: bytes, path: Path) -> None:
         pcm = seg.raw_data
         _write_wav(pcm, path, sample_rate=44100, channels=1, sample_width=2)
         return
-    except Exception:  # noqa: BLE001
-        pass
+    except Exception as exc:  # noqa: BLE001
+        # pydub may fail on some mp3 encodings; raw-bytes fallback follows
+        logger.debug("pydub mp3 decode failed â falling back to raw bytes write: %s", exc)
 
     # Fallback: write MP3 bytes directly -- not a RIFF/WAV, but lets the rest
     # of the pipeline measure file size and continue.

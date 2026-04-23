@@ -197,8 +197,9 @@ class SensorBus:
         if self._client is not None:
             try:
                 await self._client.__aexit__(None, None, None)
-            except Exception:  # noqa: BLE001
-                pass
+            except Exception as exc:  # noqa: BLE001
+                # aiomqtt.Client.__aexit__ may raise on broker disconnect during close
+                logger.warning("aiomqtt client close failed: %s", exc)
             self._client = None
 
     async def _ensure_connected(self) -> aiomqtt.Client:
@@ -265,6 +266,6 @@ class SensorBus:
             host, port_str = without_scheme.rsplit(":", 1)
             try:
                 return host, int(port_str)
-            except ValueError:
-                pass
+            except ValueError as exc:
+                logger.debug("mqtt URL port unparseable in %r â using default %d: %s", url, _DEFAULT_BROKER_PORT, exc)
         return without_scheme, _DEFAULT_BROKER_PORT
