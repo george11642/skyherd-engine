@@ -345,28 +345,50 @@ class EventBroadcaster:
             await asyncio.sleep(COST_TICK_INTERVAL_S)
 
     def _real_cost_tick(self) -> dict[str, Any]:
-        """Aggregate cost tickers from a live AgentMesh."""
-        agents = []
+        """Aggregate cost tickers from a live AgentMesh via Phase 1 public accessors.
+
+        Contract: consumes ``mesh.agent_tickers() -> list[CostTicker]`` (see
+        src/skyherd/scenarios/base.py::_DemoMesh.agent_tickers, plan 01-01). When the
+        mesh does not implement the accessor (older meshes, bare MagicMocks) the
+        method returns an empty agents list and logs at DEBUG — never raises.
+        """
+        agents: list[dict[str, Any]] = []
         all_idle = True
         total_cost = 0.0
-        for name, session in self._mesh._sessions.items():
-            ticker = self._mesh._session_manager._tickers.get(session.id)
-            if ticker is None:
-                continue
-            state = ticker._current_state
-            if state == "active":
-                all_idle = False
-            agents.append(
-                {
-                    "name": name,
-                    "state": state,
-                    "cost_delta_usd": 0.0,
-                    "cumulative_cost_usd": round(ticker.cumulative_cost_usd, 6),
-                    "tokens_in": ticker._cumulative_tokens_in,
-                    "tokens_out": ticker._cumulative_tokens_out,
-                }
+
+        try:
+            tickers = self._mesh.agent_tickers()
+        except (AttributeError, TypeError) as exc:
+            logger.debug(
+                "mesh.agent_tickers() unavailable (%s) — emitting empty agents list",
+                exc,
             )
-            total_cost += ticker.cumulative_cost_usd
+            tickers = []
+        except Exception as exc:  # noqa: BLE001
+            logger.warning("mesh.agent_tickers() raised unexpectedly: %s", exc)
+            tickers = []
+
+        for ticker in tickers:
+            try:
+                state = getattr(ticker, "_current_state", "idle")
+                if state == "active":
+                    all_idle = False
+                cumulative = float(getattr(ticker, "cumulative_cost_usd", 0.0))
+                agents.append(
+                    {
+                        "name": getattr(ticker, "agent_name", "unknown"),
+                        "state": state,
+                        "cost_delta_usd": 0.0,
+                        "cumulative_cost_usd": round(cumulative, 6),
+                        "tokens_in": int(getattr(ticker, "_cumulative_tokens_in", 0)),
+                        "tokens_out": int(getattr(ticker, "_cumulative_tokens_out", 0)),
+                    }
+                )
+                total_cost += cumulative
+            except Exception as exc:  # noqa: BLE001
+                logger.debug("Skipping malformed ticker (%s)", exc)
+                continue
+
         return {
             "ts": time.time(),
             "seq": self._cost_seq,
