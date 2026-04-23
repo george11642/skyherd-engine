@@ -119,12 +119,16 @@ jobs:
         run: uvx pip-audit --strict 2>&1 || true
 
   # ---------------------------------------------------------------------------
-  # SITL E2E — pymavlink emulator (no Docker, workflow_dispatch only)
+  # SITL smoke — pymavlink emulator (no Docker, runs on every push + PR)
+  # BLD-04 proof: real MAVLink mission (arm -> takeoff -> 3-waypoint patrol -> RTL)
+  # well under 2 minutes.  Emulator path used because the aspirational
+  # Docker Hub image does NOT exist (verified 2026-04-22).
+  # MUST fail loudly — no continue-on-error here.
   # ---------------------------------------------------------------------------
-  sitl-e2e:
-    name: SITL E2E (emulator, no Docker)
+  sitl-smoke:
+    name: SITL smoke (emulator, <2 min)
     runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_dispatch'
+    timeout-minutes: 5
 
     steps:
       - name: Checkout
@@ -138,11 +142,14 @@ jobs:
       - name: Install dependencies
         run: uv sync --all-extras
 
+      - name: Run SITL smoke wrapper (evidence-event verification)
+        run: uv run python scripts/sitl_smoke.py
+
       - name: Run SITL E2E CLI (emulator mode)
         run: uv run skyherd-sitl-e2e --emulator
 
       - name: Run SITL E2E test suite
-        run: SITL_EMULATOR=1 uv run pytest tests/drone/test_sitl_e2e.py tests/scenarios/test_coyote_with_sitl.py -v --timeout=300
+        run: SITL_EMULATOR=1 uv run pytest tests/drone/test_sitl_e2e.py tests/drone/test_sitl_smoke_failure.py tests/scenarios/test_coyote_with_sitl.py -v --timeout=300
 
   # ---------------------------------------------------------------------------
   # Docker SITL smoke (manual trigger only)
