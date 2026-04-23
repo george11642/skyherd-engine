@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-04-23T03:37:03.815Z"
+last_updated: "2026-04-23T04:59:23.871Z"
 progress:
   total_phases: 6
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 22
-  completed_plans: 18
-  percent: 82
+  completed_plans: 19
+  percent: 86
 ---
 
 # STATE: SkyHerd Engine — Project Memory
@@ -24,7 +24,7 @@ progress:
 
 **Core Value:** The 3-minute demo video must land "oh damn" inside the first 30 seconds on a pure-sim run, deterministically, every replay. Sim perfection beats hardware novelty every time a battery dies mid-demo.
 
-**Current Focus:** Phase 05 — dashboard-live-mode-vet-intake
+**Current Focus:** Phase 06 — sitl-ci-determinism-gate
 
 **Submission Deadline:** 2026-04-26 20:00 EST (target submit: 2026-04-26 18:00 EST with 2hr buffer).
 
@@ -32,11 +32,11 @@ progress:
 
 ## Current Position
 
-Phase: 05 (dashboard-live-mode-vet-intake) — EXECUTING
-Plan: 1 of 4
+Phase: 06 (sitl-ci-determinism-gate) — EXECUTING
+Plan: 1 of 3
 **Phase:** (not started — Phase 1 next)
 **Plan:** —
-**Status:** Executing Phase 05
+**Status:** Executing Phase 06
 **Progress:** [██░░░░░░░░] 23%
 
 ### Phase Status Board
