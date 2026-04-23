@@ -118,6 +118,7 @@ pythonpath = ["src"]
 addopts = "--tb=short"
 markers = [
     "slow: marks tests as slow (deselect with '-m not slow')",
+    "integration: marks tests that spawn subprocesses (deselect with '-m \"not integration\"')",
 ]
 
 # ---------------------------------------------------------------------------

@@ -295,3 +295,56 @@ def test_real_cost_tick_falls_back_when_no_accessor() -> None:
     tick = bc._real_cost_tick()
     assert tick["agents"] == []
     assert tick["all_idle"] is True
+
+
+# ---------------------------------------------------------------------------
+# Phase 5 plan 05-01: DASH-01 acceptance — live /api/snapshot returns real data
+# (consumes Phase 4 BLD-03 plumbing; does NOT re-implement it)
+# ---------------------------------------------------------------------------
+
+
+def test_snapshot_live_mode_real_world(tmp_path) -> None:
+    """DASH-01: /api/snapshot in live mode returns 50 cows (not 12 mock cows).
+
+    Factory-level proof. Complements tests/server/test_live_cli.py which
+    exercises the subprocess CLI path.
+    """
+    try:
+        from skyherd.attest.ledger import Ledger
+        from skyherd.attest.signer import Signer
+        from skyherd.server.app import create_app
+        from skyherd.world.world import make_world
+    except ImportError as exc:
+        pytest.skip(f"BLD-03 prerequisite — Phase 4 live-mode plumbing required: {exc}")
+
+    try:
+        from skyherd.scenarios.base import _DemoMesh
+    except ImportError as exc:
+        pytest.skip(f"Phase 1 _DemoMesh required: {exc}")
+
+    try:
+        world = make_world(seed=42)
+    except Exception as exc:  # noqa: BLE001
+        pytest.skip(f"BLD-03 prerequisite — make_world(seed=42) unavailable: {exc}")
+
+    from fastapi.testclient import TestClient
+
+    ledger_path = tmp_path / "dash01_ledger.db"
+    signer = Signer.generate()
+    ledger = Ledger.open(str(ledger_path), signer)
+    mesh = _DemoMesh(ledger=ledger)
+
+    app = create_app(mock=False, mesh=mesh, world=world, ledger=ledger)
+    client = TestClient(app)
+
+    r = client.get("/api/snapshot")
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert "cows" in body, f"/api/snapshot missing 'cows' key: {body.keys()}"
+    assert len(body["cows"]) == 50, (
+        f"DASH-01: expected 50 cows from ranch_a.yaml live world, got "
+        f"{len(body['cows'])} (mock path returns 12 — mock=False not honored)."
+    )
+    assert body.get("sim_time_s") == 0.0, (
+        f"DASH-01: live world boots at sim_time_s=0.0, got {body.get('sim_time_s')}"
+    )
