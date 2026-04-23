@@ -5,6 +5,7 @@
 
 import { useRef, useEffect } from "react";
 import { cn } from "@/lib/cn";
+import { Sparkline } from "@/components/shared/Sparkline";
 
 export interface AgentEvent {
   ts: number;
@@ -18,6 +19,8 @@ export interface AgentLaneProps {
   state: "active" | "idle" | "checkpointed";
   lastWake?: number;
   events: AgentEvent[];
+  /** Events-per-second ring buffer (length ~30) — right-aligned sparkline in header. */
+  eventRate?: number[];
   className?: string;
 }
 
@@ -39,7 +42,14 @@ function formatTime(ts: number): string {
   });
 }
 
-export function AgentLane({ agentName, state, lastWake, events, className }: AgentLaneProps) {
+export function AgentLane({
+  agentName,
+  state,
+  lastWake,
+  events,
+  eventRate,
+  className,
+}: AgentLaneProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const isActive = state === "active";
   const isCheckpointed = state === "checkpointed";
@@ -97,6 +107,17 @@ export function AgentLane({ agentName, state, lastWake, events, className }: Age
         >
           {state}
         </span>
+
+        {/* Event-rate sparkline (last 30s) — hidden when empty */}
+        {eventRate && eventRate.length >= 2 && (
+          <Sparkline
+            values={eventRate}
+            width={48}
+            height={16}
+            stroke={isActive ? "rgb(148 176 136)" : "rgb(110 122 140)"}
+            className="shrink-0 opacity-70"
+          />
+        )}
 
         {/* Last wake timestamp */}
         {lastWake !== undefined && (

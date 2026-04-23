@@ -3,9 +3,11 @@
  * Redesigned: dense ops-console style with Fraunces headings.
  */
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { AgentLane, type AgentEvent } from "@/components/AgentLane";
 import { getSSE } from "@/lib/sse";
+
+const RATE_BUCKETS = 30;
 
 const AGENT_NAMES = [
   "FenceLineDispatcher",
@@ -31,8 +33,38 @@ function makeInitialState(): Record<AgentName, AgentState> {
   ) as unknown as Record<AgentName, AgentState>;
 }
 
+function makeEmptyRates(): Record<AgentName, number[]> {
+  return Object.fromEntries(
+    AGENT_NAMES.map((n) => [n, Array<number>(RATE_BUCKETS).fill(0)]),
+  ) as unknown as Record<AgentName, number[]>;
+}
+
 export function AgentLanes() {
   const [agents, setAgents] = useState<Record<AgentName, AgentState>>(makeInitialState);
+  const [eventRates, setEventRates] = useState<Record<AgentName, number[]>>(() => makeEmptyRates());
+
+  // Live counters for the current 1-second bucket — mutated synchronously on
+  // each agent.event; flushed into the ring buffer on the 1s interval.
+  const currentBucketRef = useRef<Record<AgentName, number>>(
+    Object.fromEntries(AGENT_NAMES.map((n) => [n, 0])) as unknown as Record<AgentName, number>,
+  );
+
+  // 1-second tick: shift each ring buffer left, push the live count, reset.
+  useEffect(() => {
+    const id = setInterval(() => {
+      setEventRates((prev) => {
+        const next = {} as Record<AgentName, number[]>;
+        for (const name of AGENT_NAMES) {
+          const buf = prev[name];
+          const count = currentBucketRef.current[name] ?? 0;
+          next[name] = [...buf.slice(1), count];
+          currentBucketRef.current[name] = 0;
+        }
+        return next;
+      });
+    }, 1000);
+    return () => clearInterval(id);
+  }, []);
 
   const handleLog = useCallback((payload: {
     agent: string;
@@ -43,6 +75,9 @@ export function AgentLanes() {
   }) => {
     const name = payload.agent as AgentName;
     if (!AGENT_NAMES.includes(name)) return;
+
+    // Increment the live bucket — flushed into the ring each second.
+    currentBucketRef.current[name] = (currentBucketRef.current[name] ?? 0) + 1;
 
     setAgents((prev) => {
       const existing = prev[name];
@@ -139,6 +174,7 @@ export function AgentLanes() {
             state={agents[name].state}
             lastWake={agents[name].lastWake}
             events={agents[name].events}
+            eventRate={eventRates[name]}
           />
         ))}
       </div>

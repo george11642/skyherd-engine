@@ -7,6 +7,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, useSpring, useTransform } from "framer-motion";
 import { cn } from "@/lib/cn";
 import { getSSE } from "@/lib/sse";
+import { Sparkline } from "@/components/shared/Sparkline";
 
 interface AgentCost {
   name: string;
@@ -35,36 +36,6 @@ const AGENT_SHORT: Record<string, string> = {
 };
 
 const MAX_SPARKLINE = 60;
-
-function Sparkline({ values, stroke }: { values: number[]; stroke?: string }) {
-  if (values.length < 2) return null;
-  const max = Math.max(...values, 0.001);
-  const w = 80;
-  const h = 24;
-  const pts = values.map((v, i) => {
-    const x = (i / (values.length - 1)) * w;
-    const y = h - (v / max) * h;
-    return `${x},${y}`;
-  });
-  return (
-    <svg
-      width={w}
-      height={h}
-      viewBox={`0 0 ${w} ${h}`}
-      aria-hidden="true"
-      className="shrink-0 opacity-60"
-    >
-      <polyline
-        points={pts.join(" ")}
-        fill="none"
-        stroke={stroke ?? "rgb(148 176 136)"}
-        strokeWidth="1.5"
-        strokeLinejoin="round"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
 
 function AnimatedCost({ value }: { value: number }) {
   const spring = useSpring(value, { stiffness: 60, damping: 20 });
