@@ -1,9 +1,16 @@
-"""Live-mode dashboard bootstrap — constructs real mesh/world/ledger
-and hands them to create_app(). Inverse of SKYHERD_MOCK=1."""
+"""Live-mode dashboard bootstrap - constructs real mesh/world/ledger
+and hands them to create_app(). Inverse of SKYHERD_MOCK=1.
+
+An in-process ambient scenario driver (v1.1 Part A) rotates through the
+8 demo scenarios against the same deps so the live dashboard has visible
+activity without a second process. Disable with ``--no-ambient`` or
+``SKYHERD_AMBIENT=0``.
+"""
 
 from __future__ import annotations
 
 import logging
+import os
 import tempfile
 from pathlib import Path
 
@@ -19,17 +26,47 @@ app = typer.Typer(name="skyherd-server-live", add_completion=False)
 logger = logging.getLogger(__name__)
 
 
+def _env_bool(name: str, default: bool) -> bool:
+    raw = os.environ.get(name)
+    if raw is None:
+        return default
+    return raw.strip().lower() not in ("0", "false", "no", "off", "")
+
+
+def _env_float(name: str, default: float) -> float:
+    raw = os.environ.get(name)
+    if raw is None:
+        return default
+    try:
+        return float(raw)
+    except ValueError:
+        return default
+
+
 @app.command()
 def start(
     port: int = typer.Option(8000, "--port", "-p", help="HTTP port"),
     host: str = typer.Option("127.0.0.1", "--host", help="Bind host (127.0.0.1 for safety)"),
     seed: int = typer.Option(42, "--seed", help="World RNG seed"),
     log_level: str = typer.Option("info", "--log-level"),
+    ambient: bool = typer.Option(
+        None,  # sentinel - resolved from env when omitted
+        "--ambient/--no-ambient",
+        help="Run the in-process ambient scenario loop (default on; env SKYHERD_AMBIENT=0 to disable)",
+    ),
+    speed: float = typer.Option(
+        None,  # sentinel - resolved from env when omitted
+        "--speed",
+        help="Ambient sim-to-wall speed ratio (default 15.0; env SKYHERD_AMBIENT_SPEED)",
+    ),
 ) -> None:
     """Start dashboard in live mode: real world + in-memory ledger + demo mesh."""
     logging.basicConfig(level=log_level.upper())
 
-    # Construct real deps (same pattern as scenarios/base.py:226-231)
+    ambient_on = _env_bool("SKYHERD_AMBIENT", True) if ambient is None else ambient
+    ambient_speed = _env_float("SKYHERD_AMBIENT_SPEED", 15.0) if speed is None else speed
+
+    # Construct real deps (same pattern as scenarios/base.py)
     world = make_world(seed=seed)  # BLD-01: no config_path needed
 
     tmp = tempfile.NamedTemporaryFile(suffix="_skyherd_ledger.db", delete=False)
@@ -50,9 +87,42 @@ def start(
         ledger_path,
     )
     typer.echo(f"Starting SkyHerd live dashboard on {host}:{port} (seed={seed})")
-    typer.echo("  Agent lanes will populate once 'make demo' runs in another terminal.")
+    if ambient_on:
+        typer.echo(
+            f"  Ambient scenario loop: ON @ {ambient_speed}x "
+            "(coyote -> sick_cow -> water_drop -> storm -> calving -> "
+            "wildfire -> rustling -> cross_ranch_coyote, repeat)"
+        )
+    else:
+        typer.echo("  Ambient scenario loop: OFF (SKYHERD_AMBIENT=0 or --no-ambient)")
 
     live_app = create_app(mock=False, mesh=mesh, world=world, ledger=ledger)
+
+    if ambient_on:
+        from skyherd.server import app as _app_module  # noqa: PLC0415
+        from skyherd.server.ambient import AmbientDriver  # noqa: PLC0415
+
+        @live_app.on_event("startup")
+        async def _start_ambient() -> None:
+            broadcaster = getattr(_app_module, "_broadcaster", None)
+            driver = AmbientDriver(
+                mesh=mesh,
+                world=world,
+                ledger=ledger,
+                broadcaster=broadcaster,
+                speed=ambient_speed,
+            )
+            live_app.state.ambient_driver = driver
+            await driver.start()
+            logger.info("AmbientDriver started @ %.2fx", ambient_speed)
+
+        @live_app.on_event("shutdown")
+        async def _stop_ambient() -> None:
+            driver = getattr(live_app.state, "ambient_driver", None)
+            if driver is not None:
+                await driver.stop()
+                logger.info("AmbientDriver stopped")
+
     uvicorn.run(live_app, host=host, port=port, log_level=log_level)
 
 
