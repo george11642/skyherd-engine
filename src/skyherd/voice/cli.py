@@ -41,33 +41,47 @@ def say(
 
 @app.command()
 def demo() -> None:
-    """Render 3 sample Wes lines and print the wav paths."""
+    """Render 5 Wes lines -- one per urgency level -- and print scripts + wav paths."""
     from skyherd.voice.call import render_urgency_call
     from skyherd.voice.wes import WesMessage
 
     samples = [
         WesMessage(
-            urgency="call",
-            subject="coyote at the SW fence",
-            context={"location": "SW fence"},
-        ),
-        WesMessage(
-            urgency="call",
-            subject="calving detected — B007 gone off alone",
-            context={"animal_id": "B007"},
+            urgency="log",
+            subject="gate cam 2 battery swapped",
         ),
         WesMessage(
             urgency="text",
             subject="water tank 3 low",
             context={"tank_id": "Tank 3", "level": "18%"},
         ),
+        WesMessage(
+            urgency="call",
+            subject="coyote at the SW fence",
+            context={"location": "SW fence"},
+        ),
+        WesMessage(
+            urgency="emergency",
+            subject="predator inside the herd, south pasture",
+            context={"predator": "coyote"},
+        ),
+        WesMessage(
+            urgency="silent",
+            subject="nightly pattern roll-up",
+        ),
     ]
 
-    typer.echo("=== Wes Demo — 3 sample lines ===\n")
+    typer.echo("=== Wes Demo -- 5 urgency levels ===\n")
     for msg in samples:
         result = render_urgency_call(msg)
-        typer.echo(f"[{msg.urgency.upper()}]  {result['script']}")
-        typer.echo(f"           wav -> {result['wav_path']}\n")
+        label = f"[{msg.urgency.upper()}]"
+        script = result.get("script") or "(silent)"
+        typer.echo(f"{label:<12} {script}")
+        wav_path = result.get("wav_path")
+        if wav_path is None:
+            typer.echo(f"{'':<12} (log-only)\n")
+        else:
+            typer.echo(f"{'':<12} wav -> {wav_path}\n")
 
     typer.echo("Demo complete.")
 

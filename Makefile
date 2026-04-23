@@ -1,4 +1,4 @@
-.PHONY: setup sim demo dashboard dashboard-mock test lint format typecheck clean ci sitl-up sitl-down bus-up bus-down mesh-smoke one-pager hardware-demo mavic-bridge f3-bridge drone-smoke sitl-smoke determinism-3x gate-check
+.PHONY: setup sim demo dashboard dashboard-mock test lint format typecheck clean ci sitl-up sitl-down bus-up bus-down mesh-smoke one-pager hardware-demo mavic-bridge f3-bridge drone-smoke sitl-smoke determinism-3x gate-check voice-demo
 
 SEED ?= 42
 SCENARIO ?= all
@@ -96,3 +96,6 @@ determinism-3x:  ## SCEN-03 proof — seed=42 hash-stable across 3 back-to-back 
 
 gate-check:  ## SCEN-02 proof — iterates 10 CLAUDE.md Gate items, exit 0 iff 10/10 GREEN
 	uv run python scripts/gate_check.py
+
+voice-demo:  ## Render 5 Wes lines (one per urgency) — video B-roll friendly
+	SKYHERD_VOICE=$${SKYHERD_VOICE:-mock} uv run skyherd-voice demo

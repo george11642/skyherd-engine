@@ -101,28 +101,37 @@ def test_demo_help():
 
 
 def test_demo_runs_and_prints_wav_paths(tmp_path: Path):
-    """demo command renders 3 sample lines and prints their wav paths."""
+    """demo command renders 5 sample lines (one per urgency) and prints scripts."""
     # render_urgency_call is imported lazily inside the function — patch at source
     fake_result = {"script": "Coyote at the fence, boss.", "wav_path": str(tmp_path / "wes.wav")}
     with patch("skyherd.voice.call.render_urgency_call", return_value=fake_result) as mock_render:
         result = runner.invoke(app, ["demo"])
     assert result.exit_code == 0
-    # render_urgency_call called 3 times (one per sample message)
-    assert mock_render.call_count == 3
+    # render_urgency_call called 5 times (one per urgency level)
+    assert mock_render.call_count == 5
     # Output contains the script
     assert "Coyote at the fence" in result.output
     # Output contains "Demo complete"
     assert "Demo complete" in result.output
 
 
-def test_demo_output_contains_urgency_labels(tmp_path: Path):
-    """demo output labels each message with CALL or TEXT."""
-    fake_result = {"script": "Water low.", "wav_path": str(tmp_path / "wes.wav")}
+def test_demo_output_contains_all_five_urgency_labels(tmp_path: Path):
+    """demo output labels each message with LOG / TEXT / CALL / EMERGENCY / SILENT."""
+    fake_result = {"script": "test script.", "wav_path": str(tmp_path / "wes.wav")}
     with patch("skyherd.voice.call.render_urgency_call", return_value=fake_result):
         result = runner.invoke(app, ["demo"])
-    # At least one CALL and one TEXT label should appear
-    assert "CALL" in result.output
-    assert "TEXT" in result.output
+    assert result.exit_code == 0
+    for label in ("LOG", "TEXT", "CALL", "EMERGENCY", "SILENT"):
+        assert label in result.output, f"Missing urgency label {label!r} in demo output"
+
+
+def test_demo_handles_log_only_no_wav(tmp_path: Path):
+    """demo gracefully prints '(log-only)' when render returns wav_path=None."""
+    fake_result = {"script": "quiet entry", "wav_path": None}
+    with patch("skyherd.voice.call.render_urgency_call", return_value=fake_result):
+        result = runner.invoke(app, ["demo"])
+    assert result.exit_code == 0
+    assert "(log-only)" in result.output
 
 
 # ---------------------------------------------------------------------------
