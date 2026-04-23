@@ -75,6 +75,8 @@ export class SkyHerdSSE {
       "drone.update",
       "vet_intake.drafted",
       "neighbor.handoff",
+      "scenario.active",
+      "scenario.ended",
     ];
 
     for (const type of eventTypes) {
