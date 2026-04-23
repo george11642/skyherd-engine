@@ -192,6 +192,40 @@ class CrossRanchCoyoteScenario(Scenario):
                 f"Got tools: {ranch_b_tools}"
             )
 
+            # 7. Phase 02 CRM-06: silent pre-position signature — the launch_drone
+            #    mission MUST be 'neighbor_pre_position_patrol' (first-class
+            #    CrossRanchCoordinator behavior).
+            launch_calls = [c for c in ranch_b_calls if c.get("tool") == "launch_drone"]
+            missions = [c.get("input", {}).get("mission") for c in launch_calls]
+            assert "neighbor_pre_position_patrol" in missions, (
+                "Ranch_b launch_drone mission must be 'neighbor_pre_position_patrol' "
+                f"(silent pre-position signature). Got: {missions}"
+            )
+
+            # 8. Phase 02 CRM-03/06: log entry must carry response_mode=pre_position
+            #    — the receipt that the memory post-cycle hook uses to compose the
+            #    shared-store write under /neighbors/{from_ranch}/.
+            pre_position_logs = [
+                c
+                for c in handoff_logs
+                if c.get("input", {}).get("response_mode") == "pre_position"
+            ]
+            assert len(pre_position_logs) > 0, (
+                "Ranch_b neighbor_handoff log entry must set response_mode='pre_position'. "
+                f"Got logs: {handoff_logs}"
+            )
+
+            # 9. Phase 02 CRM-01 enforcement via the simulation-result shape:
+            #    ranch_b_pre_positioned must be True (simulate_coyote_at_shared_fence
+            #    sets this when any launch_drone call exists in ranch_b path).
+            sim_result = getattr(mesh, "_simulation_result", None)
+            if sim_result is not None:
+                assert sim_result.get("ranch_b_pre_positioned") is True, (
+                    "Simulation result must set ranch_b_pre_positioned=True when "
+                    "CrossRanchCoordinator dispatches. Got: "
+                    f"{sim_result.get('ranch_b_pre_positioned')}"
+                )
+
     # ------------------------------------------------------------------
     # Helpers
     # ------------------------------------------------------------------

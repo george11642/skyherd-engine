@@ -75,6 +75,7 @@ export class SkyHerdSSE {
       "drone.update",
       "vet_intake.drafted",
       "neighbor.handoff",
+      "neighbor.alert",
       "scenario.active",
       "scenario.ended",
       "memory.written",

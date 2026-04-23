@@ -201,3 +201,60 @@ class TestCrossRanchFullRun:
             "Ranch_b expected log_agent_event(neighbor_handoff). "
             f"Got tools: {[c.get('tool') for c in b_calls]}"
         )
+
+
+class TestCrossRanchCoyoteUpgradedAssertions:
+    """Phase 02 CRM-06: upgraded assert_outcome — first-class scenario."""
+
+    def test_ranch_b_mission_is_neighbor_pre_position_patrol(self, monkeypatch):
+        monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+        result = run_cross_ranch(seed=42)
+        launch_calls = [
+            c for c in result["ranch_b_tool_calls"] if c.get("tool") == "launch_drone"
+        ]
+        missions = [c.get("input", {}).get("mission") for c in launch_calls]
+        assert "neighbor_pre_position_patrol" in missions, (
+            "Ranch_b launch_drone mission must be 'neighbor_pre_position_patrol'. "
+            f"Got: {missions}"
+        )
+
+    def test_ranch_b_handoff_log_has_response_mode_pre_position(self, monkeypatch):
+        monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+        result = run_cross_ranch(seed=42)
+        pre_position_logs = [
+            c
+            for c in result["ranch_b_tool_calls"]
+            if c.get("tool") == "log_agent_event"
+            and c.get("input", {}).get("event_type") == "neighbor_handoff"
+            and c.get("input", {}).get("response_mode") == "pre_position"
+        ]
+        assert len(pre_position_logs) > 0, (
+            "Ranch_b neighbor_handoff log must set response_mode='pre_position'."
+        )
+
+    def test_simulation_result_flags_pre_positioned(self, monkeypatch):
+        monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+        result = run_cross_ranch(seed=42)
+        sim = result.get("simulation_result", {})
+        assert sim.get("ranch_b_pre_positioned") is True, (
+            "simulation_result.ranch_b_pre_positioned must be True — got "
+            f"{sim.get('ranch_b_pre_positioned')}"
+        )
+
+    def test_attestation_hashes_are_distinct(self, monkeypatch):
+        """Shared fence attested twice — hashes differ (separate ranch ledger entries)."""
+        monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+        result = run_cross_ranch(seed=42)
+        hashes = result.get("simulation_result", {}).get("attestation_hashes", [])
+        assert len(set(hashes)) >= 2, (
+            f"Expected >=2 distinct attestation hashes (one per ranch). Got: {hashes}"
+        )
+
+    def test_assert_outcome_passes_with_full_cross_ranch_mesh(self, monkeypatch):
+        """Full upgraded assert_outcome gate — calls run_cross_ranch and confirms
+        outcome_passed is True (all CRM-06 assertions satisfied)."""
+        monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+        result = run_cross_ranch(seed=42)
+        assert result["outcome_passed"], (
+            f"Upgraded assert_outcome failed: {result.get('outcome_error')}"
+        )

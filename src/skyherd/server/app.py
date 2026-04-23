@@ -171,6 +171,19 @@ def create_app(
             agents = _live_agent_statuses(mesh)
         return JSONResponse(content={"agents": agents, "ts": time.time()})
 
+    @app.get("/api/neighbors")
+    async def api_neighbors() -> JSONResponse:
+        """Cross-ranch neighbor-handoff log (Phase 02 CRM-04).
+
+        Returns inbound + outbound neighbor alerts from the live CrossRanchMesh,
+        or synthetic entries when in mock mode / no mesh is attached.
+        """
+        if use_mock or mesh is None:
+            entries = _mock_neighbor_entries()
+        else:
+            entries = _live_neighbor_entries(mesh)
+        return JSONResponse(content={"entries": entries, "ts": time.time()})
+
     @app.get("/api/attest")
     async def api_attest(since_seq: int = Query(default=0, ge=0)) -> JSONResponse:
         if use_mock or ledger is None:
@@ -332,6 +345,52 @@ def create_app(
 # ------------------------------------------------------------------
 # Helpers
 # ------------------------------------------------------------------
+
+
+def _mock_neighbor_entries() -> list[dict[str, Any]]:
+    """Deterministic sample neighbor-handoff entries for mock mode (CRM-04)."""
+    t = time.time()
+    return [
+        {
+            "direction": "inbound",
+            "from_ranch": "ranch_a",
+            "to_ranch": "ranch_b",
+            "species": "coyote",
+            "shared_fence": "fence_west",
+            "confidence": 0.91,
+            "ts": t - 30.0,
+            "attestation_hash": "sha256:mock00000001",
+        },
+        {
+            "direction": "outbound",
+            "from_ranch": "ranch_b",
+            "to_ranch": "ranch_a",
+            "species": "coyote",
+            "shared_fence": "fence_east",
+            "confidence": 0.87,
+            "ts": t - 120.0,
+            "attestation_hash": "sha256:mock00000002",
+        },
+    ]
+
+
+def _live_neighbor_entries(mesh: Any) -> list[dict[str, Any]]:
+    """Best-effort extraction from any mesh that exposes recent_events() (CRM-04).
+
+    Supports:
+      - CrossRanchMesh instances: ``mesh.recent_events() -> list[dict]``
+      - Plain AgentMesh: returns ``[]`` (no cross-ranch data)
+    Never raises; logs at DEBUG on any exception.
+    """
+    try:
+        fn = getattr(mesh, "recent_events", None)
+        if callable(fn):
+            data = fn()
+            if isinstance(data, list):
+                return list(data)
+    except Exception as exc:  # noqa: BLE001
+        logger.debug("live neighbor entries extraction failed: %s", exc)
+    return []
 
 
 def _mock_agent_statuses() -> list[dict[str, Any]]:
