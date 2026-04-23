@@ -295,7 +295,50 @@ def _build_tools() -> list[Any]:
             **prefs,
         }
 
-    return [page_rancher, page_vet, get_rancher_preferences]
+    @tool(
+        "draft_vet_intake",
+        "Draft a rancher-readable vet intake markdown packet for a diseased cow escalation. "
+        "Writes to runtime/vet_intake/<cow_tag>_<ts>.md. Returns the VetIntakeRecord dict "
+        "including signals_structured (DASH-06 pixel-head bbox carrier).",
+        {
+            "cow_tag": str,
+            "severity": str,
+            "disease": str,
+            "signals": list,
+            "cow_snapshot": dict,
+            "session_id": str,
+            "herd_context": str,
+            "attest_seq": int,
+            "signals_structured": list,
+        },
+    )
+    async def draft_vet_intake_tool(args: dict[str, Any]) -> dict[str, Any]:
+        """Delegate to skyherd.server.vet_intake.draft_vet_intake; returns model_dump()."""
+        from skyherd.server.vet_intake import draft_vet_intake
+
+        rec = draft_vet_intake(
+            cow_tag=str(args.get("cow_tag", "")),
+            severity=str(args.get("severity", "escalate")),
+            disease=str(args.get("disease", "unknown")),
+            signals=list(args.get("signals", [])),
+            cow_snapshot=dict(args.get("cow_snapshot", {})),
+            session_id=str(args.get("session_id", "unknown")),
+            herd_context=str(args.get("herd_context", "")),
+            attest_seq=args.get("attest_seq"),
+            signals_structured=args.get("signals_structured"),
+        )
+        record_dict = rec.model_dump()
+        return {
+            "content": [
+                {
+                    "type": "text",
+                    "text": f"Vet intake drafted at {record_dict['path']}",
+                }
+            ],
+            **record_dict,
+        }
+
+    return [page_rancher, page_vet, get_rancher_preferences, draft_vet_intake_tool]
 
 
 # ---------------------------------------------------------------------------

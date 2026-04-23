@@ -64,4 +64,5 @@ demos/
 
 # Runtime artifacts
 runtime/
+runtime/vet_intake/
 .venv/
