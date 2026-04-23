@@ -85,3 +85,25 @@ def test_demo_seed42_is_deterministic_3x() -> None:
         "All three sanitized md5s must match. Remaining diff lines are "
         "non-deterministic after sanitization — expand DETERMINISM_SANITIZE."
     )
+
+
+@pytest.mark.slow
+def test_demo_seed42_with_local_memory_is_deterministic_3x(tmp_path, monkeypatch) -> None:
+    """Memory adoption must preserve byte-identical seed=42 replays (MEM-09).
+
+    Runs `make demo SEED=42 SCENARIO=all` three times WITHOUT
+    SKYHERD_AGENTS=managed (LocalMemoryStore active; no real API calls).
+    Sanitizes memver_/mem_/memstore_ IDs (even though LocalMemoryStore is
+    content-derived, the sanitizer covers future managed-runtime replays).
+    """
+    # Isolate runtime/ so memory JSONL files from prior local-dev runs don't pollute.
+    monkeypatch.chdir(tmp_path)
+    hashes: list[str] = []
+    for _run_idx in range(3):
+        sanitized = _sanitize(_run_demo(42))
+        hashes.append(_md5(sanitized))
+    assert len(set(hashes)) == 1, (
+        f"Determinism broke after memory adoption — sanitized md5s differ:\n"
+        f"  run_0: {hashes[0]}\n  run_1: {hashes[1]}\n  run_2: {hashes[2]}\n"
+        "Check DETERMINISM_SANITIZE regex or LocalMemoryStore ID derivation."
+    )
