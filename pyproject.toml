@@ -83,6 +83,7 @@ obs = [
 
 [project.scripts]
 skyherd-attest = "skyherd.attest.cli:main"
+skyherd-verify = "skyherd.attest.verify_cli:main"
 skyherd-mesh = "skyherd.agents.cli:main"
 skyherd-demo = "skyherd.scenarios.cli:main"
 skyherd-voice = "skyherd.voice.cli:main"
