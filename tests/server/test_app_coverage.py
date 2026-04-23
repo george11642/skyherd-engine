@@ -224,3 +224,74 @@ async def test_dev_rancher_returns_html(dev_client):
     resp = await dev_client.get("/rancher")
     assert resp.status_code == 200
     assert "Rancher" in resp.text
+
+
+# ---------------------------------------------------------------------------
+# Phase 5 plan 05-01: public-accessor cost-tick path (DASH-02)
+# ---------------------------------------------------------------------------
+
+
+def _make_mock_mesh_with_public_accessors() -> MagicMock:
+    """Mesh mock exposing ONLY Phase 1's public API (no private _sessions/_tickers).
+
+    Shared fixture — Plan 05-03 reuses this for verify-chain + vet-intake tests.
+    """
+    from skyherd.server.events import AGENT_NAMES
+
+    mesh = MagicMock()
+    tickers = []
+    for name in AGENT_NAMES:
+        t = MagicMock()
+        t.session_id = f"sess_{name.lower()}"
+        t.agent_name = name
+        t._current_state = "active"
+        t.cumulative_cost_usd = 0.002
+        t._cumulative_tokens_in = 1000
+        t._cumulative_tokens_out = 400
+        tickers.append(t)
+    sessions = {}
+    for name in AGENT_NAMES:
+        s = MagicMock()
+        s.id = f"sess_{name.lower()}"
+        s.agent_name = name
+        s.state = "active"
+        s.last_active_ts = time.time()
+        sessions[name] = s
+    mesh.agent_tickers = MagicMock(return_value=tickers)
+    mesh.agent_sessions = MagicMock(return_value=sessions)
+    return mesh
+
+
+def test_real_cost_tick_via_public_accessors() -> None:
+    """DASH-02: _real_cost_tick must use agent_tickers() + agent_sessions(), not private attrs."""
+    from skyherd.server.events import EventBroadcaster
+
+    mesh = _make_mock_mesh_with_public_accessors()
+    bc = EventBroadcaster(mock=False, mesh=mesh, ledger=None, world=MagicMock())
+    tick = bc._real_cost_tick()
+    assert "agents" in tick
+    assert len(tick["agents"]) == 5, (
+        f"Expected 5 agents via public API, got {len(tick['agents'])}. "
+        "Fix: _real_cost_tick must call mesh.agent_tickers() not mesh._session_manager._tickers."
+    )
+    for a in tick["agents"]:
+        assert isinstance(a.get("cumulative_cost_usd"), (int, float))
+        assert a.get("name") in {
+            "FenceLineDispatcher",
+            "HerdHealthWatcher",
+            "PredatorPatternLearner",
+            "GrazingOptimizer",
+            "CalvingWatch",
+        }
+    assert tick["all_idle"] is False
+
+
+def test_real_cost_tick_falls_back_when_no_accessor() -> None:
+    """DASH-02: meshes lacking public API must yield empty agents gracefully, not raise."""
+    from skyherd.server.events import EventBroadcaster
+
+    bare_mesh = MagicMock(spec=[])  # no attributes — .agent_tickers / .agent_sessions absent
+    bc = EventBroadcaster(mock=False, mesh=bare_mesh, ledger=None, world=MagicMock())
+    tick = bc._real_cost_tick()
+    assert tick["agents"] == []
+    assert tick["all_idle"] is True
