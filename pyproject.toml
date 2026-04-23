@@ -93,6 +93,19 @@ skyherd-sitl-e2e = "skyherd.drone.e2e:app"
 [tool.hatch.build.targets.wheel]
 packages = ["src/skyherd"]
 
+[tool.hatch.build.targets.wheel.force-include]
+"worlds" = "skyherd/worlds"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "src/**",
+    "worlds/**",
+    "README.md",
+    "LICENSE",
+    "pyproject.toml",
+    "Makefile",
+]
+
 # ---------------------------------------------------------------------------
 # pytest
 # ---------------------------------------------------------------------------
