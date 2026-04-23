@@ -1,0 +1,161 @@
+{
+  "version": "1.0",
+  "project": "SkyHerd submission video",
+  "total_duration_s": 180,
+  "captions": [
+    {
+      "id": "ACT1-TITLE",
+      "t_start": 0.0,
+      "t_end": 3.0,
+      "kind": "title_card",
+      "text": "A cow can be dying for 72 hours before anyone sees it.",
+      "position": "center",
+      "style": "white-on-black, 40pt Inter"
+    },
+    {
+      "id": "ACT1-LT1",
+      "t_start": 4.0,
+      "t_end": 8.0,
+      "kind": "lower_third",
+      "text": "50,000 acres. Two hours a day. Just water.",
+      "position": "lower-left",
+      "style": "inter-medium, 22pt, drop-shadow"
+    },
+    {
+      "id": "ACT1-NAME",
+      "t_start": 8.5,
+      "t_end": 11.5,
+      "kind": "name_card",
+      "text": "George Teifel · UNM · Part 107 PIC",
+      "position": "lower-left",
+      "style": "inter-medium, 18pt"
+    },
+    {
+      "id": "ACT1-PITCH",
+      "t_start": 22.0,
+      "t_end": 25.0,
+      "kind": "wordmark_intro",
+      "text": "SkyHerd",
+      "subtitle": "the nervous system for working land",
+      "position": "center",
+      "style": "fraunces-display, 72pt, sage accent on 'Herd'"
+    },
+    {
+      "id": "ACT2-PROTOTYPE",
+      "t_start": 38.0,
+      "t_end": 40.0,
+      "kind": "context_chip",
+      "text": "LIVE · Pi #1 + Mavic Air 2 · closed private property",
+      "position": "upper-right",
+      "style": "mono-xs, chip-muted"
+    },
+    {
+      "id": "ACT2-CAUSALITY",
+      "t_start": 58.0,
+      "t_end": 62.0,
+      "kind": "sticker",
+      "text": "Coyote cutout → Pi #1 → FenceLineDispatcher → Mavic → Wes voice",
+      "position": "center",
+      "style": "chip-sage, 16pt mono"
+    },
+    {
+      "id": "ACT2-TIMING",
+      "t_start": 86.0,
+      "t_end": 90.0,
+      "kind": "pulsing_sticker",
+      "text": "30 s · fence → drone → rancher → ledger",
+      "position": "center",
+      "style": "chip-sky, 20pt mono, 2s pulse"
+    },
+    {
+      "id": "ACT2-VETPACKET",
+      "t_start": 100.0,
+      "t_end": 105.0,
+      "kind": "context_chip",
+      "text": "vet intake · A014 · pinkeye 83% · severity: escalate",
+      "position": "upper-right",
+      "style": "chip-dust"
+    },
+    {
+      "id": "ACT3-OVERLAY-MA",
+      "t_start": 126.0,
+      "t_end": 132.0,
+      "kind": "annotation",
+      "text": "5 Managed Agents · 1 platform session each · 241 → 5 refactor",
+      "position": "upper-left",
+      "style": "chip-sage, mono-sm"
+    },
+    {
+      "id": "ACT3-OVERLAY-SKILLS",
+      "t_start": 132.0,
+      "t_end": 138.0,
+      "kind": "annotation",
+      "text": "33 skill files · domain knowledge in skills/*.md, not prompts",
+      "position": "upper-left",
+      "style": "chip-sage, mono-sm"
+    },
+    {
+      "id": "ACT3-OVERLAY-IDLE",
+      "t_start": 138.0,
+      "t_end": 144.0,
+      "kind": "annotation",
+      "text": "Idle-pause billing · cost ticker freezes between events · $4/week",
+      "position": "upper-left",
+      "style": "chip-sage, mono-sm"
+    },
+    {
+      "id": "ACT3-ATTEST",
+      "t_start": 150.0,
+      "t_end": 155.0,
+      "kind": "context_chip",
+      "text": "Ed25519 Merkle chain · 360+ signed entries",
+      "position": "upper-left",
+      "style": "chip-sky"
+    },
+    {
+      "id": "ACT3-CLONE",
+      "t_start": 155.0,
+      "t_end": 170.0,
+      "kind": "timer_sticker",
+      "text": "fresh clone → make demo",
+      "position": "upper-right",
+      "style": "mono-sm, countdown from 3:00"
+    },
+    {
+      "id": "CLOSE-REPO",
+      "t_start": 170.0,
+      "t_end": 180.0,
+      "kind": "close_card",
+      "lines": [
+        "github.com/george11642/skyherd-engine",
+        "MIT · Python 3.11 · TypeScript 5.8 · Opus 4.7",
+        "George Teifel · UNM"
+      ],
+      "position": "center",
+      "style": "fraunces 32pt primary, inter 18pt secondary"
+    }
+  ],
+  "audio_markers": [
+    { "t": 12.0, "sfx": "ranch-ambient-dawn.wav", "gain_db": -18 },
+    { "t": 62.0, "sfx": "docs/demo-assets/audio/wes-coyote.wav", "gain_db": 0 },
+    { "t": 106.0, "sfx": "docs/demo-assets/audio/wes-sick-cow.wav", "gain_db": -3 },
+    { "t": 172.0, "sfx": "docs/demo-assets/audio/wes-close.wav", "gain_db": 0 }
+  ],
+  "pip_windows": [
+    {
+      "t_start": 38.0,
+      "t_end": 115.0,
+      "source": "dashboard_screen_cap",
+      "position": "bottom-right",
+      "width_pct": 22,
+      "border": "1px solid rgba(148, 176, 136, 0.35)",
+      "corner_radius_px": 6
+    }
+  ],
+  "editor_notes": [
+    "Trim cold open to exactly 0:08 before cutting to George — silence sells the pain line.",
+    "Dashboard PIP at 22% width needs the polish pass (B1-B6) or chips read illegibly — confirm font-size >=0.75rem on chips before export.",
+    "Wes voice lines must play THROUGH George's phone speaker to the lav mic — don't overdub clean audio, it kills the realism.",
+    "Timer sticker in Act 3 clone segment must tick in realtime; if clone takes >3 min on shoot day, trim this beat to 12s and cut before the make demo output."
+  ]
+}

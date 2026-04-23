@@ -1,0 +1,31 @@
+# Wes Voice Lines — Pre-render before shoot day
+
+Render these on a machine with `ELEVENLABS_API_KEY` set.
+Run `bash docs/demo-assets/audio/render.sh` from repo root. Output WAVs land next to this file.
+
+Fallback chain (if no ElevenLabs key): piper → espeak → silent. Silent is safe for editor-side QA;
+the field shoot needs the ElevenLabs or piper take routed through George's phone speaker so
+the lav mic picks it up as "real" sounding.
+
+---
+
+## wes-coyote.wav  (Act 2, 1:02)
+
+Urgency: high
+Persona: Wes, cowboy, steady, no panic
+
+  "Boss. Coyote at the south fence. Drone's on it."
+
+## wes-sick-cow.wav  (Act 2, 1:46)
+
+Urgency: observe
+Persona: Wes, softer cadence, matter-of-fact
+
+  "Boss. A014's got something in her left eye. Pulled together a vet packet for you."
+
+## wes-close.wav  (Act 3 close, 2:58)
+
+Urgency: log
+Persona: Wes, closing line, light smile
+
+  "That's the ranch taking care of itself, boss."
