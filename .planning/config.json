@@ -31,7 +31,7 @@
     "code_review": true,
     "code_review_depth": "standard",
     "code_review_command": null,
-    "pattern_mapper": true,
+    "pattern_mapper": false,
     "plan_bounce": false,
     "plan_bounce_script": null,
     "plan_bounce_passes": 2,
