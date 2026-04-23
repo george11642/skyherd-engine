@@ -14,7 +14,8 @@ SkyHerd = 5-layer nervous system for American ranches. Submission for **Built wi
 6. `docs/CLAUDE_CONTEXT.md` — deep context (stack, conventions, architecture detail)
 7. `docs/HARDWARE_DEMO_RUNBOOK.md` — 60-sec hardware hero demo
 8. `docs/HARDWARE_PI_FLEET.md` — **collar-free hardware path**: two Pi 4s + Mavic drone only (no DIY collar required)
-9. **Plan (authoritative):** `/home/george/.claude/plans/update-ur-memory-project-context-splendid-swan.md` — v5.1, locked Apr 21 2026
+9. `docs/ATTESTATION.md` — Year-2 attestation walkthrough (judge-facing): `skyherd-verify` CLI, `/attest/:hash` viewer, memver pairing, rotation
+10. **Plan (authoritative):** `/home/george/.claude/plans/update-ur-memory-project-context-splendid-swan.md` — v5.1, locked Apr 21 2026
 
 ## Non-negotiable rules
 - **Sim-first hardline** — no hardware code until Sim Gate passes (PASSED Apr 22 — see `docs/verify-latest.md`)
