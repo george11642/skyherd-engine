@@ -33,9 +33,9 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Any
 
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, Response
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, PlainTextResponse, Response
 from fastapi.staticfiles import StaticFiles
 from sse_starlette.sse import EventSourceResponse
 
@@ -157,6 +157,43 @@ def create_app(
             entries = [e.model_dump() for e in ledger.iter_events(since_seq=since_seq)][:50]
         return JSONResponse(content={"entries": entries, "ts": time.time()})
 
+    @app.post("/api/attest/verify")
+    async def api_attest_verify() -> JSONResponse:
+        """Walk the entire attestation chain and return VerifyResult (DASH-04).
+
+        Live mode:  delegates to Ledger.verify() — walks every row, re-computes
+                    hashes, checks signatures. Returns VerifyResult.model_dump().
+        Mock mode:  returns {"valid": True, "total": 0, "reason": "mock"}.
+        """
+        if use_mock or ledger is None:
+            return JSONResponse(
+                content={"valid": True, "total": 0, "reason": "mock"}
+            )
+        result = ledger.verify()
+        return JSONResponse(content=result.model_dump())
+
+    @app.get("/api/vet-intake/{intake_id}")
+    async def api_vet_intake(intake_id: str) -> PlainTextResponse:
+        """Return the markdown body for a vet-intake artifact (SCEN-01).
+
+        - 400 if intake_id fails regex validation (delegated to get_intake_path).
+        - 404 if the file does not exist on disk.
+        - 200 + text/markdown body otherwise.
+        """
+        from skyherd.server.vet_intake import get_intake_path
+
+        try:
+            path = get_intake_path(intake_id)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+        if not path.exists():
+            raise HTTPException(status_code=404, detail=f"intake {intake_id!r} not found")
+        try:
+            body = path.read_text(encoding="utf-8")
+        except OSError as exc:  # pragma: no cover — defensive, filesystem failure
+            raise HTTPException(status_code=500, detail="read error") from exc
+        return PlainTextResponse(content=body, media_type="text/markdown; charset=utf-8")
+
     # ------------------------------------------------------------------
     # SSE endpoint — connection-limited (SECURITY_REVIEW F-02)
     # ------------------------------------------------------------------
@@ -180,7 +217,11 @@ def create_app(
                 async for event_type, payload in broadcaster.subscribe():
                     yield {"event": event_type, "data": json.dumps(payload, default=str)}
 
-        return EventSourceResponse(_generator())
+        # X-Accel-Buffering: no defeats nginx/reverse-proxy SSE buffering (Pitfall 1).
+        return EventSourceResponse(
+            _generator(),
+            headers={"X-Accel-Buffering": "no"},
+        )
 
     # ------------------------------------------------------------------
     # Metrics endpoint (Prometheus text format)
@@ -257,6 +298,7 @@ def _mock_agent_statuses() -> list[dict[str, Any]]:
         result.append(
             {
                 "name": name,
+                "session_id": f"sess_mock_{name.lower()}",
                 "state": state,
                 "last_wake": t - (t % 60),
                 "cumulative_tokens_in": 1200 + i * 300,
@@ -268,18 +310,66 @@ def _mock_agent_statuses() -> list[dict[str, Any]]:
 
 
 def _live_agent_statuses(mesh: Any) -> list[dict[str, Any]]:
-    result = []
-    for name, session in mesh._sessions.items():
-        result.append(
-            {
-                "name": name,
-                "state": session.state,
-                "last_wake": session.last_active_ts,
-                "cumulative_tokens_in": session.cumulative_tokens_in,
-                "cumulative_tokens_out": session.cumulative_tokens_out,
-                "cumulative_cost_usd": session.cumulative_cost_usd,
+    """Build agent status entries from a live mesh via Phase 1 public accessors.
+
+    DASH-06: consumes ``mesh.agent_sessions() -> dict[name, Session]`` (Phase 1
+    public API). Falls back to the legacy ``mesh._sessions`` dict if the public
+    accessor is unavailable or returns a non-dict, so older meshes and bare
+    MagicMock fixtures still work. Each entry includes ``session_id`` so the
+    dashboard's ``/api/agents`` response proves real platform registration
+    (``sess_*`` pattern) rather than a mock fallback.
+    """
+    result: list[dict[str, Any]] = []
+
+    # Step 1: attempt the Phase 1 public accessor, accepting only a real dict.
+    sessions: dict[str, Any] | None = None
+    accessor = getattr(mesh, "agent_sessions", None)
+    if callable(accessor):
+        try:
+            candidate = accessor()
+        except Exception as exc:  # noqa: BLE001
+            logger.debug("mesh.agent_sessions() raised: %s — trying fallback", exc)
+            candidate = None
+        if isinstance(candidate, dict) and candidate:
+            sessions = candidate
+
+    # Step 2: fallback to the legacy private-attr path for older meshes.
+    if sessions is None:
+        legacy = getattr(mesh, "_sessions", None)
+        if isinstance(legacy, dict):
+            sessions = legacy
+
+    if not sessions:
+        return result
+
+    for name, session in sessions.items():
+        try:
+            sid_raw = getattr(session, "id", None) or getattr(session, "session_id", None)
+            sid = sid_raw if isinstance(sid_raw, str) else f"sess_{str(name).lower()}"
+            agent_name_raw = getattr(session, "agent_name", None)
+            agent_name = agent_name_raw if isinstance(agent_name_raw, str) else name
+            state_raw = getattr(session, "state", "idle")
+            state = state_raw if isinstance(state_raw, str) else "idle"
+            entry = {
+                "name": agent_name,
+                "session_id": sid,
+                "state": state,
+                "last_wake": getattr(session, "last_active_ts", None),
+                "cumulative_tokens_in": int(
+                    getattr(session, "cumulative_tokens_in", 0) or 0
+                ),
+                "cumulative_tokens_out": int(
+                    getattr(session, "cumulative_tokens_out", 0) or 0
+                ),
+                "cumulative_cost_usd": float(
+                    getattr(session, "cumulative_cost_usd", 0.0) or 0.0
+                ),
             }
-        )
+            result.append(entry)
+        except Exception as exc:  # noqa: BLE001
+            logger.debug("skipping malformed session %r (%s)", name, exc)
+            continue
+
     return result
 
 

@@ -73,6 +73,8 @@ export class SkyHerdSSE {
       "agent.log",
       "fence.breach",
       "drone.update",
+      "vet_intake.drafted",
+      "neighbor.handoff",
     ];
 
     for (const type of eventTypes) {

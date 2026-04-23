@@ -184,8 +184,31 @@ def draft_vet_intake(
 def get_intake_path(intake_id: str) -> Path:
     """Return the Path for a given intake_id.
 
-    Uses _VET_INTAKE_DIR so monkeypatching works in tests.
+    Validates that *intake_id* matches the canonical pattern
+    ``^[A-Z][0-9]{3}_[0-9]{8}T[0-9]{6}Z$`` (e.g. ``A014_20260101T000000Z``)
+    before returning the resolved path. This is the regex-guard referenced
+    by the HTTP endpoint in Plan 05-03; callers that catch ``ValueError``
+    return 400 to the client.
+
+    Uses ``_VET_INTAKE_DIR`` so monkeypatching works in tests.
     """
+    if not _INTAKE_ID_RE.match(intake_id):
+        raise ValueError(
+            f"intake_id {intake_id!r} does not match required regex "
+            r"^[A-Z][0-9]{3}_[0-9]{8}T[0-9]{6}Z$"
+        )
+
+    # Path-traversal guard: the intake_id regex already rules out "/" and "..",
+    # but resolve + startswith gives us defense in depth.
+    candidate = (_VET_INTAKE_DIR / f"{intake_id}.md").resolve()
+    intake_dir_resolved = _VET_INTAKE_DIR.resolve()
+    if not str(candidate).startswith(str(intake_dir_resolved)):
+        raise ValueError(
+            f"Path traversal attempt detected: {candidate} outside {intake_dir_resolved}"
+        )
+    # Return the un-resolved path (tests monkeypatch _VET_INTAKE_DIR to tmp_path;
+    # resolving at call time would lock-in a different base directory if the
+    # caller monkeypatches mid-test).
     return _VET_INTAKE_DIR / f"{intake_id}.md"
 
 
