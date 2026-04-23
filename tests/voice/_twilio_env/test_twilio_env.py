@@ -12,7 +12,7 @@ import warnings
 
 import pytest
 
-from skyherd.voice._twilio_env import _DEPRECATION_EMITTED, _get_twilio_auth_token
+from skyherd.voice._twilio_env import _get_twilio_auth_token
 
 
 class TestGetTwilioAuthToken:

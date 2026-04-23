@@ -264,9 +264,9 @@ class TestTwilioAuthTokenMigration:
         monkeypatch.setenv("TWILIO_FROM", "+15550001111")
         monkeypatch.delenv("TWILIO_AUTH_TOKEN", raising=False)
 
-        from skyherd.voice.call import _twilio_available
-
         import pytest as _pytest
+
+        from skyherd.voice.call import _twilio_available
         with _pytest.warns(DeprecationWarning):
             result = _twilio_available()
 

@@ -124,9 +124,9 @@ async def test_parse_payload_debug_log_on_malformed_json(caplog: pytest.LogCaptu
     caplog.set_level(logging.DEBUG, logger="skyherd.sensors.bus")
 
     # Call _parse_url with a non-integer port to trigger the ValueError branch
-    from skyherd.sensors.bus import SensorBus as _SB
+    from skyherd.sensors.bus import SensorBus
 
-    result = _SB._parse_url("mqtt://localhost:notaport")
+    result = SensorBus._parse_url("mqtt://localhost:notaport")
 
     # Returns default port silently right now — after Task 2, it will log DEBUG
     assert result[1] == 1883  # default port used
