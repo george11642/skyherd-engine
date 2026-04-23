@@ -15,11 +15,13 @@ import { AgentLanes } from "@/components/AgentLanes";
 import { CostTicker } from "@/components/CostTicker";
 import { AttestationPanel } from "@/components/AttestationPanel";
 import { MemoryPanel } from "@/components/MemoryPanel";
+import { CrossRanchPanel } from "@/components/CrossRanchPanel";
 import { VetIntakePanel } from "@/components/VetIntakePanel";
 
 export default function App() {
   const [attestCollapsed, setAttestCollapsed] = useState(false);
   const [memoryCollapsed, setMemoryCollapsed] = useState(false);
+  const [crossRanchCollapsed, setCrossRanchCollapsed] = useState(false);
 
   return (
     <div
@@ -66,6 +68,12 @@ export default function App() {
           <MemoryPanel
             collapsed={memoryCollapsed}
             onToggle={() => setMemoryCollapsed((v) => !v)}
+          />
+
+          {/* Cross-Ranch Panel — inbound/outbound neighbor alerts (Phase 02 CRM-06) */}
+          <CrossRanchPanel
+            collapsed={crossRanchCollapsed}
+            onToggle={() => setCrossRanchCollapsed((v) => !v)}
           />
         </aside>
       </div>
