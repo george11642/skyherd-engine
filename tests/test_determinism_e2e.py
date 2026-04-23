@@ -1,7 +1,8 @@
-"""Determinism e2e test: two seed=42 runs produce identical sanitized output.
+"""Determinism e2e test: three back-to-back seed=42 runs produce identical sanitized output.
 
-Wall-clock timestamps and short session-hash IDs are stripped before comparison
-so that only scenario logic, event counts, and PASS/FAIL verdicts are compared.
+Wall-clock timestamps, UUIDs, ISO dates, and short session-hash IDs are stripped
+before comparison so that only scenario logic, event counts, and PASS/FAIL
+verdicts are compared. Strengthens SCEN-03: byte-identical hashes across 3 runs.
 """
 
 from __future__ import annotations
@@ -58,17 +59,23 @@ def _run_demo(seed: int) -> str:
 
 
 @pytest.mark.slow
-def test_demo_seed42_is_deterministic() -> None:
-    """Two back-to-back seed=42 runs must produce the same sanitized output."""
-    run_a = _sanitize(_run_demo(42))
-    run_b = _sanitize(_run_demo(42))
+def test_demo_seed42_is_deterministic_3x() -> None:
+    """Three back-to-back seed=42 runs must produce identical sanitized output.
 
-    md5_a = _md5(run_a)
-    md5_b = _md5(run_b)
+    SCEN-03: scenario JSONL output is byte-identical at hash level after
+    timestamp sanitization across THREE back-to-back runs (strengthened from
+    the previous 2-run check).
+    """
+    hashes: list[str] = []
+    for run_idx in range(3):
+        sanitized = _sanitize(_run_demo(42))
+        hashes.append(_md5(sanitized))
 
-    assert md5_a == md5_b, (
-        f"Determinism check failed — sanitized md5 differs:\n"
-        f"  run_a: {md5_a}\n"
-        f"  run_b: {md5_b}\n"
-        "Remaining diff lines are non-deterministic after sanitization."
+    assert len(set(hashes)) == 1, (
+        f"Determinism check failed — sanitized md5 differs across 3 runs:\n"
+        f"  run_0: {hashes[0]}\n"
+        f"  run_1: {hashes[1]}\n"
+        f"  run_2: {hashes[2]}\n"
+        "All three sanitized md5s must match. Remaining diff lines are "
+        "non-deterministic after sanitization — expand DETERMINISM_SANITIZE."
     )
