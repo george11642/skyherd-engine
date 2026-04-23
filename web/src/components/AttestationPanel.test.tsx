@@ -141,3 +141,92 @@ describe("AttestationPanel", () => {
     expect(onToggle).toHaveBeenCalledOnce();
   });
 });
+
+describe("AttestationPanel — Verify Chain button (DASH-04)", () => {
+  beforeEach(() => {
+    sseHandlers = {};
+    vi.clearAllMocks();
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve({ entries: [], ts: Date.now() / 1000 }),
+      }),
+    );
+  });
+
+  it("renders a Verify button in the header initially", async () => {
+    await act(async () => {
+      render(<AttestationPanel />);
+    });
+    expect(screen.getByRole("button", { name: /verify/i })).toBeTruthy();
+  });
+
+  it("shows VALID chip after successful POST /api/attest/verify", async () => {
+    const fetchFn = vi.fn().mockImplementation((url: string, init?: RequestInit) => {
+      if (typeof url === "string" && url.includes("/api/attest/verify") && init?.method === "POST") {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ valid: true, total: 42 }),
+        });
+      }
+      return Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({ entries: [], ts: Date.now() / 1000 }),
+      });
+    });
+    vi.stubGlobal("fetch", fetchFn);
+
+    await act(async () => {
+      render(<AttestationPanel />);
+    });
+    const btn = screen.getByRole("button", { name: /verify/i });
+    await act(async () => {
+      fireEvent.click(btn);
+    });
+
+    await waitFor(() => expect(screen.getByText(/VALID/)).toBeTruthy());
+    // Confirm POST method was used
+    const postCall = fetchFn.mock.calls.find(
+      (c: unknown[]) => typeof c[0] === "string" && (c[0] as string).includes("/api/attest/verify"),
+    );
+    expect(postCall).toBeTruthy();
+    expect((postCall as [string, RequestInit])[1]?.method).toBe("POST");
+  });
+
+  it("shows INVALID chip when verify returns valid:false", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockImplementation((url: string, init?: RequestInit) => {
+        if (
+          typeof url === "string" &&
+          url.includes("/api/attest/verify") &&
+          init?.method === "POST"
+        ) {
+          return Promise.resolve({
+            ok: true,
+            json: () =>
+              Promise.resolve({
+                valid: false,
+                total: 42,
+                first_bad_seq: 17,
+                reason: "hash mismatch",
+              }),
+          });
+        }
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ entries: [], ts: Date.now() / 1000 }),
+        });
+      }),
+    );
+
+    await act(async () => {
+      render(<AttestationPanel />);
+    });
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: /verify/i }));
+    });
+    await waitFor(() => expect(screen.getByText(/INVALID/)).toBeTruthy());
+  });
+});

@@ -348,3 +348,154 @@ def test_snapshot_live_mode_real_world(tmp_path) -> None:
     assert body.get("sim_time_s") == 0.0, (
         f"DASH-01: live world boots at sim_time_s=0.0, got {body.get('sim_time_s')}"
     )
+
+
+# ---------------------------------------------------------------------------
+# Phase 5 plan 05-03: /api/attest/verify + /api/vet-intake + DASH-06 agents
+# ---------------------------------------------------------------------------
+
+
+def test_attest_verify_live() -> None:
+    """DASH-04: POST /api/attest/verify returns Ledger.verify().model_dump() in live mode."""
+    from fastapi.testclient import TestClient
+
+    from skyherd.server.app import create_app
+
+    ledger = MagicMock()
+    verify_result = MagicMock()
+    verify_result.model_dump = MagicMock(
+        return_value={"valid": True, "total": 42, "first_bad_seq": None, "reason": None}
+    )
+    ledger.verify = MagicMock(return_value=verify_result)
+
+    app = create_app(
+        mock=False,
+        mesh=_make_mock_mesh_with_public_accessors(),
+        ledger=ledger,
+        world=MagicMock(),
+    )
+    client = TestClient(app)
+    r = client.post("/api/attest/verify")
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert body["valid"] is True
+    assert body["total"] == 42
+    ledger.verify.assert_called_once()
+
+
+def test_attest_verify_mock() -> None:
+    """DASH-04: POST /api/attest/verify returns {valid: True, total: 0, reason: 'mock'} in mock mode."""
+    from fastapi.testclient import TestClient
+
+    from skyherd.server.app import create_app
+
+    app = create_app(mock=True)
+    client = TestClient(app)
+    r = client.post("/api/attest/verify")
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert body["valid"] is True
+    assert body["total"] == 0
+    assert body.get("reason") == "mock"
+
+
+def test_vet_intake_endpoint_returns_markdown(tmp_path, monkeypatch) -> None:
+    """SCEN-01: GET /api/vet-intake/{id} returns markdown body with text/markdown content-type."""
+    from fastapi.testclient import TestClient
+
+    from skyherd.server import vet_intake as vi
+    from skyherd.server.app import create_app
+
+    monkeypatch.setattr(vi, "_VET_INTAKE_DIR", tmp_path)
+    intake_id = "A014_20260101T000000Z"
+    (tmp_path / f"{intake_id}.md").write_text(
+        "# Vet Intake — A014 · Pinkeye · ESCALATE\n\n## Cow\n- Tag: A014\n",
+        encoding="utf-8",
+    )
+    app = create_app(mock=True)
+    client = TestClient(app)
+    r = client.get(f"/api/vet-intake/{intake_id}")
+    assert r.status_code == 200, r.text
+    assert "text/markdown" in r.headers.get("content-type", ""), (
+        f"expected text/markdown content-type, got {r.headers.get('content-type')!r}"
+    )
+    assert "A014" in r.text
+
+
+def test_vet_intake_endpoint_404_on_missing(tmp_path, monkeypatch) -> None:
+    """SCEN-01: GET /api/vet-intake/{id} returns 404 when the intake file is missing."""
+    from fastapi.testclient import TestClient
+
+    from skyherd.server import vet_intake as vi
+    from skyherd.server.app import create_app
+
+    monkeypatch.setattr(vi, "_VET_INTAKE_DIR", tmp_path)
+    app = create_app(mock=True)
+    client = TestClient(app)
+    r = client.get("/api/vet-intake/B999_20990101T000000Z")
+    assert r.status_code == 404
+
+
+def test_vet_intake_endpoint_400_on_bad_id() -> None:
+    """SCEN-01: GET /api/vet-intake/{id} rejects malformed intake_id with 400."""
+    from fastapi.testclient import TestClient
+
+    from skyherd.server.app import create_app
+
+    app = create_app(mock=True)
+    client = TestClient(app)
+    r = client.get("/api/vet-intake/not-a-valid-id")
+    assert r.status_code == 400
+
+
+def test_agents_live_session_ids() -> None:
+    """DASH-06: /api/agents returns real sess_* IDs via Phase 1 agent_sessions().
+
+    RESEARCH.md flagged this as Wave-0 MISSING. Proves the live-mode path returns
+    session IDs from the mesh (not mock fallbacks) — the data source AgentLanes
+    renders. Uses Plan 05-01's _make_mock_mesh_with_public_accessors fixture.
+    """
+    import re
+
+    from fastapi.testclient import TestClient
+
+    from skyherd.server.app import create_app
+
+    mesh = _make_mock_mesh_with_public_accessors()
+    app = create_app(
+        mock=False,
+        mesh=mesh,
+        ledger=MagicMock(),
+        world=MagicMock(),
+    )
+    client = TestClient(app)
+    r = client.get("/api/agents")
+    assert r.status_code == 200, r.text
+    body = r.json()
+
+    # Response shape may be {"agents": [...]} or a bare list — accept both
+    agents = body.get("agents") if isinstance(body, dict) else body
+    assert isinstance(agents, list), f"Expected list of agents, got {type(agents)}"
+    assert len(agents) == 5, f"DASH-06: expected 5 agents via live path, got {len(agents)}"
+
+    session_id_re = re.compile(r"^sess_[a-z_]+$")
+    expected_names = {
+        "FenceLineDispatcher",
+        "HerdHealthWatcher",
+        "PredatorPatternLearner",
+        "GrazingOptimizer",
+        "CalvingWatch",
+    }
+    seen_names: set[str] = set()
+    for entry in agents:
+        sid = entry.get("session_id") or entry.get("sessionId")
+        assert sid is not None, f"DASH-06: agent entry missing session_id: {entry}"
+        assert session_id_re.match(sid), f"DASH-06: session_id {sid!r} fails live-mode regex"
+        assert sid != "sess_mock", f"DASH-06: mock fallback leaked into live mode ({sid})"
+        name = entry.get("name") or entry.get("agent_name")
+        if name:
+            seen_names.add(name)
+    # At least 3 of the 5 canonical names must appear (tolerates implementation variance)
+    assert len(seen_names & expected_names) >= 3, (
+        f"DASH-06: expected canonical agent names, got {seen_names}"
+    )
