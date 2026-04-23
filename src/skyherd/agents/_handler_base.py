@@ -85,20 +85,51 @@ async def run_handler_cycle(
     platform_session_id: str | None = getattr(session, "platform_session_id", None)
 
     if platform_session_id and os.environ.get("SKYHERD_AGENTS") == "managed":
-        return await _run_managed(
+        tool_calls = await _run_managed(
             session=session,
             sdk_client=sdk_client,
             cached_payload=cached_payload,
             platform_session_id=platform_session_id,
             tool_dispatcher=tool_dispatcher,
         )
+    else:
+        # Local runtime — C1 fix: pass system + messages with cache_control
+        tool_calls = await _run_local_with_cache(
+            session=session,
+            sdk_client=sdk_client,
+            cached_payload=cached_payload,
+        )
 
-    # Local runtime — C1 fix: pass system + messages with cache_control
-    return await _run_local_with_cache(
-        session=session,
-        sdk_client=sdk_client,
-        cached_payload=cached_payload,
-    )
+    # MEM-05 + MEM-10 — memory post-cycle hook (non-blocking; never raises into caller).
+    # Uses session-attached refs (_memory_store_id_map / _ledger_ref / _broadcaster_ref)
+    # populated by AgentMesh.start so per-agent handler files never needed updating.
+    try:
+        from skyherd.agents.memory_hook import post_cycle_write  # noqa: PLC0415
+
+        store_id_map = getattr(session, "_memory_store_id_map", None)
+        ledger = getattr(session, "_ledger_ref", None)
+        broadcaster = getattr(session, "_broadcaster_ref", None)
+        # wake_event is already an argument; ALSO look at session.wake_events_consumed
+        # for consistency with the planned zero-signature-change path in other callers.
+        effective_wake_event = wake_event
+        if not effective_wake_event:
+            effective_wake_event = (getattr(session, "wake_events_consumed", None) or [{}])[-1]
+        await post_cycle_write(
+            session,
+            effective_wake_event,
+            tool_calls,
+            ledger,
+            broadcaster,
+            store_id_map,
+        )
+    except Exception as exc:  # noqa: BLE001
+        logger.warning(
+            "memory post-cycle write failed for %s: %s",
+            getattr(session, "agent_name", "?"),
+            type(exc).__name__,
+        )
+
+    return tool_calls
 
 
 async def _run_managed(

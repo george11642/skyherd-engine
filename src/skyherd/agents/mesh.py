@@ -107,6 +107,8 @@ class AgentMesh:
         self,
         mqtt_publish_callback: Any | None = None,
         ledger_callback: Any | None = None,
+        ledger: Any | None = None,
+        broadcaster: Any | None = None,
     ) -> None:
         self._session_manager = SessionManager(
             mqtt_publish_callback=mqtt_publish_callback,
@@ -118,17 +120,94 @@ class AgentMesh:
         self._tick_task: asyncio.Task[None] | None = None
         self._mqtt_task: asyncio.Task[None] | None = None
         self._inflight_handlers: set[asyncio.Task] = set()  # prevent GC of fire-and-forget tasks
+        # MEM-01: per-agent + shared memory store IDs — populated by _ensure_memory_stores.
+        self._memory_store_ids: dict[str, str] = {}
+        # Refs attached to sessions post-start so memory_hook can reach ledger/SSE.
+        self._ledger = ledger
+        self._broadcaster = broadcaster
+
+    # ------------------------------------------------------------------
+    # Memory store startup
+    # ------------------------------------------------------------------
+
+    async def _ensure_memory_stores(self) -> dict[str, str]:
+        """Create 1 shared + 5 per-agent memory stores. Idempotent.
+
+        Caches IDs in ``runtime/memory_store_ids.json`` — mirror of
+        ``ensure_agent`` / ``runtime/agent_ids.json``.
+
+        Returns the full map: ``{"_shared": msid, "FenceLineDispatcher": msid, ...}``.
+        """
+        import json  # noqa: PLC0415
+        from pathlib import Path  # noqa: PLC0415
+
+        from skyherd.agents.memory import get_memory_store_manager  # noqa: PLC0415
+        from skyherd.server.events import AGENT_NAMES  # noqa: PLC0415
+
+        cache = Path("runtime/memory_store_ids.json")
+        if cache.exists():
+            try:
+                cached = json.loads(cache.read_text())
+                if isinstance(cached, dict) and cached:
+                    # Ensure all 6 keys are present; otherwise rebuild.
+                    expected = {"_shared", *AGENT_NAMES}
+                    if expected.issubset(set(cached.keys())):
+                        return {str(k): str(v) for k, v in cached.items()}
+            except Exception as exc:  # noqa: BLE001
+                logger.warning("memory_store_ids.json parse failed: %s", type(exc).__name__)
+
+        mgr = get_memory_store_manager()
+        ids: dict[str, str] = {}
+        # Shared read-only domain library
+        shared_id = await mgr.ensure_store(
+            name="skyherd_ranch_a_shared",
+            description="SkyHerd shared ranch patterns — read-only domain library",
+        )
+        ids["_shared"] = shared_id
+        # Per-agent read_write stores
+        for agent_name in AGENT_NAMES:
+            sid = await mgr.ensure_store(
+                name=f"skyherd_{agent_name.lower()}_ranch_a",
+                description=f"Per-agent memory for {agent_name}",
+            )
+            ids[agent_name] = sid
+        cache.parent.mkdir(parents=True, exist_ok=True)
+        cache.write_text(json.dumps(ids, indent=2))
+        return ids
 
     # ------------------------------------------------------------------
     # Lifecycle
     # ------------------------------------------------------------------
 
     async def start(self) -> None:
-        """Create all 5 sessions and start the cost-tick loop + MQTT subscriber."""
+        """Create all 5 sessions and start the cost-tick loop + MQTT subscriber.
+
+        MEM-01: creates 1 shared + 5 per-agent memory stores on first run
+        (cached in ``runtime/memory_store_ids.json`` for idempotency).
+        Then attaches per-session refs (_memory_store_id_map, _ledger_ref,
+        _broadcaster_ref) so the post-cycle hook in _handler_base can reach
+        them without per-handler-file modifications.
+        """
+        # MEM-01: ensure memory stores exist (idempotent).
+        try:
+            self._memory_store_ids = await self._ensure_memory_stores()
+        except Exception as exc:  # noqa: BLE001
+            logger.warning("memory store ensure failed (%s); continuing without", type(exc).__name__)
+            self._memory_store_ids = {}
+
         for spec, handler_fn in _AGENT_REGISTRY:
             session = self._session_manager.create_session(spec)
             self._sessions[spec.name] = session
             self._handlers[spec.name] = handler_fn
+            # MEM-10: wire ledger + broadcaster + store-id-map refs on the session so
+            # post_cycle_write can pair memver + ledger + SSE without per-handler changes.
+            try:
+                session._memory_store_id_map = self._memory_store_ids  # type: ignore[attr-defined]
+                session._ledger_ref = self._ledger  # type: ignore[attr-defined]
+                session._broadcaster_ref = self._broadcaster  # type: ignore[attr-defined]
+            except Exception:  # noqa: BLE001
+                # Immutable/unsupported session type — skip.
+                pass
             logger.info("AgentMesh: registered %s (session %s)", spec.name, session.id[:8])
 
         tickers = self._session_manager.all_tickers()
