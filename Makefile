@@ -1,4 +1,4 @@
-.PHONY: setup sim demo dashboard dashboard-mock test lint format typecheck clean ci sitl-up sitl-down bus-up bus-down mesh-smoke one-pager hardware-demo mavic-bridge f3-bridge drone-smoke
+.PHONY: setup sim demo dashboard dashboard-mock test lint format typecheck clean ci sitl-up sitl-down bus-up bus-down mesh-smoke one-pager hardware-demo mavic-bridge f3-bridge drone-smoke sitl-smoke determinism-3x gate-check
 
 SEED ?= 42
 SCENARIO ?= all
@@ -80,3 +80,19 @@ f3-bridge:
 
 drone-smoke:
 	DRONE_BACKEND=stub uv run skyherd-drone-smoke
+
+# ---------------------------------------------------------------------------
+# Phase 6: SITL-CI & Determinism Gate
+# These three targets close BLD-04 (sitl-smoke), SCEN-03 (determinism-3x),
+# and SCEN-02 (gate-check).  Phase 4 owns `dashboard` + `dashboard-mock` —
+# do NOT edit those here.
+# ---------------------------------------------------------------------------
+
+sitl-smoke:  ## BLD-04 proof — real MAVLink mission via pymavlink emulator (<60s)
+	uv run python scripts/sitl_smoke.py
+
+determinism-3x:  ## SCEN-03 proof — seed=42 hash-stable across 3 back-to-back runs
+	uv run pytest tests/test_determinism_e2e.py -v -m slow --timeout=600
+
+gate-check:  ## SCEN-02 proof — iterates 10 CLAUDE.md Gate items, exit 0 iff 10/10 GREEN
+	uv run python scripts/gate_check.py
