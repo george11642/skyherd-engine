@@ -14,6 +14,7 @@ import { RanchMap } from "@/components/RanchMap";
 import { AgentLanes } from "@/components/AgentLanes";
 import { CostTicker } from "@/components/CostTicker";
 import { AttestationPanel } from "@/components/AttestationPanel";
+import { VetIntakePanel } from "@/components/VetIntakePanel";
 
 export default function App() {
   const [attestCollapsed, setAttestCollapsed] = useState(false);
@@ -49,6 +50,9 @@ export default function App() {
 
           {/* Cost Ticker — fixed strip */}
           <CostTicker />
+
+          {/* Vet Intake Panel (SCEN-01 + DASH-06) */}
+          <VetIntakePanel />
 
           {/* Attestation Panel — collapsible bottom sheet */}
           <AttestationPanel

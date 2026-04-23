@@ -31,7 +31,10 @@ describe("VetIntakePanel (SCEN-01 UI)", () => {
     await act(async () => {
       render(<VetIntakePanel />);
     });
-    expect(screen.getByText(/vet intake/i)).toBeTruthy();
+    // Title is a fixed string; empty-state text differs. Use the exact label.
+    expect(screen.getByText("Vet Intake")).toBeTruthy();
+    // And the empty state placeholder.
+    expect(screen.getByText(/no vet intakes yet/i)).toBeTruthy();
   });
 
   it("fetches and renders markdown after vet_intake.drafted SSE event", async () => {
