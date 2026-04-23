@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import random
 from datetime import UTC, datetime
+from importlib.resources import files
 from pathlib import Path
 from typing import Any
 
@@ -146,11 +147,39 @@ class World:
 # ---------------------------------------------------------------------------
 
 
-def make_world(seed: int, config_path: Path) -> World:
+def _default_world_config() -> Path:
+    """Return the packaged ``worlds/ranch_a.yaml`` as a filesystem Path.
+
+    Uses ``importlib.resources.files()`` so this works in both editable
+    installs (finds repo-root ``worlds/`` via the src/skyherd/worlds symlink)
+    and wheel installs (finds ``skyherd/worlds/`` inside the package).
+
+    CRITICAL: do NOT use ``with as_file(p) as path: return path`` — the
+    context manager exits before the caller uses the path, breaking on
+    zipimport installs. The ``Path(str(traversable))`` cast is safe for
+    uv-managed venv installs (SkyHerd's only supported install mode).
+    """
+    traversable = files("skyherd").joinpath("worlds/ranch_a.yaml")
+    try:
+        return Path(str(traversable))
+    except (TypeError, ValueError):
+        # Rare fallback: zipimport. Extract to a tempfile.
+        import tempfile
+        tmp = Path(tempfile.mkstemp(suffix="_ranch_a.yaml")[1])
+        tmp.write_bytes(traversable.read_bytes())
+        return tmp
+
+
+def make_world(seed: int, config_path: Path | None = None) -> World:
     """Build a fully-seeded :class:`World` from a YAML ranch config.
+
+    If *config_path* is None, resolves the packaged ``worlds/ranch_a.yaml``
+    via :func:`importlib.resources.files`.
 
     Same *seed* + same *config_path* content = identical world evolution.
     """
+    if config_path is None:
+        config_path = _default_world_config()
     rng = random.Random(seed)
 
     # --- Terrain ---

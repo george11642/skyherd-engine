@@ -92,6 +92,7 @@ skyherd-sitl-e2e = "skyherd.drone.e2e:app"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/skyherd"]
+exclude = ["src/skyherd/worlds"]
 
 [tool.hatch.build.targets.wheel.force-include]
 "worlds" = "skyherd/worlds"
