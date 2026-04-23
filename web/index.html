@@ -7,9 +7,12 @@
     <meta name="theme-color" content="#0a0c10" />
     <link rel="manifest" href="/manifest.json" />
     <title>SkyHerd — Ranch Intelligence Platform</title>
-    <!-- Font fallback: preconnect for faster loads if using Google Fonts CDN -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+    <!-- Font preload (Pitfall 4 / DASH-06): exactly 2 variable fonts so the
+         FCP/LCP dominant-font is fetched before CSS parse. -->
+    <link rel="preload" as="font" type="font/woff2"
+          href="/fonts/fraunces-variable.woff2" crossorigin="anonymous" />
+    <link rel="preload" as="font" type="font/woff2"
+          href="/fonts/inter-variable.woff2" crossorigin="anonymous" />
   </head>
   <body>
     <div id="root"></div>

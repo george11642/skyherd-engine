@@ -36,7 +36,7 @@ const AGENT_SHORT: Record<string, string> = {
 
 const MAX_SPARKLINE = 60;
 
-function Sparkline({ values }: { values: number[] }) {
+function Sparkline({ values, stroke }: { values: number[]; stroke?: string }) {
   if (values.length < 2) return null;
   const max = Math.max(...values, 0.001);
   const w = 80;
@@ -57,7 +57,7 @@ function Sparkline({ values }: { values: number[] }) {
       <polyline
         points={pts.join(" ")}
         fill="none"
-        stroke="rgb(148 176 136)"
+        stroke={stroke ?? "rgb(148 176 136)"}
         strokeWidth="1.5"
         strokeLinejoin="round"
         strokeLinecap="round"
@@ -167,12 +167,43 @@ export function CostTicker(props: CostTickerProps = {}) {
         {/* Main cost + sparkline */}
         <div className="flex items-end justify-between gap-3">
           <div className="flex items-baseline gap-2">
-            <AnimatedCost value={totalCost} />
+            <motion.span
+              animate={{
+                opacity: allIdle ? 0.4 : 1,
+                filter: allIdle ? "grayscale(1)" : "grayscale(0)",
+              }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
+              style={{
+                display: "inline-block",
+                // Inline-style fallback: framer-motion drives the eased
+                // transition, but the resting-state style must be applied
+                // synchronously so SSR / jsdom / screenshot readers see the
+                // paused treatment even without a RAF loop.
+                opacity: allIdle ? 0.4 : 1,
+                filter: allIdle ? "grayscale(1)" : "grayscale(0)",
+                transition: "opacity 0.4s ease, filter 0.4s ease",
+              }}
+            >
+              <AnimatedCost value={totalCost} />
+            </motion.span>
             <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.6875rem", color: "var(--color-text-2)" }}>
               cumulative
             </span>
           </div>
-          <Sparkline values={effectiveSparkline} />
+          <Sparkline
+            values={
+              allIdle && effectiveSparkline.length > 0
+                ? // Freeze to two identical endpoints — a literal flat
+                  // baseline, visually paused, and <=2 distinct coords for
+                  // the DASH-03 sparkline-freeze regression guard.
+                  [
+                    effectiveSparkline[effectiveSparkline.length - 1] ?? 0,
+                    effectiveSparkline[effectiveSparkline.length - 1] ?? 0,
+                  ]
+                : effectiveSparkline
+            }
+            stroke={allIdle ? "rgb(110 122 140)" : "rgb(148 176 136)"}
+          />
         </div>
 
         {/* Rate line */}
@@ -198,6 +229,8 @@ export function CostTicker(props: CostTickerProps = {}) {
                 style={{
                   backgroundColor: a.state === "active" ? "rgb(148 176 136 / 0.08)" : "var(--color-bg-2)",
                   borderColor: a.state === "active" ? "rgb(148 176 136 / 0.3)" : "var(--color-line)",
+                  opacity: allIdle ? 0.45 : 1,
+                  transition: "opacity 0.4s ease",
                 }}
                 title={`${a.name}: ${a.state} — $${a.cumulative_cost_usd.toFixed(6)}`}
               >

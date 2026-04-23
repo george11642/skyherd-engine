@@ -114,6 +114,9 @@ export function RanchMap({ snapshot: snapshotProp }: RanchMapProps = {}) {
   const animFrameRef = useRef<number>(0);
   const droneTrailRef = useRef<Array<[number, number]>>([]);
   const prevDroneRef = useRef<[number, number] | null>(null);
+  // Per-predator random phase offset (0..1) so multiple coyote rings pulse
+  // out of sync. Seeded lazily on first frame per predator id.
+  const predatorPhaseRef = useRef<Map<string, number>>(new Map());
 
   // Keep snapshotRef in sync with the snapshot prop across re-renders so tests
   // (and any future prop-driven callers) can re-render with new data.
@@ -309,10 +312,25 @@ export function RanchMap({ snapshot: snapshotProp }: RanchMapProps = {}) {
       const xSize = Math.max(6, Math.round(W * 0.02));
       const ppx = px(rx), ppy = py(ry);
 
-      // Pulsing threat ring (CSS animation handles the pulse; here we just draw a static ring)
+      // Pulsing threat ring — RAF-interpolated alpha so the ring "breathes"
+      // independently of any CSS keyframe engine. Pitfall 6: static alpha
+      // looks stepped at 480p; RAF sin wave reads as continuous motion.
+      const nowS = performance.now() / 1000;
+      let phase = predatorPhaseRef.current.get(pred.id);
+      if (phase === undefined) {
+        phase = Math.random();
+        predatorPhaseRef.current.set(pred.id, phase);
+      }
+      const reduceMotion =
+        typeof window !== "undefined" &&
+        window.matchMedia &&
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const ringAlpha = reduceMotion
+        ? 0.25
+        : 0.1 + 0.2 * Math.abs(Math.sin(((nowS + phase) * Math.PI) / 1.8));
       ctx.beginPath();
       ctx.arc(ppx, ppy, xSize * 1.8, 0, Math.PI * 2);
-      ctx.strokeStyle = "rgba(224,100,90,0.25)";
+      ctx.strokeStyle = `rgba(224,100,90,${ringAlpha})`;
       ctx.lineWidth = 1;
       ctx.stroke();
 

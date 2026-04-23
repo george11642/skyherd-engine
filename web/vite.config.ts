@@ -35,6 +35,16 @@ export default defineConfig({
   build: {
     outDir: "dist",
     sourcemap: false,
+    rollupOptions: {
+      output: {
+        // DASH-06: split the two heaviest canvas components into their own
+        // chunks so the initial bundle stays under the Lighthouse >= 90 budget.
+        manualChunks: {
+          "ranch-map": ["./src/components/RanchMap.tsx"],
+          "cross-ranch": ["./src/components/CrossRanchView.tsx"],
+        },
+      },
+    },
   },
   test: {
     globals: true,
