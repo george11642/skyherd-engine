@@ -1,0 +1,54 @@
+name: Fresh-clone smoke
+
+# BLD-02: prove the README 3-command quickstart works on a clean judge
+# environment. Runs nightly (caught before submission morning) and on
+# manual dispatch (for pre-submission sanity checks). NOT on every PR --
+# 5-min cold-path cost is too expensive for per-PR gating.
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Nightly at 08:00 UTC (covers US + EU morning)
+    - cron: "0 8 * * *"
+
+jobs:
+  fresh-clone-smoke:
+    name: Fresh-clone smoke (<=5 min SLA)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.12"
+          # CRITICAL: no cache -- must simulate true cold judge environment.
+          # Research pitfall #4: caching masks the fresh-clone SLA.
+          enable-cache: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Assert worlds/*.yaml tracked in git (BLD-01 prerequisite)
+        run: |
+          test -f worlds/ranch_a.yaml
+          test -f worlds/ranch_b.yaml
+
+      - name: Run fresh-clone smoke
+        run: bash scripts/fresh_clone_smoke.sh
+
+      - name: Report timing on failure
+        if: failure()
+        run: |
+          echo "Fresh-clone smoke FAILED. Inspect logs above for which step"
+          echo "(uv sync / pnpm / make demo / /health) exceeded budget or errored."
