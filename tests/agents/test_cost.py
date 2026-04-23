@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import json
 
 import pytest
 
@@ -199,3 +200,142 @@ class TestRunTickLoop:
         agg = self._aggregate([t])
         assert agg["all_idle"] is True
         assert agg["rate_per_hr_usd"] == pytest.approx(0.0)
+
+
+class TestMqttPublishCallback:
+    async def test_publish_callback_called_with_topic_and_payload(self):
+        captured: list[tuple[str, bytes]] = []
+
+        async def mock_publish(topic: str, data: bytes) -> None:
+            captured.append((topic, data))
+
+        t = CostTicker(session_id="sess-1", mqtt_publish_callback=mock_publish)
+        t.set_state("active")
+        t._last_tick_time -= 1.0
+        await t.emit_tick()
+        assert len(captured) == 1
+        topic, payload_bytes = captured[0]
+        assert topic == "skyherd/ranch_a/cost/ticker"
+        decoded = json.loads(payload_bytes.decode())
+        assert decoded["session_id"] == "sess-1"
+
+    async def test_publish_callback_failure_swallowed(self):
+        async def failing_publish(topic: str, data: bytes) -> None:
+            raise RuntimeError("mqtt broker down")
+
+        t = CostTicker(session_id="sess-2", mqtt_publish_callback=failing_publish)
+        t.set_state("active")
+        t._last_tick_time -= 1.0
+        # Should not raise
+        result = await t.emit_tick()
+        assert result is not None
+
+
+class TestLedgerCallback:
+    async def test_ledger_callback_called_with_payload(self):
+        captured: list[TickPayload] = []
+
+        async def mock_ledger(payload: TickPayload) -> None:
+            captured.append(payload)
+
+        t = CostTicker(session_id="sess-3", ledger_callback=mock_ledger)
+        t.set_state("active")
+        t._last_tick_time -= 1.0
+        await t.emit_tick()
+        assert len(captured) == 1
+        assert captured[0].session_id == "sess-3"
+
+    async def test_ledger_callback_failure_swallowed(self):
+        async def failing_ledger(payload: TickPayload) -> None:
+            raise RuntimeError("db locked")
+
+        t = CostTicker(session_id="sess-4", ledger_callback=failing_ledger)
+        t.set_state("active")
+        t._last_tick_time -= 1.0
+        result = await t.emit_tick()
+        assert result is not None
+
+
+class TestProperties:
+    async def test_active_s_property(self):
+        t = CostTicker(session_id="sess-prop-1")
+        t.set_state("active")
+        t._last_tick_time -= 10.0
+        await t.emit_tick()
+        assert t.active_s >= 9.0  # ~10s minus wall-clock drift
+
+    async def test_idle_s_property(self):
+        t = CostTicker(session_id="sess-prop-2")
+        t.set_state("idle")
+        t._last_tick_time -= 5.0
+        await t.emit_tick()
+        assert t.idle_s >= 4.0
+
+
+class TestRunTickLoopBody:
+    async def test_loop_ticks_all_tickers(self, monkeypatch):
+        call_count: dict[str, int] = {"a": 0, "b": 0}
+        t_a = CostTicker(session_id="a")
+        t_b = CostTicker(session_id="b")
+        t_a.set_state("active")
+
+        # Save reference to real sleep before monkeypatching so fast_sleep can yield
+        real_sleep = asyncio.sleep
+
+        async def fast_sleep(_: float) -> None:
+            await real_sleep(0)  # Real yield — lets other tasks (stop task) run
+
+        monkeypatch.setattr("skyherd.agents.cost.asyncio.sleep", fast_sleep)
+
+        # Wrap emit_tick to count invocations
+        orig_a = t_a.emit_tick
+        orig_b = t_b.emit_tick
+
+        async def wrapped_a() -> TickPayload | None:
+            call_count["a"] += 1
+            return await orig_a()
+
+        async def wrapped_b() -> TickPayload | None:
+            call_count["b"] += 1
+            return await orig_b()
+
+        t_a.emit_tick = wrapped_a  # type: ignore[method-assign]
+        t_b.emit_tick = wrapped_b  # type: ignore[method-assign]
+
+        stop_event = asyncio.Event()
+
+        async def stop_after_one_iter() -> None:
+            await real_sleep(0)  # Yield to let loop run one iteration
+            stop_event.set()
+
+        task = asyncio.create_task(stop_after_one_iter())
+        await run_tick_loop([t_a, t_b], stop_event)
+        await task
+        assert call_count["a"] >= 1
+        assert call_count["b"] >= 1
+
+    async def test_loop_swallows_ticker_exception(self, monkeypatch):
+        t_boom = CostTicker(session_id="boom")
+
+        async def raising_emit() -> TickPayload | None:
+            raise RuntimeError("tick exploded")
+
+        t_boom.emit_tick = raising_emit  # type: ignore[method-assign]
+
+        real_sleep = asyncio.sleep
+
+        async def fast_sleep(_: float) -> None:
+            await real_sleep(0)
+
+        monkeypatch.setattr("skyherd.agents.cost.asyncio.sleep", fast_sleep)
+
+        stop_event = asyncio.Event()
+
+        async def stop_soon() -> None:
+            await real_sleep(0)
+            stop_event.set()
+
+        task = asyncio.create_task(stop_soon())
+        # Must not raise
+        await run_tick_loop([t_boom], stop_event)
+        await task
