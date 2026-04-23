@@ -85,3 +85,38 @@ class TestSickCowScenario:
         hc = next((e for e in result.event_stream if e.get("type") == "health.check"), None)
         assert hc is not None
         assert hc.get("cow_tag") == "A014"
+
+
+def test_pinkeye_bbox_flows_through_classify_pipeline(
+    sick_pinkeye_world,  # type: ignore[no-untyped-def]
+    tmp_path,
+) -> None:
+    """ClassifyPipeline on a pinkeye-positive world yields a pinkeye detection with real bbox.
+
+    Branch B: uses sick_pinkeye_world fixture (discharge=0.85, disease_flags={'pinkeye'}).
+    The sick_cow scenario's A014 has discharge=0.7, which the MobileNetV3-Small model
+    classifies as class 0 (healthy) due to the binary-class-ceiling (model reliably predicts
+    class 3/escalate only at discharge>=0.8). Branch B uses discharge=0.85 which reliably
+    triggers the pixel path's class 3 output.
+
+    Asserts at least one DetectionResult has head_name='pinkeye', bbox is not None,
+    and bbox coords are within frame bounds (0<=x0<x1<=640, 0<=y0<y1<=480).
+    """
+    from skyherd.vision.pipeline import ClassifyPipeline
+
+    pipeline = ClassifyPipeline()
+    result = pipeline.run(sick_pinkeye_world, "trough_a", out_dir=tmp_path)
+
+    pinkeye_dets = [d for d in result.detections if d.head_name == "pinkeye"]
+    assert pinkeye_dets, (
+        "ClassifyPipeline produced no pinkeye detections on a positive world; "
+        f"all detections: {[d.head_name for d in result.detections]}"
+    )
+    bbox_dets = [d for d in pinkeye_dets if d.bbox is not None]
+    assert bbox_dets, (
+        "pinkeye detections have no bbox — pixel path did not engage"
+    )
+    for d in bbox_dets:
+        x0, y0, x1, y1 = d.bbox  # type: ignore[misc]
+        assert 0 <= x0 < x1 <= 640, f"invalid x coords in bbox: {d.bbox}"
+        assert 0 <= y0 < y1 <= 480, f"invalid y coords in bbox: {d.bbox}"
