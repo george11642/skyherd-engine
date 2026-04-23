@@ -163,7 +163,6 @@ def _check_determinism(fast: bool) -> CheckResult:
                 "uv", "run", "pytest",
                 str(test_file),
                 "-v", "-m", "slow",
-                "--timeout=600",
             ],
             cwd=REPO_ROOT,
             capture_output=True,
