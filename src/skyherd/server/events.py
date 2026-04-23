@@ -36,6 +36,7 @@ AGENT_NAMES = [
     "PredatorPatternLearner",
     "GrazingOptimizer",
     "CalvingWatch",
+    "CrossRanchCoordinator",
 ]
 
 
@@ -175,6 +176,13 @@ _MOCK_LOG_LINES = {
         "Paging rancher: PRIORITY — T031 calving imminent",
         "Wes call initiated via Twilio",
         "Session monitoring — next check in 30 min",
+    ],
+    "CrossRanchCoordinator": [
+        "Neighbor alert received: ranch_a fence_east — coyote confirmed",
+        "Thermal clip fetched for shared fence segment",
+        "Pre-positioning patrol drone (silent handoff — rancher NOT paged)",
+        "Pattern summary written to shared memory /neighbors/ranch_a/",
+        "Session idle — awaiting next neighbor event",
     ],
 }
 

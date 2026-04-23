@@ -58,8 +58,8 @@ def _make_ledger_mock_with_events(count: int = 3) -> MagicMock:
 
 
 @pytest.mark.asyncio
-async def test_live_cost_tick_emits_five_agents() -> None:
-    """DASH-02: live cost.tick carries 5 agent entries via public accessors."""
+async def test_live_cost_tick_emits_six_agents() -> None:
+    """DASH-02 + CRM-01: live cost.tick carries 6 agent entries via public accessors."""
     mesh = _make_mesh_with_public_accessors(state="active")
     bc = EventBroadcaster(mock=False, mesh=mesh, ledger=None, world=MagicMock())
     bc.start()
@@ -72,8 +72,8 @@ async def test_live_cost_tick_emits_five_agents() -> None:
 
         tick = await asyncio.wait_for(first_cost_tick(), timeout=5.0)
         assert "agents" in tick, f"cost.tick missing 'agents' key: {tick}"
-        assert len(tick["agents"]) == 5, (
-            f"Expected 5 agents from 5-ticker mesh, got {len(tick['agents'])}."
+        assert len(tick["agents"]) == 6, (
+            f"Expected 6 agents from 6-ticker mesh, got {len(tick['agents'])}."
         )
         for a in tick["agents"]:
             assert isinstance(a.get("cumulative_cost_usd"), (int, float))

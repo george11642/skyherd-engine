@@ -84,12 +84,13 @@ async def test_snapshot_has_drone(client):
 
 
 @pytest.mark.asyncio
-async def test_agents_returns_five_agents(client):
+async def test_agents_returns_six_agents(client):
+    """Phase 02 adds CrossRanchCoordinator → 6 agents total."""
     resp = await client.get("/api/agents")
     assert resp.status_code == 200
     data = resp.json()
     assert "agents" in data
-    assert len(data["agents"]) == 5
+    assert len(data["agents"]) == 6
 
 
 @pytest.mark.asyncio

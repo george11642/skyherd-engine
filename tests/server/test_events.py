@@ -44,7 +44,7 @@ def test_mock_world_snapshot_cow_positions():
 def test_mock_cost_tick_shape():
     tick = _mock_cost_tick(1)
     assert "agents" in tick
-    assert len(tick["agents"]) == 5
+    assert len(tick["agents"]) == 6
     assert "all_idle" in tick
     assert "rate_per_hr_usd" in tick
     assert "total_cumulative_usd" in tick

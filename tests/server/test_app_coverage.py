@@ -138,9 +138,10 @@ async def test_live_attest_uses_ledger(live_client):
 # ---------------------------------------------------------------------------
 
 
-def test_mock_agent_statuses_returns_five():
+def test_mock_agent_statuses_returns_six():
+    """Phase 02 adds CrossRanchCoordinator → 6 agents total."""
     result = _mock_agent_statuses()
-    assert len(result) == 5
+    assert len(result) == 6
 
 
 def test_mock_agent_statuses_have_required_keys():
@@ -160,7 +161,7 @@ def test_mock_agent_statuses_state_values():
         assert agent["state"] in ("active", "idle")
 
 
-def test_mock_agent_statuses_all_five_agent_names():
+def test_mock_agent_statuses_all_six_agent_names():
     result = _mock_agent_statuses()
     names = {a["name"] for a in result}
     assert names == set(AGENT_NAMES)
@@ -174,7 +175,7 @@ def test_mock_agent_statuses_all_five_agent_names():
 def test_live_agent_statuses_extracts_session_fields():
     mesh = _make_mock_mesh()
     result = _live_agent_statuses(mesh)
-    assert len(result) == 5
+    assert len(result) == 6
     for agent in result:
         assert "name" in agent
         assert "state" in agent
@@ -270,8 +271,8 @@ def test_real_cost_tick_via_public_accessors() -> None:
     bc = EventBroadcaster(mock=False, mesh=mesh, ledger=None, world=MagicMock())
     tick = bc._real_cost_tick()
     assert "agents" in tick
-    assert len(tick["agents"]) == 5, (
-        f"Expected 5 agents via public API, got {len(tick['agents'])}. "
+    assert len(tick["agents"]) == 6, (
+        f"Expected 6 agents via public API, got {len(tick['agents'])}. "
         "Fix: _real_cost_tick must call mesh.agent_tickers() not mesh._session_manager._tickers."
     )
     for a in tick["agents"]:
@@ -282,6 +283,7 @@ def test_real_cost_tick_via_public_accessors() -> None:
             "PredatorPatternLearner",
             "GrazingOptimizer",
             "CalvingWatch",
+            "CrossRanchCoordinator",
         }
     assert tick["all_idle"] is False
 
@@ -476,7 +478,7 @@ def test_agents_live_session_ids() -> None:
     # Response shape may be {"agents": [...]} or a bare list — accept both
     agents = body.get("agents") if isinstance(body, dict) else body
     assert isinstance(agents, list), f"Expected list of agents, got {type(agents)}"
-    assert len(agents) == 5, f"DASH-06: expected 5 agents via live path, got {len(agents)}"
+    assert len(agents) == 6, f"DASH-06: expected 6 agents via live path, got {len(agents)}"
 
     session_id_re = re.compile(r"^sess_[a-z_]+$")
     expected_names = {
@@ -485,6 +487,7 @@ def test_agents_live_session_ids() -> None:
         "PredatorPatternLearner",
         "GrazingOptimizer",
         "CalvingWatch",
+        "CrossRanchCoordinator",
     }
     seen_names: set[str] = set()
     for entry in agents:

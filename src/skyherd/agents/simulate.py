@@ -417,6 +417,69 @@ def predator_pattern_learner(
 
 
 # ---------------------------------------------------------------------------
+# CrossRanchCoordinator
+# ---------------------------------------------------------------------------
+
+
+def cross_ranch_coordinator(
+    wake_event: dict[str, Any],
+    session: Session,
+) -> list[dict[str, Any]]:
+    """Deterministic simulation path for CrossRanchCoordinator (Phase 02 CRM-01).
+
+    Always emits three tool calls — no page_rancher on leading indicators:
+    1. ``get_thermal_clip`` — correlate our side of the shared fence.
+    2. ``launch_drone`` — mission ``neighbor_pre_position_patrol`` (silent).
+    3. ``log_agent_event`` — ``event_type="neighbor_handoff"``,
+       ``response_mode="pre_position"``.
+
+    Pure function: no datetime, no uuid, no random, no time.time().
+    """
+    from_ranch = str(wake_event.get("from_ranch", "unknown"))
+    shared_fence = str(wake_event.get("shared_fence", "unknown"))
+    species = str(wake_event.get("species", "unknown"))
+    confidence = float(wake_event.get("confidence", 0.0))
+    ranch_id = str(wake_event.get("ranch_id", "ranch_b"))
+
+    patrol_lat = 34.123
+    patrol_lon = -106.456
+    note = (
+        f"Cross-ranch alert from {from_ranch}: {species} confirmed "
+        f"(confidence={confidence:.0%}) near {shared_fence}. "
+        "Pre-positioning patrol; no rancher page (leading indicator only)."
+    )
+
+    return [
+        {
+            "tool": "get_thermal_clip",
+            "input": {"segment": shared_fence, "ranch_id": ranch_id},
+        },
+        {
+            "tool": "launch_drone",
+            "input": {
+                "mission": "neighbor_pre_position_patrol",
+                "target_lat": patrol_lat,
+                "target_lon": patrol_lon,
+                "alt_m": 60.0,
+                "note": note,
+            },
+        },
+        {
+            "tool": "log_agent_event",
+            "input": {
+                "event_type": "neighbor_handoff",
+                "ranch_id": ranch_id,
+                "from_ranch": from_ranch,
+                "species": species,
+                "confidence": confidence,
+                "shared_fence": shared_fence,
+                "response_mode": "pre_position",
+            },
+        },
+    ]
+
+
+# ---------------------------------------------------------------------------
 # Dispatch table
 # ---------------------------------------------------------------------------
 
@@ -428,6 +491,7 @@ HANDLERS: dict[str, _HandlerFn] = {
     "HerdHealthWatcher": herd_health_watcher,
     "CalvingWatch": calving_watch,
     "PredatorPatternLearner": predator_pattern_learner,
+    "CrossRanchCoordinator": cross_ranch_coordinator,
 }
 
 

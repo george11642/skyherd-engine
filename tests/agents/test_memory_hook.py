@@ -242,16 +242,19 @@ class TestHookFailureIsolation:
 
 class TestMeshEnsureMemoryStores:
     @pytest.mark.asyncio
-    async def test_creates_six_stores(self, tmp_path, monkeypatch):
+    async def test_creates_seven_stores(self, tmp_path, monkeypatch):
+        """Phase 02 adds CrossRanchCoordinator as the 6th agent → 7 stores total
+        (1 shared + 6 per-agent)."""
         monkeypatch.chdir(tmp_path)
         from skyherd.agents.mesh import AgentMesh
 
         mesh = AgentMesh()
         ids = await mesh._ensure_memory_stores()
-        assert len(ids) == 6
+        assert len(ids) == 7
         assert "_shared" in ids
         for name in ["FenceLineDispatcher", "HerdHealthWatcher",
-                     "PredatorPatternLearner", "GrazingOptimizer", "CalvingWatch"]:
+                     "PredatorPatternLearner", "GrazingOptimizer", "CalvingWatch",
+                     "CrossRanchCoordinator"]:
             assert name in ids
             assert ids[name].startswith("memstore_")
 
