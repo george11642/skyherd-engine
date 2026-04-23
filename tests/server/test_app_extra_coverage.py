@@ -12,17 +12,14 @@ from __future__ import annotations
 
 import asyncio
 import time
-from pathlib import Path
 from typing import Any
 from unittest.mock import MagicMock
 
 import pytest
-import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 
 from skyherd.server.app import create_app
 from skyherd.server.events import AGENT_NAMES, EventBroadcaster
-
 
 # ---------------------------------------------------------------------------
 # Shared helpers
@@ -234,7 +231,7 @@ async def test_vet_intake_loop_broadcasts_new_md_files(tmp_path, monkeypatch) ->
             b._stop_event.set()
             try:
                 await asyncio.wait_for(task, timeout=1.0)
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 task.cancel()
 
         evt, payload = item

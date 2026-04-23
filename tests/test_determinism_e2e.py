@@ -67,7 +67,7 @@ def test_demo_seed42_is_deterministic_3x() -> None:
     the previous 2-run check).
     """
     hashes: list[str] = []
-    for run_idx in range(3):
+    for _run_idx in range(3):
         sanitized = _sanitize(_run_demo(42))
         hashes.append(_md5(sanitized))
 

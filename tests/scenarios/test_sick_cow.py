@@ -160,8 +160,9 @@ class TestSickCowScenario:
 
         # Phase 2 VIS-05 prerequisite — skip gracefully if upstream phase has not landed
         try:
-            from skyherd.vision.heads.pinkeye import Pinkeye  # noqa: F401
             from skyherd.vision.types import DetectionResult  # noqa: F401
+
+            from skyherd.vision.heads.pinkeye import Pinkeye  # noqa: F401
 
             # Verify bbox field exists on DetectionResult
             if not hasattr(DetectionResult, "model_fields") or "bbox" not in DetectionResult.model_fields:

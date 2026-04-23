@@ -9,12 +9,11 @@ pixel-path + model loader.
 
 from __future__ import annotations
 
+import ast
 import time
 from pathlib import Path
+from statistics import median as _median
 
-import pytest
-
-from skyherd.vision.renderer import render_trough_frame
 from skyherd.world.cattle import Cow
 
 
@@ -285,11 +284,6 @@ def test_bounds_m_override_accepted(
 # ---------------------------------------------------------------------------
 # Plan 05 required named tests (aliased or supplemental)
 # ---------------------------------------------------------------------------
-
-
-import ast
-import time
-from statistics import median as _median
 
 
 def test_positive_frame_triggers_non_healthy_detection(

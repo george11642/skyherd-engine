@@ -8,11 +8,9 @@ from __future__ import annotations
 from pathlib import Path
 
 import numpy as np
-import pytest
 import torch
 
 from skyherd.world.cattle import Cow
-
 
 # ---------------------------------------------------------------------------
 # preprocess tests
@@ -101,8 +99,9 @@ def test_load_frame_as_array(tmp_path: Path) -> None:
 
 def test_preprocess_normalizes_to_imagenet() -> None:
     """_PREPROCESS pipeline normalizes to ImageNet stats (mean ~0.449 for 128-gray input)."""
-    from skyherd.vision.preprocess import _PREPROCESS
     from PIL import Image
+
+    from skyherd.vision.preprocess import _PREPROCESS
 
     # 128/255 grey image
     gray_img = Image.fromarray(np.full((224, 224, 3), 128, dtype=np.uint8))
