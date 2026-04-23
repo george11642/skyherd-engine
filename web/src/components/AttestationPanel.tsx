@@ -55,13 +55,41 @@ export interface AttestationPanelProps {
   onToggle?: () => void;
 }
 
+type VerifyState = "idle" | "verifying" | "valid" | "invalid" | "error";
+
+interface VerifyResult {
+  valid: boolean;
+  total: number;
+  first_bad_seq?: number | null;
+  reason?: string | null;
+}
+
 export function AttestationPanel({ collapsed = false, onToggle }: AttestationPanelProps) {
   const [entries, setEntries] = useState<LedgerEntry[]>([]);
   const [expanded, setExpanded] = useState<number | null>(null);
+  const [verifyState, setVerifyState] = useState<VerifyState>("idle");
+  const [verifyResult, setVerifyResult] = useState<VerifyResult | null>(null);
 
   const handleAppend = useCallback((entry: LedgerEntry) => {
     setEntries((prev) => [...prev, entry].slice(-MAX_ENTRIES));
   }, []);
+
+  const handleVerifyClick = useCallback(
+    async (e: React.MouseEvent<HTMLButtonElement>) => {
+      // Prevent the header-button toggle from firing.
+      e.stopPropagation();
+      setVerifyState("verifying");
+      try {
+        const resp = await fetch("/api/attest/verify", { method: "POST" });
+        const data = (await resp.json()) as VerifyResult;
+        setVerifyResult(data);
+        setVerifyState(data.valid ? "valid" : "invalid");
+      } catch {
+        setVerifyState("error");
+      }
+    },
+    [],
+  );
 
   useEffect(() => {
     const sse = getSSE();
@@ -102,34 +130,72 @@ export function AttestationPanel({ collapsed = false, onToggle }: AttestationPan
       }}
       aria-label="Attestation chain"
     >
-      {/* Header */}
-      <button
-        className="flex items-center justify-between px-3 py-2 shrink-0 border-b w-full text-left"
-        style={{ borderColor: "var(--color-line)", background: "transparent" }}
-        onClick={onToggle}
-        aria-expanded={!collapsed}
-        aria-controls="attest-body"
+      {/* Header — two buttons side by side (toggle + verify) to avoid nested <button> */}
+      <div
+        className="flex items-center justify-between px-3 py-2 shrink-0 border-b"
+        style={{ borderColor: "var(--color-line)" }}
       >
-        <span
-          className="font-semibold leading-none"
-          style={{
-            fontFamily: "var(--font-display)",
-            fontSize: "0.8125rem",
-            letterSpacing: "-0.01em",
-            color: "var(--color-text-0)",
-          }}
+        <button
+          type="button"
+          className="flex-1 flex items-center gap-2 text-left min-w-0"
+          style={{ background: "transparent" }}
+          onClick={onToggle}
+          aria-expanded={!collapsed}
+          aria-controls="attest-body"
         >
-          Attestation Chain
-        </span>
-        <div className="flex items-center gap-2">
+          <span
+            className="font-semibold leading-none"
+            style={{
+              fontFamily: "var(--font-display)",
+              fontSize: "0.8125rem",
+              letterSpacing: "-0.01em",
+              color: "var(--color-text-0)",
+            }}
+          >
+            Attestation Chain
+          </span>
           <span className="chip chip-muted tabnum">
             {entries.length} entries
           </span>
-          <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.625rem", color: "var(--color-text-2)" }}>
+        </button>
+        <div className="flex items-center gap-2">
+          {verifyState === "valid" && (
+            <span className="chip chip-sage tabnum" aria-live="polite">
+              VALID · {verifyResult?.total ?? 0}
+            </span>
+          )}
+          {verifyState === "invalid" && (
+            <span className="chip chip-danger tabnum" aria-live="polite">
+              INVALID @ {verifyResult?.first_bad_seq ?? "?"}
+            </span>
+          )}
+          {verifyState === "error" && (
+            <span className="chip chip-warn tabnum" aria-live="polite">
+              VERIFY ERROR
+            </span>
+          )}
+          <button
+            type="button"
+            onClick={handleVerifyClick}
+            disabled={verifyState === "verifying"}
+            className="chip chip-sky tabnum"
+            style={{ cursor: verifyState === "verifying" ? "wait" : "pointer" }}
+            aria-label="Verify attestation chain"
+          >
+            {verifyState === "verifying" ? "Verifying…" : "Verify"}
+          </button>
+          <span
+            aria-hidden
+            style={{
+              fontFamily: "var(--font-mono)",
+              fontSize: "0.625rem",
+              color: "var(--color-text-2)",
+            }}
+          >
             {collapsed ? "▲" : "▼"}
           </span>
         </div>
-      </button>
+      </div>
 
       {/* Table */}
       {!collapsed && (
