@@ -12,6 +12,8 @@ Security contract
 from __future__ import annotations
 
 import logging
+import shutil
+from datetime import UTC, datetime
 from pathlib import Path
 
 from cryptography.exceptions import InvalidSignature
@@ -92,6 +94,62 @@ class Signer:
     def __repr__(self) -> str:  # pragma: no cover — elides private key
         pub_snippet = self.public_key_pem.splitlines()[1][:12]
         return f"Signer(pubkey={pub_snippet!r}...)"
+
+    # ------------------------------------------------------------------
+    # Rotation
+    # ------------------------------------------------------------------
+
+    @classmethod
+    def rotate(
+        cls,
+        current_path: Path | str,
+        archive_dir: Path | str,
+        *,
+        timestamp: str | None = None,
+    ) -> Signer:
+        """Rotate the Ed25519 signing key in-place.
+
+        Steps:
+          1. Copy the current private key at ``current_path`` to
+             ``archive_dir / f"{timestamp}.pem"`` (mode 0600). Archived keys
+             are retained so any old ledger row whose ``pubkey`` column holds
+             the archived public key can still be verified.
+          2. Generate a fresh ``Signer`` and write it to ``current_path``.
+          3. Return the new ``Signer``.
+
+        The archived file is a standard PEM; callers can re-load with
+        :meth:`Signer.from_file` to recover the archived pubkey if needed.
+
+        ``timestamp`` defaults to ``datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")``;
+        it is injectable for deterministic tests.
+
+        Raises:
+            FileNotFoundError: if ``current_path`` does not exist.
+        """
+        current = Path(current_path)
+        archive = Path(archive_dir)
+        if not current.exists():
+            raise FileNotFoundError(f"No key at {current} — nothing to rotate.")
+
+        archive.mkdir(parents=True, exist_ok=True)
+
+        ts = timestamp or datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
+        archive_path = archive / f"{ts}.pem"
+
+        # Avoid clobbering an existing archive entry (same-second rotation).
+        if archive_path.exists():
+            suffix = 1
+            while (archive / f"{ts}-{suffix}.pem").exists():
+                suffix += 1
+            archive_path = archive / f"{ts}-{suffix}.pem"
+
+        shutil.copy2(current, archive_path)
+        archive_path.chmod(0o600)
+
+        new_signer = cls.generate()
+        new_signer.save(current)
+        log.info("Rotated signer key: archived old to %s", archive_path)
+        return new_signer
 
 
 # ---------------------------------------------------------------------------

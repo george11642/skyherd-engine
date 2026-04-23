@@ -154,3 +154,76 @@ class TestSignVerify:
         sig = signer.sign(msg)
         for _ in range(5):
             assert verify(signer.public_key_pem, msg, sig)
+
+
+# ---------------------------------------------------------------------------
+# Rotation (Phase 4 — ATT-02)
+# ---------------------------------------------------------------------------
+
+
+class TestSignerRotate:
+    def test_rotate_archives_old_key_and_creates_new(
+        self, tmp_path: Path
+    ) -> None:
+        key_path = tmp_path / "attest.key.pem"
+        archive = tmp_path / "archive"
+        original = Signer.generate()
+        original.save(key_path)
+        original_pub = original.public_key_pem
+
+        rotated = Signer.rotate(key_path, archive, timestamp="20260423T210000Z")
+
+        # New signer returned with different pubkey
+        assert isinstance(rotated, Signer)
+        assert rotated.public_key_pem != original_pub
+
+        # Archive exists with original pubkey recoverable
+        archived = archive / "20260423T210000Z.pem"
+        assert archived.exists()
+        recovered = Signer.from_file(archived)
+        assert recovered.public_key_pem == original_pub
+
+        # Current key path now holds the new signer
+        on_disk = Signer.from_file(key_path)
+        assert on_disk.public_key_pem == rotated.public_key_pem
+
+    def test_rotate_archive_mode_600(self, tmp_path: Path) -> None:
+        key_path = tmp_path / "k.pem"
+        archive = tmp_path / "a"
+        Signer.generate().save(key_path)
+        Signer.rotate(key_path, archive, timestamp="20260423T210001Z")
+        archived = archive / "20260423T210001Z.pem"
+        mode = archived.stat().st_mode & 0o777
+        assert mode == 0o600
+
+    def test_rotate_collision_appends_suffix(self, tmp_path: Path) -> None:
+        key_path = tmp_path / "k.pem"
+        archive = tmp_path / "a"
+        Signer.generate().save(key_path)
+        Signer.rotate(key_path, archive, timestamp="20260423T210002Z")
+        # Second rotation at same timestamp string — must not clobber
+        Signer.rotate(key_path, archive, timestamp="20260423T210002Z")
+        files = sorted(p.name for p in archive.iterdir())
+        assert "20260423T210002Z.pem" in files
+        assert "20260423T210002Z-1.pem" in files
+
+    def test_rotate_missing_key_raises(self, tmp_path: Path) -> None:
+        with pytest.raises(FileNotFoundError):
+            Signer.rotate(tmp_path / "nope.pem", tmp_path / "arch")
+
+    def test_rotate_default_timestamp(self, tmp_path: Path) -> None:
+        """No ``timestamp`` arg → current UTC time used; file matches YYYYMMDDTHHMMSSZ."""
+        key_path = tmp_path / "k.pem"
+        archive = tmp_path / "a"
+        Signer.generate().save(key_path)
+        Signer.rotate(key_path, archive)
+        files = list(archive.iterdir())
+        assert len(files) == 1
+        name = files[0].name
+        # Matches 8digits+T+6digits+Z (with optional -N suffix)
+        assert name.endswith(".pem")
+        stem = name[:-4]
+        core = stem.split("-")[0]
+        assert len(core) == 16  # YYYYMMDDTHHMMSSZ
+        assert core[8] == "T"
+        assert core.endswith("Z")

@@ -65,18 +65,35 @@ async def post_cycle_write(
     # Dual-receipt pairing: Ed25519 ledger + SSE fan-out.
     if ledger is not None:
         try:
-            ledger.append(
-                source="memory",
-                kind="memver.written",
-                payload={
-                    "agent": agent_name,
-                    "memory_store_id": store_id,
-                    "memory_id": memory.id,
-                    "memory_version_id": memory.memory_version_id,
-                    "content_sha256": memory.content_sha256,
-                    "path": memory.path,
-                },
-            )
+            # memver_id kwarg is Phase-4 only; fall back to the pre-Phase-4
+            # signature if the underlying ledger does not support it.
+            try:
+                ledger.append(
+                    source="memory",
+                    kind="memver.written",
+                    payload={
+                        "agent": agent_name,
+                        "memory_store_id": store_id,
+                        "memory_id": memory.id,
+                        "memory_version_id": memory.memory_version_id,
+                        "content_sha256": memory.content_sha256,
+                        "path": memory.path,
+                    },
+                    memver_id=memory.memory_version_id,
+                )
+            except TypeError:  # noqa: PERF203 — narrow compat fallback
+                ledger.append(
+                    source="memory",
+                    kind="memver.written",
+                    payload={
+                        "agent": agent_name,
+                        "memory_store_id": store_id,
+                        "memory_id": memory.id,
+                        "memory_version_id": memory.memory_version_id,
+                        "content_sha256": memory.content_sha256,
+                        "path": memory.path,
+                    },
+                )
         except Exception as exc:  # noqa: BLE001
             logger.warning(
                 "ledger.append failed for memver %s: %s",

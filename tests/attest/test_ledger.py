@@ -352,3 +352,106 @@ class TestVerifyResult:
         d = result.model_dump()
         assert "valid" in d
         assert "total" in d
+
+
+# ---------------------------------------------------------------------------
+# Memver pairing (Phase 4 — ATT-04)
+# ---------------------------------------------------------------------------
+
+
+class TestMemverPairing:
+    def test_append_with_memver_id_persists_field(self, ledger: Ledger) -> None:
+        event = ledger.append(
+            "memory", "memver.written", {"agent": "A"},
+            memver_id="memver_abc123",
+        )
+        assert event.memver_id == "memver_abc123"
+
+    def test_memver_id_reread_via_iter_events(self, ledger: Ledger) -> None:
+        ledger.append("memory", "memver.written", {"a": 1}, memver_id="memver_x")
+        ledger.append("memory", "memver.written", {"a": 2})  # no memver
+        events = list(ledger.iter_events())
+        assert events[0].memver_id == "memver_x"
+        assert events[1].memver_id is None
+
+    def test_memver_id_bound_in_canonical_json(self, ledger: Ledger) -> None:
+        event = ledger.append("s", "k", {"v": 1}, memver_id="memver_bound")
+        assert '"_memver_id":"memver_bound"' in event.payload_json
+
+    def test_memver_id_tamper_detected_via_verify(self, ledger: Ledger) -> None:
+        ledger.append("s", "k", {"v": 1}, memver_id="memver_real")
+        # Tamper: swap the _memver_id in the payload_json column.
+        ledger._conn.execute(
+            "UPDATE events SET payload_json = REPLACE(payload_json, 'memver_real', 'memver_fake')"
+        )
+        ledger._conn.commit()
+        result = ledger.verify()
+        assert result.valid is False
+
+    def test_memver_id_empty_string_treated_as_none(self, ledger: Ledger) -> None:
+        """Empty/falsy memver_id means the row does NOT bind the pairing."""
+        event = ledger.append("s", "k", {"v": 1}, memver_id="")
+        assert event.memver_id == ""
+        assert "_memver_id" not in event.payload_json
+
+
+# ---------------------------------------------------------------------------
+# Mid-chain rotation (Phase 4 — ATT-02)
+# ---------------------------------------------------------------------------
+
+
+class TestMidChainRotation:
+    def test_rotation_mid_chain_verify_still_valid(
+        self, tmp_path: Path
+    ) -> None:
+        """Start key A → 3 events → rotate → key B → 3 events → verify all 6."""
+        key_path = tmp_path / "key.pem"
+        archive = tmp_path / "archive"
+        signer_a = Signer.generate()
+        signer_a.save(key_path)
+
+        db = tmp_path / "chain.db"
+        ledger_a = Ledger.open(db, signer_a)
+        for i in range(3):
+            ledger_a.append("sensor", "reading", {"i": i})
+        # Close the ledger's handle to the DB so the new ledger can reopen.
+        ledger_a._conn.close()
+
+        # Rotate key on disk.
+        signer_b = Signer.rotate(
+            key_path, archive, timestamp="20260423T210100Z"
+        )
+        assert signer_b.public_key_pem != signer_a.public_key_pem
+
+        # Re-open the ledger with the new signer — previously written rows
+        # remain, chain continues.
+        ledger_b = Ledger.open(db, signer_b)
+        for i in range(3, 6):
+            ledger_b.append("sensor", "reading", {"i": i})
+
+        result = ledger_b.verify()
+        assert result.valid is True, result.reason
+        assert result.total == 6
+        ledger_b._conn.close()
+
+    def test_rotation_preserves_first_row_pubkey(self, tmp_path: Path) -> None:
+        """Pre-rotation rows keep verifying against their original pubkey column."""
+        key_path = tmp_path / "key.pem"
+        archive = tmp_path / "archive"
+        signer_a = Signer.generate()
+        pub_a = signer_a.public_key_pem
+        signer_a.save(key_path)
+
+        db = tmp_path / "chain2.db"
+        ledger_a = Ledger.open(db, signer_a)
+        ledger_a.append("s", "k", {"v": 1})
+        ledger_a._conn.close()
+
+        signer_b = Signer.rotate(
+            key_path, archive, timestamp="20260423T210200Z"
+        )
+
+        ledger_b = Ledger.open(db, signer_b)
+        events = list(ledger_b.iter_events())
+        assert events[0].pubkey == pub_a  # pre-rotation pubkey preserved
+        ledger_b._conn.close()

@@ -70,6 +70,7 @@ class Event(BaseModel):
     event_hash: str
     signature: str  # hex
     pubkey: str  # PEM
+    memver_id: str | None = None  # optional Phase-1 memory version pairing
 
 
 class VerifyResult(BaseModel):
@@ -164,10 +165,33 @@ class Ledger:
     # Write path
     # ------------------------------------------------------------------
 
-    def append(self, source: str, kind: str, payload: dict) -> Event:
-        """Append one event atomically; returns the committed Event."""
+    def append(
+        self,
+        source: str,
+        kind: str,
+        payload: dict,
+        *,
+        memver_id: str | None = None,
+    ) -> Event:
+        """Append one event atomically; returns the committed Event.
+
+        When ``memver_id`` is non-empty, it is injected into the payload under
+        the reserved key ``_memver_id`` before canonical-JSON hashing. This
+        makes the two-receipts-agree pairing tamper-evident: any mutation of
+        the paired memory version id invalidates the event hash.
+        """
         ts_iso = datetime.fromtimestamp(self._ts(), tz=UTC).isoformat()
-        canonical_payload = _canonical_json(payload)
+
+        # Bind memver_id into the payload BEFORE canonical-JSON hashing so
+        # tamper-evidence covers the pairing. Use a reserved underscore prefix
+        # to avoid colliding with caller-supplied keys.
+        if memver_id:
+            bound_payload = dict(payload)
+            bound_payload["_memver_id"] = memver_id
+        else:
+            bound_payload = payload
+
+        canonical_payload = _canonical_json(bound_payload)
         prev_hash = self._last_hash()
 
         raw_hash = _compute_hash(prev_hash, canonical_payload, ts_iso, source, kind)
@@ -209,6 +233,7 @@ class Ledger:
             event_hash=event_hash_hex,
             signature=sig_hex,
             pubkey=pubkey,
+            memver_id=memver_id,
         )
 
     # ------------------------------------------------------------------
@@ -228,6 +253,18 @@ class Ledger:
             (since_seq,),
         )
         for row in cur:
+            # Best-effort extract of _memver_id from payload_json so Event
+            # round-trips the pairing without a dedicated column.
+            memver_id: str | None = None
+            try:
+                parsed = json.loads(row[4])
+                if isinstance(parsed, dict):
+                    raw = parsed.get("_memver_id")
+                    if isinstance(raw, str):
+                        memver_id = raw
+            except (ValueError, TypeError):
+                pass
+
             yield Event(
                 seq=row[0],
                 ts_iso=row[1],
@@ -238,6 +275,7 @@ class Ledger:
                 event_hash=row[6],
                 signature=row[7],
                 pubkey=row[8],
+                memver_id=memver_id,
             )
 
     def export_jsonl(self, path: Path | str) -> None:
