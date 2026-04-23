@@ -118,12 +118,14 @@ class PymavlinkBackend(DroneBackend):
             dialect="ardupilotmega",
         )
         deadline = time.monotonic() + _CONNECT_TIMEOUT_S
+        # pymavlink has no stubs for mavfile subclasses; recv_match/wait_heartbeat/
+        # target_system all exist at runtime on UDP connection objects
         while time.monotonic() < deadline:
-            msg = conn.recv_match(type="HEARTBEAT", blocking=True, timeout=2.0)
+            msg = conn.recv_match(type="HEARTBEAT", blocking=True, timeout=2.0)  # type: ignore[call-arg]
             if msg:
-                logger.info("PymavlinkBackend heartbeat from sysid=%d", conn.target_system)
-                conn.wait_heartbeat(timeout=2.0)
-                return conn
+                logger.info("PymavlinkBackend heartbeat from sysid=%d", conn.target_system)  # type: ignore[attr-defined]
+                conn.wait_heartbeat(timeout=2.0)  # type: ignore[attr-defined]
+                return conn  # type: ignore[return-value]
         raise DroneUnavailable(f"No heartbeat received within {_CONNECT_TIMEOUT_S:.0f} s")
 
     async def takeoff(self, alt_m: float = 30.0) -> None:

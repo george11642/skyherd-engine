@@ -305,8 +305,10 @@ async def test_telemetry_debug_log_on_transient_failure(caplog) -> None:  # type
     import logging
 
     async def _armed_raise():
-        raise RuntimeError("stream not ready")
-        yield  # make it an async generator  # noqa: unreachable
+        # Raise on first iteration; the if-False branch keeps this an async generator
+        if True:
+            raise RuntimeError("stream not ready")
+        yield  # noqa: RET505 — unreachable; needed to declare async generator type
 
     backend, mock_sdk = await _connected_backend(battery_pct=80.0)
     # Replace the armed() stream with one that raises immediately

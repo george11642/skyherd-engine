@@ -111,7 +111,8 @@ def create_app(
 
     # Managed Agents webhook router — POST /webhooks/managed-agents
     try:
-        from skyherd.agents.webhook import webhook_router, set_mesh as _set_webhook_mesh
+        from skyherd.agents.webhook import set_mesh as _set_webhook_mesh
+        from skyherd.agents.webhook import webhook_router
         app.include_router(webhook_router)
         if mesh is not None:
             _set_webhook_mesh(mesh)
