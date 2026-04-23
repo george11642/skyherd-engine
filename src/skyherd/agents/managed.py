@@ -103,6 +103,31 @@ class ManagedSession:
 
 
 # ---------------------------------------------------------------------------
+# Tool config builder (MEM-11)
+# ---------------------------------------------------------------------------
+
+
+def _build_tools_config(agent_spec: Any) -> dict[str, Any]:
+    """Build the tools config for a managed agent.
+
+    Default: ``agent_toolset_20260401`` with ``default_config.enabled=True``.
+    If ``agent_spec.disable_tools`` is non-empty, emit explicit per-tool
+    disables.
+
+    MEM-11: CalvingWatch + GrazingOptimizer disable ``web_search`` + ``web_fetch``
+    for determinism (preserves ``make demo SEED=42 SCENARIO=all`` byte-identical).
+    """
+    cfg: dict[str, Any] = {
+        "type": "agent_toolset_20260401",
+        "default_config": {"enabled": True},
+    }
+    disable = getattr(agent_spec, "disable_tools", None) or []
+    if disable:
+        cfg["configs"] = [{"name": t, "enabled": False} for t in disable]
+    return cfg
+
+
+# ---------------------------------------------------------------------------
 # ManagedSessionManager
 # ---------------------------------------------------------------------------
 
@@ -136,6 +161,7 @@ class ManagedSessionManager:
         agent_ids_path: str = "runtime/agent_ids.json",
         mqtt_publish_callback: Any | None = None,
         ledger_callback: Any | None = None,
+        memory_store_ids: dict[str, str] | None = None,
     ) -> None:
         import anthropic
 
@@ -154,6 +180,8 @@ class ManagedSessionManager:
         self._sessions: dict[str, ManagedSession] = {}  # local_id → ManagedSession
         self._mqtt_publish = mqtt_publish_callback
         self._ledger = ledger_callback
+        # MEM-01: per-agent + _shared memory store IDs populated by AgentMesh startup.
+        self._memory_store_ids: dict[str, str] = memory_store_ids or {}
 
         # Load persisted agent IDs if available
         if self._agent_ids_path.exists():
@@ -217,9 +245,7 @@ class ManagedSessionManager:
             name=agent_spec.name,
             model=agent_spec.model,
             system=system_prompt or f"You are {agent_spec.name} for SkyHerd.",
-            tools=[
-                {"type": "agent_toolset_20260401", "default_config": {"enabled": True}},
-            ],
+            tools=[_build_tools_config(agent_spec)],
         )
 
         self._agent_ids[agent_spec.name] = agent.id
@@ -233,15 +259,46 @@ class ManagedSessionManager:
     # ------------------------------------------------------------------
 
     async def create_session_async(self, agent_spec: Any) -> ManagedSession:
-        """Create a new MA session for *agent_spec* (async)."""
+        """Create a new MA session for *agent_spec* (async).
+
+        Attaches memory stores as session ``resources`` via ``extra_body`` —
+        the anthropic 0.96 SDK's typed Resource union lacks ``memory_store``,
+        so we smuggle the field via extra_body. Confirmed PASS by A1 probe
+        against the live API 2026-04-23 (docs/A1_PROBE_RESULT.md).
+
+        Per-agent store gets ``access: read_write``; shared store gets
+        ``access: read_only``. Field name is ``access`` (NOT ``mode``) per the
+        A1 probe schema finding — ``mode`` triggers 400 "Extra inputs".
+        """
         agent_id = await self.ensure_agent(agent_spec)
         env_id = await self._ensure_environment()
 
-        platform_session = await self._client.beta.sessions.create(
-            agent=agent_id,
-            environment_id=env_id,
-            title=f"skyherd-{agent_spec.name}",
-        )
+        # Resolve memory store IDs (per-agent read_write + shared read_only).
+        per_agent_store_id = self._memory_store_ids.get(agent_spec.name)
+        shared_store_id = self._memory_store_ids.get("_shared")
+        resources: list[dict[str, Any]] = []
+        if per_agent_store_id:
+            resources.append({
+                "type": "memory_store",
+                "memory_store_id": per_agent_store_id,
+                "access": "read_write",
+            })
+        if shared_store_id:
+            resources.append({
+                "type": "memory_store",
+                "memory_store_id": shared_store_id,
+                "access": "read_only",
+            })
+
+        create_kwargs: dict[str, Any] = {
+            "agent": agent_id,
+            "environment_id": env_id,
+            "title": f"skyherd-{agent_spec.name}",
+        }
+        if resources:
+            create_kwargs["extra_body"] = {"resources": resources}
+
+        platform_session = await self._client.beta.sessions.create(**create_kwargs)
 
         local_id = str(uuid.uuid4())
         session = ManagedSession(

@@ -863,3 +863,160 @@ class TestManagedSessionManagerLifecycle:
         }
         result = await mgr.smoke_test_session(FENCELINE_DISPATCHER_SPEC, wake_event)
         assert result == "sess_smoke_001"
+
+
+# ---------------------------------------------------------------------------
+# Plan 01-03: _build_tools_config + memory_store_ids extra_body attach (MEM-02, MEM-11)
+# ---------------------------------------------------------------------------
+
+
+class TestBuildToolsConfig:
+    def test_build_tools_config_no_disable_returns_default_config(self):
+        from skyherd.agents.managed import _build_tools_config
+        from skyherd.agents.spec import AgentSpec
+
+        spec = AgentSpec(name="X", system_prompt_template_path="/tmp/x.md")
+        cfg = _build_tools_config(spec)
+        assert cfg["type"] == "agent_toolset_20260401"
+        assert cfg["default_config"] == {"enabled": True}
+        assert "configs" not in cfg
+
+    def test_build_tools_config_with_disable_emits_configs(self):
+        from skyherd.agents.managed import _build_tools_config
+        from skyherd.agents.spec import AgentSpec
+
+        spec = AgentSpec(
+            name="X",
+            system_prompt_template_path="/tmp/x.md",
+            disable_tools=["web_search", "web_fetch"],
+        )
+        cfg = _build_tools_config(spec)
+        assert cfg["configs"] == [
+            {"name": "web_search", "enabled": False},
+            {"name": "web_fetch", "enabled": False},
+        ]
+
+    def test_build_tools_config_handles_spec_without_attr(self):
+        from skyherd.agents.managed import _build_tools_config
+
+        class BareSpec:
+            pass
+
+        cfg = _build_tools_config(BareSpec())
+        assert cfg["type"] == "agent_toolset_20260401"
+        assert "configs" not in cfg
+
+
+class TestEnsureAgentToolsConfig:
+    @pytest.mark.asyncio
+    async def test_ensure_agent_passes_tools_config_from_spec(self, monkeypatch, tmp_path):
+        from skyherd.agents.managed import _build_tools_config
+        from skyherd.agents.spec import AgentSpec
+
+        monkeypatch.setenv("ANTHROPIC_API_KEY", "sk-test-fake")
+        monkeypatch.chdir(tmp_path)
+
+        mgr = ManagedSessionManager(
+            api_key="sk-test-fake",
+            agent_ids_path=str(tmp_path / "agent_ids.json"),
+        )
+        # Mock the beta.agents.create call to capture tools kwarg.
+        mock_agent_response = MagicMock()
+        mock_agent_response.id = "agent_xyz"
+        mgr._client = MagicMock()
+        mgr._client.beta = MagicMock()
+        mgr._client.beta.agents = MagicMock()
+        mgr._client.beta.agents.create = AsyncMock(return_value=mock_agent_response)
+
+        spec_path = tmp_path / "sys.md"
+        spec_path.write_text("System prompt.")
+        spec = AgentSpec(
+            name="CalvingWatch",
+            system_prompt_template_path=str(spec_path),
+            disable_tools=["web_search"],
+        )
+
+        await mgr.ensure_agent(spec)
+        create_kwargs = mgr._client.beta.agents.create.await_args.kwargs
+        assert create_kwargs["tools"] == [_build_tools_config(spec)]
+
+
+class TestSessionCreateMemoryAttach:
+    @pytest.fixture
+    def _mocked_mgr(self, monkeypatch, tmp_path):
+        """Build a MSM with create_session_async primed but dependencies mocked."""
+        monkeypatch.setenv("ANTHROPIC_API_KEY", "sk-test-fake")
+        monkeypatch.chdir(tmp_path)
+
+        def _factory(memory_store_ids: dict[str, str] | None = None):
+            mgr = ManagedSessionManager(
+                api_key="sk-test-fake",
+                environment_id="env_test",
+                agent_ids_path=str(tmp_path / "agent_ids.json"),
+                memory_store_ids=memory_store_ids,
+            )
+            mgr._client = MagicMock()
+            mgr._client.beta = MagicMock()
+            mgr._client.beta.sessions = MagicMock()
+            mock_session = MagicMock()
+            mock_session.id = "sess_fake"
+            mgr._client.beta.sessions.create = AsyncMock(return_value=mock_session)
+            # Skip real agent creation — patch ensure_agent + _ensure_environment.
+            mgr.ensure_agent = AsyncMock(return_value="agent_X")  # type: ignore
+            mgr._ensure_environment = AsyncMock(return_value="env_test")  # type: ignore
+            return mgr
+
+        return _factory
+
+    @pytest.mark.asyncio
+    async def test_session_create_attaches_memory_resources_via_extra_body(self, _mocked_mgr):
+        from skyherd.agents.fenceline_dispatcher import FENCELINE_DISPATCHER_SPEC
+
+        mgr = _mocked_mgr(memory_store_ids={
+            "FenceLineDispatcher": "memstore_perA",
+            "_shared": "memstore_shared",
+        })
+        await mgr.create_session_async(FENCELINE_DISPATCHER_SPEC)
+        kwargs = mgr._client.beta.sessions.create.await_args.kwargs
+        assert kwargs["extra_body"] == {
+            "resources": [
+                {"type": "memory_store", "memory_store_id": "memstore_perA", "access": "read_write"},
+                {"type": "memory_store", "memory_store_id": "memstore_shared", "access": "read_only"},
+            ]
+        }
+
+    @pytest.mark.asyncio
+    async def test_session_create_no_extra_body_when_no_memory_store_ids(self, _mocked_mgr):
+        from skyherd.agents.fenceline_dispatcher import FENCELINE_DISPATCHER_SPEC
+
+        mgr = _mocked_mgr(memory_store_ids=None)
+        await mgr.create_session_async(FENCELINE_DISPATCHER_SPEC)
+        kwargs = mgr._client.beta.sessions.create.await_args.kwargs
+        assert "extra_body" not in kwargs
+
+    @pytest.mark.asyncio
+    async def test_session_create_only_shared_when_no_per_agent_entry(self, _mocked_mgr):
+        from skyherd.agents.fenceline_dispatcher import FENCELINE_DISPATCHER_SPEC
+
+        # PredatorPatternLearner not in the map, only _shared entry
+        mgr = _mocked_mgr(memory_store_ids={"_shared": "memstore_shared"})
+        await mgr.create_session_async(FENCELINE_DISPATCHER_SPEC)
+        kwargs = mgr._client.beta.sessions.create.await_args.kwargs
+        assert kwargs["extra_body"] == {
+            "resources": [
+                {"type": "memory_store", "memory_store_id": "memstore_shared", "access": "read_only"},
+            ]
+        }
+
+    @pytest.mark.asyncio
+    async def test_session_create_only_per_agent_when_no_shared(self, _mocked_mgr):
+        from skyherd.agents.fenceline_dispatcher import FENCELINE_DISPATCHER_SPEC
+
+        mgr = _mocked_mgr(memory_store_ids={"FenceLineDispatcher": "memstore_fld"})
+        await mgr.create_session_async(FENCELINE_DISPATCHER_SPEC)
+        kwargs = mgr._client.beta.sessions.create.await_args.kwargs
+        assert kwargs["extra_body"] == {
+            "resources": [
+                {"type": "memory_store", "memory_store_id": "memstore_fld", "access": "read_write"},
+            ]
+        }

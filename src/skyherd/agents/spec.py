@@ -52,3 +52,7 @@ class AgentSpec:
     checkpoint_interval_s: int = 3600
     max_idle_s_before_checkpoint: int = 300
     model: str = _DEFAULT_MODEL
+    # Tools to disable via agent_toolset_20260401 configs (MEM-11).
+    # E.g. ["web_search", "web_fetch"] for CalvingWatch + GrazingOptimizer so
+    # `make demo SEED=42 SCENARIO=all` remains byte-identical (no live web reads).
+    disable_tools: list[str] = field(default_factory=list)
