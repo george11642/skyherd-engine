@@ -1,4 +1,4 @@
-.PHONY: setup sim demo dashboard dashboard-mock test lint format typecheck clean ci sitl-up sitl-down bus-up bus-down mesh-smoke one-pager hardware-demo hardware-demo-sim hardware-demo-sim-down h2-smoke h3-smoke h4-smoke h4-docs mavic-bridge f3-bridge drone-smoke sitl-smoke determinism-3x gate-check voice-demo rehearsal record-ready preflight laptop-drone-smoke
+.PHONY: setup sim demo dashboard dashboard-mock test lint format typecheck clean ci sitl-up sitl-down bus-up bus-down mosquitto-up mosquitto-down mesh-smoke one-pager hardware-demo hardware-demo-sim hardware-demo-sim-down h2-smoke h3-smoke h4-smoke h4-docs mavic-bridge f3-bridge drone-smoke sitl-smoke determinism-3x gate-check voice-demo rehearsal record-ready preflight laptop-drone-smoke edge-pi-setup
 
 SEED ?= 42
 SCENARIO ?= all
@@ -55,10 +55,17 @@ sitl-down:
 
 bus-up:
 	docker run -d --name skyherd-mosquitto -p 1883:1883 eclipse-mosquitto:2 \
-		sh -c 'echo "listener 1883\nallow_anonymous true" > /mosquitto/config/mosquitto.conf && mosquitto -c /mosquitto/config/mosquitto.conf'
+		sh -c 'printf "listener 1883\nallow_anonymous true\n" > /mosquitto/config/mosquitto.conf && mosquitto -c /mosquitto/config/mosquitto.conf'
 
 bus-down:
 	docker stop skyherd-mosquitto && docker rm skyherd-mosquitto
+
+# Aliases — plan & Pi setup script refer to these names.
+mosquitto-up: bus-up  ## Alias for bus-up (used by scripts/setup-edge-pi.sh)
+mosquitto-down: bus-down  ## Alias for bus-down
+
+edge-pi-setup:  ## Interactive one-command Pi 4 edge bringup (EDGE_ID=edge-house|edge-barn)
+	@bash scripts/setup-edge-pi.sh $(EDGE_ID)
 
 mesh-smoke:
 	uv run skyherd-mesh mesh smoke --verbose

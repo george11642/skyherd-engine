@@ -81,3 +81,8 @@ ios/SkyHerdCompanion/Frameworks/*.framework/
 android/**/build/
 android/**/.gradle/
 android/**/local.properties
+
+# SkyHerd Pi setup — cached secrets (Wi-Fi PSK + generated Pi password).
+# chmod 600, never committed.
+.skyherd-edge-setup.env
+/tmp/skyherd-flash/

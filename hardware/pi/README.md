@@ -2,7 +2,36 @@
 
 The curl-pipe path from a blank SD card to a live SkyHerd edge node.
 
-## 60-second flow
+## One-command path (recommended)
+
+From the laptop, with a Pi 4, SD card, and SD reader handy:
+
+```bash
+make edge-pi-setup EDGE_ID=edge-house   # first Pi (troughs 1–2)
+make edge-pi-setup EDGE_ID=edge-barn    # second Pi (troughs 3–6)
+```
+
+The script `scripts/setup-edge-pi.sh` runs five phases:
+
+| Phase | What it does | User action |
+|---|---|---|
+| A | Starts mosquitto, configures Windows portproxy (WSL2), captures wifi PSK | Type PSK once (cached to `.skyherd-edge-setup.env`, chmod 600, gitignored) |
+| B | Downloads RPi OS Lite, flashes, injects `custom.toml` + `skyherd-credentials.json` | Confirm SD drive letter; move SD from Pi → laptop |
+| C | Waits for Pi reboot | Move SD from laptop → Pi, power on |
+| D | Discovers Pi via mDNS/arp-scan, runs `bootstrap.sh` over SSH | nothing |
+| E | Watches MQTT for heartbeat, checks `systemctl is-active skyherd-edge` | nothing |
+
+Flags:
+- `--dry-run` — print what would happen, no `sudo`/`dd`/network writes.
+- `--phase-a-only` — configure the laptop side, stop before the SD flash.
+- `SKYHERD_EDGE_SETUP_SKIP_PHASES=A,B` — resume at a later phase.
+
+Prereqs on the laptop (WSL2 Ubuntu):
+- `docker` + `mosquitto-clients` (`sudo apt-get install mosquitto-clients`)
+- `usbipd-win` on the Windows side, to attach the SD reader to WSL2
+  (auto-invoked by the script; install via `winget install usbipd` if missing)
+
+## Manual fallback (if the script can't flash)
 
 1. **Flash SD card** — Raspberry Pi OS Bookworm 64-bit Lite via
    [Raspberry Pi Imager](https://www.raspberrypi.com/software/). In the
