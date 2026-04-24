@@ -83,4 +83,12 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("com.google.android.material:material:1.12.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+
+    // ---- Unit tests (Phase 7.2: parity with iOS SafetyGuardTests) ----
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("org.jetbrains.kotlin:kotlin-test:1.9.22")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+    // org.json ships with Android but is stubbed on host JVM — use the
+    // same impl artifact in unit tests.
+    testImplementation("org.json:json:20231013")
 }
