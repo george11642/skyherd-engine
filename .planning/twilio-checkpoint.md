@@ -14,11 +14,11 @@ Live Twilio trial account provisioned for SkyHerd Engine. Credentials written to
 
 Written to `/home/george/projects/active/skyherd-engine/.env.local`:
 
-- `TWILIO_SID=<REDACTED_TWILIO_SID>`
-- `TWILIO_AUTH_TOKEN=<REDACTED_TWILIO_AUTH_TOKEN>`  (rotate post-hackathon per user plan)
-- `TWILIO_FROM=+15673646319`  (Westminster, OH local; SMS + Voice enabled)
-- `TWILIO_TO_NUMBER=+15052085378`
-- `RANCHER_PHONE=+15052085378`
+- `TWILIO_SID=<REDACTED — see .env.local>`
+- `TWILIO_AUTH_TOKEN=<REDACTED — see .env.local; rotate post-hackathon>`
+- `TWILIO_FROM=<REDACTED — see .env.local>` (Westminster, OH local; SMS + Voice enabled)
+- `TWILIO_TO_NUMBER=<REDACTED — see .env.local>`
+- `RANCHER_PHONE=<REDACTED — see .env.local>`
 
 Trial account balance at provisioning: **$15.50** credit.
 Plan: Trial (SMS + Voice). Account name: "SkyHerd".
@@ -31,8 +31,8 @@ won't re-challenge for ~30 days on the same cookies.
 
 ```
 POST https://api.twilio.com/2010-04-01/Accounts/{SID}/Messages.json
-From=+15673646319
-To=+15052085378
+From=+1XXXXXXXXXX
+To=+1XXXXXXXXXX
 Body=SkyHerd voice chain online
 ```
 
