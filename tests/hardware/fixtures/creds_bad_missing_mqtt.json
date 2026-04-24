@@ -1,0 +1,7 @@
+{
+  "wifi_ssid": "RanchWifi",
+  "wifi_psk": "supersecret1234",
+  "ranch_id": "ranch_a",
+  "edge_id": "edge-house",
+  "trough_ids": "trough_1,trough_2"
+}
