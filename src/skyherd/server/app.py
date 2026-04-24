@@ -83,8 +83,17 @@ def create_app(
     mesh: Any = None,
     ledger: Any = None,
     world: Any = None,
+    drone_backend: Any = None,
+    manual_override_token: str | None = None,
 ) -> FastAPI:
-    """App factory — injectable for testing."""
+    """App factory — injectable for testing.
+
+    ``drone_backend`` is optional. When provided alongside a non-empty
+    ``manual_override_token`` (or ``SKYHERD_MANUAL_OVERRIDE_TOKEN`` env var),
+    the manual drone-control endpoints at ``/api/drone/*`` are active. Absent
+    either, the endpoints return 503 — determinism gate stays byte-identical
+    because the sim scenarios never pass a backend.
+    """
     use_mock = mock if mock is not None else _MOCK_MODE
 
     broadcaster = EventBroadcaster(mock=use_mock, mesh=mesh, ledger=ledger, world=world)
@@ -141,6 +150,27 @@ def create_app(
         logger.info("Mounted Memory API router at /api/memory")
     except Exception as exc:  # noqa: BLE001
         logger.warning("Memory API router not mounted: %s", exc)
+
+    # Manual drone-control endpoints — /api/drone/{arm,disarm,takeoff,rtl,land,estop}
+    # (Phase 7.1 LDC-03). Always mount so the endpoints return structured 503
+    # when disabled, giving the dashboard a clear "manual override disabled"
+    # message instead of a 404.
+    try:
+        from skyherd.server.drone_control import attach_drone_control  # noqa: PLC0415
+
+        token = (
+            manual_override_token
+            if manual_override_token is not None
+            else os.environ.get("SKYHERD_MANUAL_OVERRIDE_TOKEN", "")
+        )
+        attach_drone_control(
+            app,
+            get_backend=lambda: drone_backend,
+            broadcaster=broadcaster,
+            token=token,
+        )
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("Drone-control endpoints not mounted: %s", exc)
 
     # ------------------------------------------------------------------
     # Health
