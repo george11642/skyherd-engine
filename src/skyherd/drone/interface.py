@@ -155,9 +155,16 @@ def get_backend(name: str | None = None) -> DroneBackend:
 
             _register("stub", StubBackend)
         elif backend_name == "mavic":
+            # Phase 7: "mavic" now returns the two-legged MavicAdapter
+            # (DJI primary + MAVSDK failover).  The bare MavicBackend is
+            # still reachable via "mavic_direct" for tests and diagnostics.
+            from skyherd.drone.mavic_adapter import MavicAdapter  # noqa: PLC0415
+
+            _register("mavic", MavicAdapter)
+        elif backend_name == "mavic_direct":
             from skyherd.drone.mavic import MavicBackend  # noqa: PLC0415
 
-            _register("mavic", MavicBackend)
+            _register("mavic_direct", MavicBackend)
         elif backend_name == "f3_inav":
             from skyherd.drone.f3_inav import F3InavBackend  # noqa: PLC0415
 
@@ -165,7 +172,7 @@ def get_backend(name: str | None = None) -> DroneBackend:
         else:
             raise DroneError(
                 f"Unknown drone backend {backend_name!r}. "
-                f"Available: {sorted(_REGISTRY) or ['sitl', 'stub', 'mavic', 'f3_inav']}"
+                f"Available: {sorted(_REGISTRY) or ['sitl', 'stub', 'mavic', 'mavic_direct', 'f3_inav']}"
             )
 
     cls = _REGISTRY[backend_name]

@@ -314,8 +314,18 @@ async def test_disconnect_clears_connected() -> None:
 # ---------------------------------------------------------------------------
 
 
-async def test_get_backend_factory_returns_mavic() -> None:
+async def test_get_backend_factory_returns_mavic_adapter() -> None:
+    """Phase 7: "mavic" now returns the two-legged MavicAdapter."""
     from skyherd.drone.interface import get_backend
+    from skyherd.drone.mavic_adapter import MavicAdapter
 
     backend = get_backend("mavic")
+    assert isinstance(backend, MavicAdapter)
+
+
+async def test_get_backend_factory_mavic_direct_returns_bare_backend() -> None:
+    """Phase 7 regression: "mavic_direct" still returns bare MavicBackend."""
+    from skyherd.drone.interface import get_backend
+
+    backend = get_backend("mavic_direct")
     assert isinstance(backend, MavicBackend)
