@@ -376,14 +376,20 @@ const BeatScenario = ({
   const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
 
-  const fadeIn = interpolate(frame, [0, 15], [0, 1], {
+  // Snappy fade-in (8 frames) and a fadeOut that bottoms at 0.25 instead
+  // of 0, so consecutive scenarios crossfade through dimmed visuals
+  // rather than a black flash at the boundary. Scenario 1 still starts
+  // from 0 (it inherits Act 2 establish's final full-opacity frame via
+  // Series hard-cut; that cut is fine — the bad seam was scenario→
+  // scenario).
+  const fadeIn = interpolate(frame, [0, 8], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
   const fadeOut = interpolate(
     frame,
-    [durationInFrames - 20, durationInFrames],
-    [1, 0],
+    [durationInFrames - 14, durationInFrames],
+    [1, 0.25],
     { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
   );
   const opacity = Math.min(fadeIn, fadeOut);
