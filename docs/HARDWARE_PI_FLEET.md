@@ -241,3 +241,134 @@ difference.
 Raspberry Pi OS **Bookworm 64-bit** (Debian 12). This is required for
 `picamera2` via the `libcamera` stack. Bullseye is not supported for `--extra edge`.
 Pi 4 4 GB minimum; 8 GB preferred.
+
+---
+
+## Friday Morning Sequence (exact 15-minute plug-in)
+
+> **Target state after this sequence:** two Pi heartbeats green on the
+> dashboard (`/api/edges`) and a Mavic Air 2 paired via the companion app.
+> **Zero code edits required** — George plugs in, runs three one-liners,
+> and starts filming.
+
+### 0. Night-before prep (one-time, does not count against 15-min budget)
+
+- Laptop: `uv sync --all-extras && (cd web && pnpm install && pnpm run build)`.
+- SD cards (2×): flash Raspberry Pi OS **Bookworm 64-bit** via Raspberry Pi
+  Imager ≥ 1.8. In Imager **Advanced Options**:
+  - Hostname: `edge-house` (SD #1) / `edge-barn` (SD #2).
+  - Enable SSH — "Use password authentication" OR paste laptop's `~/.ssh/id_ed25519.pub`.
+  - Wifi SSID + PSK + country = US.
+  - Username: `pi` (default).
+- On each SD card's `/boot/firmware/` partition (mount after flash, before eject):
+  copy `hardware/pi/credentials.example.json` → rename to `skyherd-credentials.json`
+  → edit `wifi_ssid`, `wifi_psk`, `mqtt_url` (point at laptop IP), `edge_id`
+  (`edge-house` or `edge-barn`), `trough_ids` (per naming table above).
+
+### 1. Plug in Pi-A (ranch-house side) — 3 min
+
+```bash
+# From laptop — Pi-A is powered on and joined wifi via Imager advanced options:
+ssh pi@edge-house.local     # first login — no password if SSH key was added
+# On the Pi:
+curl -sSfL https://raw.githubusercontent.com/george11642/skyherd-engine/main/hardware/pi/bootstrap.sh | bash
+```
+
+The script is idempotent — see `## Idempotency Audit` below. Expected output:
+~15 s of apt-install log, then "Provisioning complete" and the first heartbeat
+within another 15–30 s.
+
+### 2. Plug in Pi-B (barn side) — 3 min (run in parallel with step 1)
+
+```bash
+ssh pi@edge-barn.local
+curl -sSfL https://raw.githubusercontent.com/george11642/skyherd-engine/main/hardware/pi/bootstrap.sh | bash
+```
+
+### 3. Launch dashboard on laptop — 1 min
+
+```bash
+make dashboard     # http://localhost:8000
+```
+
+### 4. Verify both Pi heartbeats are green — 1 min
+
+```bash
+curl -s http://localhost:8000/api/edges | jq '.edges[] | {edge_id, online, last_seen_ts}'
+# Expect both edge-house + edge-barn with online:true within 30s of bootstrap finish
+```
+
+Alternative, from any machine on the LAN:
+
+```bash
+mosquitto_sub -h <laptop-ip> -v -t 'skyherd/ranch_a/edge_status/#'
+# Both nodes publish every 30s.
+```
+
+### 5. Pair Mavic Air 2 via companion app — 4 min
+
+- On Android phone: install the SkyHerdCompanion APK from the GitHub Actions
+  artifact. URL is documented in
+  `docs/HARDWARE_H3_RUNBOOK.md` → §Companion App APK Download.
+- Power on DJI RC → pair with Mavic Air 2 (standard DJI pairing procedure).
+- Open SkyHerdCompanion → enter laptop MQTT URL (matches `mqtt_url` in
+  credentials.json) → confirm both badges green:
+  - **DJI: connected**
+  - **MQTT: connected**
+
+### 6. End-to-end smoke test — 3 min
+
+Publish a mock coyote event on Pi-A's topic from the laptop to confirm the full
+dispatch chain fires (drone mission is dispatched to the stub or live Mavic,
+Wes voice page triggers, attestation ledger appends):
+
+```bash
+mosquitto_pub -h <laptop-ip> \
+    -t 'skyherd/ranch_a/events/camera.motion' \
+    -m '{"ranch":"ranch_a","edge_id":"edge-house","kind":"camera.motion","confidence":0.9,"label":"coyote","ts":1714000000}'
+```
+
+Watch the dashboard (http://localhost:8000) for:
+1. **FenceLineDispatcher** lane flashes orange within 2 s.
+2. **Agent log** row: `launch_drone(FENCE_SW, deterrent)`.
+3. **Attestation panel** appends a new HashChip row.
+
+**Total wall time: ~15 min.** Any step that exceeds 2× expected →
+check `docs/PREFLIGHT_CHECKLIST.md` §Troubleshooting.
+
+---
+
+## Idempotency Audit (Phase 9 PF-01, 2026-04-24)
+
+The Pi bootstrap path was re-audited Friday morning for zero-config
+re-runnability. Findings:
+
+| Check | Result | Notes |
+|---|---|---|
+| `bash -n hardware/pi/bootstrap.sh` syntax | PASS | — |
+| `bash -n scripts/provision-edge.sh` syntax | PASS | — |
+| Re-running `bootstrap.sh --dry-run` twice produces identical stdout | PASS | `diff /tmp/br1.txt /tmp/br2.txt` clean |
+| All `apt-get install` invocations use `-y` | PASS | 2 call sites, both `-y` |
+| No interactive `read`/`prompt`/`confirm` in Friday-path scripts | PASS | Only `read_text()` in Python (unrelated) |
+| `credentials.example.json` parses as valid JSON | PASS | `jq . hardware/pi/credentials.example.json` clean |
+| Wifi fallback only fires when no default route | PASS | Guarded by `ip route grep default` |
+| `provision-edge.sh` is idempotent (systemd unit re-enable safe) | PASS | `systemctl enable` is idempotent |
+
+**Verdict: Friday plug-in requires zero code edits.** The only user inputs
+are the values George fills into `skyherd-credentials.json` on each SD card
+before flashing — and those are plain config, not code.
+
+---
+
+## Companion App APK URL
+
+See `docs/HARDWARE_H3_RUNBOOK.md` § Companion App APK Download for the exact
+URL + manual-build fallback. In an emergency, the APK can be produced locally:
+
+```bash
+cd android/SkyHerdCompanion
+./gradlew assembleDebug
+# Output: app/build/outputs/apk/debug/app-debug.apk
+```
+
+Install via `adb install app-debug.apk` or sideload via USB transfer.
