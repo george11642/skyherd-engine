@@ -18,6 +18,7 @@ vi.mock("@/lib/sse", () => ({
       sseHandlers[eventType] = (sseHandlers[eventType] ?? []).filter((h) => h !== handler);
     },
   }),
+  getReplayIfActive: () => null,
 }));
 
 function triggerSSE(eventType: string, payload: unknown) {

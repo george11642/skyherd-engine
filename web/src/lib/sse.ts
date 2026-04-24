@@ -126,7 +126,9 @@ let _globalSSE: SkyHerdSSE | null = null;
 
 /**
  * Returns the active event driver.
- * - In replay/demo mode (VITE_DEMO_MODE=replay): returns a SkyHerdReplay.
+ * - In replay/demo mode (VITE_DEMO_MODE=replay): returns a SkyHerdReplay in
+ *   its default *paused* state. Nothing flows until a UI affordance (e.g.
+ *   ScenarioStrip "Start Simulation") calls `.start()`.
  * - Otherwise: returns a live SkyHerdSSE connected to /events.
  *
  * Both classes share the same on/off/connect/close interface via SSEHandler,
@@ -141,4 +143,16 @@ export function getSSE(): SkyHerdSSE | SkyHerdReplay {
     _globalSSE.connect();
   }
   return _globalSSE;
+}
+
+/**
+ * Returns the replay instance if demo mode is active, else `null`. Useful for
+ * components (e.g. ScenarioStrip) that need to call `.start()` / `.pause()`
+ * without owning the mode-selection logic.
+ */
+export function getReplayIfActive(): SkyHerdReplay | null {
+  if (import.meta.env.VITE_DEMO_MODE === "replay") {
+    return getReplay();
+  }
+  return null;
 }

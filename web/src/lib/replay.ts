@@ -1,13 +1,19 @@
 /**
  * Replay driver — demo mode substitute for SkyHerdSSE.
  *
- * Loads /replay.json on mount, cycles through all scenarios end-to-end,
+ * Loads /replay.json on start(), cycles through all scenarios end-to-end,
  * re-emitting each event through the same handler map that SkyHerdSSE uses.
  * Events play at ~3× speed so judges see action within a few seconds.
  *
  * Interface is intentionally compatible with SkyHerdSSE so callers that do
  *   sse.on("fence.breach", handler)
  * work unchanged regardless of which driver is active.
+ *
+ * Opt-in start (Phase 3.1): a fresh instance is paused — nothing flows until
+ * the user clicks "Start Simulation". pause() halts emission by dropping all
+ * pending timers; a subsequent start() restarts the full sequence from
+ * scenario 0. (Simpler than tracking per-event resumption — the demo is
+ * short enough that a full re-run is acceptable.)
  */
 
 import type { SSEHandler } from "./sse";
@@ -34,7 +40,7 @@ interface ReplayBundle {
 
 export class SkyHerdReplay {
   private handlers: Map<string, SSEHandler[]> = new Map();
-  private stopped = false;
+  private paused = true;
   private timeouts: ReturnType<typeof setTimeout>[] = [];
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -54,27 +60,59 @@ export class SkyHerdReplay {
     );
   }
 
+  /**
+   * SkyHerdSSE-compatible: callers may still invoke connect(). In replay mode
+   * this is now a no-op so the driver only runs after an explicit start().
+   */
   connect(): this {
-    this.stopped = false;
-    this._start().catch(() => {
-      // Non-fatal — replay.json may be unavailable in local dev
+    return this;
+  }
+
+  /**
+   * Kick off playback from scenario 0. If already running, ignored.
+   * Safe to call after pause() to resume (restarts the sequence).
+   */
+  start(): this {
+    if (!this.paused) return this;
+    this.paused = false;
+    // Wake existing subscribers (StatBand "READY → LIVE", scenario strip, etc.)
+    // even before the fetch resolves — keeps the UI in sync with the click.
+    this._emit("scenario.active", {
+      name: "coyote",
+      pass_idx: 0,
+      speed: SPEED,
+      started_at: new Date().toISOString(),
+    });
+    this._run().catch(() => {
+      // Non-fatal — replay.json may be unavailable in local dev.
     });
     return this;
   }
 
-  close(): void {
-    this.stopped = true;
+  /** Halt emission and cancel all pending event timers. */
+  pause(): this {
+    this.paused = true;
     for (const t of this.timeouts) clearTimeout(t);
     this.timeouts = [];
+    return this;
+  }
+
+  isPaused(): boolean {
+    return this.paused;
+  }
+
+  /** Alias kept for SkyHerdSSE compatibility — close() == pause(). */
+  close(): void {
+    this.pause();
   }
 
   private _emit(kind: string, payload: unknown): void {
-    if (this.stopped) return;
+    if (this.paused) return;
     const handlers = this.handlers.get(kind) ?? [];
     for (const h of handlers) h(payload);
   }
 
-  private async _start(): Promise<void> {
+  private async _run(): Promise<void> {
     let bundle: ReplayBundle;
     try {
       const resp = await fetch("/replay.json");
@@ -85,7 +123,7 @@ export class SkyHerdReplay {
       return;
     }
 
-    if (this.stopped) return;
+    if (this.paused) return;
 
     // Play all scenarios end-to-end in a loop
     let cumulativeOffsetMs = 0;
@@ -150,10 +188,11 @@ export class SkyHerdReplay {
     // Restart from beginning once all scenarios have played
     const totalMs = cumulativeOffsetMs;
     const loopTimer = setTimeout(() => {
-      if (!this.stopped) {
-        this.close();
-        this.stopped = false;
-        this._start().catch(() => {});
+      if (!this.paused) {
+        // Clear pending timers from the just-finished pass, then loop.
+        for (const t of this.timeouts) clearTimeout(t);
+        this.timeouts = [];
+        this._run().catch(() => {});
       }
     }, totalMs + 1000);
     this.timeouts.push(loopTimer);
@@ -162,10 +201,19 @@ export class SkyHerdReplay {
 
 let _globalReplay: SkyHerdReplay | null = null;
 
+/**
+ * Module-level singleton. Returned instance is paused — callers (e.g. the
+ * ScenarioStrip "Start Simulation" button) must invoke `.start()` to begin
+ * playback.
+ */
 export function getReplay(): SkyHerdReplay {
   if (!_globalReplay) {
     _globalReplay = new SkyHerdReplay();
-    _globalReplay.connect();
   }
   return _globalReplay;
+}
+
+/** Test-only reset. Exposed for vitest so singleton state doesn't leak. */
+export function __resetReplayForTest(): void {
+  _globalReplay = null;
 }

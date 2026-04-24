@@ -275,6 +275,53 @@ h1, h2, .display {
 }
 
 /* ─────────────────────────────────────────────
+   LANDING  (marketing page at `/`)
+   Token scope: any rule here MUST be nested under
+   `.landing-root` so the ops-console palette on
+   `/demo` stays untouched.
+   Mirrors skyheard/src/app/globals.css tokens.
+   ───────────────────────────────────────────── */
+.landing-root {
+  /* slate palette */
+  --color-slate-950: #0a0f1a;
+  --color-slate-900: #0f172a;
+  --color-slate-800: #1e293b;
+  --color-slate-700: #334155;
+  --color-slate-600: #475569;
+  --color-slate-400: #94a3b8;
+  --color-slate-300: #cbd5e1;
+  --color-slate-200: #e2e8f0;
+  --color-slate-100: #f1f5f9;
+  /* amber palette */
+  --color-amber-500: #f59e0b;
+  --color-amber-600: #d97706;
+  --color-amber-400: #fbbf24;
+  --color-amber-300: #fcd34d;
+  /* green palette */
+  --color-green-500: #22c55e;
+  --color-green-600: #16a34a;
+  --color-green-400: #4ade80;
+
+  scroll-behavior: smooth;
+  background: var(--color-slate-950);
+  color: var(--color-slate-200);
+  font-family: var(--font-body);
+  /* Landing page scrolls — cancel the ops-console flex clip from #root. */
+  overflow-y: auto;
+  min-height: 100dvh;
+}
+
+/* The ops console hides overflow on #root; landing needs vertical scroll
+   so the page flows past the viewport. When a landing page is mounted,
+   release the clip. */
+#root:has(.landing-root) {
+  overflow-y: auto;
+  display: block;
+  height: auto;
+  min-height: 100dvh;
+}
+
+/* ─────────────────────────────────────────────
    BUTTON BASE
    ───────────────────────────────────────────── */
 .btn {
