@@ -23,6 +23,7 @@ import { AttestationPanel } from "@/components/AttestationPanel";
 import { MemoryPanel } from "@/components/MemoryPanel";
 import { CrossRanchPanel } from "@/components/CrossRanchPanel";
 import { VetIntakePanel } from "@/components/VetIntakePanel";
+import { LaptopDroneControl } from "@/components/LaptopDroneControl";
 import {
   RightRailAccordion,
   type AccordionTab,
@@ -106,6 +107,13 @@ export default function App() {
         badge: neighborCount || undefined,
         badgeVariant: "thermal",
         render: () => <CrossRanchPanel />,
+      },
+      {
+        id: "laptop-drone",
+        label: "Laptop Drone",
+        badge: undefined,
+        badgeVariant: "dust",
+        render: () => <LaptopDroneControl />,
       },
     ],
     [memoryCount, attestCount, vetCount, neighborCount],
