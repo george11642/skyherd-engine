@@ -1,0 +1,10 @@
+{
+  "deduplicationId": "broken-event-no-data-field",
+  "time": "2026-04-24T10:00:00.123456Z",
+  "deviceInfo": {
+    "applicationId": "09f8a7e4-0001-4f8a-8888-aaaabbbbcccc",
+    "devEui": "A8610A3453210A00"
+  },
+  "fCnt": 1,
+  "fPort": 2
+}

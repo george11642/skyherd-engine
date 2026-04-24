@@ -1,0 +1,7 @@
+{
+  "_comment": "DevEUI (16-hex, uppercase) → ranch + cow_tag. Populated by hardware/collar/provisioning/register-collar.py. The live registry lives at runtime/collars/registry.json (gitignored).",
+  "A8610A3453210A00": {
+    "ranch": "ranch_a",
+    "cow_tag": "A001"
+  }
+}

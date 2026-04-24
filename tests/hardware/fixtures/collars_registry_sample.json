@@ -1,0 +1,14 @@
+{
+  "A8610A3453210A00": {
+    "ranch": "ranch_a",
+    "cow_tag": "A001"
+  },
+  "A8610A3453210A01": {
+    "ranch": "ranch_a",
+    "cow_tag": "A002"
+  },
+  "A8610A3453210B00": {
+    "ranch": "ranch_b",
+    "cow_tag": "B001"
+  }
+}

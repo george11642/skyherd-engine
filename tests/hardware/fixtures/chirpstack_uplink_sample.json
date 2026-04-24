@@ -1,0 +1,46 @@
+{
+  "deduplicationId": "a1b2c3d4-0001-4abc-9def-111122223333",
+  "time": "2026-04-24T10:00:00.123456Z",
+  "deviceInfo": {
+    "tenantId": "52f14cd4-c6f1-4fbd-8f87-4025e1d49242",
+    "tenantName": "SkyHerd",
+    "applicationId": "09f8a7e4-0001-4f8a-8888-aaaabbbbcccc",
+    "applicationName": "skyherd-collars",
+    "deviceProfileId": "3b3f8b98-0001-4abc-8111-222233334444",
+    "deviceProfileName": "rak3172-collar-v1",
+    "deviceName": "collar-A001",
+    "devEui": "A8610A3453210A00",
+    "tags": {}
+  },
+  "devAddr": "01020304",
+  "adr": true,
+  "dr": 3,
+  "fCnt": 42,
+  "fPort": 2,
+  "confirmed": false,
+  "data": "iflLFKQogMAEBgFSAwCEAw==",
+  "rxInfo": [
+    {
+      "gatewayId": "ac1f09fffe0500aa",
+      "uplinkId": 9001,
+      "gatewayTime": "2026-04-24T10:00:00.120000Z",
+      "rssi": -82,
+      "snr": 8.5,
+      "location": {
+        "latitude": 34.052,
+        "longitude": -106.534,
+        "altitude": 1540
+      }
+    }
+  ],
+  "txInfo": {
+    "frequency": 903900000,
+    "modulation": {
+      "lora": {
+        "bandwidth": 125000,
+        "spreadingFactor": 7,
+        "codeRate": "CR_4_5"
+      }
+    }
+  }
+}
