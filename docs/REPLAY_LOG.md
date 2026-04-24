@@ -12606,3 +12606,8 @@
 | 2026-04-24T16:04:38.255096+00:00 | cross_ranch_coyote | seed=42 | events=131 | tools=4 | attest=364 | PASS |
 | 2026-04-24T16:04:38.515180+00:00 | wildfire | seed=42 | events=122 | tools=4 | attest=363 | PASS |
 | 2026-04-24T16:04:38.782637+00:00 | rustling | seed=42 | events=123 | tools=6 | attest=365 | PASS |
+| 2026-04-24T17:22:30.029538+00:00 | coyote | seed=42 | events=131 | tools=4 | attest=364 | PASS |
+| 2026-04-24T17:22:59.879151+00:00 | sick_cow | seed=42 | events=62 | tools=6 | attest=184 | PASS |
+| 2026-04-24T17:23:15.511362+00:00 | water_drop | seed=42 | events=121 | tools=4 | attest=360 | PASS |
+| 2026-04-24T17:23:43.330372+00:00 | calving | seed=42 | events=123 | tools=8 | attest=366 | PASS |
+| 2026-04-24T17:23:59.711461+00:00 | storm | seed=42 | events=124 | tools=4 | attest=364 | PASS |

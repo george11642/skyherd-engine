@@ -86,3 +86,7 @@ android/**/local.properties
 # chmod 600, never committed.
 .skyherd-edge-setup.env
 /tmp/skyherd-flash/
+
+# Remotion demo video pipeline
+remotion-video/node_modules
+remotion-video/out

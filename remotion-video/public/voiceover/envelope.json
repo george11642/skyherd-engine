@@ -1,0 +1,112 @@
+{
+  "wes-attest.mp3": {
+    "duration_s": 14.759,
+    "duration_frames": 443,
+    "fps": 30,
+    "is_speaking_frames": [
+      [
+        0,
+        443
+      ]
+    ]
+  },
+  "wes-calving.mp3": {
+    "duration_s": 4.258,
+    "duration_frames": 128,
+    "fps": 30,
+    "is_speaking_frames": [
+      [
+        0,
+        128
+      ]
+    ]
+  },
+  "wes-close.mp3": {
+    "duration_s": 2.456,
+    "duration_frames": 74,
+    "fps": 30,
+    "is_speaking_frames": [
+      [
+        0,
+        74
+      ]
+    ]
+  },
+  "wes-coyote.mp3": {
+    "duration_s": 3.527,
+    "duration_frames": 106,
+    "fps": 30,
+    "is_speaking_frames": [
+      [
+        0,
+        106
+      ]
+    ]
+  },
+  "wes-establish.mp3": {
+    "duration_s": 5.564,
+    "duration_frames": 167,
+    "fps": 30,
+    "is_speaking_frames": [
+      [
+        0,
+        167
+      ]
+    ]
+  },
+  "wes-george-hook.mp3": {
+    "duration_s": 7.523,
+    "duration_frames": 226,
+    "fps": 30,
+    "is_speaking_frames": [
+      [
+        0,
+        226
+      ]
+    ]
+  },
+  "wes-sick-cow.mp3": {
+    "duration_s": 5.695,
+    "duration_frames": 171,
+    "fps": 30,
+    "is_speaking_frames": [
+      [
+        0,
+        171
+      ]
+    ]
+  },
+  "wes-storm.mp3": {
+    "duration_s": 3.291,
+    "duration_frames": 99,
+    "fps": 30,
+    "is_speaking_frames": [
+      [
+        0,
+        99
+      ]
+    ]
+  },
+  "wes-synthesis.mp3": {
+    "duration_s": 19.409,
+    "duration_frames": 582,
+    "fps": 30,
+    "is_speaking_frames": [
+      [
+        0,
+        582
+      ]
+    ]
+  },
+  "wes-why.mp3": {
+    "duration_s": 8.673,
+    "duration_frames": 260,
+    "fps": 30,
+    "is_speaking_frames": [
+      [
+        0,
+        260
+      ]
+    ]
+  }
+}

@@ -1,0 +1,36 @@
+@import "tailwindcss";
+
+/* ─────────────────────────────────────────────
+   DESIGN TOKENS  (mirrors web/src/index.css)
+   ───────────────────────────────────────────── */
+@theme {
+  /* Background layers */
+  --color-bg-0: rgb(10 12 16);
+  --color-bg-1: rgb(16 19 25);
+  --color-bg-2: rgb(24 28 36);
+  --color-line: rgb(38 45 58);
+
+  /* Text */
+  --color-text-0: rgb(236 239 244);
+  --color-text-1: rgb(168 180 198);
+  --color-text-2: rgb(110 122 140);
+
+  /* Accent palette */
+  --color-accent-sage: rgb(148 176 136);
+  --color-accent-dust: rgb(210 178 138);
+  --color-accent-thermal: rgb(255 143 60);
+  --color-accent-sky: rgb(120 180 220);
+
+  /* Status */
+  --color-warn: rgb(240 195 80);
+  --color-danger: rgb(224 100 90);
+  --color-ok: rgb(120 190 140);
+
+  /* Font families — match web dashboard; Inter is preloaded via @remotion/fonts */
+  --font-display: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, "Cascadia Code", "JetBrains Mono", monospace;
+
+  /* Spacing — 4px base */
+  --spacing: 0.25rem;
+}

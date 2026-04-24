@@ -1,4 +1,4 @@
-.PHONY: setup sim demo dashboard dashboard-mock test lint format typecheck clean ci sitl-up sitl-down bus-up bus-down mosquitto-up mosquitto-down mesh-smoke one-pager hardware-demo hardware-demo-sim hardware-demo-sim-down h2-smoke h3-smoke h4-smoke h4-docs mavic-bridge f3-bridge drone-smoke sitl-smoke determinism-3x gate-check voice-demo rehearsal record-ready preflight laptop-drone-smoke edge-pi-setup
+.PHONY: setup sim demo dashboard dashboard-mock test lint format typecheck clean ci sitl-up sitl-down bus-up bus-down mosquitto-up mosquitto-down mesh-smoke one-pager hardware-demo hardware-demo-sim hardware-demo-sim-down h2-smoke h3-smoke h4-smoke h4-docs mavic-bridge f3-bridge drone-smoke sitl-smoke determinism-3x gate-check voice-demo rehearsal record-ready preflight laptop-drone-smoke edge-pi-setup video-record-clips
 
 SEED ?= 42
 SCENARIO ?= all
@@ -173,6 +173,9 @@ record-ready:  ## VIDEO-06: pre-shoot preflight — warm dashboard, print scrub-
 
 preflight:  ## PF-04: run the Phase 9 preflight E2E suite (<30s, fully mocked)
 	uv run pytest tests/hardware/test_preflight_e2e.py -v --no-cov
+
+video-record-clips:  ## Record 7+2 dashboard clips for Remotion composition (needs `make record-ready` running)
+	uv run --with playwright python scripts/record_dashboard.py --all
 
 # ---------------------------------------------------------------------------
 # Phase 7.1: Laptop-as-drone-controller (no-mobile-app path)
