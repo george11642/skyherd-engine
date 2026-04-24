@@ -303,6 +303,46 @@ def pi_to_mission_cmd(
         pass
 
 
+# ---------------------------------------------------------------------------
+# deterrent — Phase 6 H2-03
+# ---------------------------------------------------------------------------
+
+
+@app.command("deterrent")
+def deterrent_cmd(
+    ranch_id: str = typer.Option("ranch_a", "--ranch", help="Ranch identifier."),
+    mute: bool = typer.Option(
+        False, "--mute", help="Force mute backend (CI default)."
+    ),
+    verbose: bool = typer.Option(False, "--verbose", "-v", help="Enable debug logging."),
+) -> None:
+    """Subscribe to deterrent MQTT events and play predator WAV to OS audio.
+
+    Phase 6 H2-03.  Default backend auto-selection:
+    pygame → simpleaudio → nop (logs only).  ``--mute`` or
+    ``SKYHERD_DETERRENT=mute`` forces the no-op backend.
+    """
+    _configure_logging(verbose)
+    import os
+
+    if mute:
+        os.environ["SKYHERD_DETERRENT"] = "mute"
+    try:
+        from skyherd.edge.speaker_bridge import SpeakerBridge
+    except ImportError as exc:
+        typer.echo(
+            f"deterrent unavailable — skyherd.edge.speaker_bridge missing ({exc}).",
+            err=True,
+        )
+        raise typer.Exit(code=1) from exc
+
+    bridge = SpeakerBridge(ranch_id=ranch_id)
+    try:
+        asyncio.run(bridge.run())
+    except KeyboardInterrupt:
+        pass
+
+
 def main() -> None:
     app()
 
