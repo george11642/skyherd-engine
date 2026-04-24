@@ -29,7 +29,7 @@ import {
   type AccordionTab,
 } from "@/components/shared/RightRailAccordion";
 import { KeyboardHelp } from "@/components/shared/KeyboardHelp";
-import { getSSE } from "@/lib/sse";
+import { getSSE, getReplayIfActive } from "@/lib/sse";
 
 export default function App() {
   // Track lightweight counts for tab badges.  Each panel owns its state
@@ -51,6 +51,18 @@ export default function App() {
   }, []);
   const handleNeighbor = useCallback(() => {
     setNeighborCount((c) => c + 1);
+  }, []);
+
+  // Autostart: when URL includes ?autostart=1 (or =true), immediately start
+  // the replay driver on mount. Recorder scripts + share-links use this to
+  // bypass the Start Simulation overlay so the map animates on first paint.
+  // No-op outside replay mode (getReplayIfActive() returns null).
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const flag = params.get("autostart");
+    if (flag !== "1" && flag !== "true") return;
+    const replay = getReplayIfActive();
+    if (replay && replay.isPaused()) replay.start();
   }, []);
 
   useEffect(() => {
