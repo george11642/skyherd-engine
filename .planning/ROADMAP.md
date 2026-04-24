@@ -202,6 +202,16 @@ Plans:
 Plans:
 - [ ] TBD (run /gsd-plan-phase 8 to break down)
 
+### Phase 10: Dashboard Polish 10/10 (livestock viz, layout fixes, ease-of-use, stitch-grade UI)
+
+**Goal:** [To be planned]
+**Requirements**: TBD
+**Depends on:** Phase 9
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd-plan-phase 10 to break down)
+
 ---
 
 ### Phase 9: Demo Video Scaffolding + Submission

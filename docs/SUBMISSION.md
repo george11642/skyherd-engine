@@ -101,6 +101,21 @@ Capture all four from a running `make record-ready` with fresh seed.
 
 ---
 
+## Hardware path — laptop-primary (2026-04-25 · Phase 7.1)
+
+iOS + Android companion code is feature-complete and tested (880+ tests
+including the DJI SDK V5 mock path), but the installed demo uses the
+**laptop path** because judges can't install iOS builds without a Mac and
+we pivoted away from requiring a phone in the loop. The canonical Friday
+demo is: Ubuntu laptop + USB-C data cable + DJI RC + Mavic Air 2, driven
+through the MAVSDK-over-USB-C leg of `MavicAdapter` plus the manual-
+override `/api/drone/*` endpoints added in Phase 7.1. Full procedure in
+[`docs/LAPTOP_DRONE_CONTROL.md`](./LAPTOP_DRONE_CONTROL.md); phone-based
+control remains documented as the premium path in
+[`docs/HARDWARE_H3_RUNBOOK.md`](./HARDWARE_H3_RUNBOOK.md) §9.
+
+---
+
 ## Tech stack (for Devpost tags)
 
 `python` `typescript` `react` `fastapi` `claude-sdk` `anthropic` `tailwind`

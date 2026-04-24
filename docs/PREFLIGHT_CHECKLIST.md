@@ -1,6 +1,7 @@
 # PREFLIGHT_CHECKLIST — Friday Morning Hardware Plug-In
 
 **Phase 9 deliverable · PF-03 · 2026-04-24**
+**Phase 7.1 update · 2026-04-25** — laptop path now primary.
 
 20-item checklist George runs Friday morning before filming. Each item has:
 
@@ -9,6 +10,11 @@
 - **`expect:`** — the expected output or pattern.
 
 Target total time: **< 30 minutes, coffee to first heartbeat green**.
+
+> **Laptop is the primary controller path as of 2026-04-25.** See
+> `docs/LAPTOP_DRONE_CONTROL.md`. Phone-based control (iOS / Android) is
+> still documented but is no longer required for Friday's demo —
+> relegated to Group 3 (optional).
 
 > Pair with: `docs/HARDWARE_PI_FLEET.md` §Friday Morning Sequence for the
 > 15-minute operational flow. This checklist is the pre-flight safety pass
@@ -84,7 +90,12 @@ Target total time: **< 30 minutes, coffee to first heartbeat green**.
 
 ---
 
-## Group 3 — Mavic readiness (4 items)
+## Group 3 — Mavic readiness (optional phone-based path)
+
+> **Skip this entire group unless you're using the phone companion app.**
+> The laptop-primary path in Group 6 replaces items 12 and 13. Item 11
+> (RC + Mavic power + pair) is still required regardless of controller
+> choice. Item 14 (SITL smoke) is still useful as a standalone sanity check.
 
 ### 11. DJI RC + Mavic Air 2 powered + paired
 
@@ -92,13 +103,13 @@ Target total time: **< 30 minutes, coffee to first heartbeat green**.
 - `verify:` RC screen shows **Aircraft Connected** and battery > 50%.
 - `expect:` both green. If red, swap battery or re-pair per DJI RC manual.
 
-### 12. Companion APK installed on phone
+### 12. Companion APK installed on phone *(optional — skip unless using phone)*
 
 - [ ] Action: download APK from URL in `docs/HARDWARE_H3_RUNBOOK.md` §Companion App APK Download, sideload.
 - `verify:` Android → Settings → Apps → SkyHerdCompanion version string matches CI run.
 - `expect:` version present, opens without crash.
 
-### 13. App reports DJI + MQTT both green
+### 13. App reports DJI + MQTT both green *(optional — skip unless using phone)*
 
 - [ ] Action: open app, enter MQTT URL (matches laptop), connect Mavic.
 - `verify:` two badges top-right of the app screen.
@@ -110,6 +121,39 @@ Target total time: **< 30 minutes, coffee to first heartbeat green**.
 - `verify:` exit code 0 in < 60 s.
 - `expect:` `PASS` line in the test output; means the MAVLink stack is valid
   even if the real Mavic is unavailable.
+
+---
+
+## Group 6 — Laptop Drone Control path (primary · 2026-04-25 · Phase 7.1)
+
+> **This is the default path for Friday.** See
+> `docs/LAPTOP_DRONE_CONTROL.md` for the full procedure and cable spec.
+> If all three items below are green, you can skip Group 3 items 12–13.
+
+### 21. USB-C data cable plugged RC → laptop
+
+- [ ] Action: plug the data-capable USB-C cable from the laptop into the
+  **DJI RC controller's USB-C port** (not the aircraft).
+- `verify:` `dmesg | tail -20` immediately after plugging.
+- `expect:` a line like `cdc_acm ...: ttyACM0: USB ACM device` or similar
+  USB-serial enumeration. If silent → swap the cable; many USB-C cables are
+  charge-only.
+
+### 22. Kernel sees the DJI RC and /dev/ttyACM* is readable
+
+- [ ] Action: confirm device enumeration + permissions.
+- `verify:` `lsusb | grep -iE 'dji|pixhawk|silicon labs' && ls -l /dev/ttyACM*`
+- `expect:` one `lsusb` hit + a `/dev/ttyACM*` file owned by `root:plugdev`
+  mode `crw-rw----`. If permission denied: `sudo udevadm control --reload-rules && sudo udevadm trigger` (requires the udev rules from `docs/LAPTOP_DRONE_CONTROL.md` §Linux §1).
+
+### 23. Laptop-drone smoke + dashboard ready
+
+- [ ] Action: run the mocked end-to-end smoke and verify the manual
+  override token is in the environment.
+- `verify:` `make laptop-drone-smoke && test -n "$SKYHERD_MANUAL_OVERRIDE_TOKEN" && echo OK`
+- `expect:` 14 tests passed in < 10 s, then `OK`. If the token is unset:
+  `export SKYHERD_MANUAL_OVERRIDE_TOKEN="$(openssl rand -hex 16)"` — paste
+  the value into the dashboard console as `window.__DRONE_MANUAL_TOKEN`.
 
 ---
 
