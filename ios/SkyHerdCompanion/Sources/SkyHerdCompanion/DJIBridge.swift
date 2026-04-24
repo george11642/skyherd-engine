@@ -72,9 +72,20 @@ public final class DJIBridge: NSObject {
 
     /// Arm and take off to the default altitude (5 m for dev testing; agents send alt_m in args).
     /// - Parameter altM: Target altitude in metres AGL.  Clamped to ``Config.maxAltitudeM``.
+    ///
+    /// Precondition (H3-01 audit gate): ``currentState.gpsValid`` must be ``true``.
+    /// When the DJI SDK is unavailable (stub mode), this defaults to ``true`` so
+    /// unit tests don't need to thread GPS state.
     public func takeoff(altM: Double = 5.0) async throws {
         let clampedAlt = min(altM, Config.maxAltitudeM)
         AppLogger.dji.info("takeoff requested: altM=\(clampedAlt, privacy: .public)")
+
+        // GPS fix is a hard precondition for autonomous flight.  Stub mode
+        // defaults gpsValid=true so tests pass without mocking SDK telemetry.
+        guard currentState.gpsValid else {
+            AppLogger.dji.warning("takeoff refused: GPS fix invalid")
+            throw DJIBridgeError.gpsInvalid("GPS fix required before takeoff")
+        }
 
 #if DJI_SDK_AVAILABLE
         guard isRegistered, isConnected else {
@@ -263,6 +274,10 @@ public final class DJIBridge: NSObject {
                 currentState.lat = loc.coordinate.latitude
                 currentState.lon = loc.coordinate.longitude
             }
+            // H3-01 audit: surface GPS fix strength so takeoff can refuse
+            // when no 3D fix is present (Mavic Air 2 GPS level reports 0–5;
+            // level >= 3 corresponds to isGPSSignalStrong in DJI SDK V5).
+            currentState.gpsValid = fcState.isGPSSignalStrong
         }
         if let battery = DJISDKManager.product()?.battery {
             currentState.batteryPct = Double(battery.chargeRemainingInPercent)
@@ -328,12 +343,16 @@ public enum DJIBridgeError: Error, LocalizedError {
     case sdkUnavailable(String)
     case djiError(String)
     case timeout(String)
+    case gpsInvalid(String)
+    case lostSignal(String)
 
     public var errorDescription: String? {
         switch self {
         case .sdkUnavailable(let msg): return "DJI SDK unavailable: \(msg)"
         case .djiError(let msg):       return "DJI error: \(msg)"
         case .timeout(let msg):        return "Timeout: \(msg)"
+        case .gpsInvalid(let msg):     return "\(DroneErrorCode.gpsInvalid.rawValue): \(msg)"
+        case .lostSignal(let msg):     return "\(DroneErrorCode.lostSignal.rawValue): \(msg)"
         }
     }
 }

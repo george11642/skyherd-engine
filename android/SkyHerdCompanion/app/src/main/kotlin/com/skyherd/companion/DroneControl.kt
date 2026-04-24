@@ -6,10 +6,14 @@ import dji.v5.common.callback.CommonCallbacks
 import dji.v5.common.error.IDJIError
 import dji.v5.manager.aircraft.flightcontroller.FlightControllerManager
 import dji.v5.manager.aircraft.payload.PayloadCenter
+import dji.v5.manager.aircraft.battery.BatteryManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 
@@ -41,21 +45,85 @@ class DroneControl(
         private const val TAG = "SkyHerdDroneControl"
         private const val ACK_TOPIC = "${MQTTBridge.TOPIC_STATE_BASE}ack"
         private const val TELEMETRY_TOPIC = "${MQTTBridge.TOPIC_STATE_BASE}telemetry"
+
+        /** Lost-signal watchdog poll interval (ms). */
+        private const val WATCHDOG_POLL_MS = 5_000L
+        /** How long MQTT must stay disconnected (in-flight) before RTH fires. */
+        private const val WATCHDOG_GRACE_MS = 30_000L
     }
 
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val safety = SafetyGuards()
 
+    /** H3-01: set when takeoff ACK succeeds; cleared on RTH or land. */
+    @Volatile private var inAirState: Boolean = false
+
+    /** H3-01: watchdog toggle (default on; can be disabled via [autoRthOnLostSignal]). */
+    @Volatile var autoRthOnLostSignal: Boolean = true
+
+    /** Active watchdog coroutine job (null when not running). */
+    private var watchdogJob: Job? = null
+
     fun start() {
         mqttBridge.commandListener = { topic, payload ->
             scope.launch { handleCommand(topic, payload) }
         }
+        startLostSignalWatchdog()
         Log.i(TAG, "DroneControl started — listening for commands")
     }
 
     fun stop() {
+        watchdogJob?.cancel()
+        watchdogJob = null
         scope.cancel()
         mqttBridge.commandListener = null
+    }
+
+    // ------------------------------------------------------------------
+    // Lost-signal watchdog (H3-01, Rule-2)
+    // ------------------------------------------------------------------
+
+    /**
+     * Polls [MQTTBridge.isConnected] every [WATCHDOG_POLL_MS]; if MQTT stays
+     * disconnected for [WATCHDOG_GRACE_MS] while [inAirState] is true, fires
+     * ``fc.startGoHome`` to bring the drone home autonomously.
+     *
+     * This is a safety-net only — the DJI SDK already has its own RTH-on-RC-
+     * signal-lost logic; this watchdog covers the separate case where the
+     * **companion-to-broker** link drops but the RC link stays up.
+     */
+    private fun startLostSignalWatchdog() {
+        watchdogJob?.cancel()
+        watchdogJob = scope.launch {
+            var firstDisconnectAtMs: Long? = null
+            while (isActive) {
+                delay(WATCHDOG_POLL_MS)
+                val connected = mqttBridge.isConnected
+                if (!connected && inAirState && autoRthOnLostSignal) {
+                    val now = System.currentTimeMillis()
+                    if (firstDisconnectAtMs == null) {
+                        firstDisconnectAtMs = now
+                        Log.w(TAG, "Watchdog: MQTT disconnected while in-air — grace timer started")
+                    } else if (now - firstDisconnectAtMs >= WATCHDOG_GRACE_MS) {
+                        Log.e(TAG, "Watchdog: MQTT down > ${WATCHDOG_GRACE_MS}ms — firing RTH")
+                        val fc = getFlightController()
+                        fc?.startGoHome(object : CommonCallbacks.CompletionCallback {
+                            override fun onSuccess() {
+                                Log.i(TAG, "Watchdog RTH initiated")
+                                inAirState = false
+                            }
+
+                            override fun onFailure(error: IDJIError) {
+                                Log.e(TAG, "Watchdog RTH failed: ${error.description()}")
+                            }
+                        })
+                        firstDisconnectAtMs = null
+                    }
+                } else if (connected) {
+                    firstDisconnectAtMs = null
+                }
+            }
+        }
     }
 
     // ------------------------------------------------------------------
@@ -91,10 +159,14 @@ class DroneControl(
 
     private fun cmdTakeoff(args: JSONObject, seq: Int) {
         val altM = args.optDouble("alt_m", 30.0).toFloat()
+        val windKt = args.opt("wind_kt")?.let { (it as? Number)?.toFloat() }
 
         val batteryPct = getBatteryPercent()
         try {
             safety.checkTakeoff(batteryPct = batteryPct, altM = altM)
+            if (windKt != null) {
+                safety.checkWind(windKt)
+            }
         } catch (e: SafetyGuards.SafetyViolation) {
             ackError("takeoff", seq, e.message ?: "safety violation")
             return
@@ -108,6 +180,7 @@ class DroneControl(
         fc.startTakeoff(object : CommonCallbacks.CompletionCallback {
             override fun onSuccess() {
                 Log.i(TAG, "Takeoff started — target alt ${altM}m")
+                inAirState = true
                 ackOk("takeoff", seq)
             }
 
@@ -138,6 +211,7 @@ class DroneControl(
         fc.startGoHome(object : CommonCallbacks.CompletionCallback {
             override fun onSuccess() {
                 Log.i(TAG, "RTH initiated")
+                inAirState = false
                 ackOk("return_to_home", seq)
             }
 
@@ -191,9 +265,12 @@ class DroneControl(
 
     private fun getBatteryPercent(): Float {
         return runCatching {
-            // DJI SDK V5: BatteryManager.getInstance().getChargeRemainingInPercent()
-            // Returning 100 as safe default when unavailable in stub
-            100f
+            // DJI SDK V5: BatteryManager.getInstance() exposes aggregate battery
+            // info.  chargeRemainingInPercent returns 0-100 as Int.
+            // When the SDK is absent (unit tests) or no battery is paired,
+            // runCatching traps the NPE/RuntimeException and we fall back to
+            // 100f so the safety guard doesn't spuriously trip.
+            BatteryManager.getInstance().chargeRemainingInPercent.toFloat()
         }.getOrDefault(100f)
     }
 

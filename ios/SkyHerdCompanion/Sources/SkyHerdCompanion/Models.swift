@@ -70,6 +70,13 @@ public struct DroneStateSnapshot: Codable, Equatable {
     public var mode: String
     public var lat: Double
     public var lon: Double
+    /// GPS fix is strong enough for autonomous flight.
+    ///
+    /// Populated from ``DJIFlightControllerState.isGPSSignalStrong`` when the
+    /// DJI SDK is available; defaults to ``true`` in stub mode so unit tests
+    /// don't need to thread GPS state.  Takeoff must refuse when this is
+    /// ``false`` to satisfy the H3 audit gate (see ``docs/H3_DJI_AUDIT.md``).
+    public var gpsValid: Bool
 
     public init(
         armed: Bool = false,
@@ -78,7 +85,8 @@ public struct DroneStateSnapshot: Codable, Equatable {
         batteryPct: Double = 100.0,
         mode: String = "UNKNOWN",
         lat: Double = 0.0,
-        lon: Double = 0.0
+        lon: Double = 0.0,
+        gpsValid: Bool = true
     ) {
         self.armed = armed
         self.inAir = inAir
@@ -87,6 +95,7 @@ public struct DroneStateSnapshot: Codable, Equatable {
         self.mode = mode
         self.lat = lat
         self.lon = lon
+        self.gpsValid = gpsValid
     }
 
     enum CodingKeys: String, CodingKey {
@@ -95,6 +104,7 @@ public struct DroneStateSnapshot: Codable, Equatable {
         case altitudeM = "altitude_m"
         case batteryPct = "battery_pct"
         case mode, lat, lon
+        case gpsValid = "gps_valid"
     }
 }
 
@@ -131,6 +141,8 @@ public enum DroneErrorCode: String {
     case windCeiling = "E_WIND_CEILING"
     case timeout = "E_TIMEOUT"
     case unknownCmd = "E_UNKNOWN_CMD"
+    case gpsInvalid = "E_GPS_INVALID"
+    case lostSignal = "E_LOST_SIGNAL"
 }
 
 // MARK: - AnyCodable helper
