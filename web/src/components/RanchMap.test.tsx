@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, act } from "@testing-library/react";
-import { RanchMap, ScenarioBreadcrumb, classifyCow } from "./RanchMap";
+import { RanchMap, ScenarioBreadcrumb, classifyCow, applySnapshotToTweens } from "./RanchMap";
+import { tweenValue } from "@/lib/tween";
 
 // Mock SSE client — shared across both RanchMap and ScenarioBreadcrumb suites.
 // A mutable handler map lets the breadcrumb tests re-emit scenario.active /
@@ -241,5 +242,238 @@ describe("RanchMap — predator pulse ring motion (DASH-05)", () => {
       (HTMLCanvasElement.prototype as unknown as { getContext: unknown }).getContext =
         origGetContext;
     }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Shared RAF tween pipeline (Phase 10.5 — DASH10-09 + scope expansion)
+// ---------------------------------------------------------------------------
+
+// Helper: build an empty state object typed to the `applySnapshotToTweens`
+// signature. Avoids exporting the `EntityState` interface from production code
+// purely for test wiring.
+type EntityStateArg = Parameters<typeof applySnapshotToTweens>[0];
+function makeState(): EntityStateArg {
+  return {
+    cows: new Map(),
+    predators: new Map(),
+    drone: null,
+    trail: [],
+    lastDroneTarget: null,
+    seenCowIds: new Set<string>(),
+    seenPredatorIds: new Set<string>(),
+  } as EntityStateArg;
+}
+
+describe("applySnapshotToTweens — cows", () => {
+  it("seeds a new cow at its target position with no motion", () => {
+    const state = makeState();
+    const snap = {
+      cows: [{ id: "c1", pos: [0.3, 0.4] as [number, number], bcs: 5 }],
+      predators: [],
+    };
+    applySnapshotToTweens(state, snap, 1000, false);
+    const rec = state.cows.get("c1");
+    expect(rec).toBeDefined();
+    if (!rec) return;
+    expect(tweenValue(rec.xTween, 1000)).toBeCloseTo(0.3, 5);
+    expect(tweenValue(rec.yTween, 1000)).toBeCloseTo(0.4, 5);
+    // After the full duration — still at target
+    expect(tweenValue(rec.xTween, 2000)).toBeCloseTo(0.3, 5);
+  });
+
+  it("tweens cow position toward new target over 800ms (ease-out-cubic)", () => {
+    const state = makeState();
+    // Snapshot 1: cow at (0.2, 0.2)
+    applySnapshotToTweens(
+      state,
+      { cows: [{ id: "c1", pos: [0.2, 0.2] as [number, number], bcs: 5 }], predators: [] },
+      1000,
+      false,
+    );
+    // Snapshot 2 at t=2000ms: cow moved to (0.8, 0.8)
+    applySnapshotToTweens(
+      state,
+      { cows: [{ id: "c1", pos: [0.8, 0.8] as [number, number], bcs: 5 }], predators: [] },
+      2000,
+      false,
+    );
+    const rec = state.cows.get("c1");
+    if (!rec) throw new Error("cow not seeded");
+    // Immediately after retarget — still at 0.2
+    expect(tweenValue(rec.xTween, 2000)).toBeCloseTo(0.2, 5);
+    // Midway through (400ms into 800ms tween) — ease-out-cubic(0.5)=0.875
+    // → 0.2 + (0.8 - 0.2) * 0.875 = 0.725
+    expect(tweenValue(rec.xTween, 2400)).toBeCloseTo(0.725, 3);
+    // After 800ms — at target
+    expect(tweenValue(rec.xTween, 2800)).toBeCloseTo(0.8, 5);
+  });
+
+  it("prefers-reduced-motion snaps cow positions with 0ms duration", () => {
+    const state = makeState();
+    applySnapshotToTweens(
+      state,
+      { cows: [{ id: "c1", pos: [0.2, 0.2] as [number, number], bcs: 5 }], predators: [] },
+      1000,
+      true, // reduce motion
+    );
+    applySnapshotToTweens(
+      state,
+      { cows: [{ id: "c1", pos: [0.8, 0.8] as [number, number], bcs: 5 }], predators: [] },
+      2000,
+      true,
+    );
+    const rec = state.cows.get("c1");
+    if (!rec) throw new Error("cow not seeded");
+    // First sample after retarget should already be at target (snap-to).
+    expect(tweenValue(rec.xTween, 2000)).toBeCloseTo(0.8, 5);
+  });
+
+  it("culls cows absent from the new snapshot", () => {
+    const state = makeState();
+    applySnapshotToTweens(
+      state,
+      {
+        cows: [
+          { id: "c1", pos: [0.2, 0.2] as [number, number], bcs: 5 },
+          { id: "c2", pos: [0.4, 0.4] as [number, number], bcs: 5 },
+        ],
+        predators: [],
+      },
+      1000,
+      false,
+    );
+    expect(state.cows.size).toBe(2);
+    applySnapshotToTweens(
+      state,
+      {
+        cows: [{ id: "c1", pos: [0.3, 0.3] as [number, number], bcs: 5 }],
+        predators: [],
+      },
+      2000,
+      false,
+    );
+    expect(state.cows.size).toBe(1);
+    expect(state.cows.has("c1")).toBe(true);
+    expect(state.cows.has("c2")).toBe(false);
+  });
+
+  it("triggers a color cross-fade when a cow's health state changes", () => {
+    const state = makeState();
+    applySnapshotToTweens(
+      state,
+      { cows: [{ id: "c1", pos: [0.5, 0.5] as [number, number], bcs: 5 }], predators: [] },
+      1000,
+      false,
+    );
+    const rec1 = state.cows.get("c1");
+    if (!rec1) throw new Error("cow missing");
+    expect(rec1.health).toBe("healthy");
+    // Sick transition
+    applySnapshotToTweens(
+      state,
+      {
+        cows: [
+          { id: "c1", pos: [0.5, 0.5] as [number, number], bcs: 5, state: "sick" },
+        ],
+        predators: [],
+      },
+      2000,
+      false,
+    );
+    const rec2 = state.cows.get("c1");
+    if (!rec2) throw new Error("cow missing");
+    expect(rec2.health).toBe("sick");
+    // colorStartMs should be the current now
+    expect(rec2.colorStartMs).toBe(2000);
+    // Source color is the previously-applied healthy RGB
+    expect(rec2.colorFrom).toEqual([148, 176, 136]);
+    expect(rec2.colorTo).toEqual([224, 100, 90]);
+  });
+});
+
+describe("applySnapshotToTweens — drone + trail + predators", () => {
+  it("seeds drone tween on first snapshot and retargets on subsequent", () => {
+    const state = makeState();
+    applySnapshotToTweens(
+      state,
+      { cows: [], predators: [], drone: { pos: [0.1, 0.1] as [number, number] } },
+      1000,
+      false,
+    );
+    expect(state.drone).not.toBeNull();
+    applySnapshotToTweens(
+      state,
+      { cows: [], predators: [], drone: { pos: [0.9, 0.9] as [number, number] } },
+      2000,
+      false,
+    );
+    if (!state.drone) throw new Error("drone missing");
+    // Drone tween uses 600ms duration — at 300ms into retarget,
+    // ease-out-cubic(0.5) = 0.875 → 0.1 + 0.8*0.875 = 0.8
+    expect(tweenValue(state.drone.xTween, 2300)).toBeCloseTo(0.8, 3);
+    // After 600ms — fully at target
+    expect(tweenValue(state.drone.xTween, 2600)).toBeCloseTo(0.9, 5);
+  });
+
+  it("appends a trail point each time the drone target changes", () => {
+    const state = makeState();
+    applySnapshotToTweens(
+      state,
+      { cows: [], predators: [], drone: { pos: [0.1, 0.1] as [number, number] } },
+      1000,
+      false,
+    );
+    applySnapshotToTweens(
+      state,
+      { cows: [], predators: [], drone: { pos: [0.5, 0.5] as [number, number] } },
+      2000,
+      false,
+    );
+    applySnapshotToTweens(
+      state,
+      { cows: [], predators: [], drone: { pos: [0.5, 0.5] as [number, number] } },
+      3000,
+      false,
+    );
+    expect(state.trail.length).toBe(2);
+    expect(state.trail[1].spawnMs).toBe(2000);
+  });
+
+  it("caps trail at TRAIL_LEN=12 points", () => {
+    const state = makeState();
+    for (let i = 0; i < 30; i++) {
+      applySnapshotToTweens(
+        state,
+        {
+          cows: [],
+          predators: [],
+          drone: { pos: [i * 0.03, i * 0.03] as [number, number] },
+        },
+        1000 + i * 100,
+        false,
+      );
+    }
+    expect(state.trail.length).toBeLessThanOrEqual(12);
+  });
+
+  it("tweens new predators from their seed position with fade-in", () => {
+    const state = makeState();
+    applySnapshotToTweens(
+      state,
+      {
+        cows: [],
+        predators: [
+          { id: "p1", pos: [0.5, 0.5] as [number, number], species: "coyote" },
+        ],
+      },
+      1000,
+      false,
+    );
+    const rec = state.predators.get("p1");
+    expect(rec).toBeDefined();
+    if (!rec) return;
+    expect(rec.fadeStartMs).toBe(1000);
+    expect(tweenValue(rec.xTween, 1000)).toBeCloseTo(0.5, 5);
   });
 });

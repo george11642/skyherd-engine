@@ -1,24 +1,42 @@
 /**
- * RanchMap — Canvas 2D ranch visualization (Phase 10 10/10 treatment).
+ * RanchMap — Canvas 2D ranch visualization with shared RAF tween pipeline.
  *
- * Layer order (painter's algorithm): terrain → paddock fills → paddock labels
- * (pushed to corners) → fences → water tanks → cows (+ health ring for non-
- * healthy) → cow tag labels (only for watch/sick/calving) → drone trail →
- * drone triangle → drone label (smart offset, never collides with EAST) →
- * predators + threat ring → weather overlay (bottom-left) → cattle legend
- * (bottom-right, summarizing herd health).
+ * Phase 10.5 (DASH10-08, DASH10-09, scope expansion): every moving entity
+ * on the map — cows, drone, drone trail, predators — now interpolates
+ * smoothly between SSE `world.snapshot` ticks using a single shared RAF
+ * loop + ease-out-cubic tweens. A WebGL2 `TerrainLayer` is mounted beneath
+ * the 2D canvas to hint at landscape texture (raw WebGL, no deps).
+ *
+ * Layer order (painter's algorithm): WebGL terrain → paddock fills → paddock
+ * labels (pushed to corners) → fences → water tanks → cows (+ health ring
+ * for non-healthy) → cow tag labels (only for watch/sick/calving) → drone
+ * trail → drone triangle → drone label (smart offset, never collides with
+ * EAST) → predators + threat ring → weather overlay (bottom-left) → cattle
+ * legend (bottom-right, summarizing herd health).
  *
  * Subscribes to:
- *   - "world.snapshot" SSE — updates cow/drone/predator positions
+ *   - "world.snapshot" SSE — updates cow/drone/predator positions, which
+ *     retarget the per-entity tween records via `retarget(...)`.
  *   - "scenario.active" / "scenario.ended" — drives the ScenarioBreadcrumb
  *     and the `scenarioGlowZone` that tints a paddock when a scenario names
  *     a zone (coyote → NE, water_drop → where tank is, etc.).
  *
- * 60fps RAF loop, HiDPI aware.
+ * 60fps RAF loop, HiDPI aware. `prefers-reduced-motion: reduce` makes all
+ * tweens snap-to-target for accessibility.
  */
 
 import { useEffect, useRef, useCallback, useState } from "react";
 import { getSSE } from "@/lib/sse";
+import { TerrainLayer } from "@/components/shared/TerrainLayer";
+import {
+  createTween,
+  retarget as retargetTween,
+  tweenValue,
+  lerpRgb,
+  prefersReducedMotion,
+  lerp,
+  type TweenState,
+} from "@/lib/tween";
 
 interface Cow {
   id: string;
@@ -66,38 +84,50 @@ interface WorldSnapshot {
   weather?: { conditions: string; temp_f: number; wind_kt: number };
 }
 
+// Tween durations (ms) — tuned per entity so drones feel snappier than cows.
+const COW_POS_MS = 800;
+const COW_COLOR_MS = 400;
+const COW_FADE_IN_MS = 500;
+const DRONE_POS_MS = 600;
+const PREDATOR_FADE_MS = 500;
+const TRAIL_FADE_MS = 400;
+
 // Brand palette (matches CSS tokens)
 const C = {
-  bg_day:   "#0a0c10",
+  bg_day: "#0a0c10",
   bg_night: "#070810",
-  grid:     "rgba(236,239,244,0.025)",
+  grid: "rgba(236,239,244,0.025)",
   paddock_border: "rgba(148,176,136,0.22)",
-  fence:    "rgba(168,180,198,0.28)",
+  fence: "rgba(168,180,198,0.28)",
   // Cow health states — colorblind-safe triple (hue differences alongside
   // luminance differences so deuteranopes can still distinguish)
-  cow_healthy:  "#94b088",   // sage (green-gray)
-  cow_watch:    "#d2b28a",   // dust (warm tan)
-  cow_sick:     "#e0645a",   // danger (salmon-red)
-  cow_calving:  "#78b4dc",   // sky (cool blue)
-  drone:    "#78b4dc",       // sky
-  predator: "#e0645a",       // danger
-  water_high:   "#78b4dc",
-  water_mid:    "#f0c350",
-  water_low:    "#e0645a",
-  text:     "rgba(168,180,198,0.8)",
+  cow_healthy: "#94b088", // sage
+  cow_watch: "#d2b28a", // dust
+  cow_sick: "#e0645a", // danger
+  cow_calving: "#78b4dc", // sky
+  drone: "#78b4dc", // sky
+  predator: "#e0645a", // danger
+  water_high: "#78b4dc",
+  water_mid: "#f0c350",
+  water_low: "#e0645a",
+  text: "rgba(168,180,198,0.8)",
   text_dim: "rgba(110,122,140,0.8)",
   text_bright: "rgba(236,239,244,0.95)",
-  trail:    "rgba(120,180,220,0.18)",
+  trail: "rgba(120,180,220,0.18)",
   glow_coyote: "rgba(255,143,60,0.12)",
-  glow_water:  "rgba(120,180,220,0.12)",
-  glow_sick:   "rgba(224,100,90,0.12)",
+  glow_water: "rgba(120,180,220,0.12)",
+  glow_sick: "rgba(224,100,90,0.12)",
+};
+
+// RGB triples for the health-color cross-fade.
+const COW_RGB: Record<CowHealth, [number, number, number]> = {
+  healthy: [148, 176, 136],
+  watch: [210, 178, 138],
+  sick: [224, 100, 90],
+  calving: [120, 180, 220],
 };
 
 type CowHealth = "healthy" | "watch" | "sick" | "calving";
-
-function lerp(a: number, b: number, t: number): number {
-  return a + (b - a) * t;
-}
 
 function hexToRgba(hex: string, alpha: number): string {
   const r = parseInt(hex.slice(1, 3), 16);
@@ -118,10 +148,14 @@ export function classifyCow(cow: Cow): CowHealth {
 
 function cowColor(health: CowHealth): string {
   switch (health) {
-    case "sick":    return C.cow_sick;
-    case "calving": return C.cow_calving;
-    case "watch":   return C.cow_watch;
-    default:        return C.cow_healthy;
+    case "sick":
+      return C.cow_sick;
+    case "calving":
+      return C.cow_calving;
+    case "watch":
+      return C.cow_watch;
+    default:
+      return C.cow_healthy;
   }
 }
 
@@ -151,7 +185,6 @@ function scenarioToZone(name?: string): { paddock?: string; color?: string } {
 
 // Paddock label corner placement — always push to an OUTSIDE corner so labels
 // never collide with map-center symbols (drone triangle, center-clustered cows).
-// We use the "outside" corner relative to the canvas center for each quadrant.
 function paddockLabelAnchor(
   p: Paddock,
   px: (x: number) => number,
@@ -160,21 +193,19 @@ function paddockLabelAnchor(
   const [x0, y0, x1, y1] = p.bounds;
   const leftHalf = x0 < 0.5;
   const topHalf = y0 < 0.5;
-  if (leftHalf && topHalf)  return { x: px(x0) + 6,  y: py(y0) + 14, align: "left"  }; // NORTH/W: top-left
-  if (!leftHalf && topHalf) return { x: px(x1) - 6,  y: py(y0) + 14, align: "right" }; // NORTH/E: top-right
-  if (leftHalf && !topHalf) return { x: px(x0) + 6,  y: py(y1) - 6,  align: "left"  }; // SOUTH/W: bottom-left
-  return                        { x: px(x1) - 6,  y: py(y1) - 6,  align: "right" }; // SOUTH/E: bottom-right
+  if (leftHalf && topHalf) return { x: px(x0) + 6, y: py(y0) + 14, align: "left" };
+  if (!leftHalf && topHalf) return { x: px(x1) - 6, y: py(y0) + 14, align: "right" };
+  if (leftHalf && !topHalf) return { x: px(x0) + 6, y: py(y1) - 6, align: "left" };
+  return { x: px(x1) - 6, y: py(y1) - 6, align: "right" };
 }
 
-/**
- * Drone label smart offset — avoids collision with paddock labels.
- *
- * If the drone sits near a paddock-label anchor, flip the label side so they
- * never overlap.  Also uses bottom-right placement when drone is near the
- * top-left-ish center (our "EAST collision" fix).
- */
-function droneLabelOffset(dx: number, dy: number, W: number, H: number):
-  { x: number; y: number; align: CanvasTextAlign } {
+/** Drone label smart offset — avoids collision with paddock labels. */
+function droneLabelOffset(
+  dx: number,
+  dy: number,
+  W: number,
+  H: number,
+): { x: number; y: number; align: CanvasTextAlign } {
   const centerX = W / 2;
   const centerY = H / 2;
   const rightSide = dx < centerX;
@@ -188,6 +219,220 @@ function droneLabelOffset(dx: number, dy: number, W: number, H: number):
   };
 }
 
+// ---------------------------------------------------------------------------
+// Entity tween state — shared RAF pipeline records
+// ---------------------------------------------------------------------------
+
+interface CowTweenRec {
+  xTween: TweenState;
+  yTween: TweenState;
+  fadeStartMs: number; // when the cow first appeared (for fade-in)
+  health: CowHealth;
+  /** RGB at the start of the current color cross-fade. */
+  colorFrom: [number, number, number];
+  /** Target RGB for the current health state. */
+  colorTo: [number, number, number];
+  /** `performance.now()` at which the current color cross-fade started. */
+  colorStartMs: number;
+}
+
+interface PredatorTweenRec {
+  xTween: TweenState;
+  yTween: TweenState;
+  fadeStartMs: number;
+  phase: number;
+}
+
+interface DroneTweenRec {
+  xTween: TweenState;
+  yTween: TweenState;
+}
+
+interface TrailPoint {
+  x: number;
+  y: number;
+  spawnMs: number;
+}
+
+interface EntityState {
+  cows: Map<string, CowTweenRec>;
+  predators: Map<string, PredatorTweenRec>;
+  drone: DroneTweenRec | null;
+  trail: TrailPoint[];
+  /** Last drone target pos — so we only push trail points on change. */
+  lastDroneTarget: [number, number] | null;
+  /** Set of cow IDs seen in the last snapshot — for cull detection. */
+  seenCowIds: Set<string>;
+  seenPredatorIds: Set<string>;
+}
+
+function createEntityState(): EntityState {
+  return {
+    cows: new Map(),
+    predators: new Map(),
+    drone: null,
+    trail: [],
+    lastDroneTarget: null,
+    seenCowIds: new Set(),
+    seenPredatorIds: new Set(),
+  };
+}
+
+/**
+ * Apply a new snapshot to the entity-state tweens. Pure-ish: mutates `state`
+ * in place (keeps allocation count low on the RAF hot path), but never
+ * touches the incoming `snap`. Called from the `world.snapshot` SSE handler.
+ */
+export function applySnapshotToTweens(
+  state: EntityState,
+  snap: WorldSnapshot,
+  nowMs: number,
+  reduceMotion: boolean,
+): void {
+  // --- Cows ---
+  const nextCowIds = new Set<string>();
+  for (const cow of snap.cows ?? []) {
+    nextCowIds.add(cow.id);
+    const [tx, ty] = cow.pos;
+    const health = classifyCow(cow);
+    const existing = state.cows.get(cow.id);
+    if (!existing) {
+      // Brand-new cow: seed at target position with fade-in.
+      state.cows.set(cow.id, {
+        xTween: createTween(tx, tx, nowMs, reduceMotion ? 0 : COW_POS_MS),
+        yTween: createTween(ty, ty, nowMs, reduceMotion ? 0 : COW_POS_MS),
+        fadeStartMs: nowMs,
+        health,
+        colorFrom: COW_RGB[health],
+        colorTo: COW_RGB[health],
+        colorStartMs: nowMs - COW_COLOR_MS, // fully on
+      });
+    } else {
+      existing.xTween = retargetTween(
+        existing.xTween,
+        tx,
+        nowMs,
+        reduceMotion ? 0 : COW_POS_MS,
+      );
+      existing.yTween = retargetTween(
+        existing.yTween,
+        ty,
+        nowMs,
+        reduceMotion ? 0 : COW_POS_MS,
+      );
+      if (existing.health !== health) {
+        // Cross-fade from the previously-blended color to the new target.
+        const pColor = tweenCowColor(existing, nowMs);
+        existing.colorFrom = pColor;
+        existing.colorTo = COW_RGB[health];
+        existing.colorStartMs = reduceMotion ? nowMs - COW_COLOR_MS : nowMs;
+        existing.health = health;
+      }
+    }
+  }
+  // Cull cows no longer in the snapshot.
+  for (const id of state.cows.keys()) {
+    if (!nextCowIds.has(id)) state.cows.delete(id);
+  }
+  state.seenCowIds = nextCowIds;
+
+  // --- Predators ---
+  const nextPredIds = new Set<string>();
+  for (const pred of snap.predators ?? []) {
+    nextPredIds.add(pred.id);
+    const [tx, ty] = pred.pos;
+    const existing = state.predators.get(pred.id);
+    if (!existing) {
+      state.predators.set(pred.id, {
+        xTween: createTween(tx, tx, nowMs, reduceMotion ? 0 : COW_POS_MS),
+        yTween: createTween(ty, ty, nowMs, reduceMotion ? 0 : COW_POS_MS),
+        fadeStartMs: nowMs,
+        phase: Math.random(),
+      });
+    } else {
+      existing.xTween = retargetTween(
+        existing.xTween,
+        tx,
+        nowMs,
+        reduceMotion ? 0 : COW_POS_MS,
+      );
+      existing.yTween = retargetTween(
+        existing.yTween,
+        ty,
+        nowMs,
+        reduceMotion ? 0 : COW_POS_MS,
+      );
+    }
+  }
+  for (const id of state.predators.keys()) {
+    if (!nextPredIds.has(id)) state.predators.delete(id);
+  }
+  state.seenPredatorIds = nextPredIds;
+
+  // --- Drone ---
+  const drone = snap.drone;
+  if (drone) {
+    let droneX = 0.5;
+    let droneY = 0.5;
+    if (Array.isArray(drone.pos)) {
+      [droneX, droneY] = drone.pos;
+    } else if (drone.lat !== undefined && drone.lon !== undefined) {
+      droneX = Math.max(0.05, Math.min(0.95, (drone.lon - -106.48) / 0.05 + 0.5));
+      droneY = Math.max(0.05, Math.min(0.95, (drone.lat - 34.1) / 0.05 + 0.5));
+    }
+    if (!state.drone) {
+      state.drone = {
+        xTween: createTween(droneX, droneX, nowMs, reduceMotion ? 0 : DRONE_POS_MS),
+        yTween: createTween(droneY, droneY, nowMs, reduceMotion ? 0 : DRONE_POS_MS),
+      };
+    } else {
+      state.drone.xTween = retargetTween(
+        state.drone.xTween,
+        droneX,
+        nowMs,
+        reduceMotion ? 0 : DRONE_POS_MS,
+      );
+      state.drone.yTween = retargetTween(
+        state.drone.yTween,
+        droneY,
+        nowMs,
+        reduceMotion ? 0 : DRONE_POS_MS,
+      );
+    }
+    // Trail — append only on meaningful change.
+    const prev = state.lastDroneTarget;
+    if (
+      !prev ||
+      Math.abs(prev[0] - droneX) > 0.001 ||
+      Math.abs(prev[1] - droneY) > 0.001
+    ) {
+      state.trail.push({ x: droneX, y: droneY, spawnMs: nowMs });
+      if (state.trail.length > TRAIL_LEN) {
+        state.trail.splice(0, state.trail.length - TRAIL_LEN);
+      }
+      state.lastDroneTarget = [droneX, droneY];
+    }
+  }
+}
+
+/** Current eased RGB for the cow's color cross-fade. */
+function tweenCowColor(
+  rec: CowTweenRec,
+  nowMs: number,
+): [number, number, number] {
+  const raw =
+    COW_COLOR_MS <= 0
+      ? 1
+      : (nowMs - rec.colorStartMs) / COW_COLOR_MS;
+  const t = raw >= 1 ? 1 : raw <= 0 ? 0 : raw;
+  // Linear blend (eased externally); color cross-fade looks best linear.
+  return [
+    rec.colorFrom[0] + (rec.colorTo[0] - rec.colorFrom[0]) * t,
+    rec.colorFrom[1] + (rec.colorTo[1] - rec.colorFrom[1]) * t,
+    rec.colorFrom[2] + (rec.colorTo[2] - rec.colorFrom[2]) * t,
+  ];
+}
+
 /**
  * RanchMapProps — optional snapshot override for tests & storybook fixtures.
  */
@@ -198,16 +443,26 @@ interface RanchMapProps {
 export function RanchMap({ snapshot: snapshotProp }: RanchMapProps = {}) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const snapshotRef = useRef<WorldSnapshot | null>(snapshotProp ?? null);
+  const entityRef = useRef<EntityState>(createEntityState());
   const animFrameRef = useRef<number>(0);
-  const droneTrailRef = useRef<Array<[number, number]>>([]);
-  const prevDroneRef = useRef<[number, number] | null>(null);
   const predatorPhaseRef = useRef<Map<string, number>>(new Map());
   const scenarioZoneRef = useRef<{ paddock?: string; color?: string }>({});
+  const reduceMotionRef = useRef<boolean>(prefersReducedMotion());
 
-  // Keep snapshotRef in sync with the snapshot prop across re-renders so tests
-  // (and any future prop-driven callers) can re-render with new data.
+  // Keep snapshotRef in sync with the snapshot prop across re-renders AND
+  // fold the prop through the tween pipeline for test-driven rendering.
   if (snapshotProp !== undefined && snapshotRef.current !== snapshotProp) {
     snapshotRef.current = snapshotProp;
+    const nowMs =
+      typeof performance !== "undefined" && typeof performance.now === "function"
+        ? performance.now()
+        : Date.now();
+    applySnapshotToTweens(
+      entityRef.current,
+      snapshotProp,
+      nowMs,
+      reduceMotionRef.current,
+    );
   }
 
   const draw = useCallback(() => {
@@ -216,27 +471,33 @@ export function RanchMap({ snapshot: snapshotProp }: RanchMapProps = {}) {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
     const snap = snapshotRef.current;
+    const state = entityRef.current;
+    const nowMs =
+      typeof performance !== "undefined" && typeof performance.now === "function"
+        ? performance.now()
+        : Date.now();
 
     const W = canvas.width / devicePixelRatio;
     const H = canvas.height / devicePixelRatio;
 
-    // Scale for HiDPI
     ctx.save();
     ctx.scale(devicePixelRatio, devicePixelRatio);
 
     const px = (x: number) => x * W;
     const py = (y: number) => y * H;
 
-    // --- Background ---
+    // --- Background (deliberately mostly transparent over WebGL terrain) ---
     const isNight = snap?.is_night ?? false;
-    ctx.fillStyle = isNight ? C.bg_night : C.bg_day;
+    // Keep a base fill so scenario tints & paddock shading still read
+    // correctly; WebGL terrain already provides the base landscape hint.
+    ctx.fillStyle = isNight ? "rgba(7,8,16,0.55)" : "rgba(10,12,16,0.45)";
     ctx.fillRect(0, 0, W, H);
 
-    // Subtle terrain texture
+    // Subtle terrain wash (kept from Phase 10 for continuity)
     const terrainGrad = ctx.createLinearGradient(0, 0, W, H);
-    terrainGrad.addColorStop(0, "rgba(16,20,12,0.4)");
+    terrainGrad.addColorStop(0, "rgba(16,20,12,0.22)");
     terrainGrad.addColorStop(0.5, "rgba(12,16,10,0.0)");
-    terrainGrad.addColorStop(1, "rgba(20,16,10,0.3)");
+    terrainGrad.addColorStop(1, "rgba(20,16,10,0.18)");
     ctx.fillStyle = terrainGrad;
     ctx.fillRect(0, 0, W, H);
 
@@ -251,12 +512,12 @@ export function RanchMap({ snapshot: snapshotProp }: RanchMapProps = {}) {
       }
     }
 
-    // --- Paddocks (terrain fills) ---
+    // --- Paddocks ---
     const paddocks: Paddock[] = snap?.paddocks ?? [
-      { id: "north",  bounds: [0, 0, 0.5, 0.5], forage_pct: 72 },
-      { id: "south",  bounds: [0.5, 0, 1, 0.5], forage_pct: 58 },
-      { id: "east",   bounds: [0.5, 0.5, 1, 1], forage_pct: 84 },
-      { id: "west",   bounds: [0, 0.5, 0.5, 1], forage_pct: 43 },
+      { id: "north", bounds: [0, 0, 0.5, 0.5], forage_pct: 72 },
+      { id: "south", bounds: [0.5, 0, 1, 0.5], forage_pct: 58 },
+      { id: "east", bounds: [0.5, 0.5, 1, 1], forage_pct: 84 },
+      { id: "west", bounds: [0, 0.5, 0.5, 1], forage_pct: 43 },
     ];
     const activeZone = scenarioZoneRef.current;
     for (const p of paddocks) {
@@ -269,9 +530,8 @@ export function RanchMap({ snapshot: snapshotProp }: RanchMapProps = {}) {
       ctx.fillStyle = grad;
       ctx.fillRect(px(x0), py(y0), px(x1 - x0), py(y1 - y0));
 
-      // Scenario-active glow tint on the matching paddock
       if (activeZone.paddock === p.id && activeZone.color) {
-        const nowS = performance.now() / 1000;
+        const nowS = nowMs / 1000;
         const pulse = 0.5 + 0.5 * Math.sin(nowS * 1.3);
         const glowBase = activeZone.color;
         const match = glowBase.match(/rgba\(([^)]+)\)/);
@@ -283,19 +543,17 @@ export function RanchMap({ snapshot: snapshotProp }: RanchMapProps = {}) {
         }
       }
 
-      // Paddock border
       ctx.strokeStyle = C.paddock_border;
       ctx.lineWidth = 1;
       ctx.setLineDash([]);
       ctx.strokeRect(px(x0), py(y0), px(x1 - x0), py(y1 - y0));
     }
 
-    // --- Paddock labels (pushed to outside corner, never center) ---
+    // --- Paddock labels ---
     ctx.font = `${Math.round(W * 0.018)}px "JetBrains Mono Variable", monospace`;
     for (const p of paddocks) {
       const anchor = paddockLabelAnchor(p, px, py);
       ctx.textAlign = anchor.align;
-      // Label pill background for readability against terrain
       const label = p.id.toUpperCase();
       const metrics = ctx.measureText(label);
       const padX = 4;
@@ -309,18 +567,14 @@ export function RanchMap({ snapshot: snapshotProp }: RanchMapProps = {}) {
       const bgY = anchor.y - Math.round(W * 0.018) - padY / 2;
       ctx.fillStyle = "rgba(10,12,16,0.6)";
       ctx.fillRect(bgX, bgY, lw, lh);
-      // Label text
       ctx.fillStyle = C.text;
       ctx.fillText(label, anchor.x, anchor.y);
 
-      // Forage % indicator (small bar along bottom of paddock — stays visible
-      // but no longer competes with the paddock-id text for vertical space)
       const [x0, y0, x1, y1] = p.bounds;
       const forage = p.forage_pct ?? 60;
       const barW = px(x1 - x0) - 8;
       const barH = 2;
       const barY = py(y1) - barH - 3;
-      // Keep bar out of the bottom-row label anchors so it never crosses text
       const isBottomRow = y0 >= 0.5;
       if (!isBottomRow) {
         ctx.fillStyle = "rgba(38,45,58,0.6)";
@@ -348,18 +602,18 @@ export function RanchMap({ snapshot: snapshotProp }: RanchMapProps = {}) {
       const level = t.level_pct;
       const color = level > 60 ? C.water_high : level > 30 ? C.water_mid : C.water_low;
       const r = Math.max(5, Math.round(W * 0.018));
-      const cx = px(tx), cy = py(ty);
+      const cx = px(tx),
+        cy = py(ty);
 
       const sq = r * 1.4;
       ctx.strokeStyle = color;
       ctx.lineWidth = 1.5;
       ctx.strokeRect(cx - sq, cy - sq, sq * 2, sq * 2);
 
-      const fillH = (sq * 2) * (level / 100);
+      const fillH = sq * 2 * (level / 100);
       ctx.fillStyle = hexToRgba(color, 0.25);
       ctx.fillRect(cx - sq, cy + sq - fillH, sq * 2, fillH);
 
-      // Level text — anchored BELOW the square (not on it) for clarity
       ctx.fillStyle = color;
       ctx.font = `${Math.round(W * 0.016)}px "JetBrains Mono Variable", monospace`;
       ctx.textAlign = "center";
@@ -367,23 +621,31 @@ export function RanchMap({ snapshot: snapshotProp }: RanchMapProps = {}) {
       ctx.textAlign = "left";
     }
 
-    // --- Cattle (with health ring for non-healthy) ---
+    // --- Cattle (with health ring, tween positions + fade-in + color blend) ---
     const cows: Cow[] = snap?.cows ?? [];
     const healthCounts = { healthy: 0, watch: 0, sick: 0, calving: 0 };
     for (const cow of cows) {
       const health = classifyCow(cow);
       healthCounts[health] += 1;
-      const [cx, cy] = cow.pos;
-      const color = cowColor(health);
+      const rec = state.cows.get(cow.id);
+      // If a snapshot arrived via the prop path but the tween-apply hasn't
+      // been called yet (defensive), fall back to the raw pos.
+      const dispX = rec ? tweenValue(rec.xTween, nowMs) : cow.pos[0];
+      const dispY = rec ? tweenValue(rec.yTween, nowMs) : cow.pos[1];
+      const rgb = rec ? tweenCowColor(rec, nowMs) : COW_RGB[health];
+      const fadeT = rec
+        ? Math.min(1, (nowMs - rec.fadeStartMs) / COW_FADE_IN_MS)
+        : 1;
       const r = Math.max(3, Math.round(W * 0.011));
-      const ppx = px(cx);
-      const ppy = py(cy);
+      const ppx = px(dispX);
+      const ppy = py(dispY);
+      const rgbStr = `rgba(${Math.round(rgb[0])},${Math.round(rgb[1])},${Math.round(rgb[2])},`;
 
-      // Health ring for non-healthy cows — draws attention without screaming
+      // Health ring for non-healthy cows
       if (health !== "healthy") {
         ctx.beginPath();
         ctx.arc(ppx, ppy, r * 2.2, 0, Math.PI * 2);
-        ctx.strokeStyle = hexToRgba(color, 0.5);
+        ctx.strokeStyle = `${rgbStr}${0.5 * fadeT})`;
         ctx.lineWidth = 1.2;
         ctx.stroke();
       }
@@ -391,43 +653,42 @@ export function RanchMap({ snapshot: snapshotProp }: RanchMapProps = {}) {
       // Core dot
       ctx.beginPath();
       ctx.arc(ppx, ppy, r, 0, Math.PI * 2);
-      ctx.fillStyle = hexToRgba(color, 0.92);
+      ctx.fillStyle = `${rgbStr}${0.92 * fadeT})`;
       ctx.fill();
 
-      // Tag label for non-healthy cows (highest-signal UX win — judges can
-      // immediately see which cow the agent is talking about)
+      // Tag label for non-healthy cows
       if (cow.tag && health !== "healthy") {
         ctx.font = `bold ${Math.round(W * 0.013)}px "JetBrains Mono Variable", monospace`;
-        ctx.fillStyle = color;
+        ctx.fillStyle = `${rgbStr}${1 * fadeT})`;
         ctx.textAlign = "left";
         ctx.fillText(cow.tag, ppx + r + 4, ppy + 3);
       }
     }
 
-    // --- Drone motion trail ---
-    const drone = snap?.drone;
-    let droneX = 0.5, droneY = 0.5;
-    if (drone) {
-      if (Array.isArray(drone.pos)) {
-        [droneX, droneY] = drone.pos;
-      } else if (drone.lat !== undefined && drone.lon !== undefined) {
-        droneX = Math.max(0.05, Math.min(0.95, (drone.lon - -106.48) / 0.05 + 0.5));
-        droneY = Math.max(0.05, Math.min(0.95, (drone.lat - 34.10) / 0.05 + 0.5));
+    // --- Drone: tweened position + trail with fade-in per point ---
+    let droneX = 0.5;
+    let droneY = 0.5;
+    if (state.drone) {
+      droneX = tweenValue(state.drone.xTween, nowMs);
+      droneY = tweenValue(state.drone.yTween, nowMs);
+    } else if (snap?.drone) {
+      // Fallback if snapshot arrived but tween pipeline has no state.
+      const d = snap.drone;
+      if (Array.isArray(d.pos)) [droneX, droneY] = d.pos;
+      else if (d.lat !== undefined && d.lon !== undefined) {
+        droneX = Math.max(0.05, Math.min(0.95, (d.lon - -106.48) / 0.05 + 0.5));
+        droneY = Math.max(0.05, Math.min(0.95, (d.lat - 34.1) / 0.05 + 0.5));
       }
     }
 
-    const prev = prevDroneRef.current;
-    if (!prev || Math.abs(prev[0] - droneX) > 0.001 || Math.abs(prev[1] - droneY) > 0.001) {
-      droneTrailRef.current = [...droneTrailRef.current, [droneX, droneY] as [number, number]].slice(-TRAIL_LEN);
-      prevDroneRef.current = [droneX, droneY];
-    }
-
-    const trail = droneTrailRef.current;
+    const trail = state.trail;
     for (let i = 1; i < trail.length; i++) {
-      const alpha = (i / trail.length) * 0.55;
+      const age = nowMs - trail[i].spawnMs;
+      const fadeIn = Math.min(1, age / TRAIL_FADE_MS);
+      const alpha = (i / trail.length) * 0.55 * fadeIn;
       ctx.beginPath();
-      ctx.moveTo(px(trail[i - 1][0]), py(trail[i - 1][1]));
-      ctx.lineTo(px(trail[i][0]), py(trail[i][1]));
+      ctx.moveTo(px(trail[i - 1].x), py(trail[i - 1].y));
+      ctx.lineTo(px(trail[i].x), py(trail[i].y));
       ctx.strokeStyle = `rgba(120,180,220,${alpha})`;
       ctx.lineWidth = 1.5 + (i / trail.length) * 0.8;
       ctx.stroke();
@@ -435,7 +696,8 @@ export function RanchMap({ snapshot: snapshotProp }: RanchMapProps = {}) {
 
     // Drone triangle
     const dSize = Math.max(7, Math.round(W * 0.022));
-    const dx = px(droneX), dy = py(droneY);
+    const dx = px(droneX),
+      dy = py(droneY);
     ctx.beginPath();
     ctx.moveTo(dx, dy - dSize);
     ctx.lineTo(dx + dSize * 0.65, dy + dSize * 0.55);
@@ -447,12 +709,11 @@ export function RanchMap({ snapshot: snapshotProp }: RanchMapProps = {}) {
     ctx.lineWidth = 1.5;
     ctx.stroke();
 
-    // Drone label — smart offset so it never overlaps with EAST/WEST paddock text
+    // Drone label
     const labelAnchor = droneLabelOffset(dx, dy, W, H);
     ctx.fillStyle = C.drone;
     ctx.font = `bold ${Math.round(W * 0.015)}px "JetBrains Mono Variable", monospace`;
     ctx.textAlign = labelAnchor.align;
-    // Background pill to avoid terrain-stripe read-through
     const droneText = "DRONE";
     const droneMetrics = ctx.measureText(droneText);
     const dPadX = 4;
@@ -467,34 +728,45 @@ export function RanchMap({ snapshot: snapshotProp }: RanchMapProps = {}) {
     ctx.fillText(droneText, labelAnchor.x, labelAnchor.y);
     ctx.textAlign = "left";
 
-    // --- Predators ---
+    // --- Predators (tweened position + fade-in) ---
     const predators: Predator[] = snap?.predators ?? [];
     for (const pred of predators) {
-      const [rx, ry] = pred.pos;
+      const rec = state.predators.get(pred.id);
+      const rx = rec ? tweenValue(rec.xTween, nowMs) : pred.pos[0];
+      const ry = rec ? tweenValue(rec.yTween, nowMs) : pred.pos[1];
+      const fadeT = rec
+        ? Math.min(1, (nowMs - rec.fadeStartMs) / PREDATOR_FADE_MS)
+        : 1;
       const xSize = Math.max(6, Math.round(W * 0.02));
-      const ppx = px(rx), ppy = py(ry);
+      const ppx = px(rx),
+        ppy = py(ry);
 
-      const nowS = performance.now() / 1000;
-      let phase = predatorPhaseRef.current.get(pred.id);
+      const nowS = nowMs / 1000;
+      let phase = rec?.phase;
       if (phase === undefined) {
-        phase = Math.random();
-        predatorPhaseRef.current.set(pred.id, phase);
+        phase = predatorPhaseRef.current.get(pred.id);
+        if (phase === undefined) {
+          phase = Math.random();
+          predatorPhaseRef.current.set(pred.id, phase);
+        }
       }
-      const reduceMotion =
-        typeof window !== "undefined" &&
-        window.matchMedia &&
-        window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      const ringAlpha = reduceMotion
+      const reduceMotion = reduceMotionRef.current;
+      const ringAlphaBase = reduceMotion
         ? 0.25
         : 0.1 + 0.2 * Math.abs(Math.sin(((nowS + phase) * Math.PI) / 1.8));
       ctx.beginPath();
       ctx.arc(ppx, ppy, xSize * 1.8, 0, Math.PI * 2);
-      ctx.strokeStyle = `rgba(224,100,90,${ringAlpha})`;
+      ctx.strokeStyle = `rgba(224,100,90,${ringAlphaBase * fadeT})`;
       ctx.lineWidth = 1;
       ctx.stroke();
 
       // X mark
-      ctx.strokeStyle = C.predator;
+      ctx.strokeStyle = lerpRgb(
+        [224, 100, 90],
+        [224, 100, 90],
+        0,
+        fadeT,
+      );
       ctx.lineWidth = 2;
       ctx.beginPath();
       ctx.moveTo(ppx - xSize, ppy - xSize);
@@ -505,21 +777,27 @@ export function RanchMap({ snapshot: snapshotProp }: RanchMapProps = {}) {
       ctx.lineTo(ppx - xSize, ppy + xSize);
       ctx.stroke();
 
-      // Species label — same background treatment as drone for consistency
-      const speciesText = (pred.species?.toUpperCase() ?? "PRED");
+      // Species label
+      const speciesText = pred.species?.toUpperCase() ?? "PRED";
       ctx.font = `bold ${Math.round(W * 0.016)}px "JetBrains Mono Variable", monospace`;
       const specMetrics = ctx.measureText(speciesText);
       const sPad = 4;
-      ctx.fillStyle = "rgba(10,12,16,0.72)";
-      ctx.fillRect(ppx + xSize + 2, ppy - Math.round(W * 0.016), specMetrics.width + sPad * 2, Math.round(W * 0.016) + 4);
-      ctx.fillStyle = C.predator;
+      ctx.fillStyle = `rgba(10,12,16,${0.72 * fadeT})`;
+      ctx.fillRect(
+        ppx + xSize + 2,
+        ppy - Math.round(W * 0.016),
+        specMetrics.width + sPad * 2,
+        Math.round(W * 0.016) + 4,
+      );
+      ctx.fillStyle = `rgba(224,100,90,${fadeT})`;
       ctx.fillText(speciesText, ppx + xSize + 2 + sPad, ppy + 2);
     }
 
-    // --- Weather overlay (bottom-left, pinned) ---
+    // --- Weather overlay ---
     const weather = snap?.weather;
     if (weather) {
-      const overlayW = 210, overlayH = 22;
+      const overlayW = 210,
+        overlayH = 22;
       ctx.fillStyle = "rgba(10,12,16,0.78)";
       ctx.fillRect(4, H - overlayH - 4, overlayW, overlayH);
       ctx.strokeStyle = "rgba(110,122,140,0.3)";
@@ -533,7 +811,7 @@ export function RanchMap({ snapshot: snapshotProp }: RanchMapProps = {}) {
       );
     }
 
-    // --- Cattle legend (bottom-right, always-on herd summary) ---
+    // --- Cattle legend ---
     const legendX = W - 4;
     const legendY = H - 4;
     const legendW = 188;
@@ -547,7 +825,6 @@ export function RanchMap({ snapshot: snapshotProp }: RanchMapProps = {}) {
     const segY = legendY - 7;
     const totalCows = cows.length;
     const dotR = 3;
-    // Healthy
     ctx.fillStyle = C.cow_healthy;
     ctx.beginPath();
     ctx.arc(segX + dotR, segY - 3, dotR, 0, Math.PI * 2);
@@ -555,7 +832,6 @@ export function RanchMap({ snapshot: snapshotProp }: RanchMapProps = {}) {
     ctx.fillStyle = C.text;
     ctx.fillText(`${healthCounts.healthy}`, segX + dotR * 2 + 3, segY);
     segX += 28;
-    // Watch
     ctx.fillStyle = C.cow_watch;
     ctx.beginPath();
     ctx.arc(segX + dotR, segY - 3, dotR, 0, Math.PI * 2);
@@ -563,7 +839,6 @@ export function RanchMap({ snapshot: snapshotProp }: RanchMapProps = {}) {
     ctx.fillStyle = C.text;
     ctx.fillText(`${healthCounts.watch}`, segX + dotR * 2 + 3, segY);
     segX += 28;
-    // Sick
     ctx.fillStyle = C.cow_sick;
     ctx.beginPath();
     ctx.arc(segX + dotR, segY - 3, dotR, 0, Math.PI * 2);
@@ -571,7 +846,6 @@ export function RanchMap({ snapshot: snapshotProp }: RanchMapProps = {}) {
     ctx.fillStyle = C.text;
     ctx.fillText(`${healthCounts.sick}`, segX + dotR * 2 + 3, segY);
     segX += 28;
-    // Calving
     ctx.fillStyle = C.cow_calving;
     ctx.beginPath();
     ctx.arc(segX + dotR, segY - 3, dotR, 0, Math.PI * 2);
@@ -579,14 +853,15 @@ export function RanchMap({ snapshot: snapshotProp }: RanchMapProps = {}) {
     ctx.fillStyle = C.text;
     ctx.fillText(`${healthCounts.calving}`, segX + dotR * 2 + 3, segY);
     segX += 36;
-    // Total
     ctx.fillStyle = C.text_bright;
     ctx.fillText(`· ${totalCows} HEAD`, segX, segY);
 
     ctx.restore();
   }, []);
 
-  // RAF loop
+  // Single shared RAF loop — drives the 2D canvas. TerrainLayer runs its
+  // own WebGL RAF loop (which exits early under reduced-motion); we keep
+  // the 2D loop separate because it must re-render every frame for tweens.
   useEffect(() => {
     let running = true;
     const loop = () => {
@@ -601,14 +876,44 @@ export function RanchMap({ snapshot: snapshotProp }: RanchMapProps = {}) {
     };
   }, [draw]);
 
+  // Update reduced-motion pref in response to OS changes at runtime.
+  useEffect(() => {
+    if (typeof window === "undefined" || typeof window.matchMedia !== "function") {
+      return undefined;
+    }
+    const mql = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const onChange = () => {
+      reduceMotionRef.current = mql.matches;
+    };
+    reduceMotionRef.current = mql.matches;
+    mql.addEventListener?.("change", onChange);
+    return () => {
+      mql.removeEventListener?.("change", onChange);
+    };
+  }, []);
+
   // SSE subscription — world snapshot + scenario zone glow
   useEffect(() => {
     const sse = getSSE();
-    const onSnap = (payload: WorldSnapshot) => { snapshotRef.current = payload; };
+    const onSnap = (payload: WorldSnapshot) => {
+      snapshotRef.current = payload;
+      const nowMs =
+        typeof performance !== "undefined" && typeof performance.now === "function"
+          ? performance.now()
+          : Date.now();
+      applySnapshotToTweens(
+        entityRef.current,
+        payload,
+        nowMs,
+        reduceMotionRef.current,
+      );
+    };
     const onScenarioActive = (p: { name?: string }) => {
       scenarioZoneRef.current = scenarioToZone(p?.name);
     };
-    const onScenarioEnded = () => { scenarioZoneRef.current = {}; };
+    const onScenarioEnded = () => {
+      scenarioZoneRef.current = {};
+    };
     sse.on("world.snapshot", onSnap);
     sse.on("scenario.active", onScenarioActive);
     sse.on("scenario.ended", onScenarioEnded);
@@ -633,14 +938,18 @@ export function RanchMap({ snapshot: snapshotProp }: RanchMapProps = {}) {
       }, 50);
     });
     observer.observe(canvas);
-    return () => { observer.disconnect(); clearTimeout(timeout); };
+    return () => {
+      observer.disconnect();
+      clearTimeout(timeout);
+    };
   }, []);
 
   return (
     <div className="relative w-full h-full">
+      <TerrainLayer />
       <canvas
         ref={canvasRef}
-        className="w-full h-full block"
+        className="w-full h-full block relative"
         style={{ imageRendering: "crisp-edges" }}
         aria-label="Ranch map showing cattle positions by health status, drone patrol path, water tanks, paddock boundaries, and predators"
         role="img"
