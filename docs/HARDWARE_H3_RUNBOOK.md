@@ -1,9 +1,14 @@
-# HARDWARE_H3_RUNBOOK — Mavic Air 2 (DJI SDK V5 + MAVSDK failover)
+# HARDWARE_H3_RUNBOOK — Mavic Air 2 (laptop-primary · DJI + MAVSDK failover)
 
-**Phase:** 7 · **Last updated:** 2026-04-24
+**Phase:** 7 · **Last updated:** 2026-04-25 (Phase 7.1 — laptop path promoted to primary)
 **Scope:** From unboxing a fresh DJI Mavic Air 2 to flying an agent-
 commanded pattern mission with MAVSDK failover. **Software path only** —
 this runbook exists so a Saturday shoot can happen without new code.
+
+> **2026-04-25 update:** The laptop-as-controller path (§1) is now the
+> primary route. Phone-based iOS/Android control is retained in §9 as an
+> alternative for teams with a Mac + iPhone combo. No code removed — only
+> the documented default changed.
 
 ---
 
@@ -12,63 +17,74 @@ this runbook exists so a Saturday shoot can happen without new code.
 ### Hardware
 
 - DJI Mavic Air 2 + RC controller + two charged batteries.
-- An iOS 16+ or Android 12+ phone/tablet.
-- (Optional) USB-C OTG cable for MAVSDK fallback.
+- A laptop (Linux / WSL2 — macOS and Windows work; Ubuntu 24.04 is the
+  reference target).
+- **USB-C data cable** (not charge-only) from laptop to RC controller.
+- (Optional) iOS 16+ or Android 12+ phone/tablet — only for the §9
+  phone-based path.
 - (Optional) Bluetooth speaker for deterrent tone on-ground.
 - Pi 4 fleet from Phase 5 (H1) already running.
 
 ### Accounts + credentials
 
-- **DJI developer account** (free) — needed for `DJIAppKey` in
-  `ios/SkyHerdCompanion/SupportingFiles/Config.xcconfig` or
-  `android/SkyHerdCompanion/app/local.properties`.
-- **Apple developer account** only if you want signed iOS builds;
-  unsigned stub-mode builds work in CI without one.
+- **None required for the laptop path.**
+- **DJI developer account** (free) — needed only for §9 (iOS / Android
+  `DJIAppKey` in `ios/SkyHerdCompanion/SupportingFiles/Config.xcconfig` or
+  `android/SkyHerdCompanion/app/local.properties`).
+- **Apple developer account** — needed only for §9 (signed iOS builds).
 
 ### Environment
 
-On the laptop running `skyherd-live`:
+**Laptop path (primary):**
 
 ```bash
-export DRONE_BACKEND=mavic          # enables MavicAdapter (DJI + MAVSDK)
+export SKYHERD_MANUAL_OVERRIDE_TOKEN="$(openssl rand -hex 16)"
+export DRONE_BACKEND=mavic_direct    # direct MAVSDK-over-USB-C to RC
+```
+
+**Phone path (§9, alternative):**
+
+```bash
+export DRONE_BACKEND=mavic           # enables MavicAdapter (DJI + MAVSDK)
 export MAVIC_WS_URL=ws://<phone-ip>:8765
 export MAVIC_MQTT_URL=mqtt://<laptop-ip>:1883
 ```
 
-To force-disable the MAVSDK fallback (diagnostic), use
-`DRONE_BACKEND=mavic_direct` — the bare `MavicBackend` with no failover.
+---
+
+## 1. Step 1 — Laptop path (primary, 2026-04-25)
+
+Full procedure: `docs/LAPTOP_DRONE_CONTROL.md`. Quick version:
+
+```bash
+# 1. Plug USB-C from laptop into the DJI RC (not the aircraft).
+lsusb | grep -iE 'dji|silicon labs'     # expect one hit
+ls /dev/ttyACM*                          # expect one tty
+
+# 2. Launch the live dashboard with the MAVLink-over-USB-C backend.
+export SKYHERD_MANUAL_OVERRIDE_TOKEN="$(openssl rand -hex 16)"
+DRONE_BACKEND=mavic_direct uv run python -m skyherd.server.live \
+    --port 8000 --host 127.0.0.1 --seed 42
+
+# 3. Open http://localhost:8000/?drone=1
+# 4. In browser console: window.__DRONE_MANUAL_TOKEN = "<your-token>"
+# 5. Right-rail → Laptop Drone tab → hold ARM 3s → hold TAKEOFF 3s → LAND.
+```
+
+Test the wiring without flying anything: `make laptop-drone-smoke` —
+14 mocked tests in under 10 s.
+
+Friday preflight: see `docs/PREFLIGHT_CHECKLIST.md` Group 6 for the three
+sanity checks that gate takeoff.
 
 ---
 
-## 1. Step 1 — Pair the companion app
+> **Sections 2–5 below assume the phone-based path (§9 alternative).** If
+> you followed §1 (laptop-primary), skip to §6 Troubleshooting — the
+> laptop path needs no MQTT broker, no companion app pairing, and no
+> mid-flight failover test.
 
-### iOS
-
-```bash
-cd ios/SkyHerdCompanion
-./bootstrap.sh           # installs xcodegen, creates Config.xcconfig
-# open Config.xcconfig, set DJI_API_KEY=<your_key>
-xcodegen generate
-open SkyHerdCompanion.xcodeproj
-# Build & Run on a paired iPhone/iPad — grant location + external-accessory
-```
-
-### Android
-
-```bash
-cd android/SkyHerdCompanion
-# Set DJI_API_KEY in app/src/main/res/values/strings.xml
-./gradlew assembleDebug
-adb install app/build/outputs/apk/debug/app-debug.apk
-# Launch SkyHerd on phone, grant permissions
-```
-
-Both apps display **"DJI Status: Registered"** then **"Connected"** when
-the RC controller is plugged into the phone and the Mavic powers on.
-
----
-
-## 2. Step 2 — Bind the MQTT broker
+## 2. Step 2 — Bind the MQTT broker *(phone-based path only)*
 
 Start the laptop-side broker from the root of this repo:
 
@@ -163,12 +179,21 @@ push touching `ios/**` or `android/**`:
   `skyherd-companion-ios-build`**. Re-sign with your dev cert before
   `xcrun simctl install` or TestFlight.
 
-**Note:** Both workflows run with `continue-on-error: true` because the
-DJI SDK artifacts (xcframework on iOS, AAR on Android) are proprietary
-and not committed to the repo. Builds succeed in stub mode (no DJI
-calls) but download-from-DJI + manual placement is required for
-functional builds. See `HARDWARE_MAVIC_IOS.md` and
-`HARDWARE_MAVIC_ANDROID.md` for the vendor download flow.
+**Phase 7.2 update (2026-04-23):** The iOS workflow now builds for the
+device slice (`generic/platform=iOS`) and emits a Sideloadly-compatible
+unsigned IPA at `build/ipa/SkyHerdCompanion-unsigned.ipa`. The build step
+runs **without** `continue-on-error` — a failing Swift build is now a real
+CI regression. Optional steps (xcarchive, simulator tests) keep
+`continue-on-error: true` because they depend on runner capabilities.
+
+To turn on the real DJI SDK, both platforms need the proprietary
+artifact (iOS xcframework, Android AAR) to be manually placed:
+
+- iOS: drop `DJISDK.xcframework` into
+  `ios/SkyHerdCompanion/Frameworks/` and set `SKYHERD_SWIFT_FLAGS =
+  DJI_SDK_AVAILABLE` in `SupportingFiles/Config.xcconfig`. See
+  `HARDWARE_MAVIC_IOS.md`.
+- Android: follow `HARDWARE_MAVIC_ANDROID.md` §3 for the AAR flow.
 
 If the Actions runner fails to generate a Gradle wrapper or install
 XcodeGen for > 60 min, treat it as the defer-fallback path documented in
@@ -201,7 +226,12 @@ _See also: `docs/H3_DJI_AUDIT.md`, `docs/MAVIC_MISSION_SCHEMA.md`,
 
 ---
 
-## 9. Companion App APK Download (Phase 9 · 2026-04-24)
+## 9. Alternative: phone-based control (legacy path)
+
+**As of 2026-04-25 this is the alternative path.** The laptop route (§1)
+is the default for Friday's demo. Use the content below only if you have a
+Mac + paired iPhone/Android and specifically want to run the companion
+app loop. The APK download + install flow remains supported.
 
 **For Friday morning plug-in.** Two paths — primary (CI artifact) and
 fallback (local build). The local build is always available and requires no
@@ -269,16 +299,32 @@ sideloading. The APK is unsigned; DJI SDK artifacts are fetched by Gradle
 
 ### Path C — iOS (if filming on iPhone)
 
-iOS side is Xcode-only (no CI-downloadable build). Use:
+Two paths, pick whichever matches your hardware:
+
+**C1 — Xcode + Mac (real DJI SDK, real flight):**
 
 ```bash
 cd ios/SkyHerdCompanion
-./bootstrap.sh
+cp SupportingFiles/Config.xcconfig.template SupportingFiles/Config.xcconfig
 # edit SupportingFiles/Config.xcconfig — add DJI_API_KEY=<your_key>
+# (and SKYHERD_SWIFT_FLAGS = DJI_SDK_AVAILABLE once the xcframework is in place)
+./bootstrap.sh
 xcodegen generate
 open SkyHerdCompanion.xcodeproj
 # Xcode → Product → Run on paired iPhone (requires Apple Developer account)
 ```
 
-Unsigned stub-mode builds run in CI (`.github/workflows/ios-app.yml`) but
-cannot be sideloaded without a signed cert — Xcode+phone is the path.
+**C2 — Sideloadly + unsigned IPA (no Mac, stub DJI mode, Phase 7.2):**
+
+1. Download the `skyherd-companion-ios-build` artifact from GitHub
+   Actions.  Inside: `build/ipa/SkyHerdCompanion-unsigned.ipa`.
+2. Open Sideloadly, drag the IPA, enter Apple ID, click **Start**.
+3. On iPhone: Settings → General → VPN & Device Management → Trust.
+4. App runs in DJI stub mode — MQTT + watchdog + router work; no drone
+   actuation.
+
+Phase 7.2's CI now emits a device-slice archive (not a Simulator `.app`);
+the IPA packaging step in `.github/workflows/ios-app.yml` produces a
+Sideloadly-compatible bundle.  Earlier claims in this runbook about
+`xcrun simctl install` on a `.app` bundle were removed — the artifact is
+now an IPA targeting real iPhones.

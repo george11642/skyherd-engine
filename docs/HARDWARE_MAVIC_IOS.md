@@ -3,18 +3,46 @@
 George-facing runbook for getting SkyHerdCompanion (iOS) running on a real
 iPhone or iPad connected to the DJI Mavic Air 2.
 
+> **Phase 7.2 update (2026-04-23):** WebSocket transport was removed;
+> MQTT is now the only command path. A no-Mac Sideloadly install path
+> is documented below for quick judge demos.
+
+---
+
+## Two install paths
+
+| Path                         | Needs Mac? | DJI SDK? | Use when                            |
+|------------------------------|------------|----------|-------------------------------------|
+| **Xcode + cable**            | yes        | yes      | Real flight, dev iteration          |
+| **Sideloadly + unsigned IPA**| **no**     | no (stub)| Protocol demo, no-Mac judge laptop  |
+
 ---
 
 ## Prerequisites
 
-1. **macOS 13+** with **Xcode 15+** installed from the Mac App Store.
+### Xcode path
+
+1. **macOS 13+** with **Xcode 15+** from the Mac App Store.
 2. Install build tools:
    ```bash
    brew install xcodegen ios-deploy
    ```
-3. An **Apple Developer account** — the free tier is sufficient for direct device
-   sideloading (7-day cert); a paid account ($99/year) is needed for TestFlight.
+3. An **Apple Developer account** — free tier is enough for direct device
+   sideloading (7-day cert); paid ($99/year) is needed for TestFlight.
 4. DJI API key (see below).
+
+### Sideloadly path
+
+1. Any computer (Windows or macOS) with [Sideloadly](https://sideloadly.io)
+   installed.
+2. The `skyherd-companion-ios-build` artifact from a green GitHub Actions
+   **iOS Companion App Build** run.
+3. An Apple ID (free).
+4. Phase 7.2's unsigned IPA lives at
+   `build/ipa/SkyHerdCompanion-unsigned.ipa` inside the artifact zip.
+
+No DJI SDK calls will work in the sideloaded build — only MQTT, CommandRouter,
+safety guards, and the lost-signal watchdog run (stub mode).
 
 ---
 
@@ -24,52 +52,83 @@ iPhone or iPad connected to the DJI Mavic Air 2.
 2. Go to **My Apps → Create App**.
 3. Set:
    - **Bundle ID**: `com.skyherd.companion`
-   - **Platform**: iOS
-   - (Register a separate entry for Android if not already done — same bundle ID is fine)
+   - **Platform**: iOS (register a separate entry for Android if not already done —
+     same bundle ID is fine)
 4. Copy the generated key; you'll paste it in the next section.
 
 ---
 
-## Build & Install
+## Xcode Build & Install
 
 ```bash
 cd /path/to/skyherd-engine
 cd ios/SkyHerdCompanion
+
+# One-time: copy the xcconfig template
+cp SupportingFiles/Config.xcconfig.template SupportingFiles/Config.xcconfig
+${EDITOR:-vi} SupportingFiles/Config.xcconfig   # fill in DJI_API_KEY
+
 ./bootstrap.sh          # installs XcodeGen, generates SkyHerdCompanion.xcodeproj
 open SkyHerdCompanion.xcodeproj
 ```
 
-1. In Xcode, open **SupportingFiles/Info.plist**.
-2. Find the key `DJIAppKey` and replace `$(DJI_API_KEY)` with your real key.
-   (Alternatively, create `ios/SkyHerdCompanion/Config.xcconfig` and set
-   `DJI_API_KEY = your_key_here` — Xcode will expand the variable automatically.)
-3. Select your iPhone as the run destination in the scheme selector.
-4. Press **⌘R** to build and install on the device.
-   - On first run, go to **iPhone > Settings > General > VPN & Device Management**
-     and trust your developer certificate.
+1. `Config.xcconfig` feeds `DJI_API_KEY` into Info.plist automatically.
+   Never edit Info.plist directly.
+2. Select your iPhone as the run destination in the scheme selector.
+3. Press **⌘R** to build and install on the device.
+   - On first run, go to **iPhone → Settings → General → VPN & Device
+     Management** and trust your developer certificate.
 
-### Add DJISDK.xcframework
+### Add DJISDK.xcframework (required for real flight)
 
 The DJI Mobile SDK V5 ships as a closed-source binary XCFramework:
 
-1. Download from <https://developer.dji.com/mobile-sdk/> (iOS SDK V5).
-2. Extract and place `DJISDK.xcframework` in `ios/SkyHerdCompanion/Frameworks/`.
-3. In `project.yml`, uncomment:
-   ```yaml
-   - framework: Frameworks/DJISDK.xcframework
-     embed: true
+1. Download **DJI Mobile SDK V5 iOS 5.11.x** (or newer) from
+   <https://developer.dji.com/mobile-sdk/>.
+2. Extract and place `DJISDK.xcframework` at:
    ```
-4. Re-run `./bootstrap.sh` to regenerate the Xcode project with the framework linked.
-5. Add the compile flag `DJI_SDK_AVAILABLE` to the build settings (XcodeGen will
-   pick it up if you add it to `settings.base` in `project.yml`).
-
-Without the framework the app compiles in **stub mode** — all DJI calls log
-warnings and return stub values.  This is sufficient for protocol / safety-guard
-testing without hardware.
+   ios/SkyHerdCompanion/Frameworks/DJISDK.xcframework
+   ```
+3. In `project.yml`, uncomment the framework dependency:
+   ```yaml
+   dependencies:
+     - framework: Frameworks/DJISDK.xcframework
+       embed: true
+   ```
+4. In `SupportingFiles/Config.xcconfig`, set:
+   ```xcconfig
+   SKYHERD_SWIFT_FLAGS = DJI_SDK_AVAILABLE
+   ```
+   `project.yml` threads this into `SWIFT_ACTIVE_COMPILATION_CONDITIONS`, so
+   `#if DJI_SDK_AVAILABLE` inside `DJIBridge.swift` lights up the real SDK
+   calls.  Without this flag the app compiles in **stub mode** — every DJI
+   call logs a warning and returns placeholder state, sufficient for
+   protocol / safety-guard testing without hardware.
+5. Re-run `./bootstrap.sh`.
 
 ---
 
-## Connect Mavic Air 2
+## Sideloadly Install (no Mac)
+
+1. Open the GitHub Actions run for your commit → **iOS Companion App Build**
+   → Artifacts → download `skyherd-companion-ios-build.zip`.
+2. Unzip.  You'll see `build/ipa/SkyHerdCompanion-unsigned.ipa`.
+3. Launch Sideloadly, drag the IPA onto the main window.
+4. Enter your Apple ID, keep the bundle ID `com.skyherd.companion` (match
+   the DJI dev app registration if you plan to reuse for a real SDK build
+   later), click **Start**.
+5. On iPhone, **Settings → General → VPN & Device Management → Trust**
+   your Apple ID profile.
+6. Launch SkyHerd.  Enter `MAVIC_MQTT_HOST` (laptop LAN IP) in the
+   bundled settings panel or rely on the default `localhost` if using a
+   USB-tethered broker.
+
+This build runs stub-mode DJI — the watchdog, router, and MQTT pipeline are
+real; drone actuation is logs only.
+
+---
+
+## Connect Mavic Air 2 (Xcode path only)
 
 1. Turn on the Mavic Air 2 and its remote controller.
 2. Connect the remote controller to the iPhone via **USB-C** (newer iPhones) or
@@ -81,39 +140,32 @@ testing without hardware.
 
 ## Configure Laptop Backend
 
-On the laptop running SkyHerd Engine:
-
 ```bash
 # In .env or shell
 export DRONE_BACKEND=mavic
-export MAVIC_WS_URL=ws://<iphone-local-ip>:8765
+export MAVIC_MQTT_HOST=<laptop-ip>     # or 127.0.0.1 for direct
+export MAVIC_MQTT_PORT=1883
 ```
 
-Find the iPhone's local IP in **Settings → Wi-Fi → (your network) → IP address**.
-Both laptop and iPhone must be on the same LAN (or direct USB tether).
-
-The iOS app opens a WebSocket **server** on port 8765.  The Python MavicBackend
-is the **client** that connects to it.
+Find the iPhone's local IP in **Settings → Wi-Fi → (your network) → IP
+address**.  Both laptop and iPhone must be on the same LAN (or direct USB
+tether with reverse proxy).
 
 ### Quick Connectivity Test
 
 ```bash
-uv run python -c "
-import asyncio
-from skyherd.drone.mavic import MavicBackend
+# Start the ranch broker + adapter
+make hardware-demo-sim-up
 
-async def test():
-    b = MavicBackend()
-    await b.connect()
-    state = await b.state()
-    print(state)
-    await b.disconnect()
-
-asyncio.run(test())
-"
+# On the phone, check the Connection Status row reads:
+#   DJI SDK: Registered  (or Stub on sideloaded builds)
+#   MQTT:    Connected
+#   Watchdog: Running
 ```
 
-### Takeoff Test (5 m)
+### Takeoff Test (5 m, real SDK only)
+
+With the app running, from the laptop:
 
 ```bash
 uv run python -c "
@@ -163,11 +215,15 @@ xcrun altool --upload-app \
 
 ## Troubleshooting
 
-| Symptom | Fix |
-|---|---|
-| "DJI: Registering…" hangs | API key wrong or network blocked |
-| "DJI: Disconnected" after cable insert | USB trust not accepted on iPhone |
-| `MAVIC_WS_URL` refused | iPhone behind firewall; check iOS > Settings > Privacy > Local Network |
-| `E_BATTERY_LOW` | Charge Mavic to >25% before ops |
-| `E_WIND_CEILING` | Wind >21 kt — wait for calmer conditions |
-| Python `DroneUnavailable` | iPhone IP changed; update `MAVIC_WS_URL` |
+| Symptom                                    | Fix                                                   |
+|--------------------------------------------|-------------------------------------------------------|
+| `DJI API key missing` banner at launch     | Config.xcconfig not populated; see Xcode path step 1  |
+| DJI SDK status stays "Registering…"        | API key wrong or network blocked                      |
+| DJI SDK status "Disconnected" after cable  | USB trust not accepted on iPhone — unplug + replug    |
+| MQTT status "Disconnected"                 | Check `MAVIC_MQTT_HOST`; ensure LAN allows :1883      |
+| `E_BATTERY_LOW`                            | Charge Mavic battery to >30 % (Phase 7.2 floor)       |
+| `E_WIND_CEILING`                           | Wind ≥ 21 kt — wait for calmer conditions             |
+| `E_UNSUPPORTED: gotoLocation requires...` | Expected for `patrol` commands until DJIWaypointV2     |
+| Watchdog fires RTH unexpectedly            | MQTT dropped > 30 s while airborne; check LAN         |
+| Python `DroneUnavailable`                  | iPhone IP changed; update `MAVIC_MQTT_HOST`           |
+| Sideloaded app says "Stub (no SDK)"        | Expected — Sideloadly path cannot include xcframework |

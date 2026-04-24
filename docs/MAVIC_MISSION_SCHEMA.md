@@ -176,26 +176,72 @@ the prior app build.
 
 ---
 
-## 5. Companion-app parsing notes
+## 5. Companion-app parsing notes + MQTT topic scheme
+
+### Unified MQTT topic scheme (Phase 7.2)
+
+Both iOS and Android share a single topic base.  The trailing platform
+segment identifies the sender; there is no routing divergence anymore
+(previous builds had `ack/ios` vs `state/ack` mismatch — see Phase 7.2
+Audit 2).
+
+| Direction  | Topic                              | Publisher | Payload              | Retained |
+|------------|------------------------------------|-----------|----------------------|----------|
+| broker → app   | `skyherd/drone/cmd/#`          | MavicAdapter | DroneCommand / MissionV1 | no |
+| iOS → broker   | `skyherd/drone/ack/ios`        | iOS app   | DroneAck             | no       |
+| iOS → broker   | `skyherd/drone/state/ios`      | iOS app   | MQTTStatePayload     | yes (latest) |
+| iOS → broker   | `skyherd/drone/status/ios`     | iOS app   | `online`/`offline`   | yes      |
+| Android → broker | `skyherd/drone/ack/android`  | Android app | DroneAck           | no       |
+| Android → broker | `skyherd/drone/state/android`| Android app | state JSON         | yes (latest) |
+| Android → broker | `skyherd/drone/status/android` | Android app | online/offline   | yes      |
+
+The `/status/{platform}` topic is published with QoS 1 + retained and uses
+an MQTT Will to auto-mark the client `offline` on unexpected disconnect —
+the laptop's lost-signal watchdog subscribes here so it can dual-confirm a
+companion-app outage within one MQTT keep-alive interval.
+
+### Envelope acceptance
+
+Both companion apps accept EITHER shape on the command topic:
+
+```json
+// Legacy
+{"cmd":"takeoff","args":{"alt_m":5.0},"seq":1}
+
+// MissionV1
+{"version":1,"metadata":{...},"command":{"cmd":"takeoff","args":{...}},"seq":1}
+```
 
 ### iOS (Swift)
 
-Use `JSONSerialization.jsonObject(with:options:)` → cast to
-`[String: Any]`, then `AnyCodable` for nested fields. Unknown top-level
-keys are discarded by Swift because `CommandRouter` reads only the keys
-it cares about. Optional fields: `args["deterrent_tone_hz"]?.value as? Int`.
+`DroneCommand.init(from: Decoder)` detects the envelope shape via the
+presence of a `version` key and decodes `metadata` into a typed
+`MissionMetadata` struct. `CommandRouter` reads `metadata.battery_floor_pct`
+and `metadata.wind_kt` per-call when present.
 
 ### Android (Kotlin)
 
-Use `org.json.JSONObject` directly (already a dependency in
-`DroneControl.kt`). Optional fields: `args.optInt("deterrent_tone_hz", -1)`
-with `-1` sentinel for "absent". Unknown top-level keys are ignored by
-`JSONObject.opt*` accessors.
+`DroneControl.parseEnvelope(payload)` performs the same detection and
+returns `Parsed(cmd, args, seq, metadata)`.  `applyMissionMetadata(...)`
+copies `battery_floor_pct` onto the `SafetyGuards` instance before each
+command.
 
 ### Python (adapter side)
 
-Import `MissionV1` and call `.to_wire()` before MQTT/WebSocket send;
-parse with `MissionV1.from_wire(payload)` when consuming.
+Import `MissionV1` and call `.to_wire()` before MQTT send; parse with
+`MissionV1.from_wire(payload)` when consuming.
+
+### Lost-signal watchdog contract
+
+When the companion-to-broker MQTT link drops for ≥ 30 s **while the drone
+is in-air**, both apps fire their local RTH:
+
+- iOS: `LostSignalWatchdog.tick` (see
+  `ios/SkyHerdCompanion/Sources/SkyHerdCompanion/LostSignalWatchdog.swift`)
+- Android: `DroneControl.startLostSignalWatchdog`
+
+The threshold is 30 s on both platforms (parity, Phase 7.2).  Both can be
+disabled at runtime via `autoRthEnabled` / `autoRthOnLostSignal`.
 
 ---
 
