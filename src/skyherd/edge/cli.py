@@ -260,6 +260,49 @@ def coyote(
         asyncio.run(harness.run())
 
 
+# ---------------------------------------------------------------------------
+# pi-to-mission — Phase 6 H2-01
+# ---------------------------------------------------------------------------
+
+
+@app.command("pi-to-mission")
+def pi_to_mission_cmd(
+    ranch_id: str = typer.Option("ranch_a", "--ranch", help="Ranch identifier."),
+    backend: str = typer.Option(
+        "sitl", "--backend", help="Drone backend (sitl | stub | mavic | f3_inav)."
+    ),
+    seed: int | None = typer.Option(
+        None, "--seed", help="Deterministic mission-id seed."
+    ),
+    verbose: bool = typer.Option(False, "--verbose", "-v", help="Enable debug logging."),
+) -> None:
+    """Subscribe to Pi sensor MQTT topics and dispatch drone missions.
+
+    Phase 6 H2-01 bridge: listens on the ``skyherd/{ranch}/fence/+``,
+    ``skyherd/{ranch}/alert/thermal_hit`` and ``skyherd/{ranch}/thermal/+``
+    topics and executes the resulting ``launch_drone`` / ``play_deterrent``
+    tool calls against the chosen drone backend.
+    """
+    _configure_logging(verbose)
+    import os
+
+    os.environ.setdefault("DRONE_BACKEND", backend)
+    try:
+        from skyherd.edge.pi_to_mission import PiToMissionBridge
+    except ImportError as exc:
+        typer.echo(
+            f"pi-to-mission unavailable — skyherd.edge.pi_to_mission missing ({exc}).",
+            err=True,
+        )
+        raise typer.Exit(code=1) from exc
+
+    bridge = PiToMissionBridge(ranch_id=ranch_id, seed=seed)
+    try:
+        asyncio.run(bridge.run())
+    except KeyboardInterrupt:
+        pass
+
+
 def main() -> None:
     app()
 
