@@ -92,6 +92,17 @@ export class SkyHerdReplay {
   // UI "1×" maps to this internal multiplier. Mutated by setSpeed().
   private speed = DEFAULT_SPEED;
 
+  // Cache the bundle after the first fetch so setSpeed() can reschedule
+  // without re-downloading 2+ MB.
+  private bundle: ReplayBundle | null = null;
+
+  // Sim-time (seconds) already consumed by prior scheduling chunks. Combined
+  // with (now - playbackStartedAtMs) * speed it tells us the current sim
+  // position, which lets setSpeed() cancel + reschedule the remainder from
+  // "right now" at the new cadence.
+  private playbackOffsetSimS = 0;
+  private playbackStartedAtMs = 0;
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   on(eventType: string, handler: (payload: any) => void): this {
     const list = this.handlers.get(eventType) ?? [];
@@ -117,8 +128,8 @@ export class SkyHerdReplay {
   start(): this {
     if (!this.paused) return this;
     this.paused = false;
-    // Prime the UI (StatBand READY → LIVE, ScenarioStrip auto-advance) before
-    // the fetch resolves.
+    this.playbackOffsetSimS = 0;
+    this.playbackStartedAtMs = performance.now();
     this._emit("scenario.active", {
       name: "coyote",
       pass_idx: 0,
@@ -147,11 +158,19 @@ export class SkyHerdReplay {
   }
 
   /**
-   * Set playback speed (UI 0.5×/1×/2×/4× → internal 1.5/3/6/12).
-   * While running, new speeds take full effect on the next loop iteration.
+   * Set playback speed. Takes immediate effect — pending events are cancelled
+   * and rescheduled at the new cadence from the current sim position.
    */
   setSpeed(speed: number): this {
+    const prev = this.speed;
     this.speed = Math.max(0.25, speed);
+    if (this.paused || !this.bundle) return this;
+    const wallElapsedMs = performance.now() - this.playbackStartedAtMs;
+    this.playbackOffsetSimS += (wallElapsedMs / 1000) * prev;
+    this.playbackStartedAtMs = performance.now();
+    for (const t of this.timeouts) clearTimeout(t);
+    this.timeouts = [];
+    this._scheduleRemaining();
     return this;
   }
 
@@ -167,47 +186,65 @@ export class SkyHerdReplay {
   }
 
   private async _run(): Promise<void> {
-    let bundle: ReplayBundle;
-    try {
-      const resp = await fetch("/replay.v2.json");
-      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-      bundle = await resp.json();
-    } catch {
-      // Non-fatal — no ambient fallback. Dashboard will remain empty.
-      return;
+    if (!this.bundle) {
+      try {
+        const resp = await fetch("/replay.v2.json");
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const raw = (await resp.json()) as ReplayBundle;
+        for (const scenario of raw.scenarios) {
+          for (const ev of scenario.events) {
+            ev.payload = normalizePayload(ev.kind, ev.payload) as Record<string, unknown>;
+          }
+        }
+        this.bundle = raw;
+      } catch {
+        return;
+      }
     }
-
     if (this.paused) return;
+    this._scheduleRemaining();
+  }
 
-    let cumulativeOffsetMs = 0;
+  private _scheduleRemaining(): void {
+    if (!this.bundle) return;
 
-    const enqueueScenario = (scenario: ReplayScenario, offsetMs: number): number => {
-      let lastTsRel = 0;
+    const SCENARIO_GAP_S = 2;
+    let cumulativeSimS = 0;
+    let lastScenarioEndSimS = 0;
+
+    for (const scenario of this.bundle.scenarios) {
       for (const ev of scenario.events) {
-        const wallMs = offsetMs + (ev.ts_rel / this.speed) * 1000;
-        lastTsRel = ev.ts_rel;
-        const payload = normalizePayload(ev.kind, ev.payload);
-        const t = setTimeout(() => {
-          this._emit(ev.kind, payload);
-        }, wallMs);
-        this.timeouts.push(t);
+        const absSimS = cumulativeSimS + ev.ts_rel;
+        if (absSimS < this.playbackOffsetSimS) continue;
+        const wallMs = ((absSimS - this.playbackOffsetSimS) / this.speed) * 1000;
+        const payload = ev.payload;
+        const kind = ev.kind;
+        this.timeouts.push(
+          setTimeout(() => this._emit(kind, payload), wallMs),
+        );
       }
-      return offsetMs + (lastTsRel / this.speed) * 1000;
-    };
-
-    for (const scenario of bundle.scenarios) {
-      cumulativeOffsetMs = enqueueScenario(scenario, cumulativeOffsetMs) + 2000;
+      lastScenarioEndSimS = cumulativeSimS + scenario.duration_s;
+      cumulativeSimS += scenario.duration_s + SCENARIO_GAP_S;
     }
 
-    // Loop playback — when all scenarios have played, restart.
-    const loopTimer = setTimeout(() => {
-      if (!this.paused) {
-        for (const t of this.timeouts) clearTimeout(t);
-        this.timeouts = [];
-        this._run().catch(() => {});
-      }
-    }, cumulativeOffsetMs + 1000);
-    this.timeouts.push(loopTimer);
+    const loopSimS = lastScenarioEndSimS + SCENARIO_GAP_S;
+    if (loopSimS > this.playbackOffsetSimS) {
+      const loopWallMs = ((loopSimS - this.playbackOffsetSimS) / this.speed) * 1000 + 1000;
+      this.timeouts.push(
+        setTimeout(() => {
+          if (this.paused) return;
+          this.playbackOffsetSimS = 0;
+          this.playbackStartedAtMs = performance.now();
+          for (const t of this.timeouts) clearTimeout(t);
+          this.timeouts = [];
+          this._scheduleRemaining();
+        }, loopWallMs),
+      );
+    } else {
+      this.playbackOffsetSimS = 0;
+      this.playbackStartedAtMs = performance.now();
+      this._scheduleRemaining();
+    }
   }
 }
 
