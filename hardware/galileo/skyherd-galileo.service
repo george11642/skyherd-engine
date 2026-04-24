@@ -1,0 +1,21 @@
+[Unit]
+Description=SkyHerd Galileo edge-tank telemetry publisher
+Documentation=https://github.com/george11642/skyherd-engine/blob/main/docs/HARDWARE_GALILEO.md
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+EnvironmentFile=/etc/skyherd/galileo.env
+ExecStart=/usr/bin/python3 /opt/skyherd-galileo/sensor_publisher.py
+Restart=on-failure
+RestartSec=5
+# Galileo Gen 1 has 256 MB RAM — give the publisher a safe floor, not a cap.
+# Keep User=root: the Yocto image runs root-only for simplicity; lock down if
+# you harden the image (see docs/HARDWARE_GALILEO.md § Hardening).
+User=root
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

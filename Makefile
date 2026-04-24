@@ -1,4 +1,4 @@
-.PHONY: setup sim demo dashboard dashboard-mock test lint format typecheck clean ci sitl-up sitl-down bus-up bus-down mosquitto-up mosquitto-down mesh-smoke one-pager hardware-demo hardware-demo-sim hardware-demo-sim-down h2-smoke h3-smoke h4-smoke h4-docs mavic-bridge f3-bridge drone-smoke sitl-smoke determinism-3x gate-check voice-demo rehearsal record-ready preflight laptop-drone-smoke edge-pi-setup video-record-clips video-pipeline video-iterate video-render
+.PHONY: setup sim demo dashboard dashboard-mock test lint format typecheck clean ci sitl-up sitl-down bus-up bus-down mosquitto-up mosquitto-down mesh-smoke one-pager hardware-demo hardware-demo-sim hardware-demo-sim-down h2-smoke h3-smoke h4-smoke h4-docs mavic-bridge f3-bridge drone-smoke sitl-smoke determinism-3x gate-check voice-demo rehearsal record-ready preflight laptop-drone-smoke edge-pi-setup edge-galileo-setup video-record-clips video-pipeline video-iterate video-render
 
 SEED ?= 42
 SCENARIO ?= all
@@ -66,6 +66,9 @@ mosquitto-down: bus-down  ## Alias for bus-down
 
 edge-pi-setup:  ## Interactive one-command Pi 4 edge bringup (EDGE_ID=edge-house|edge-barn)
 	@bash scripts/setup-edge-pi.sh $(EDGE_ID)
+
+edge-galileo-setup:  ## Set up Intel Galileo Gen 1 as edge-tank node (water tank + weather telemetry)
+	@bash scripts/setup-edge-galileo.sh
 
 mesh-smoke:
 	uv run skyherd-mesh mesh smoke --verbose
