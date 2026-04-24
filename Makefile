@@ -1,4 +1,4 @@
-.PHONY: setup sim demo dashboard dashboard-mock test lint format typecheck clean ci sitl-up sitl-down bus-up bus-down mesh-smoke one-pager hardware-demo mavic-bridge f3-bridge drone-smoke sitl-smoke determinism-3x gate-check voice-demo
+.PHONY: setup sim demo dashboard dashboard-mock test lint format typecheck clean ci sitl-up sitl-down bus-up bus-down mesh-smoke one-pager hardware-demo hardware-demo-sim hardware-demo-sim-down h2-smoke mavic-bridge f3-bridge drone-smoke sitl-smoke determinism-3x gate-check voice-demo
 
 SEED ?= 42
 SCENARIO ?= all
@@ -99,3 +99,21 @@ gate-check:  ## SCEN-02 proof — iterates 10 CLAUDE.md Gate items, exit 0 iff 1
 
 voice-demo:  ## Render 5 Wes lines (one per urgency) — video B-roll friendly
 	SKYHERD_VOICE=$${SKYHERD_VOICE:-mock} uv run skyherd-voice demo
+
+# ---------------------------------------------------------------------------
+# Phase 6 (H2): laptop-local hardware-demo sim — desk coyote → SITL takeoff
+# ---------------------------------------------------------------------------
+
+hardware-demo-sim:  ## H2 laptop demo: mosquitto + SITL + coyote + pi-to-mission + speaker
+	@echo "Starting SkyHerd H2 laptop demo — coyote harness → SITL takeoff → deterrent"
+	docker compose -f docker-compose.hardware-demo.yml up -d --build
+	@echo ""
+	@echo "  Dashboard:  http://localhost:8000"
+	@echo "  Tail logs:  docker compose -f docker-compose.hardware-demo.yml logs -f"
+	@echo "  Stop stack: make hardware-demo-sim-down"
+
+hardware-demo-sim-down:  ## Stop the H2 laptop demo stack
+	docker compose -f docker-compose.hardware-demo.yml down
+
+h2-smoke:  ## Fast unit-level smoke of the H2 chain (<5s, no docker)
+	uv run pytest tests/hardware/test_h2_e2e.py -v --no-cov

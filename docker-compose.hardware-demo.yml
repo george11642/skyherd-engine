@@ -1,0 +1,127 @@
+# SkyHerd Phase 6 (H2) laptop-local hardware demo.
+#
+# One-shot: ``make hardware-demo-sim``
+#
+# Boots mosquitto + ArduPilot SITL + the live dashboard + the Pi coyote
+# harness + the pi-to-mission bridge + the speaker bridge.  All services
+# run on a single laptop; the only external image pull is ArduPilot SITL.
+
+services:
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: skyherd-mosquitto
+    ports:
+      - "1883:1883"
+    command: >
+      sh -c "printf 'listener 1883\nallow_anonymous true\n'
+      > /mosquitto/config/mosquitto.conf
+      && exec mosquitto -c /mosquitto/config/mosquitto.conf"
+
+  sitl:
+    image: ${SITL_IMAGE:-ardupilot/ardupilot-sitl:Copter-4.5.7}
+    container_name: skyherd-sitl
+    ports:
+      - "${SITL_PORT_UDP:-14540}:14540/udp"
+      - "5760:5760/tcp"
+    environment:
+      SITL_HOME: "34.1230,-106.4560,1500,180"  # NM ranch_a SW fence
+    healthcheck:
+      test: ["CMD-SHELL", "echo ok"]
+      interval: 10s
+      timeout: 3s
+      retries: 12
+      start_period: 15s
+
+  skyherd-live:
+    build:
+      context: .
+      dockerfile: docker/hardware-demo-edge.Dockerfile
+    container_name: skyherd-live
+    depends_on:
+      - mosquitto
+    ports:
+      - "8000:8000"
+    environment:
+      MQTT_URL: "mqtt://mosquitto:1883"
+      RANCH_ID: "ranch_a"
+      SKYHERD_SEED: "42"
+    command:
+      - "uv"
+      - "run"
+      - "python"
+      - "-m"
+      - "skyherd.server.live"
+      - "--host"
+      - "0.0.0.0"
+      - "--port"
+      - "8000"
+      - "--seed"
+      - "42"
+
+  skyherd-edge-coyote:
+    build:
+      context: .
+      dockerfile: docker/hardware-demo-edge.Dockerfile
+    container_name: skyherd-edge-coyote
+    depends_on:
+      - mosquitto
+    environment:
+      MQTT_URL: "mqtt://mosquitto:1883"
+      RANCH_ID: "ranch_a"
+      COYOTE_CAM_ID: "coyote_cam"
+      COYOTE_INTERVAL_S: "2.0"
+    command:
+      - "uv"
+      - "run"
+      - "skyherd-edge"
+      - "coyote"
+      - "--seed"
+      - "42"
+      - "--interval-s"
+      - "2.0"
+
+  skyherd-pi-to-mission:
+    build:
+      context: .
+      dockerfile: docker/hardware-demo-edge.Dockerfile
+    container_name: skyherd-pi-to-mission
+    depends_on:
+      - mosquitto
+      - sitl
+    environment:
+      MQTT_URL: "mqtt://mosquitto:1883"
+      RANCH_ID: "ranch_a"
+      DRONE_BACKEND: "sitl"
+      MAVSDK_HOST: "sitl"
+      MAVSDK_UDP: "udp://:14540"
+    command:
+      - "uv"
+      - "run"
+      - "skyherd-edge"
+      - "pi-to-mission"
+      - "--ranch"
+      - "ranch_a"
+      - "--backend"
+      - "sitl"
+      - "--seed"
+      - "42"
+
+  skyherd-speaker:
+    build:
+      context: .
+      dockerfile: docker/hardware-demo-edge.Dockerfile
+    container_name: skyherd-speaker
+    depends_on:
+      - mosquitto
+    environment:
+      MQTT_URL: "mqtt://mosquitto:1883"
+      RANCH_ID: "ranch_a"
+      SKYHERD_DETERRENT: "mute"   # headless container — no audio device
+    command:
+      - "uv"
+      - "run"
+      - "skyherd-edge"
+      - "deterrent"
+      - "--ranch"
+      - "ranch_a"
+      - "--mute"
