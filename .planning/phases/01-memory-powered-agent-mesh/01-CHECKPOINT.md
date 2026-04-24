@@ -2,8 +2,10 @@
 type: human-verify
 plan: 01-06
 stage: Task 3
-status: pending
+status: approved-partial
 created: 2026-04-23
+verified: 2026-04-23
+verify_doc: 01-VISUAL-VERIFY.md
 ---
 
 # Plan 01-06 Task 3 — MemoryPanel human-verify checkpoint
