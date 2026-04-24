@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, act } from "@testing-library/react";
-import { RanchMap, ScenarioBreadcrumb } from "./RanchMap";
+import { RanchMap, ScenarioBreadcrumb, classifyCow } from "./RanchMap";
 
 // Mock SSE client — shared across both RanchMap and ScenarioBreadcrumb suites.
 // A mutable handler map lets the breadcrumb tests re-emit scenario.active /
@@ -101,6 +101,69 @@ describe("ScenarioBreadcrumb (B4)", () => {
       triggerSSE("scenario.ended", { name: "sick_cow", outcome: "passed" });
     });
     expect(queryByTestId("scenario-breadcrumb")).toBeNull();
+  });
+});
+
+describe("classifyCow (Phase 10)", () => {
+  it("returns 'healthy' for normal bcs + grazing state", () => {
+    expect(classifyCow({ id: "c1", pos: [0.5, 0.5], bcs: 5.5, state: "grazing" })).toBe("healthy");
+  });
+
+  it("returns 'sick' when state is sick", () => {
+    expect(classifyCow({ id: "c1", pos: [0.5, 0.5], bcs: 5, state: "sick" })).toBe("sick");
+  });
+
+  it("returns 'calving' when state is calving", () => {
+    expect(classifyCow({ id: "c1", pos: [0.5, 0.5], bcs: 5, state: "calving" })).toBe("calving");
+  });
+
+  it("returns 'calving' when state is labor", () => {
+    expect(classifyCow({ id: "c1", pos: [0.5, 0.5], bcs: 5, state: "labor" })).toBe("calving");
+  });
+
+  it("returns 'sick' for severely thin cow (bcs < 3)", () => {
+    expect(classifyCow({ id: "c1", pos: [0.5, 0.5], bcs: 2.5 })).toBe("sick");
+  });
+
+  it("returns 'watch' for moderately thin cow (bcs < 4)", () => {
+    expect(classifyCow({ id: "c1", pos: [0.5, 0.5], bcs: 3.5 })).toBe("watch");
+  });
+
+  it("returns 'watch' when state is resting", () => {
+    expect(classifyCow({ id: "c1", pos: [0.5, 0.5], bcs: 6, state: "resting" })).toBe("watch");
+  });
+
+  it("defaults to 'healthy' when bcs is missing", () => {
+    expect(classifyCow({ id: "c1", pos: [0.5, 0.5] })).toBe("healthy");
+  });
+
+  it("sick state overrides otherwise-healthy bcs", () => {
+    expect(classifyCow({ id: "c1", pos: [0.5, 0.5], bcs: 6, state: "sick" })).toBe("sick");
+  });
+});
+
+describe("RanchMap — scenario zone glow (Phase 10)", () => {
+  beforeEach(() => {
+    sseHandlers = {};
+  });
+
+  it("subscribes to scenario.active / scenario.ended", () => {
+    render(<RanchMap />);
+    expect(sseHandlers["scenario.active"]?.length ?? 0).toBeGreaterThan(0);
+    expect(sseHandlers["scenario.ended"]?.length ?? 0).toBeGreaterThan(0);
+  });
+
+  it("ignores scenario.active with no name", () => {
+    render(<RanchMap />);
+    // These must not throw — the internal scenarioToZone handles undefined safely
+    act(() => { triggerSSE("scenario.active", {}); });
+    act(() => { triggerSSE("scenario.ended", {}); });
+    act(() => { triggerSSE("scenario.active", { name: "coyote" }); });
+    act(() => { triggerSSE("scenario.active", { name: "water_drop" }); });
+    act(() => { triggerSSE("scenario.active", { name: "sick_cow" }); });
+    act(() => { triggerSSE("scenario.active", { name: "calving" }); });
+    act(() => { triggerSSE("scenario.active", { name: "storm" }); });
+    act(() => { triggerSSE("scenario.active", { name: "unknown" }); });
   });
 });
 
