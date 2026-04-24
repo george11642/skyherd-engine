@@ -137,12 +137,17 @@ def get_backend(name: str | None = None) -> DroneBackend:
 
     Resolution order:
     1. *name* argument (if provided)
-    2. ``DRONE_BACKEND`` environment variable
-    3. Defaults to ``"sitl"``
+    2. ``SKYHERD_DRONE_BACKEND`` environment variable (hackathon-era alias)
+    3. ``DRONE_BACKEND`` environment variable (legacy)
+    4. Defaults to ``"sitl"``
 
     Call :py:meth:`DroneBackend.connect` to open the connection.
     """
-    backend_name = name or os.environ.get("DRONE_BACKEND", "sitl")
+    backend_name = (
+        name
+        or os.environ.get("SKYHERD_DRONE_BACKEND")
+        or os.environ.get("DRONE_BACKEND", "sitl")
+    )
 
     # Lazy imports so callers that only use StubBackend never pull mavsdk.
     if backend_name not in _REGISTRY:
@@ -169,10 +174,24 @@ def get_backend(name: str | None = None) -> DroneBackend:
             from skyherd.drone.f3_inav import F3InavBackend  # noqa: PLC0415
 
             _register("f3_inav", F3InavBackend)
+        elif backend_name == "betaflight":
+            # Hackathon bench demo: USB-serial motor spin via MSP v1.
+            from skyherd.drone.betaflight_override import (  # noqa: PLC0415
+                BetaflightOverrideBackend,
+            )
+
+            _register("betaflight", BetaflightOverrideBackend)
         else:
+            available = sorted(_REGISTRY) or [
+                "sitl",
+                "stub",
+                "mavic",
+                "mavic_direct",
+                "f3_inav",
+                "betaflight",
+            ]
             raise DroneError(
-                f"Unknown drone backend {backend_name!r}. "
-                f"Available: {sorted(_REGISTRY) or ['sitl', 'stub', 'mavic', 'mavic_direct', 'f3_inav']}"
+                f"Unknown drone backend {backend_name!r}. Available: {available}"
             )
 
     cls = _REGISTRY[backend_name]
