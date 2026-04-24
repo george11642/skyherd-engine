@@ -160,11 +160,11 @@ export const Main = ({ actDurations, voDurationsFrames }: MainProps) => {
       <Sequence from={scenarioStart(2) + 60} durationInFrames={60}>
         <Audio src={staticFile("sfx/radio-static.mp3")} volume={0.3} />
       </Sequence>
-      {/* UI ticks at each scenario's lower-third trigger (~frame 150 local). */}
+      {/* UI ticks at each scenario's lower-third trigger (~frame 60 local). */}
       {[0, 1, 2, 3, 4].map((i) => (
         <Sequence
           key={`ui-tick-${i}`}
-          from={scenarioStart(i) + 150}
+          from={scenarioStart(i) + 60}
           durationInFrames={20}
         >
           <Audio src={staticFile("sfx/ui-tick.mp3")} volume={0.55} />

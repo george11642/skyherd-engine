@@ -117,15 +117,24 @@ const LowerThird = ({
   );
 };
 
-// ── Scrub-anchor chip (HashChip / card reveal) ───────────────────────────────
+// ── Scrub-anchor chip (HashChip card — topic + status pill + hash) ───────────
 type AnchorChipProps = {
   label: string;
-  value: string;
+  topic: string;
+  hash: string;
+  statusPill: string;
   appearFrame: number;
   accent: LowerThirdProps["accent"];
 };
 
-const AnchorChip = ({ label, value, appearFrame, accent }: AnchorChipProps) => {
+const AnchorChip = ({
+  label,
+  topic,
+  hash,
+  statusPill,
+  appearFrame,
+  accent,
+}: AnchorChipProps) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const p = spring({
@@ -138,6 +147,7 @@ const AnchorChip = ({ label, value, appearFrame, accent }: AnchorChipProps) => {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
+  const accentColor = ACCENT_MAP[accent];
 
   return (
     <div
@@ -148,35 +158,96 @@ const AnchorChip = ({ label, value, appearFrame, accent }: AnchorChipProps) => {
         transform: `scale(${scale})`,
         opacity,
         fontFamily: "Inter, sans-serif",
-        backgroundColor: "rgba(16,19,25,0.86)",
-        border: `1px solid ${ACCENT_MAP[accent]}`,
-        borderRadius: 8,
-        padding: "16px 22px",
-        backdropFilter: "blur(10px)",
-        boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
+        backgroundColor: "rgba(16,19,25,0.9)",
+        border: `1px solid ${accentColor}`,
+        borderRadius: 10,
+        padding: "14px 18px",
+        backdropFilter: "blur(12px)",
+        boxShadow: "0 8px 32px rgba(0,0,0,0.55)",
+        minWidth: 280,
+        display: "flex",
+        flexDirection: "column",
+        gap: 10,
       }}
     >
+      {/* Header row: label (left) + status pill (right) */}
       <div
         style={{
-          fontSize: 12,
-          color: ACCENT_MAP[accent],
-          letterSpacing: "0.3em",
-          textTransform: "uppercase",
-          marginBottom: 6,
-          fontWeight: 600,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 14,
         }}
       >
-        {label}
+        <div
+          style={{
+            fontSize: 11,
+            color: accentColor,
+            letterSpacing: "0.3em",
+            textTransform: "uppercase",
+            fontWeight: 700,
+          }}
+        >
+          {label}
+        </div>
+        <div
+          style={{
+            fontSize: 10,
+            color: "rgb(10 12 16)",
+            backgroundColor: accentColor,
+            padding: "3px 9px",
+            borderRadius: 999,
+            letterSpacing: "0.18em",
+            textTransform: "uppercase",
+            fontWeight: 800,
+          }}
+        >
+          {statusPill}
+        </div>
       </div>
+      {/* Topic label */}
       <div
         style={{
-          fontFamily: "ui-monospace, JetBrains Mono, monospace",
-          fontSize: 22,
+          fontSize: 20,
           color: "rgb(236 239 244)",
-          fontWeight: 500,
+          fontWeight: 600,
+          letterSpacing: "-0.005em",
         }}
       >
-        {value}
+        {topic}
+      </div>
+      {/* Condensed hash with Ed25519 ident */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 10,
+          borderTop: `1px solid rgba(148,176,136,0.18)`,
+          paddingTop: 8,
+        }}
+      >
+        <div
+          style={{
+            fontSize: 10,
+            color: "rgb(120 132 148)",
+            letterSpacing: "0.2em",
+            textTransform: "uppercase",
+            fontWeight: 600,
+          }}
+        >
+          Ed25519
+        </div>
+        <div
+          style={{
+            fontFamily: "ui-monospace, JetBrains Mono, monospace",
+            fontSize: 17,
+            color: "rgb(236 239 244)",
+            fontWeight: 500,
+            letterSpacing: "0.02em",
+          }}
+        >
+          {hash}
+        </div>
       </div>
     </div>
   );
@@ -281,7 +352,9 @@ type ScenarioProps = {
   detail: string;
   accent: LowerThirdProps["accent"];
   anchorLabel: string;
-  anchorValue: string;
+  anchorTopic: string;
+  anchorHash: string;
+  anchorStatus: string;
   anchorFrame: number; // local frame when anchor chip appears
   scenarioNumber: number;
 };
@@ -294,7 +367,9 @@ const BeatScenario = ({
   detail,
   accent,
   anchorLabel,
-  anchorValue,
+  anchorTopic,
+  anchorHash,
+  anchorStatus,
   anchorFrame,
   scenarioNumber,
 }: ScenarioProps) => {
@@ -390,12 +465,14 @@ const BeatScenario = ({
         agent={agent}
         detail={detail}
         accent={accent}
-        appearFrame={150}
-        durationInFrames={durationInFrames - 150}
+        appearFrame={60}
+        durationInFrames={durationInFrames - 60}
       />
       <AnchorChip
         label={anchorLabel}
-        value={anchorValue}
+        topic={anchorTopic}
+        hash={anchorHash}
+        statusPill={anchorStatus}
         appearFrame={anchorFrame}
         accent={accent}
       />
@@ -627,8 +704,10 @@ export const Act2Demo = ({ voDurationsFrames }: Act2Props) => {
             detail="Coyote · 91% confidence · Fence W-12 · Mavic dispatched"
             accent="thermal"
             anchorLabel="Attest row"
-            anchorValue="scenario/coyote/attest_row"
-            anchorFrame={360}
+            anchorTopic="Fence W-12 breach"
+            anchorHash="a7c3…f91e"
+            anchorStatus="Signed"
+            anchorFrame={240}
             scenarioNumber={1}
           />
         </Series.Sequence>
@@ -641,8 +720,10 @@ export const Act2Demo = ({ voDurationsFrames }: Act2Props) => {
             detail="Cow A014 · pinkeye 83% · Vet packet generated"
             accent="warn"
             anchorLabel="Vet packet"
-            anchorValue="scenario/sick_cow/packet"
-            anchorFrame={360}
+            anchorTopic="Cow A014 · pinkeye"
+            anchorHash="4d82…b03c"
+            anchorStatus="Sent"
+            anchorFrame={240}
             scenarioNumber={2}
           />
         </Series.Sequence>
@@ -655,8 +736,10 @@ export const Act2Demo = ({ voDurationsFrames }: Act2Props) => {
             detail="Tank 7 pressure drop · IR flyover scheduled"
             accent="sky"
             anchorLabel="IR flyover"
-            anchorValue="scenario/water/ir_still"
-            anchorFrame={330}
+            anchorTopic="Tank 7 · pressure drop"
+            anchorHash="92e1…5a0d"
+            anchorStatus="Queued"
+            anchorFrame={240}
             scenarioNumber={3}
           />
         </Series.Sequence>
@@ -669,8 +752,10 @@ export const Act2Demo = ({ voDurationsFrames }: Act2Props) => {
             detail="Cow 117 · pre-labor · Rancher paged (priority)"
             accent="sage"
             anchorLabel="Behavior trace"
-            anchorValue="scenario/calving/trace"
-            anchorFrame={360}
+            anchorTopic="Cow 117 · pre-labor"
+            anchorHash="61bf…2c94"
+            anchorStatus="Paged"
+            anchorFrame={240}
             scenarioNumber={4}
           />
         </Series.Sequence>
@@ -683,8 +768,10 @@ export const Act2Demo = ({ voDurationsFrames }: Act2Props) => {
             detail="Hail ETA 45 min · Paddock B → Shelter 2"
             accent="dust"
             anchorLabel="Redirect plan"
-            anchorValue="scenario/storm/paddock_redirect"
-            anchorFrame={360}
+            anchorTopic="Paddock B → Shelter 2"
+            anchorHash="d3a9…7e11"
+            anchorStatus="Active"
+            anchorFrame={240}
             scenarioNumber={5}
           />
         </Series.Sequence>
