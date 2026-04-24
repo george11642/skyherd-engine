@@ -31,6 +31,7 @@ class WorldSnapshot(BaseModel):
     cows: list[dict[str, Any]]
     predators: list[dict[str, Any]]
     event_count: int
+    drone: dict[str, Any] | None = None
 
     model_config = {"arbitrary_types_allowed": True}
 
@@ -60,6 +61,28 @@ class World:
         self.predator_spawner = predator_spawner
         self.weather_driver = weather_driver
         self.events: list[dict[str, Any]] = []
+        # Drone state is owned externally (scenario engine / drone control)
+        # and pushed into the world via set_drone_state(). Snapshot surfaces
+        # whatever was last set; None when no drone is airborne.
+        self._drone_state: dict[str, Any] | None = None
+
+    # ------------------------------------------------------------------
+    # Drone state (external push model)
+    # ------------------------------------------------------------------
+
+    def set_drone_state(self, state: dict[str, Any] | None) -> None:
+        """Record the latest drone telemetry for inclusion in world snapshots.
+
+        Callers (scenario runner, drone backend, ambient driver) push a dict
+        like ``{"pos": [x, y], "state": "patrol", "alt_m": 35.0,
+        "battery_pct": 82.0}`` each tick while a drone is airborne. Passing
+        ``None`` clears the state so future snapshots omit the drone.
+        """
+        self._drone_state = state
+
+    def drone_state(self) -> dict[str, Any] | None:
+        """Return the last drone state set via ``set_drone_state`` (or None)."""
+        return self._drone_state
 
     # ------------------------------------------------------------------
     # Step
@@ -139,6 +162,7 @@ class World:
             cows=[c.model_dump() for c in self.herd.cows],
             predators=[p.model_dump() for p in self.predator_spawner.predators],
             event_count=len(self.events),
+            drone=self._drone_state,
         )
 
 
