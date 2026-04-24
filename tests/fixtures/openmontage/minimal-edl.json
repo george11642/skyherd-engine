@@ -1,0 +1,62 @@
+{
+  "version": "1.0",
+  "render_runtime": "remotion",
+  "renderer_family": "remotion",
+  "theme": "skyherd-fixture",
+  "cuts": [
+    {
+      "id": "hero",
+      "source": "",
+      "type": "hero_title",
+      "in_seconds": 0.0,
+      "out_seconds": 3.0,
+      "transition_in": "fade",
+      "transition_in_duration": 0.5
+    },
+    {
+      "id": "metric",
+      "source": "",
+      "type": "stat_card",
+      "in_seconds": 3.0,
+      "out_seconds": 6.5,
+      "stat_label": "uptime",
+      "stat_value": "24/7"
+    },
+    {
+      "id": "establish",
+      "source": "remotion-video/public/clips/ambient_establish.mp4",
+      "in_seconds": 6.5,
+      "out_seconds": 14.0,
+      "transition_in": "cut"
+    }
+  ],
+  "overlays": [
+    {
+      "id": "section-1",
+      "type": "section_title",
+      "text": "the watch begins",
+      "in_seconds": 0.0,
+      "out_seconds": 3.0
+    }
+  ],
+  "audio": {
+    "narration": [
+      {
+        "id": "vo-1",
+        "src": "remotion-video/public/voiceover/vo-establish.mp3",
+        "in_seconds": 0.0,
+        "out_seconds": 14.0
+      }
+    ],
+    "music": {
+      "src": "remotion-video/public/music/bgm-main.mp3",
+      "ducking": "binary"
+    },
+    "sfx": []
+  },
+  "transitions": [],
+  "metadata": {
+    "openmontage_version": "fixture-test",
+    "pipeline": "hybrid"
+  }
+}
