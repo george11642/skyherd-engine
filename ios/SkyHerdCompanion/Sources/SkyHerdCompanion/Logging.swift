@@ -7,10 +7,7 @@ enum AppLogger {
     /// DJI SDK registration and aircraft events.
     static let dji = Logger(subsystem: subsystem, category: "DJI")
 
-    /// WebSocket server accepting connections from the Python backend.
-    static let ws = Logger(subsystem: subsystem, category: "WebSocket")
-
-    /// MQTT bridge (telemetry bus).
+    /// MQTT bridge — primary command transport + telemetry bus.
     static let mqtt = Logger(subsystem: subsystem, category: "MQTT")
 
     /// Command routing and dispatch.

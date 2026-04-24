@@ -90,10 +90,16 @@ public struct BatteryGuard {
         self.floorPct = floorPct
     }
 
-    /// Throws ``SafetyGuardError.batteryLow`` if `pct` is below the floor.
+    /// Throws ``SafetyGuardError.batteryLow`` if `pct` is at or below the floor.
+    ///
+    /// Semantics: "below or at floor = unsafe". A battery sitting exactly on the
+    /// floor has effectively no margin — a 1% drop during rotor spin-up would
+    /// breach it mid-takeoff. This matches the Android implementation and the
+    /// Python safety-guard (`src/skyherd/drone/safety.py`) where
+    /// ``pct <= BATTERY_MIN_TAKEOFF_PCT`` is the reject condition.
     public func checkTakeoff(pct: Double) throws {
-        if pct < floorPct {
-            AppLogger.safety.warning("Battery guard: \(pct)% < floor \(self.floorPct)%")
+        if pct <= floorPct {
+            AppLogger.safety.warning("Battery guard: \(pct)% <= floor \(self.floorPct)%")
             throw SafetyGuardError.batteryLow(pct)
         }
     }

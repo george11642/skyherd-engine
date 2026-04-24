@@ -29,14 +29,16 @@ public final class DJIBridge: NSObject {
     public static let shared = DJIBridge()
 
     // State observable by the UI layer
-    private(set) var isRegistered = false
-    private(set) var isConnected = false
+    public private(set) var isRegistered = false
+    public private(set) var isConnected = false
 
     // Cached state snapshot updated from SDK callbacks
-    private(set) var currentState = DroneStateSnapshot()
+    public private(set) var currentState = DroneStateSnapshot()
 
-    // Observers for SDK registration / product connection
-    private var appState: AppState?
+    // Weak back-reference to AppState so status callbacks can surface in the UI.
+    // Set via ``registerApp(appState:)``.  Intentionally weak so the singleton
+    // DJIBridge never keeps AppState alive beyond its SwiftUI lifecycle.
+    private weak var appState: AppState?
 
     // Sequence counter for internal logging
     private var seqCounter = 0
@@ -47,12 +49,19 @@ public final class DJIBridge: NSObject {
 
     // MARK: - Registration
 
-    /// Call once at app launch (from ``App.init``).  Reads ``Config.djiApiKey`` and
-    /// invokes ``DJISDKManager.registerApp``.
-    public func registerApp() {
+    /// Call once at app launch (from ``App.init``) with the shared ``AppState``.
+    ///
+    /// Reads ``Config.djiApiKey`` and invokes ``DJISDKManager.registerApp``.
+    /// If the key is empty, ``AppState.lastError`` is set to a user-visible
+    /// string and registration is skipped (no silent failure).
+    public func registerApp(appState: AppState) {
+        self.appState = appState
         let key = Config.djiApiKey
         guard !key.isEmpty else {
-            AppLogger.dji.error("DJI API key is empty — registration skipped")
+            AppLogger.dji.error("DJI API key is empty — registration aborted")
+            appState.lastError =
+                "DJI API key missing — set DJI_API_KEY in Config.xcconfig or the DJIAppKey " +
+                "entry in Info.plist. Registration has been skipped; drone commands will be rejected."
             notifyStatus("No API key")
             return
         }
@@ -115,48 +124,34 @@ public final class DJIBridge: NSObject {
         currentState.altitudeM = clampedAlt
         currentState.mode = "GUIDED"
 #endif
+        pushDroneStateToApp()
         AppLogger.dji.info("takeoff ok — alt=\(clampedAlt, privacy: .public) m")
     }
 
     // MARK: - Goto location
 
     /// Fly to a geographic position at the specified altitude.
+    ///
+    /// **NOT YET IMPLEMENTED** — the DJI SDK V5 exposes point-to-point flight only
+    /// through ``DJIWaypointV2Mission``, which is a substantial wiring effort
+    /// beyond the Phase 7.2 scope.  Calling this method always throws
+    /// ``DJIBridgeError.unsupported`` so patrol missions fail loudly rather than
+    /// silently triggering RTH (as the prior ``fc.startGoHome`` implementation
+    /// did — see Phase 7.2 audit, Audit 1 #3).
     public func gotoLocation(
         _ lat: CLLocationDegrees,
         _ lon: CLLocationDegrees,
         _ alt: Double
     ) async throws {
         let clampedAlt = min(alt, Config.maxAltitudeM)
-        AppLogger.dji.info("gotoLocation: \(lat),\(lon) alt=\(clampedAlt)")
-
-#if DJI_SDK_AVAILABLE
-        guard isRegistered, isConnected else {
-            throw DJIBridgeError.sdkUnavailable("DJI not ready")
-        }
-        guard let fc = DJISDKManager.product()?.flightController else {
-            throw DJIBridgeError.sdkUnavailable("FlightController unavailable")
-        }
-        let coordinate = CLLocationCoordinate2D(latitude: lat, longitude: lon)
-        try await withCheckedThrowingContinuation { (cont: CheckedContinuation<Void, Error>) in
-            fc.startGoHome { error in       // go-home as closest DJI V5 analogue to goto;
-                // For a real goto, use DJIWaypointV2Mission.
-                if let error {
-                    cont.resume(throwing: DJIBridgeError.djiError(error.localizedDescription))
-                } else {
-                    cont.resume()
-                }
-            }
-        }
-        _ = coordinate                      // suppress unused warning
-        currentState.lat = lat
-        currentState.lon = lon
-        currentState.altitudeM = clampedAlt
-#else
-        AppLogger.dji.warning("DJI SDK stub: gotoLocation()")
-        currentState.lat = lat
-        currentState.lon = lon
-        currentState.altitudeM = clampedAlt
-#endif
+        AppLogger.dji.warning(
+            "gotoLocation(\(lat),\(lon),\(clampedAlt)) is not implemented — " +
+            "throwing unsupported (prev impl silently triggered RTH)"
+        )
+        throw DJIBridgeError.unsupported(
+            "gotoLocation requires DJIWaypointV2Mission — not yet implemented. " +
+            "Use return_to_home or wait for Phase 8+ waypoint support."
+        )
     }
 
     // MARK: - Return to home
@@ -190,6 +185,7 @@ public final class DJIBridge: NSObject {
         currentState.armed = false
         currentState.mode = "LAND"
 #endif
+        pushDroneStateToApp()
         AppLogger.dji.info("returnToHome ok")
     }
 
@@ -198,9 +194,8 @@ public final class DJIBridge: NSObject {
     /// Play a deterrent tone.
     ///
     /// - Note: The Mavic Air 2 has **no onboard speaker**.  This method logs
-    ///   the request and optionally routes audio to a paired Bluetooth speaker
-    ///   via ``AVAudioSession``.  Future work: accessory speaker support via
-    ///   ``ExternalAccessory`` framework.
+    ///   the request; routing to a paired Bluetooth speaker via
+    ///   ``AVAudioSession`` is a Phase 8+ enhancement.
     ///
     /// - Parameters:
     ///   - hz: Frequency in Hz (e.g. 12 000 for ultrasonic deterrent).
@@ -208,56 +203,8 @@ public final class DJIBridge: NSObject {
     public func playTone(hz: Int, ms: Int) {
         AppLogger.dji.warning(
             "playTone(hz:\(hz), ms:\(ms)) — Mavic Air 2 has no onboard speaker; " +
-            "log only.  Add Bluetooth speaker accessory support via AVAudioSession."
+            "log only.  Deferred: Bluetooth speaker accessory via AVAudioSession (Phase 8+)."
         )
-        // TODO: Route to AVAudioEngine for Bluetooth speaker when accessory is paired.
-    }
-
-    // MARK: - Capture visual clip
-
-    /// Capture a visual clip from the drone camera.
-    ///
-    /// Returns the local URL of the saved video file.
-    /// - Parameter seconds: Clip duration in seconds.
-    public func captureVisualClip(seconds: Int) async throws -> URL {
-        AppLogger.dji.info("captureVisualClip: \(seconds)s")
-
-#if DJI_SDK_AVAILABLE
-        guard isRegistered, isConnected else {
-            throw DJIBridgeError.sdkUnavailable("DJI not ready")
-        }
-        // Use DJI Media Manager to trigger and download a recording.
-        // Implementation sketch — real implementation requires:
-        //   1. DJICamera.startRecordVideo completion handler
-        //   2. Sleep/wait for `seconds`
-        //   3. DJICamera.stopRecordVideo
-        //   4. DJIMediaManager.fetchMediaTaskScheduler to pull the file
-        guard let camera = DJISDKManager.product()?.camera else {
-            throw DJIBridgeError.sdkUnavailable("Camera unavailable")
-        }
-        try await withCheckedThrowingContinuation { (cont: CheckedContinuation<Void, Error>) in
-            camera.startRecordVideo { error in
-                if let error { cont.resume(throwing: DJIBridgeError.djiError(error.localizedDescription)) }
-                else { cont.resume() }
-            }
-        }
-        try await Task.sleep(nanoseconds: UInt64(seconds) * 1_000_000_000)
-        try await withCheckedThrowingContinuation { (cont: CheckedContinuation<Void, Error>) in
-            camera.stopRecordVideo { error in
-                if let error { cont.resume(throwing: DJIBridgeError.djiError(error.localizedDescription)) }
-                else { cont.resume() }
-            }
-        }
-        // Return a placeholder path — real implementation downloads via DJIMediaManager.
-        let url = FileManager.default.temporaryDirectory
-            .appendingPathComponent("mavic_clip_\(Int(Date().timeIntervalSince1970)).mp4")
-        return url
-#else
-        AppLogger.dji.warning("DJI SDK stub: captureVisualClip()")
-        let url = FileManager.default.temporaryDirectory
-            .appendingPathComponent("stub_clip_\(Int(Date().timeIntervalSince1970)).mp4")
-        return url
-#endif
     }
 
     // MARK: - State
@@ -282,15 +229,27 @@ public final class DJIBridge: NSObject {
         if let battery = DJISDKManager.product()?.battery {
             currentState.batteryPct = Double(battery.chargeRemainingInPercent)
         }
+        pushDroneStateToApp()
 #endif
         return currentState
     }
 
     // MARK: - Internal helpers
 
+    /// Post a status message to both the system logger **and** the bound
+    /// ``AppState.djiStatus`` (surfaced in the UI). Prior implementations
+    /// logged only, so the UI stuck on "Not registered" forever.
     private func notifyStatus(_ message: String) {
-        // Post to AppState if wired up — AppState observes DJIBridge via Combine in a real app.
         AppLogger.dji.info("DJI status: \(message, privacy: .public)")
+        if let appState = appState {
+            appState.djiStatus = message
+        }
+    }
+
+    /// Mirror the cached ``currentState`` into ``AppState.droneState`` so the UI
+    /// refreshes after every bridge transition.
+    private func pushDroneStateToApp() {
+        appState?.droneState = currentState
     }
 }
 
@@ -319,6 +278,7 @@ extension DJIBridge: DJISDKManagerDelegate {
             self.isConnected = product != nil
             self.currentState.mode = "STANDBY"
             self.notifyStatus(product != nil ? "Connected" : "Disconnected")
+            self.pushDroneStateToApp()
         }
     }
 
@@ -328,6 +288,7 @@ extension DJIBridge: DJISDKManagerDelegate {
             self.isConnected = false
             self.currentState.mode = "UNKNOWN"
             self.notifyStatus("Disconnected")
+            self.pushDroneStateToApp()
         }
     }
 
@@ -345,6 +306,7 @@ public enum DJIBridgeError: Error, LocalizedError {
     case timeout(String)
     case gpsInvalid(String)
     case lostSignal(String)
+    case unsupported(String)
 
     public var errorDescription: String? {
         switch self {
@@ -353,6 +315,7 @@ public enum DJIBridgeError: Error, LocalizedError {
         case .timeout(let msg):        return "Timeout: \(msg)"
         case .gpsInvalid(let msg):     return "\(DroneErrorCode.gpsInvalid.rawValue): \(msg)"
         case .lostSignal(let msg):     return "\(DroneErrorCode.lostSignal.rawValue): \(msg)"
+        case .unsupported(let msg):    return "\(DroneErrorCode.unsupported.rawValue): \(msg)"
         }
     }
 }

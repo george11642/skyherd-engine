@@ -2,8 +2,8 @@ import SwiftUI
 
 /// Main developer-testing UI.
 ///
-/// Shows live DJI registration state, WebSocket server state, MQTT state,
-/// last received command, and manual arm / takeoff / RTH buttons for bench testing.
+/// Shows live DJI registration state, MQTT state, lost-signal watchdog state,
+/// last received command, and manual takeoff / RTH buttons for bench testing.
 struct ContentView: View {
     @EnvironmentObject private var appState: AppState
 
@@ -29,10 +29,10 @@ struct ContentView: View {
         Section("Connection Status") {
             labeledRow("DJI SDK", value: appState.djiStatus,
                        color: statusColor(appState.djiStatus, good: "Registered"))
-            labeledRow("WebSocket", value: appState.wsStatus,
-                       color: statusColor(appState.wsStatus, good: "Listening"))
             labeledRow("MQTT", value: appState.mqttStatus,
                        color: statusColor(appState.mqttStatus, good: "Connected"))
+            labeledRow("Watchdog", value: appState.watchdogStatus,
+                       color: statusColor(appState.watchdogStatus, good: "Running"))
         }
     }
 
@@ -59,7 +59,9 @@ struct ContentView: View {
                        color: s.inAir ? .blue : .primary)
             labeledRow("Altitude", value: String(format: "%.1f m", s.altitudeM))
             labeledRow("Battery", value: String(format: "%.0f%%", s.batteryPct),
-                       color: s.batteryPct < 25 ? .red : .primary)
+                       color: s.batteryPct <= Config.batteryFloorPct ? .red : .primary)
+            labeledRow("GPS Fix", value: s.gpsValid ? "Valid" : "Invalid",
+                       color: s.gpsValid ? .primary : .red)
             labeledRow("Mode", value: s.mode)
             labeledRow("Position",
                        value: String(format: "%.5f, %.5f", s.lat, s.lon))
@@ -75,6 +77,8 @@ struct ContentView: View {
     }
 
     private var devButtonsSection: some View {
+        // Arm button removed (Phase 7.2): DJI SDK V5 has no standalone arm —
+        // motors spin up on startTakeoff. Showing a no-op button was misleading.
         Section("Dev Controls (bench testing)") {
             Button("Manual Takeoff (5 m)") {
                 Task { await devTakeoff() }
@@ -85,15 +89,10 @@ struct ContentView: View {
                 Task { await devRTH() }
             }
             .tint(.orange)
-
-            Button("Arm (DJI motors)") {
-                Task { await devArm() }
-            }
-            .tint(.green)
         }
     }
 
-    // MARK: - Dev actions (bypass WebSocket, call DJIBridge directly)
+    // MARK: - Dev actions (bypass MQTT, call DJIBridge directly)
 
     private func devTakeoff() async {
         do {
@@ -108,15 +107,6 @@ struct ContentView: View {
             try await DJIBridge.shared.returnToHome()
         } catch {
             await MainActor.run { appState.lastError = error.localizedDescription }
-        }
-    }
-
-    private func devArm() async {
-        // DJI SDK V5 does not expose a standalone arm command — motors start on takeoff.
-        // This button is a no-op placeholder that documents the limitation.
-        await MainActor.run {
-            appState.lastError =
-                "DJI SDK V5 does not expose a standalone arm command; use Takeoff instead."
         }
     }
 

@@ -2,21 +2,134 @@ import Foundation
 
 // MARK: - Inbound command envelope (Python → app)
 
-/// A command sent by the SkyHerd Engine Python backend over WebSocket.
+/// A command sent by the SkyHerd Engine Python backend over MQTT.
 ///
-/// JSON wire format:
+/// **Legacy wire format** (v0, still accepted for backward compat):
 /// ```json
 /// {"cmd": "takeoff", "args": {"alt_m": 5.0}, "seq": 42}
 /// ```
+///
+/// **V1 wire format** (``MissionV1`` envelope — see
+/// `docs/MAVIC_MISSION_SCHEMA.md`):
+/// ```json
+/// {
+///   "version": 1,
+///   "metadata": {"mission_id": "m001", "battery_floor_pct": 30.0, "wind_kt": 12.0},
+///   "command":  {"cmd": "takeoff", "args": {"alt_m": 5.0}},
+///   "seq": 42
+/// }
+/// ```
+///
+/// Both shapes decode to this single struct.  When a V1 envelope is present,
+/// ``metadata`` is populated; legacy payloads leave it ``nil``.
 public struct DroneCommand: Codable, Equatable {
     public let cmd: String
     public let args: [String: AnyCodable]
     public let seq: Int
+    /// Optional mission metadata (V1 envelope). ``nil`` for legacy payloads.
+    public let metadata: MissionMetadata?
 
-    public init(cmd: String, args: [String: AnyCodable] = [:], seq: Int) {
+    public init(
+        cmd: String,
+        args: [String: AnyCodable] = [:],
+        seq: Int,
+        metadata: MissionMetadata? = nil
+    ) {
         self.cmd = cmd
         self.args = args
         self.seq = seq
+        self.metadata = metadata
+    }
+
+    // MARK: Custom decoder — supports legacy + V1 envelopes
+
+    private enum TopKeys: String, CodingKey {
+        case cmd, args, seq              // legacy
+        case version, metadata, command  // V1
+    }
+
+    private enum V1CommandKeys: String, CodingKey {
+        case cmd, args
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: TopKeys.self)
+
+        // Detect V1 envelope by presence of `version` key.
+        if container.contains(.version) {
+            // Validate version (strictly 1 for now; forward-compat ignores unknowns elsewhere).
+            let version = try container.decode(Int.self, forKey: .version)
+            guard version == 1 else {
+                throw DecodingError.dataCorruptedError(
+                    forKey: .version,
+                    in: container,
+                    debugDescription: "Unsupported mission envelope version: \(version)"
+                )
+            }
+            self.metadata = try container.decodeIfPresent(MissionMetadata.self, forKey: .metadata)
+            let inner = try container.nestedContainer(keyedBy: V1CommandKeys.self, forKey: .command)
+            self.cmd = try inner.decode(String.self, forKey: .cmd)
+            self.args = try inner.decodeIfPresent([String: AnyCodable].self, forKey: .args) ?? [:]
+            self.seq = try container.decode(Int.self, forKey: .seq)
+        } else {
+            // Legacy: flat {cmd, args, seq}
+            self.cmd = try container.decode(String.self, forKey: .cmd)
+            self.args = try container.decodeIfPresent([String: AnyCodable].self, forKey: .args) ?? [:]
+            self.seq = try container.decode(Int.self, forKey: .seq)
+            self.metadata = nil
+        }
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        // Re-encode in legacy flat form to minimise wire churn. V1 envelope
+        // is inbound-only; the app never originates mission packets.
+        var container = encoder.container(keyedBy: TopKeys.self)
+        try container.encode(cmd, forKey: .cmd)
+        try container.encode(args, forKey: .args)
+        try container.encode(seq, forKey: .seq)
+    }
+}
+
+// MARK: - MissionV1 metadata
+
+/// Subset of ``docs/MAVIC_MISSION_SCHEMA.md`` → ``MissionMetadata`` that
+/// influences app-side behaviour (safety guards + logging).  Unknown keys are
+/// ignored for forward compatibility.
+public struct MissionMetadata: Codable, Equatable {
+    public let missionId: String?
+    public let ranchId: String?
+    public let scenario: String?
+    public let windKt: Double?
+    public let batteryFloorPct: Double?
+    public let geofenceVersion: String?
+    public let issuedBy: String?
+
+    public init(
+        missionId: String? = nil,
+        ranchId: String? = nil,
+        scenario: String? = nil,
+        windKt: Double? = nil,
+        batteryFloorPct: Double? = nil,
+        geofenceVersion: String? = nil,
+        issuedBy: String? = nil
+    ) {
+        self.missionId = missionId
+        self.ranchId = ranchId
+        self.scenario = scenario
+        self.windKt = windKt
+        self.batteryFloorPct = batteryFloorPct
+        self.geofenceVersion = geofenceVersion
+        self.issuedBy = issuedBy
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case missionId = "mission_id"
+        case ranchId = "ranch_id"
+        case scenario
+        case windKt = "wind_kt"
+        case batteryFloorPct = "battery_floor_pct"
+        case geofenceVersion = "geofence_version"
+        case issuedBy = "issued_by"
     }
 }
 
@@ -110,7 +223,7 @@ public struct DroneStateSnapshot: Codable, Equatable {
 
 // MARK: - MQTT envelope types
 
-/// Outbound state published on ``skyherd/drone/state/*``.
+/// Outbound state published on ``skyherd/drone/state/ios``.
 public struct MQTTStatePayload: Codable {
     public let ts: Double
     public let state: DroneStateSnapshot
@@ -121,7 +234,7 @@ public struct MQTTStatePayload: Codable {
     }
 }
 
-/// Outbound ACK published on ``skyherd/drone/ack/*``.
+/// Outbound ACK published on ``skyherd/drone/ack/ios``.
 public struct MQTTAckPayload: Codable {
     public let ts: Double
     public let ack: DroneAck
@@ -143,6 +256,10 @@ public enum DroneErrorCode: String {
     case unknownCmd = "E_UNKNOWN_CMD"
     case gpsInvalid = "E_GPS_INVALID"
     case lostSignal = "E_LOST_SIGNAL"
+    /// Command recognised but not yet wired to the DJI SDK (e.g. gotoLocation
+    /// pending DJIWaypointV2Mission). Surfaced by patrol missions that cannot
+    /// honour waypoints.
+    case unsupported = "E_UNSUPPORTED"
 }
 
 // MARK: - AnyCodable helper

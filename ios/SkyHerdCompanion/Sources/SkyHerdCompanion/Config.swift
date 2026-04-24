@@ -21,21 +21,12 @@ enum Config {
         return ""
     }
 
-    // MARK: - WebSocket server (this app acts as server; Python backend connects to us)
+    // NOTE: No WebSocket server exists — MQTT is the primary transport.
+    // The app subscribes to skyherd/drone/cmd/# and publishes ACKs on
+    // skyherd/drone/ack/ios. WebSocket references in prior builds were
+    // aspirational and have been removed (see Phase 7.2 audit).
 
-    /// Port the app's WebSocket server binds on.
-    /// Override with UserDefaults key "ws_port" or env var "SKYHERD_WS_PORT".
-    static var wsPort: UInt16 {
-        if let envVal = ProcessInfo.processInfo.environment["SKYHERD_WS_PORT"],
-           let port = UInt16(envVal)
-        {
-            return port
-        }
-        let saved = UserDefaults.standard.integer(forKey: "ws_port")
-        return saved > 0 ? UInt16(saved) : 8765
-    }
-
-    // MARK: - MQTT (optional telemetry bus — same broker as the ranch sim)
+    // MARK: - MQTT (primary transport — same broker as the ranch sim)
 
     /// MQTT broker host.  Override with UserDefaults key "mqtt_host" or
     /// env var "MAVIC_MQTT_HOST".
@@ -67,8 +58,18 @@ enum Config {
     /// Max altitude cap in metres (DJI hard limit 120 m; SkyHerd ops cap 60 m).
     static let maxAltitudeM: Double = 60.0
 
-    /// Battery floor below which takeoff is denied (percent).
-    static let batteryFloorPct: Double = 25.0
+    /// Battery floor at or below which takeoff is denied (percent).
+    /// Aligned to Android + Python `BATTERY_MIN_TAKEOFF_PCT = 30` for cross-
+    /// platform parity. Override via env var `MAVIC_BATTERY_FLOOR_PCT` for
+    /// test/dev scenarios (e.g. a 25% override when demoing on a depleted pack).
+    static var batteryFloorPct: Double {
+        if let envVal = ProcessInfo.processInfo.environment["MAVIC_BATTERY_FLOOR_PCT"],
+           let pct = Double(envVal)
+        {
+            return pct
+        }
+        return 30.0
+    }
 
     /// Wind ceiling above which takeoff is denied (knots).
     static let windCeilingKt: Double = 21.0

@@ -1,13 +1,21 @@
 import Foundation
 import CocoaMQTT
+#if canImport(UIKit)
+import UIKit
+#endif
 
 // MARK: - MQTTBridge
 
 /// Maintains an MQTT connection to the ranch broker and:
-/// - Subscribes to ``skyherd/drone/cmd/#`` to receive commands as an alternative
-///   transport to WebSocket (useful when phone is on WiFi with direct broker access).
+///
+/// - Subscribes to ``skyherd/drone/cmd/#`` to receive commands from the
+///   SkyHerd Engine laptop.
 /// - Publishes state snapshots on ``skyherd/drone/state/ios``.
 /// - Publishes ACKs on ``skyherd/drone/ack/ios``.
+///
+/// Topic scheme follows ``docs/MAVIC_MISSION_SCHEMA.md`` §5 — the base
+/// (`skyherd/drone`) is shared with Android; the `/ios` suffix identifies
+/// the sending platform to the backend.
 ///
 /// Auto-reconnects with exponential back-off (1 s → 128 s max).
 @MainActor
@@ -29,6 +37,7 @@ public final class MQTTBridge: NSObject {
     private var cmdTopic: String { "\(topicBase)/cmd/#" }
     private var stateTopic: String { "\(topicBase)/state/ios" }
     private var ackTopic: String { "\(topicBase)/ack/ios" }
+    private var statusTopic: String { "\(topicBase)/status/ios" }
 
     private override init() {
         super.init()
@@ -44,7 +53,7 @@ public final class MQTTBridge: NSObject {
     }
 
     private func connect() {
-        let clientID = "SkyHerdCompanion-iOS-\(UIDevice.current.identifierForVendor?.uuidString ?? UUID().uuidString)"
+        let clientID = "SkyHerdCompanion-iOS-\(deviceIdentifier())"
         let client = CocoaMQTT(clientID: clientID, host: Config.mqttHost, port: Config.mqttPort)
         client.keepAlive = 60
         client.cleanSession = true
@@ -53,7 +62,7 @@ public final class MQTTBridge: NSObject {
         client.maxAutoReconnectTimeInterval = 128
         client.logLevel = .warning
         client.willMessage = CocoaMQTTMessage(
-            topic: "\(topicBase)/status/ios",
+            topic: statusTopic,
             string: "offline",
             qos: .qos1,
             retained: true
@@ -88,6 +97,29 @@ public final class MQTTBridge: NSObject {
 
     // MARK: - Helpers
 
+    private func deviceIdentifier() -> String {
+        #if canImport(UIKit)
+        return UIDevice.current.identifierForVendor?.uuidString ?? UUID().uuidString
+        #else
+        // Non-UIKit contexts (macOS unit tests) — return a stable fallback.
+        return UUID().uuidString
+        #endif
+    }
+
+    /// Expose the decoded command pipeline to unit tests. Decodes the payload
+    /// and routes through the injected router, returning the resulting ACK.
+    @discardableResult
+    public func _decodeAndDispatch(payload: Data) async -> DroneAck? {
+        guard let router = router else { return nil }
+        do {
+            let cmd = try JSONDecoder().decode(DroneCommand.self, from: payload)
+            return await router.dispatch(cmd)
+        } catch {
+            AppLogger.mqtt.error("_decodeAndDispatch: decode failed \(error)")
+            return nil
+        }
+    }
+
     private func handleIncomingMessage(_ message: CocoaMQTTMessage) {
         guard let json = message.string?.data(using: .utf8) else { return }
         do {
@@ -117,7 +149,7 @@ extension MQTTBridge: CocoaMQTTDelegate {
                 mqtt.subscribe(self.cmdTopic, qos: .qos1)
                 // Publish online status
                 mqtt.publish(
-                    "\(self.topicBase)/status/ios",
+                    self.statusTopic,
                     withString: "online",
                     qos: .qos1,
                     retained: true
@@ -154,16 +186,3 @@ extension MQTTBridge: CocoaMQTTDelegate {
     public nonisolated func mqttDidPing(_ mqtt: CocoaMQTT) {}
     public nonisolated func mqttDidReceivePong(_ mqtt: CocoaMQTT) {}
 }
-
-// MARK: - UIDevice import shim (available in UIKit contexts only)
-#if canImport(UIKit)
-import UIKit
-#else
-// SwiftUI Previews / unit tests on simulator without full UIKit
-private enum UIDevice {
-    static var current: UIDeviceStub { UIDeviceStub() }
-    struct UIDeviceStub {
-        var identifierForVendor: UUID? { UUID(uuidString: "00000000-0000-0000-0000-000000000000") }
-    }
-}
-#endif

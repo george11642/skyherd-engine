@@ -6,8 +6,10 @@ import Combine
 public final class AppState: ObservableObject {
     // MARK: Connection status strings (UI display)
     @Published public var djiStatus: String = "Not registered"
-    @Published public var wsStatus: String = "Stopped"
     @Published public var mqttStatus: String = "Disconnected"
+
+    // MARK: Lost-signal watchdog status (surfaced for debug UI + attestation)
+    @Published public var watchdogStatus: String = "Idle"
 
     // MARK: Last command info
     @Published public var lastCmdId: String = "--"
