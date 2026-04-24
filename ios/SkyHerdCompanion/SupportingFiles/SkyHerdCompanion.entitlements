@@ -6,11 +6,15 @@
     <key>com.apple.developer.location.always-usage-description</key>
     <string>SkyHerd enforces geofence boundaries during drone operations.</string>
 
-    <!-- Required for DJI remote controller accessory communication -->
-    <key>com.apple.developer.networking.networkextension</key>
-    <array>
-        <string>app-proxy-provider</string>
-    </array>
+    <!--
+      Network Extension / app-proxy-provider entitlement was REMOVED in
+      Phase 7.2: it is unused by the app (MQTT + USB accessory cover all
+      transports) AND requires a paid Apple Developer Program membership
+      with special approval, which blocks free-tier / personal-team
+      sideloading. If a future phase adds a VPN/packet-tunnel feature,
+      restore the entitlement in a dedicated signing target rather than
+      the main companion app.
+    -->
 
     <!-- App Group — reserved for future cross-app data sharing (e.g. with a SkyHerd widget) -->
     <!-- Uncomment and set the correct group ID when needed:

@@ -13,7 +13,7 @@ on:
 
 jobs:
   build:
-    name: xcodebuild (unsigned, stub mode)
+    name: xcodebuild (unsigned device slice, stub mode)
     runs-on: macos-14
     steps:
       - name: Checkout
@@ -22,30 +22,118 @@ jobs:
       - name: Install XcodeGen
         run: brew install xcodegen
 
+      - name: Bootstrap Config.xcconfig (empty for CI stub build)
+        working-directory: ios/SkyHerdCompanion
+        run: |
+          if [ ! -f SupportingFiles/Config.xcconfig ]; then
+            cp SupportingFiles/Config.xcconfig.template SupportingFiles/Config.xcconfig
+            echo "Using empty Config.xcconfig for CI stub build"
+          fi
+
+      - name: Probe for DJI xcframework (optional — informational)
+        id: dji_probe
+        working-directory: ios/SkyHerdCompanion
+        run: |
+          if [ -d "Frameworks/DJISDK.xcframework" ]; then
+            echo "dji_available=true" >> "$GITHUB_OUTPUT"
+            echo "DJI xcframework present — real SDK mode"
+          else
+            echo "dji_available=false" >> "$GITHUB_OUTPUT"
+            echo "DJI xcframework absent — building in stub mode (expected in CI)"
+          fi
+        continue-on-error: true
+
       - name: Generate Xcode project
         working-directory: ios/SkyHerdCompanion
         run: xcodegen generate
 
-      - name: Build (stub mode — no DJI xcframework, no signing)
+      - name: Build for iOS device slice (unsigned)
         working-directory: ios/SkyHerdCompanion
         run: |
           xcodebuild \
+            -project SkyHerdCompanion.xcodeproj \
             -scheme SkyHerdCompanion \
             -configuration Debug \
-            -destination 'generic/platform=iOS Simulator' \
+            -destination 'generic/platform=iOS' \
             -derivedDataPath build \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
             build | tee xcodebuild.log
-        continue-on-error: true     # H3-05: DJI xcframework may be missing
+        # No continue-on-error: a failing Swift build is a real regression we
+        # want CI to surface. The only expected-to-fail step is the optional
+        # archive below, which is gated on the DJI probe.
 
-      - name: Upload build products (if built)
+      - name: Unit tests (iOS Simulator)
+        working-directory: ios/SkyHerdCompanion
+        run: |
+          xcodebuild test \
+            -project SkyHerdCompanion.xcodeproj \
+            -scheme SkyHerdCompanion \
+            -destination 'platform=iOS Simulator,name=iPhone 15,OS=latest' \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            -enableCodeCoverage YES \
+            test 2>&1 | tee xcodebuild-test.log
+        continue-on-error: true  # simulator may be unavailable on some runner images
+
+      - name: Write ExportOptions.plist (unsigned development export)
+        working-directory: ios/SkyHerdCompanion
+        run: |
+          cat > ExportOptions.plist <<'PLIST'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>method</key><string>development</string>
+              <key>signingStyle</key><string>automatic</string>
+              <key>compileBitcode</key><false/>
+              <key>stripSwiftSymbols</key><true/>
+              <key>thinning</key><string>&lt;none&gt;</string>
+          </dict>
+          </plist>
+          PLIST
+
+      - name: Archive (unsigned) — Sideloadly-compatible
+        working-directory: ios/SkyHerdCompanion
+        run: |
+          xcodebuild archive \
+            -project SkyHerdCompanion.xcodeproj \
+            -scheme SkyHerdCompanion \
+            -configuration Debug \
+            -destination 'generic/platform=iOS' \
+            -archivePath build/SkyHerdCompanion.xcarchive \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            | tee xcodebuild-archive.log
+        continue-on-error: true  # archive needs a team; keep green in stub mode
+
+      - name: Package unsigned IPA (best-effort)
+        working-directory: ios/SkyHerdCompanion
+        run: |
+          if [ -d "build/SkyHerdCompanion.xcarchive" ]; then
+            mkdir -p build/ipa Payload
+            cp -R build/SkyHerdCompanion.xcarchive/Products/Applications/SkyHerdCompanion.app Payload/
+            zip -qr build/ipa/SkyHerdCompanion-unsigned.ipa Payload
+            rm -rf Payload
+            ls -la build/ipa/
+          else
+            echo "No archive produced — skipping IPA packaging (stub-mode runner)"
+          fi
+        continue-on-error: true
+
+      - name: Upload build products
         if: success() || failure()
         uses: actions/upload-artifact@v4
         with:
           name: skyherd-companion-ios-build
           path: |
             ios/SkyHerdCompanion/build/Build/Products/
+            ios/SkyHerdCompanion/build/ipa/
             ios/SkyHerdCompanion/xcodebuild.log
+            ios/SkyHerdCompanion/xcodebuild-test.log
+            ios/SkyHerdCompanion/xcodebuild-archive.log
           if-no-files-found: warn
           retention-days: 30

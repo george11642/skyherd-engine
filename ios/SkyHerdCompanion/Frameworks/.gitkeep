@@ -1,0 +1,26 @@
+# Frameworks/ — DJI Mobile SDK V5 drop-in
+#
+# The DJI Mobile SDK ships as a binary XCFramework and is NOT checked into
+# this repo (proprietary, ~350 MB). CI builds the companion app in "stub
+# mode" where `#if DJI_SDK_AVAILABLE` branches degrade to logging stubs.
+#
+# To light up the real SDK locally:
+#
+#   1. Register for a free DJI developer account at
+#      https://developer.dji.com and create an app entry with bundle id
+#      `com.skyherd.companion`.
+#   2. Download the latest iOS Mobile SDK V5 (tested against v5.11+) from
+#      https://developer.dji.com/mobile-sdk/ .
+#   3. Extract `DJISDK.xcframework` and place it DIRECTLY INSIDE THIS
+#      DIRECTORY so the path becomes:
+#         ios/SkyHerdCompanion/Frameworks/DJISDK.xcframework
+#   4. Uncomment the framework dependency in `project.yml`:
+#         - framework: Frameworks/DJISDK.xcframework
+#           embed: true
+#   5. Set `SKYHERD_SWIFT_FLAGS = DJI_SDK_AVAILABLE` in
+#      `SupportingFiles/Config.xcconfig` (copy from the template).
+#   6. Re-run `./bootstrap.sh` to regenerate the Xcode project with the
+#      framework linked.
+#
+# This .gitkeep exists solely to ensure the empty directory is tracked so
+# `FRAMEWORK_SEARCH_PATHS` resolves on a fresh clone (Phase 7.2 audit fix).

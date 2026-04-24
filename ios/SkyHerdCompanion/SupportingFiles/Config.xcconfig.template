@@ -1,0 +1,27 @@
+//
+// Config.xcconfig.template — SkyHerd Companion iOS
+//
+// Copy this file to `Config.xcconfig` in the same directory and fill in the
+// values. `Config.xcconfig` is gitignored; the template is not.
+//
+//   cp Config.xcconfig.template Config.xcconfig
+//   # edit Config.xcconfig with your real DJI_API_KEY
+//
+// project.yml references this file via `configFiles:` — if it is missing,
+// `xcodegen generate` will create an empty placeholder and the build will
+// warn about an empty DJI_API_KEY.
+//
+
+// DJI Mobile SDK API key.
+// Obtain from https://developer.dji.com/user/apps — bundle id must match
+// `com.skyherd.companion`.
+DJI_API_KEY =
+
+// When DJISDK.xcframework is placed in Frameworks/ AND the framework
+// dependency is uncommented in project.yml, also set this to `1` so
+// `#if DJI_SDK_AVAILABLE` lights up the real SDK calls instead of stubs.
+// Leave empty for stub-mode builds (default — works out of the box in CI).
+//
+// Example:
+//   SKYHERD_SWIFT_FLAGS = DJI_SDK_AVAILABLE
+SKYHERD_SWIFT_FLAGS =

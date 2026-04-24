@@ -7,6 +7,16 @@ options:
   generateEmptyDirectories: true
   createIntermediateGroups: true
 
+# xcconfig layering:
+#   Debug/Release both pull from SupportingFiles/Config.xcconfig (gitignored),
+#   which must define DJI_API_KEY and (optionally) DJI_SDK_AVAILABLE=1 once
+#   the xcframework is in place. A template lives at
+#   SupportingFiles/Config.xcconfig.template — copy it to Config.xcconfig on
+#   first checkout.
+configFiles:
+  Debug: SupportingFiles/Config.xcconfig
+  Release: SupportingFiles/Config.xcconfig
+
 settings:
   base:
     SWIFT_VERSION: "5.9"
@@ -18,6 +28,10 @@ settings:
     SWIFT_STRICT_CONCURRENCY: targeted
     # DJI API key injected from xcconfig; override in Config.xcconfig
     DJI_API_KEY: ""
+    # Compile-time flag — only set when DJISDK.xcframework is present.
+    # Config.xcconfig sets DJI_SDK_AVAILABLE=1 to light this up; default
+    # empty = stub mode for CI and contributors without the framework.
+    SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited) $(SKYHERD_SWIFT_FLAGS)"
 
 packages:
   CocoaMQTT:
@@ -74,7 +88,8 @@ targets:
       # After running ./bootstrap.sh, download DJISDK.xcframework from
       # https://developer.dji.com/mobile-sdk/ and place it in:
       #   ios/SkyHerdCompanion/Frameworks/DJISDK.xcframework
-      # Then uncomment the next two lines:
+      # Then uncomment the next two lines AND set DJI_SDK_AVAILABLE=1 in
+      # SupportingFiles/Config.xcconfig.
       # - framework: Frameworks/DJISDK.xcframework
       #   embed: true
     settings:

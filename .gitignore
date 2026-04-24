@@ -66,3 +66,18 @@ demos/
 runtime/
 runtime/vet_intake/
 .venv/
+
+# iOS — generated + secrets
+ios/**/build/
+ios/**/DerivedData/
+ios/**/*.xcodeproj/
+ios/**/*.xcworkspace/
+ios/SkyHerdCompanion/SupportingFiles/Config.xcconfig
+# Frameworks/ ships only .gitkeep + README; xcframework bundles are gitignored
+ios/SkyHerdCompanion/Frameworks/*.xcframework/
+ios/SkyHerdCompanion/Frameworks/*.framework/
+
+# Android — generated
+android/**/build/
+android/**/.gradle/
+android/**/local.properties
