@@ -164,8 +164,10 @@ async def _run_managed(
         ],
     )
 
-    # Stream events from the platform
-    async with sdk_client.beta.sessions.events.stream(platform_session_id) as stream:
+    # Stream events from the platform.
+    # AsyncEvents.stream() is a coroutine — await it first to get the AsyncStream,
+    # then use async with for proper resource cleanup on the resulting object.
+    async with await sdk_client.beta.sessions.events.stream(platform_session_id) as stream:
         async for event in stream:
             event_type = getattr(event, "type", None)
 

@@ -398,11 +398,21 @@ class TestRunManaged:
         return ev
 
     def _make_managed_client(self, events: list) -> MagicMock:
-        """Return a mock sdk_client whose beta.sessions.events.stream yields *events*."""
+        """Return a mock sdk_client whose beta.sessions.events.stream yields *events*.
+
+        The real SDK's AsyncEvents.stream() is ``async def`` — it returns a coroutine
+        that resolves to an AsyncStream (which is itself an async context manager).
+        The mock must match: stream() is an awaitable coroutine, and the awaited result
+        supports ``async with`` + ``async for``.  The fix under test is the
+        ``async with await ...stream(...)`` pattern; without the inner ``await`` the
+        code would try to enter the coroutine object as a context manager, raising
+        TypeError.
+        """
         from contextlib import asynccontextmanager
 
+        # Inner async CM that the awaited coroutine returns.
         @asynccontextmanager
-        async def _fake_stream(_session_id):
+        async def _stream_cm():
             async def _gen():
                 for ev in events:
                     yield ev
@@ -410,6 +420,10 @@ class TestRunManaged:
             stream = MagicMock()
             stream.__aiter__ = lambda s: _gen()
             yield stream
+
+        # Outer coroutine — mirrors ``async def stream(session_id) -> AsyncStream``.
+        async def _fake_stream(_session_id):
+            return _stream_cm()
 
         mock_client = MagicMock()
         mock_client.beta = MagicMock()
@@ -552,6 +566,90 @@ class TestRunManaged:
         )
         # page_rancher must be in the calls list (loop didn't break early)
         assert any(c["tool"] == "page_rancher" for c in calls)
+
+    @pytest.mark.asyncio
+    async def test_stream_is_awaited_before_async_with(self):
+        """Regression: stream() coroutine must be awaited before async-with.
+
+        The real SDK's AsyncEvents.stream() is ``async def`` — it returns a
+        coroutine, NOT an AsyncStream directly.  Using ``async with stream(...)``
+        without ``await`` would pass the unawaited coroutine object to
+        ``__aenter__``, which raises TypeError at runtime.  This test guards
+        against that regression by using a mock that returns an awaitable
+        coroutine (matching the real SDK shape): if the code omits ``await``,
+        Python raises ``TypeError: object coroutine can't be used in 'async with'``
+        and the test fails.
+        """
+        from skyherd.agents._handler_base import _run_managed
+
+        mgr = SessionManager()
+        session = mgr.create_session(FENCELINE_DISPATCHER_SPEC)
+
+        terminal = self._make_stream_event("session.status_terminated")
+        mock_client = self._make_managed_client([terminal])
+        cached_payload = {
+            "system": [],
+            "messages": [{"role": "user", "content": [{"type": "text", "text": "wake"}]}],
+        }
+
+        # Must not raise TypeError — if await is missing this blows up.
+        calls = await _run_managed(
+            session=session,
+            sdk_client=mock_client,
+            cached_payload=cached_payload,
+            platform_session_id="sess_regression",
+            tool_dispatcher=None,
+        )
+        assert calls == []
+
+    @pytest.mark.asyncio
+    async def test_managed_stream_session_events_awaits_coroutine(self):
+        """Regression: ManagedSessionManager.stream_session_events must await stream().
+
+        Guards the same ``async with await ...stream(...)`` fix in managed.py.
+        A mock whose .stream() is an async def coroutine (not a context manager
+        directly) will raise TypeError if the await is missing.
+        """
+        from contextlib import asynccontextmanager
+        from unittest.mock import AsyncMock, MagicMock, patch
+
+        terminal = self._make_stream_event("session.status_terminated")
+
+        @asynccontextmanager
+        async def _stream_cm():
+            async def _gen():
+                yield terminal
+
+            s = MagicMock()
+            s.__aiter__ = lambda self: _gen()
+            yield s
+
+        async def _fake_stream(_session_id):
+            return _stream_cm()
+
+        mock_client = MagicMock()
+        mock_client.beta.sessions.events.stream = _fake_stream
+
+        with patch("anthropic.AsyncAnthropic", return_value=mock_client):
+            import os
+            mgr = ManagedSessionManager.__new__(ManagedSessionManager)
+            mgr._client = mock_client
+
+        ms = ManagedSession(
+            id="local-1",
+            agent_name="FenceLineDispatcher",
+            platform_session_id="sess_reg2",
+            platform_agent_id="agent_reg2",
+            platform_env_id="env_reg2",
+        )
+
+        # Collect events — must not raise TypeError.
+        collected = []
+        async for ev in mgr.stream_session_events(ms):
+            collected.append(ev)
+
+        assert len(collected) == 1
+        assert collected[0].type == "session.status_terminated"
 
 
 # ---------------------------------------------------------------------------

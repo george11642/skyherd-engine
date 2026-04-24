@@ -442,9 +442,11 @@ class ManagedSessionManager:
 
     async def stream_session_events(self, session: ManagedSession):
         """Yield platform SSE events from the session stream."""
-        # SDK types `stream()` as Coroutine[AsyncStream] but at runtime the returned
-        # AsyncStream is itself an async context manager. Python SDK idiom.
-        async with self._client.beta.sessions.events.stream(  # pyright: ignore[reportGeneralTypeIssues]
+        # AsyncEvents.stream() is a coroutine (async def) that returns AsyncStream.
+        # Must await the coroutine to obtain the AsyncStream before using it as a
+        # context manager — omitting await would enter the coroutine object itself,
+        # which is not an async context manager and raises TypeError at runtime.
+        async with await self._client.beta.sessions.events.stream(
             session.platform_session_id
         ) as stream:
             async for event in stream:
