@@ -9,6 +9,7 @@ activity without a second process. Disable with ``--no-ambient`` or
 
 from __future__ import annotations
 
+import asyncio
 import logging
 import os
 import tempfile
@@ -24,6 +25,35 @@ from skyherd.world.world import make_world
 
 app = typer.Typer(name="skyherd-server-live", add_completion=False)
 logger = logging.getLogger(__name__)
+
+
+async def _provision_local_memory_stores() -> tuple[object, dict[str, str]]:
+    """Construct a LocalMemoryStore + ensure 1 shared + 5 per-agent stores.
+
+    Mirrors ``AgentMesh._ensure_memory_stores`` so the live dashboard mesh and
+    the production mesh produce the SAME store IDs (deterministic, content-
+    derived). The same manager instance is shared by ``_DemoMesh`` (writes) and
+    ``attach_memory_api`` (reads), so ``GET /api/memory/{agent}`` reflects
+    real ambient activity instead of the mock fallback.
+    """
+    # Local import to avoid pulling memory.py into modules that don't need it.
+    from skyherd.agents.memory import get_memory_store_manager  # noqa: PLC0415
+    from skyherd.server.events import AGENT_NAMES  # noqa: PLC0415
+
+    # Force the local shim — live.py is the dashboard process and must NOT
+    # accidentally hit the real REST API. This also keeps determinism.
+    mgr = get_memory_store_manager("local")
+    ids: dict[str, str] = {}
+    ids["_shared"] = await mgr.ensure_store(
+        name="skyherd_ranch_a_shared",
+        description="SkyHerd shared ranch patterns — read-only domain library",
+    )
+    for agent_name in AGENT_NAMES:
+        ids[agent_name] = await mgr.ensure_store(
+            name=f"skyherd_{agent_name.lower()}_ranch_a",
+            description=f"Per-agent memory for {agent_name}",
+        )
+    return mgr, ids
 
 
 def _env_bool(name: str, default: bool) -> bool:
@@ -78,7 +108,28 @@ def start(
     # Local import to avoid circular dep (scenarios imports server indirectly)
     from skyherd.scenarios.base import _DemoMesh  # noqa: PLC0415
 
-    mesh = _DemoMesh(ledger=ledger)
+    # Provision the shared LocalMemoryStore + 6 stores BEFORE building the mesh
+    # so dispatch -> post_cycle_write writes to the same backing JSONL files
+    # that /api/memory/{agent} reads from.
+    try:
+        memory_mgr, memory_store_ids = asyncio.run(_provision_local_memory_stores())
+        logger.info(
+            "Live dashboard: provisioned %d memory stores (local shim)",
+            len(memory_store_ids),
+        )
+    except Exception as exc:  # noqa: BLE001
+        logger.warning(
+            "memory store provisioning failed (%s) — /api/memory/* will fall back to mock",
+            exc,
+        )
+        memory_mgr = None
+        memory_store_ids = {}
+
+    mesh = _DemoMesh(
+        ledger=ledger,
+        memory_store_manager=memory_mgr,
+        memory_store_ids=memory_store_ids,
+    )
 
     logger.info(
         "Live dashboard: seed=%d world_cows=%d ledger=%s",
@@ -113,6 +164,18 @@ def start(
         async def _ambient_lifespan(fastapi_app):  # type: ignore[no-untyped-def]
             async with original_lifespan(fastapi_app):
                 broadcaster = getattr(_app_module, "_broadcaster", None)
+                # Re-attach broadcaster to the mesh + every per-agent session so
+                # post_cycle_write fires `memory.written` SSE events through the
+                # SAME broadcaster instance the dashboard subscribes to (DEFECT-1).
+                if broadcaster is not None and hasattr(mesh, "attach_broadcaster"):
+                    mesh.attach_broadcaster(broadcaster)
+                # Mirror manager + store-id map onto app.state so the memory
+                # API can reach them when the catch-all SPA reload re-mounts
+                # the router (defence in depth — primary path is the
+                # ``mesh._memory_store_manager`` lookup in app.create_app).
+                live_app.state.memory_store_manager = memory_mgr
+                live_app.state.memory_store_ids = dict(memory_store_ids)
+                live_app.state.broadcaster = broadcaster
                 driver = AmbientDriver(
                     mesh=mesh,
                     world=world,

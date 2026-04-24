@@ -152,6 +152,26 @@ describe("MemoryPanel", () => {
     });
   });
 
+  it("applies memory-row--flash class on memory.written SSE", async () => {
+    await act(async () => {
+      render(<MemoryPanel />);
+    });
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("memory-tab-PredatorPatternLearner"));
+    });
+    act(() => triggerSSE("memory.written", SAMPLE_WRITTEN));
+    await waitFor(() => {
+      const rows = document.querySelectorAll("[data-testid='memory-row']");
+      expect(rows.length).toBeGreaterThanOrEqual(1);
+      // The freshly-written row carries the flash class so the CSS keyframe
+      // animation defined in index.css fires (DEFECT-2).
+      const flashed = document.querySelector(
+        "[data-testid='memory-row'].memory-row--flash",
+      );
+      expect(flashed).not.toBeNull();
+    });
+  });
+
   it("registers and unregisters memory.written handler on mount/unmount", async () => {
     const { unmount } = render(<MemoryPanel />);
     await waitFor(() =>

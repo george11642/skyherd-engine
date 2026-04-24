@@ -238,6 +238,15 @@ h1, h2, .display {
   animation: scenario-breath 3s ease-in-out infinite;
 }
 
+/* Memory row flash — fades sage tint on `memory.written` SSE (Plan 01-06 DEFECT-2) */
+@keyframes memory-row-flash {
+  0%   { background-color: rgba(148, 189, 119, 0.45); }
+  100% { background-color: transparent; }
+}
+.memory-row--flash {
+  animation: memory-row-flash 1.2s ease-out;
+}
+
 /* Utility classes — text primitives (B6) */
 .text-display { font-family: var(--font-display); letter-spacing: -0.02em; }
 .text-mono-xs { font-family: var(--font-mono); font-size: 0.6875rem; }
@@ -251,7 +260,8 @@ h1, h2, .display {
   .log-enter,
   .fence-pulse,
   .skeleton,
-  .scenario-active {
+  .scenario-active,
+  .memory-row--flash {
     animation: none;
   }
 }

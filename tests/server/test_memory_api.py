@@ -248,6 +248,133 @@ async def test_live_mode_upstream_failure_returns_502(client):
 
 
 @pytest.mark.asyncio
+async def test_live_mode_with_demomesh_returns_real_writes(tmp_path, monkeypatch):
+    """End-to-end: a LocalMemoryStore-backed `_DemoMesh` write surfaces in `/api/memory/{agent}`.
+
+    Plan 01-06 DEFECT-1 — confirms the live dashboard wiring threads the same
+    memory_store_manager from `_DemoMesh` into `attach_memory_api` so reads
+    return ambient writes (not the mock fallback).
+    """
+    import tempfile
+    from httpx import ASGITransport, AsyncClient
+    from skyherd.agents.memory import LocalMemoryStore
+    from skyherd.attest.ledger import Ledger
+    from skyherd.attest.signer import Signer
+    from skyherd.scenarios.base import _DemoMesh
+    from skyherd.server.app import create_app
+    from skyherd.server.events import AGENT_NAMES
+
+    # Isolate runtime/ writes so the test doesn't pollute repo state.
+    monkeypatch.chdir(tmp_path)
+    (tmp_path / "runtime" / "memory").mkdir(parents=True, exist_ok=True)
+
+    mgr = LocalMemoryStore()
+    store_ids: dict[str, str] = {}
+    store_ids["_shared"] = await mgr.ensure_store("skyherd_ranch_a_shared")
+    for name in AGENT_NAMES:
+        store_ids[name] = await mgr.ensure_store(f"skyherd_{name.lower()}_ranch_a")
+
+    # Direct write: simulates what post_cycle_write does inside dispatch().
+    written = await mgr.write_memory(
+        store_ids["FenceLineDispatcher"],
+        "/notes/dispatch-seg_west.md",
+        "# FenceLine dispatch — seg_west\n\n- ts: 0\n",
+    )
+
+    tmp = tempfile.NamedTemporaryFile(suffix=".db", delete=False)
+    tmp.close()
+    ledger = Ledger.open(tmp.name, Signer.generate())
+    mesh = _DemoMesh(
+        ledger=ledger,
+        memory_store_manager=mgr,
+        memory_store_ids=store_ids,
+    )
+    live_app = create_app(mock=False, mesh=mesh, ledger=ledger)
+
+    async with AsyncClient(
+        transport=ASGITransport(app=live_app, raise_app_exceptions=True),
+        base_url="http://test",
+    ) as c:
+        resp = await c.get("/api/memory/FenceLineDispatcher")
+
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["agent"] == "FenceLineDispatcher"
+    assert body["memory_store_id"] == store_ids["FenceLineDispatcher"]
+    paths = [e.get("path") for e in body["entries"]]
+    assert "/notes/dispatch-seg_west.md" in paths, body
+    # The exact memver_id from the LocalMemoryStore write must be in the response.
+    memvers = [e.get("memory_version_id") for e in body["entries"]]
+    assert written.memory_version_id in memvers
+
+
+@pytest.mark.asyncio
+async def test_demomesh_dispatch_emits_memory_written_to_broadcaster(tmp_path, monkeypatch):
+    """`_DemoMesh.dispatch` broadcasts `memory.written` after a wake cycle.
+
+    Plan 01-06 DEFECT-1 — exercising the simulation-path post-cycle hook so the
+    live dashboard's SSE stream surfaces a `memory.written` event when the
+    ambient driver fires a scenario.
+    """
+    import tempfile
+    from skyherd.agents.fenceline_dispatcher import (
+        FENCELINE_DISPATCHER_SPEC,
+        handler as fenceline_handler,
+    )
+    from skyherd.agents.memory import LocalMemoryStore
+    from skyherd.attest.ledger import Ledger
+    from skyherd.attest.signer import Signer
+    from skyherd.scenarios.base import _DemoMesh
+    from skyherd.server.events import AGENT_NAMES
+
+    monkeypatch.chdir(tmp_path)
+
+    mgr = LocalMemoryStore()
+    store_ids: dict[str, str] = {}
+    store_ids["_shared"] = await mgr.ensure_store("skyherd_ranch_a_shared")
+    for name in AGENT_NAMES:
+        store_ids[name] = await mgr.ensure_store(f"skyherd_{name.lower()}_ranch_a")
+
+    tmp = tempfile.NamedTemporaryFile(suffix=".db", delete=False)
+    tmp.close()
+    ledger = Ledger.open(tmp.name, Signer.generate())
+
+    captured: list[tuple[str, dict]] = []
+
+    class _RecordingBroadcaster:
+        def _broadcast(self, event_type: str, payload: dict) -> None:
+            captured.append((event_type, payload))
+
+    broadcaster = _RecordingBroadcaster()
+    mesh = _DemoMesh(
+        ledger=ledger,
+        memory_store_manager=mgr,
+        memory_store_ids=store_ids,
+        broadcaster=broadcaster,
+    )
+
+    wake = {
+        "topic": "skyherd/ranch_a/fence/seg_west",
+        "type": "fence.breach",
+        "ranch_id": "ranch_a",
+        "segment": "seg_west",
+        "lat": 34.123,
+        "lon": -106.456,
+        "ts": "1970-01-01T00:00:00Z",
+    }
+    await mesh.dispatch(
+        "FenceLineDispatcher", wake, FENCELINE_DISPATCHER_SPEC, fenceline_handler
+    )
+
+    written = [e for e in captured if e[0] == "memory.written"]
+    assert written, f"no memory.written emitted; captured={[e[0] for e in captured]}"
+    payload = written[0][1]
+    assert payload["agent"] == "FenceLineDispatcher"
+    assert payload["memory_store_id"] == store_ids["FenceLineDispatcher"]
+    assert payload["path"].startswith("/notes/dispatch-")
+
+
+@pytest.mark.asyncio
 async def test_live_mode_versions_delegates(client):
     from unittest.mock import AsyncMock
     from skyherd.agents.memory import MemoryVersion

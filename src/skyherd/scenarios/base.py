@@ -191,14 +191,38 @@ class _DemoMesh:
     Public accessors (stable API for Phase 5 dashboard live-mode):
       - agent_sessions() -> dict[str, Session]
       - agent_tickers()  -> list[CostTicker]
+
+    Memory wiring (Plan 01-06 DEFECT-1):
+      ``_memory_store_manager`` + ``_memory_store_ids`` are read by
+      ``skyherd.server.app::create_app`` to mount ``/api/memory/{agent}`` against
+      live data. ``_broadcaster`` is set post-construction by the live-app
+      lifespan so ``memory.written`` SSE events reach the dashboard. The
+      simulation path in :meth:`dispatch` invokes ``post_cycle_write`` directly
+      so a memory write fires every wake cycle, mirroring the live ``AgentMesh``
+      contract.
     """
 
-    def __init__(self, ledger: Ledger | None = None) -> None:
+    def __init__(
+        self,
+        ledger: Ledger | None = None,
+        memory_store_manager: Any | None = None,
+        memory_store_ids: dict[str, str] | None = None,
+        broadcaster: Any | None = None,
+    ) -> None:
         self._tool_call_log: dict[str, list[dict[str, Any]]] = {}
         self._ledger = ledger
 
         # ONE SessionManager per scenario run (was 241 before this refactor).
         self._session_manager = SessionManager()
+
+        # Memory wiring — populated by live.py when present; None in offline scenarios.
+        # The 'auto' factory (LocalMemoryStore by default) is deterministic so we
+        # can safely default-instantiate when callers want memory writes but did
+        # not provision their own. Stays None if caller passed nothing AND no
+        # store_id_map was supplied (preserves the byte-identical fast path).
+        self._memory_store_manager: Any | None = memory_store_manager
+        self._memory_store_ids: dict[str, str] = dict(memory_store_ids or {})
+        self._broadcaster: Any | None = broadcaster
 
         # Eagerly create one session per agent, mirroring AgentMesh.start().
         # create_session is sync and ~microseconds — safe to call 5x in __init__.
@@ -208,9 +232,36 @@ class _DemoMesh:
             session = self._session_manager.create_session(spec)
             self._sessions[spec.name] = session
             self._handlers[spec.name] = handler_fn
+            self._attach_session_refs(session)
             logger.debug(
                 "_DemoMesh: registered %s (session %s)", spec.name, session.id[:8]
             )
+
+    # ------------------------------------------------------------------
+    # Memory wiring helpers (Plan 01-06 DEFECT-1)
+    # ------------------------------------------------------------------
+
+    def _attach_session_refs(self, session: Session) -> None:
+        """Mirror ``AgentMesh.start`` — wire memory + ledger + broadcaster refs."""
+        try:
+            session._memory_store_id_map = self._memory_store_ids  # type: ignore[attr-defined]
+            session._ledger_ref = self._ledger  # type: ignore[attr-defined]
+            session._broadcaster_ref = self._broadcaster  # type: ignore[attr-defined]
+        except Exception:  # noqa: BLE001
+            # Immutable session type (rare) — skip, hook will no-op.
+            pass
+
+    def attach_broadcaster(self, broadcaster: Any) -> None:
+        """Wire the live broadcaster after construction.
+
+        ``create_app`` instantiates the broadcaster inside its lifespan, so the
+        live-mode dashboard can only hand it to us after startup. We re-attach
+        to every existing session so subsequent wake cycles emit
+        ``memory.written`` SSE events.
+        """
+        self._broadcaster = broadcaster
+        for session in self._sessions.values():
+            self._attach_session_refs(session)
 
     # ------------------------------------------------------------------
     # Public accessors — stable API consumed by Phase 5 dashboard live-mode.
@@ -280,6 +331,32 @@ class _DemoMesh:
                     source=agent_name,
                     kind=f"tool_call.{call.get('tool', 'unknown')}",
                     payload=call,
+                )
+
+        # MEM-05/MEM-10 mirror — fire the post-cycle memory hook on the
+        # simulation path so live-mode dashboard scenarios produce
+        # `memory.written` SSE events without requiring an API key. The live
+        # `run_handler_cycle` path (handler_base) already invokes this when
+        # `sdk_client` is set; _DemoMesh always runs sim with sdk_client=None,
+        # so we re-create the hook call here. No-ops cleanly when no
+        # store_id_map / store_manager is wired (offline scenario tests).
+        if self._memory_store_ids:
+            try:
+                from skyherd.agents.memory_hook import post_cycle_write  # noqa: PLC0415
+
+                await post_cycle_write(
+                    session,
+                    wake_event,
+                    calls,
+                    self._ledger,
+                    self._broadcaster,
+                    self._memory_store_ids,
+                )
+            except Exception as exc:  # noqa: BLE001
+                logger.debug(
+                    "_DemoMesh post-cycle memory hook failed for %s: %s",
+                    agent_name,
+                    type(exc).__name__,
                 )
         return calls
 
