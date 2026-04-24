@@ -73,6 +73,10 @@ edge-galileo-setup:  ## Set up Intel Galileo Gen 1 as edge-tank node (water tank
 mesh-smoke:
 	uv run skyherd-mesh mesh smoke --verbose
 
+drone-betaflight-smoke:  ## Spin motor 0 at 1200us for 2s via MSP (needs F3 connected, NO PROPS)
+	@SKYHERD_DRONE_BACKEND=betaflight \
+	 uv run python -m skyherd.drone.betaflight_override --test
+
 one-pager:
 	uv run python scripts/render_pdf.py docs/ONE_PAGER.md docs/ONE_PAGER.pdf
 

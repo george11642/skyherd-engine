@@ -49,6 +49,12 @@ voice = [
     "elevenlabs>=1.9",
     "twilio>=9.10.5,<10",
 ]
+drone-hw = [
+    # USB-serial motor control via MSP v1 (BetaflightOverrideBackend).
+    # Not required for laptop-only installs — install with:
+    #   uv sync --extra drone-hw
+    "pyserial>=3.5,<4",
+]
 docs = [
     "weasyprint>=62",
     "markdown>=3.6",
