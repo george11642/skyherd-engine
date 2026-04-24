@@ -8,14 +8,14 @@
 ## Pre-Roll Checklist (30 min before camera rolls)
 
 - [ ] Wind < 21 kt (`windy.com`)
-- [ ] Pi #1 heartbeat green: `curl http://localhost:8000/api/edges` → `edge-fence: ok`
-- [ ] Pi #2 heartbeat green → `edge-barn: ok`
+- [ ] Pi heartbeat green: `curl http://localhost:8000/api/edges` → `edge-house: ok`
+- [ ] Galileo heartbeat green → `edge-tank: ok`
 - [ ] Mavic: 3× full batteries, GPS lock (8+ sats), VLOS confirmed
 - [ ] Phone: SkyHerdCompanion — "DJI: connected" + "MQTT: connected" both green
 - [ ] Laptop: `make hardware-demo` command ready in terminal (pre-typed, not yet entered)
 - [ ] Dashboard: `http://localhost:8000` visible on second monitor
 - [ ] Coyote cutout: mounted on cardboard, fishing line attached
-- [ ] Plush cow: red wet-erase on left eye, in frame of Pi #2
+- [ ] Plush cow: red wet-erase on left eye, in frame of the Pi (repositioned from Shot A)
 
 ---
 
@@ -27,7 +27,7 @@
 |------|-----|--------|-------------------|
 | 1 | George | Stand near laptop, face camera. Say: *"It's 7:42 pm on the south range."* | Dashboard: 50 cows grazing |
 | 2 | George | Run `make hardware-demo` | Terminal: "Starting SkyHerd hardware-only demo…" |
-| 3 | Gavin | Pull coyote cutout through Pi #1 frame (2–3 sec, 1–2 m/sec) | Pi logs detection; MQTT fires |
+| 3 | Gavin | Pull coyote cutout through Pi frame (2–3 sec, 1–2 m/sec) | Pi logs detection; MQTT fires |
 | 4 | Auto | FenceLineDispatcher fires | Dashboard: agent log lights up "Coyote detected, dispatching drone" |
 | 5 | Auto | Mavic lifts off | Physical drone ascent OR SITL animation on dashboard |
 | 6 | Auto | Deterrent plays | Bluetooth speaker tone / phone speaker |

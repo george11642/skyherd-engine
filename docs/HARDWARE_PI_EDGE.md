@@ -244,8 +244,10 @@ Recommended mitigations (inexpensive):
    heartbeat reads `/sys/class/thermal/thermal_zone0/temp` every 30 s.
    Alert at 75 °C; investigate at 80 °C.
 
-### Two-Pi fleet
+### Pi + Galileo fleet
 
-George has **two Pi 4 units** — see `docs/HARDWARE_PI_FLEET.md` for the
-naming convention (`edge-house` + `edge-barn`), per-Pi config files, MQTT
-fleet topology, failover behaviour, and the one-command provisioning script.
+The live ranch deployment pairs one Pi 4 (`edge-house`, vision for all six
+trough cameras) with one Intel Galileo (`edge-tank`, water-tank + weather
+telemetry). See `docs/HARDWARE_PI_FLEET.md` for the naming convention,
+MQTT topology, failover behaviour, and the one-command provisioning.
+Galileo runbook: `docs/HARDWARE_GALILEO.md`.

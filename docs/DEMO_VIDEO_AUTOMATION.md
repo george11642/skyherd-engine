@@ -270,10 +270,11 @@ From the Phase 4 agent's self-report:
 - Same 3-act structure, same 3:00 target, same Remotion composition —
   only specific `<Video src=...>` references swap from simulated dashboard
   clips to real field footage shot on Fri 2026-04-25.
-- Hardware path: **collar-free** per `docs/HARDWARE_PI_FLEET.md`. Two
-  Raspberry Pi 4 edge nodes (`edge-house`, `edge-barn`) running trough
-  cams + thermal + MQTT, plus one DJI Mavic 3 Enterprise for aerial shots.
-  No DIY LoRa collars required.
+- Hardware path: **collar-free** per `docs/HARDWARE_PI_FLEET.md`. One
+  Raspberry Pi 4 (`edge-house`, all six trough cameras + thermal + MQTT)
+  plus one Intel Galileo Gen 1 (`edge-tank`, water-tank + weather
+  telemetry), plus one DJI Mavic 3 Enterprise for aerial shots. No DIY
+  LoRa collars required.
 - George appears on camera for his two scripted segments, replacing the
   kinetic-typography treatments from v1.
 
@@ -285,9 +286,9 @@ to `docs/HARDWARE_PI_FLEET.md` and `docs/HARDWARE_DEMO_RUNBOOK.md`:
 | v1 clip (sim) | v2 field replacement | Provenance | Script beat |
 |---------------|----------------------|------------|:-----------:|
 | `public/clips/coyote.mp4` | Mavic hover over fenceline at sunset w/ deterrent audio + real Wes call overlay | Mavic thermal payload, per `HARDWARE_DEMO_RUNBOOK.md` scene 1 | Act 2 Scenario 1 (0:38–0:52) |
-| `public/clips/sick_cow.mp4` | Pi-camera trough shot of A014 (or stand-in cow) + vet-intake packet overlay | `edge-barn` Pi camera + dashboard `/rancher` PWA | Act 2 Scenario 2 (0:52–1:06) |
+| `public/clips/sick_cow.mp4` | Pi-camera trough shot of A014 (or stand-in cow) + vet-intake packet overlay | `edge-house` Pi camera + dashboard `/rancher` PWA | Act 2 Scenario 2 (0:52–1:06) |
 | `public/clips/water.mp4` | Mavic IR flyover of real water trough at dawn | Mavic thermal payload | Act 2 Scenario 3 (1:06–1:20) |
-| `public/clips/calving.mp4` | Pi-camera pasture shot (or stock-footage stand-in) + behavior-trace overlay | `edge-barn` Pi camera | Act 2 Scenario 4 (1:20–1:34) |
+| `public/clips/calving.mp4` | Pi-camera pasture shot (or stock-footage stand-in) + behavior-trace overlay | `edge-house` Pi camera | Act 2 Scenario 4 (1:20–1:34) |
 | `public/clips/storm.mp4` | Mavic wide shot of herd + paddock redirect arrow overlay | Mavic + dashboard overlay | Act 2 Scenario 5 (1:34–1:48) |
 | `public/clips/ambient_30x_synthesis.mp4` | Time-lapse of sun moving over ranch while agent-mesh chips fire | Mavic stationary + dashboard overlay | Act 2 synthesis (1:48–2:20) |
 | Kinetic-typography George #1 (Act 1) | George on-camera reading Act 1 hook line | Handheld / tripod, lav mic | Act 1 hook (0:08–0:18) |

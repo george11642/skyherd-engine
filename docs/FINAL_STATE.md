@@ -48,7 +48,7 @@ HEAD at time of snapshot: post-cleanup commits (see `git log --oneline -12`)
 | H3 — Drone under agent command | Software ready | Flash ArduPilot on supported FC; run `make sitl` to verify |
 | H4 — DIY LoRa GPS collar node | Software ready | LoRa module + ESP32 or Pi Pico W; parts on hand |
 | H5 — Outdoor field demo | Not started | Requires H3 shipped; ~half day setup |
-| Two-Pi-4 fleet | Software ready | `provision-edge.sh` one-command; edge-house + edge-barn configs |
+| Pi + Galileo fleet | Software ready | `provision-edge.sh` + `hardware/galileo/bootstrap.sh` one-command; `edge-house` (Pi 4 camera edge) + `edge-tank` (Galileo Gen 1 telemetry) configs |
 | iOS companion | Software ready | DJI SDK V5 + CocoaMQTT; XcodeGen; 52 protocol tests passing |
 | Android companion | Software ready | DJI SDK V5 + Paho MQTT; 55 tests passing |
 | Hardware-only demo runbook | Software ready | `make hardware-demo`; 37 tests; coyote SVG cutout template |

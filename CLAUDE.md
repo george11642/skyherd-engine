@@ -13,9 +13,10 @@ SkyHerd = 5-layer nervous system for American ranches. Submission for **Built wi
 5. `docs/verify-latest.md` — automated truth-check
 6. `docs/CLAUDE_CONTEXT.md` — deep context (stack, conventions, architecture detail)
 7. `docs/HARDWARE_DEMO_RUNBOOK.md` — 60-sec hardware hero demo
-8. `docs/HARDWARE_PI_FLEET.md` — **collar-free hardware path**: two Pi 4s + Mavic drone only (no DIY collar required)
-9. `docs/ATTESTATION.md` — Year-2 attestation walkthrough (judge-facing): `skyherd-verify` CLI, `/attest/:hash` viewer, memver pairing, rotation
-10. **Plan (authoritative):** `/home/george/.claude/plans/update-ur-memory-project-context-splendid-swan.md` — v5.1, locked Apr 21 2026
+8. `docs/HARDWARE_PI_FLEET.md` — Pi + Galileo topology (Pi camera edge + Galileo Gen 1 telemetry node, no DIY collar)
+9. `docs/HARDWARE_GALILEO.md` — Intel Galileo Gen 1 `edge-tank` runbook (water tank + weather)
+10. `docs/ATTESTATION.md` — Year-2 attestation walkthrough (judge-facing): `skyherd-verify` CLI, `/attest/:hash` viewer, memver pairing, rotation
+11. **Plan (authoritative):** `/home/george/.claude/plans/update-ur-memory-project-context-splendid-swan.md` — v5.1, locked Apr 21 2026
 
 ## Non-negotiable rules
 - **Sim-first hardline** — no hardware code until Sim Gate passes (PASSED Apr 22 — see `docs/verify-latest.md`)
@@ -66,6 +67,7 @@ All share `page_rancher(urgency, context)` → Twilio SMS/voice via **"Wes"** co
 - `web/` Vite + React 19 + Tailwind v4 SPA (+ `/rancher` PWA)
 - `android/SkyHerdCompanion/` Kotlin + DJI SDK V5 + MQTT
 - `ios/SkyHerdCompanion/` Swift + DJI SDK V5 + CocoaMQTT (XcodeGen)
+- `hardware/pi/` + `hardware/galileo/` one-command bringup for `edge-house` (Pi 4 camera edge) and `edge-tank` (Galileo Gen 1 telemetry)
 - `hardware/collar/` optional DIY LoRa firmware (PlatformIO) + 3D print + BOM
 - `skills/` 33-file ranch domain knowledge library
 - `worlds/` ranch YAML (`ranch_a`, `ranch_b`) • `docs/` • `tests/` 880+ tests
@@ -75,7 +77,7 @@ Python 3.11+ / uv · FastAPI + SSE · `claude-agent-sdk` 0.1.64 + `anthropic` 0.
 
 ## Timeline (2026-04-23 Thu → 2026-04-26 Sun)
 - **Thu Apr 23** — finalize software (v1.0 already closed; freeze submission branch, draft copy)
-- **Fri Apr 24** — hardware integration pass (collar-free path via `docs/HARDWARE_PI_FLEET.md`: 2× Pi 4 + Mavic) + **start filming**
+- **Fri Apr 24** — hardware integration pass (Pi + Galileo Gen 1 + Mavic via `docs/HARDWARE_PI_FLEET.md`) + **start filming**
 - **Sat Apr 25** — continue filming + start preparing launch video + finalize 100–200 word summary
 - **Sun Apr 26** — finalize + submit by 6pm EST (8pm EST deadline)
 

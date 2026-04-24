@@ -56,37 +56,43 @@ Target total time: **< 30 minutes, coffee to first heartbeat green**.
 
 ---
 
-## Group 2 — Pi readiness (5 items)
+## Group 2 — Edge-node readiness (5 items)
 
-### 6. Both Pis reachable via SSH
+> Fleet = 1× Pi 4 (`edge-house`, all six trough cameras) + 1× Intel Galileo
+> Gen 1 (`edge-tank`, water-tank + weather telemetry). Galileo is on the
+> Windows ICS subnet `192.168.137.x`; Pi is on the iPhone-hotspot wifi at
+> `172.20.10.x`. `edge-barn` Pi naming is still accepted by the scripts
+> for the legacy two-Pi split.
 
-- [ ] Action: Pi-A + Pi-B are on LAN and SSH works key-free.
-- `verify:` `ssh -o BatchMode=yes pi@edge-house.local 'hostname' && ssh -o BatchMode=yes pi@edge-barn.local 'hostname'`
-- `expect:` `edge-house` and `edge-barn`.
+### 6. Both edge nodes reachable
 
-### 7. Credentials file present on each Pi
+- [ ] Action: Pi on wifi, Galileo on ICS Ethernet, both pingable from the laptop.
+- `verify:` `ssh -o BatchMode=yes pi@edge-house.local 'hostname' && ssh -o BatchMode=yes root@192.168.137.20 'hostname'`
+- `expect:` `edge-house` and `edge-tank` (substitute the Galileo's actual ICS IP — `arp -a` or `ip neigh` on the laptop).
 
-- [ ] Action: confirm `skyherd-credentials.json` was dropped in `/boot/firmware/` during flash.
-- `verify:` `ssh pi@edge-house.local 'sudo jq .edge_id /boot/firmware/skyherd-credentials.json'`
-- `expect:` `"edge-house"` — and same check on edge-barn returns `"edge-barn"`.
+### 7. Credentials files present on each node
 
-### 8. Bootstrap completes without errors on Pi-A
+- [ ] Action: confirm `skyherd-credentials.json` was dropped in `/boot/firmware/` on the Pi, and `skyherd-galileo-credentials.json` on the Galileo boot partition.
+- `verify:` `ssh pi@edge-house.local 'sudo jq .edge_id /boot/firmware/skyherd-credentials.json'` and `ssh root@192.168.137.20 'python3 -c "import json; print(json.load(open(\"/boot/skyherd-galileo-credentials.json\"))[\"edge_id\"])"'`
+- `expect:` `"edge-house"` and `edge-tank`.
+
+### 8. Bootstrap completes without errors on the Pi
 
 - [ ] Action: run bootstrap over SSH pipe from laptop.
 - `verify:` `ssh pi@edge-house.local 'curl -sSfL https://raw.githubusercontent.com/george11642/skyherd-engine/main/hardware/pi/bootstrap.sh | bash' 2>&1 | tail -5`
-- `expect:` output ending in `Provisioning complete` or the first `edge_status` heartbeat JSON line.
+- `expect:` output ending in `Provisioning complete` or the first `edge_status` heartbeat JSON line. Galileo equivalent: `bash /media/mmcblk0p1/bootstrap.sh` on-device (see `docs/HARDWARE_GALILEO.md`).
 
-### 9. systemd unit active on both Pis
+### 9. systemd units active on both nodes
 
-- [ ] Action: query the service.
-- `verify:` `ssh pi@edge-house.local 'systemctl is-active skyherd-edge' && ssh pi@edge-barn.local 'systemctl is-active skyherd-edge'`
+- [ ] Action: query each service.
+- `verify:` `ssh pi@edge-house.local 'systemctl is-active skyherd-edge' && ssh root@192.168.137.20 'systemctl is-active skyherd-galileo'`
 - `expect:` `active` on both.
 
 ### 10. `/api/edges` reports both nodes online
 
 - [ ] Action: query the dashboard API.
 - `verify:` `curl -s http://localhost:8000/api/edges | jq '.edges | map({edge_id, online})'`
-- `expect:` array containing both `edge-house` and `edge-barn` with `online: true` within 90 s of bootstrap finish.
+- `expect:` array containing `edge-house` and `edge-tank` with `online: true` within 90 s of bootstrap finish.
 
 ---
 

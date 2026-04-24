@@ -214,7 +214,8 @@ Generated Apr 22 2026. Excludes `.refs/`, `.venv/`, `runtime/`, `node_modules/`,
 | `docs/CROSS_RANCH_MESH.md` | Cross-ranch mesh design — NeighborBroadcaster protocol, ranch_b integration. |
 | `docs/HARDWARE_DEMO_RUNBOOK.md` | 60-second hardware-only hero demo — 2 Pi + Mavic Air 2, shot list, coyote prop. |
 | `docs/HARDWARE_PI_EDGE.md` | Pi H1 edge runtime setup — camera, detector, MQTT publish, systemd install. |
-| `docs/HARDWARE_PI_FLEET.md` | 2-Pi-4 fleet commissioning guide — edge-house + edge-barn provisioning. |
+| `docs/HARDWARE_PI_FLEET.md` | Pi + Galileo fleet commissioning guide — `edge-house` (Pi 4 camera edge) + `edge-tank` (Galileo Gen 1 telemetry) provisioning. |
+| `docs/HARDWARE_GALILEO.md` | Intel Galileo Gen 1 `edge-tank` runbook — water-tank + weather telemetry, mraa wiring, sim-mode fallback. |
 | `docs/HARDWARE_MAVIC_PROTOCOL.md` | Mavic Air 2 WebSocket protocol spec — command schema, telemetry schema, safety interlocks. |
 | `docs/HARDWARE_MAVIC_ANDROID.md` | Android companion setup + DJI SDK V5 integration guide. |
 | `docs/HARDWARE_MAVIC_IOS.md` | iOS companion setup + XcodeGen + CocoaMQTT integration guide. |

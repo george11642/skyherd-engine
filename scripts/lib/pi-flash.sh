@@ -168,18 +168,57 @@ hash_pi_password() {
 
 # ---------------------------------------------------------------------------
 # inject_first_boot — populate the boot partition with:
-#   - `ssh`             (empty file, enables sshd on first boot)
-#   - `userconf.txt`    ("pi:<crypt-hash>")
-#   - `custom.toml`     (Bookworm first-boot: hostname/user/wifi/ssh)
+#   - `ssh`                     (empty file, enables sshd on first boot)
+#   - `userconf.txt`            ("pi:<crypt-hash>")
+#   - `custom.toml`             (Bookworm first-boot: hostname/user/[wlan]/ssh)
+#   - `wpa_supplicant.conf`     (EAP mode only — WPA-Enterprise)
 #   - `skyherd-credentials.json` (our bootstrap reads this)
 #
-# Usage: inject_first_boot \
-#          <boot_mount> <edge_id> <trough_ids_json_array> \
-#          <ssid> <psk> <mqtt_url> <pi_password_plain>
+# Two modes:
+#   - `psk` — WPA-Personal. Writes `[wlan]` block in custom.toml; no
+#             wpa_supplicant.conf is emitted.
+#   - `eap` — WPA-Enterprise (PEAP/MSCHAPV2). Does NOT write `[wlan]` in
+#             custom.toml (stock schema doesn't support EAP and malformed
+#             values break the firstrun hook). Instead drops a
+#             `wpa_supplicant.conf` in /boot/firmware/ which Bookworm's
+#             first-boot migrates into NetworkManager automatically.
+#
+# Usage:
+#   PSK:  inject_first_boot psk <boot_mount> <edge_id> <trough_ids_json> \
+#                           <ssid> <psk> <mqtt_url> <pi_password_plain>
+#   EAP:  inject_first_boot eap <boot_mount> <edge_id> <trough_ids_json> \
+#                           <ssid> <eap_identity> <eap_password> <eap_phase2> \
+#                           <mqtt_url> <pi_password_plain> [<eap_method>] [<country>]
+#
+# Security: the file containing the EAP password (wpa_supplicant.conf) is
+# chmod 600. The EAP identity and password are NEVER echoed to stdout/stderr.
+# The credentials.json carries only the SSID + mode + identity (no password).
 #
 # Returns 0 on success; the mount must be writable.
 # ---------------------------------------------------------------------------
 inject_first_boot() {
+    local mode="$1"
+    shift
+    case "$mode" in
+        psk)
+            _inject_first_boot_psk "$@"
+            return $?
+            ;;
+        eap)
+            _inject_first_boot_eap "$@"
+            return $?
+            ;;
+        *)
+            echo "inject_first_boot: unknown mode '$mode' (expected: psk|eap)" >&2
+            return 1
+            ;;
+    esac
+}
+
+# ---------------------------------------------------------------------------
+# _inject_first_boot_psk — WPA-Personal path (original behaviour).
+# ---------------------------------------------------------------------------
+_inject_first_boot_psk() {
     local boot_mount="$1"
     local edge_id="$2"
     local trough_ids_json="$3"   # e.g. "[1,2]" or "[3,4,5,6]"
@@ -261,6 +300,141 @@ TOML_EOF
 {
   "wifi_ssid": "${ssid_j}",
   "wifi_psk": "${psk_j}",
+  "mqtt_url": "${mqtt_j}",
+  "ranch_id": "ranch_a",
+  "edge_id": "${edge_j}",
+  "trough_ids": ${trough_ids_json}
+}
+JSON_EOF
+    fi
+    chmod 600 "$creds_path" || true
+    chmod 600 "${boot_mount}/userconf.txt" || true
+    chmod 600 "${boot_mount}/custom.toml" || true
+    return 0
+}
+
+# ---------------------------------------------------------------------------
+# _inject_first_boot_eap — WPA-Enterprise (PEAP/MSCHAPv2) path.
+#
+# Writes custom.toml WITHOUT a [wlan] block and drops a
+# wpa_supplicant.conf at /boot/firmware/wpa_supplicant.conf that Bookworm's
+# first-boot migrates into NetworkManager. File is chmod 600.
+# ---------------------------------------------------------------------------
+_inject_first_boot_eap() {
+    local boot_mount="$1"
+    local edge_id="$2"
+    local trough_ids_json="$3"
+    local ssid="$4"
+    local eap_identity="$5"
+    local eap_password="$6"
+    local eap_phase2="$7"
+    local mqtt_url="$8"
+    local pi_password_plain="$9"
+    local eap_method="${10:-PEAP}"
+    local country="${11:-US}"
+
+    if [[ -z "$boot_mount" || -z "$edge_id" || -z "$trough_ids_json" ]]; then
+        echo "inject_first_boot: missing required args" >&2
+        return 1
+    fi
+    if [[ ! -d "$boot_mount" ]]; then
+        echo "inject_first_boot: boot mount not a directory: $boot_mount" >&2
+        return 1
+    fi
+    if [[ -z "$ssid" || -z "$eap_identity" || -z "$eap_password" || -z "$eap_phase2" ]]; then
+        # Do NOT echo the values of identity/password — just name the missing slot.
+        echo "inject_first_boot(eap): missing one of ssid/eap_identity/eap_password/eap_phase2" >&2
+        return 1
+    fi
+
+    local pw_hash
+    pw_hash="$(hash_pi_password "$pi_password_plain")" || return 1
+
+    # 1. Empty ssh marker.
+    : > "${boot_mount}/ssh"
+
+    # 2. userconf.txt (pi:hash).
+    printf 'pi:%s\n' "$pw_hash" > "${boot_mount}/userconf.txt"
+
+    # 3. custom.toml — NO [wlan] block in EAP mode. The firstrun hook's
+    #    parser only understands WPA-Personal here; writing EAP fields would
+    #    break it. Wifi is provided out-of-band via wpa_supplicant.conf.
+    local pw_esc
+    pw_esc="$(_toml_escape "$pw_hash")"
+    cat > "${boot_mount}/custom.toml" <<TOML_EOF
+# Raspberry Pi OS Bookworm first-boot config (generated by SkyHerd setup-edge-pi.sh).
+# Wi-Fi mode: WPA-Enterprise (EAP). Handled via wpa_supplicant.conf, not [wlan].
+config_version = 1
+
+[system]
+hostname = "${edge_id}"
+
+[user]
+name = "pi"
+password = "${pw_esc}"
+password_encrypted = true
+
+[ssh]
+enabled = true
+password_authentication = true
+TOML_EOF
+
+    # 4. wpa_supplicant.conf — WPA-EAP config. The wpa_supplicant
+    #    double-quoted string syntax does NOT process escapes, so we reject
+    #    any value containing `"` or newline rather than silently corrupt.
+    local field
+    for field in "$ssid" "$eap_identity" "$eap_password" "$eap_phase2" "$eap_method" "$country"; do
+        if [[ "$field" == *'"'* || "$field" == *$'\n'* ]]; then
+            echo "inject_first_boot(eap): wpa_supplicant fields must not contain \" or newline" >&2
+            return 1
+        fi
+    done
+
+    local wpa_path="${boot_mount}/wpa_supplicant.conf"
+    # Pre-create with 600 so the window where the file exists with default
+    # perms is zero.
+    (umask 077 && : > "$wpa_path")
+    chmod 600 "$wpa_path"
+    cat > "$wpa_path" <<WPA_EOF
+ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+update_config=1
+country=${country}
+
+network={
+    ssid="${ssid}"
+    scan_ssid=1
+    key_mgmt=WPA-EAP
+    eap=${eap_method}
+    identity="${eap_identity}"
+    password="${eap_password}"
+    phase1="peaplabel=0"
+    phase2="auth=${eap_phase2}"
+}
+WPA_EOF
+    chmod 600 "$wpa_path" || true
+
+    # 5. skyherd-credentials.json — EAP shape. Carries SSID + mode + identity
+    #    only. The EAP password is NOT persisted to this file (it lives in
+    #    wpa_supplicant.conf with chmod 600 only).
+    local creds_path="${boot_mount}/skyherd-credentials.json"
+    if command -v jq >/dev/null 2>&1; then
+        jq -n \
+            --arg ssid "$ssid" \
+            --arg mode "eap" \
+            --arg mqtt "$mqtt_url" \
+            --arg edge "$edge_id" \
+            --argjson troughs "$trough_ids_json" \
+            '{wifi_ssid:$ssid, wifi_mode:$mode, mqtt_url:$mqtt, ranch_id:"ranch_a", edge_id:$edge, trough_ids:$troughs}' \
+            > "$creds_path"
+    else
+        local ssid_j mqtt_j edge_j
+        ssid_j="$(_json_escape "$ssid")"
+        mqtt_j="$(_json_escape "$mqtt_url")"
+        edge_j="$(_json_escape "$edge_id")"
+        cat > "$creds_path" <<JSON_EOF
+{
+  "wifi_ssid": "${ssid_j}",
+  "wifi_mode": "eap",
   "mqtt_url": "${mqtt_j}",
   "ranch_id": "ranch_a",
   "edge_id": "${edge_j}",

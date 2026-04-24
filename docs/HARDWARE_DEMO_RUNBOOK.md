@@ -24,8 +24,8 @@
 - [ ] Laptop charged + USB-C adapter in bag
 - [ ] `uv sync --all-extras` done on laptop
 - [ ] `make dashboard` smoke-tested: `http://localhost:8000` shows ranch map
-- [ ] Pi #1 (`edge-fence`): plugged in at fence location, heartbeat green on `/api/edges`
-- [ ] Pi #2 (`edge-barn`): plugged in at trough/milk-crate stand, heartbeat green
+- [ ] Pi (`edge-house`): plugged in at fence/trough location, heartbeat green on `/api/edges` (single vision node, covers all six trough cameras)
+- [ ] Galileo (`edge-tank`): plugged into USB-Ethernet adapter on laptop, heartbeat green (water-tank + weather telemetry)
 - [ ] Mavic Air 2: 3× fully charged batteries, pre-flight checklist done
 - [ ] DJI Remote: charged, linked to Mavic
 - [ ] Phone (Android/iOS): SkyHerdCompanion open, "DJI: connected" + "MQTT: connected" both green
@@ -39,7 +39,7 @@
 ```bash
 ANTHROPIC_API_KEY=$KEY \
 DRONE_BACKEND=mavic \
-HARDWARE_OVERRIDES=trough_cam:trough_1:edge-fence,trough_cam:trough_2:edge-barn \
+HARDWARE_OVERRIDES=trough_cam:trough_1:edge-house,trough_cam:trough_2:edge-house,water_tank:tank_n:edge-tank \
 make hardware-demo
 ```
 
@@ -47,17 +47,24 @@ Dashboard auto-launches at `http://localhost:8000`. Open on George's second moni
 
 ---
 
-## Pi Side (commissioned ahead)
+## Edge Nodes (commissioned ahead)
 
-Each Pi already runs `skyherd-edge` via systemd (see `docs/HARDWARE_PI_FLEET.md`).
+The Pi runs `skyherd-edge` via systemd; the Galileo runs `skyherd-galileo`.
+See [`docs/HARDWARE_PI_FLEET.md`](HARDWARE_PI_FLEET.md) and
+[`docs/HARDWARE_GALILEO.md`](HARDWARE_GALILEO.md).
 
 Quick verify before shoot:
 ```bash
 curl http://<laptop-ip>:8000/api/edges
-# Should show edge-fence and edge-barn both with status: green
+# Should show edge-house (Pi) + edge-tank (Galileo) both with status: green
 ```
 
-If a Pi shows red: `ssh pi@edge-fence sudo systemctl restart skyherd-edge` and wait 15s.
+Fixes:
+- Pi red: `ssh pi@edge-house sudo systemctl restart skyherd-edge` — 15 s.
+- Galileo red: `ssh root@192.168.137.xxx systemctl restart skyherd-galileo` — 15 s.
+- Galileo hardware flaky: set `SENSOR_MODE=sim` in `/etc/skyherd/galileo.env`
+  and restart, or run the sim publisher on the laptop (see
+  `docs/HARDWARE_GALILEO.md` § Sim mode). Topics and payloads stay identical.
 
 ---
 
@@ -73,12 +80,12 @@ If a Pi shows red: `ssh pi@edge-fence sudo systemctl restart skyherd-edge` and w
 
 ### Shot A — Coyote Hero (35–45 sec)
 
-**Setup**: Pi #1 camera on fence post, framing the gap. Gavin off-screen with fishing-line-on-stick attached to coyote cutout. George stands near laptop/dashboard, facing camera.
+**Setup**: Pi camera on fence post, framing the gap. Gavin off-screen with fishing-line-on-stick attached to coyote cutout. George stands near laptop/dashboard, facing camera.
 
 **Action**:
 1. George: *"It's 7:42 pm on the south range."* — glances at dashboard showing 50 cows grazing.
 2. Gavin pulls cardboard coyote through frame slowly (2–3 seconds across).
-3. Pi #1 MegaDetector fires → MQTT event hits laptop → FenceLineDispatcher wakes → dashboard shows agent log: "Coyote detected, dispatching drone."
+3. Pi MegaDetector fires → MQTT event hits laptop → FenceLineDispatcher wakes → dashboard shows agent log: "Coyote detected, dispatching drone."
 4. Mavic lifts off automatically (or George shows liftoff on phone screen).
 5. Drone flies 20m to fence line position, plays deterrent tone through Bluetooth speaker.
 6. George's phone rings — Wes voice: *"Boss. Coyote at the south fence. Drone's on it."*
@@ -89,10 +96,10 @@ If a Pi shows red: `ssh pi@edge-fence sudo systemctl restart skyherd-edge` and w
 
 ### Shot B — Sick Cow (20 sec)
 
-**Setup**: Pi #2 on milk crate or fence rail at trough height. Plush cow with red wet-erase "discharge" on left eye in frame.
+**Setup**: Pi camera re-framed onto milk crate or fence rail at trough height. Plush cow with red wet-erase "discharge" on left eye in frame. (Same physical Pi as Shot A — now pointed at trough_3..trough_6 vantage.)
 
 **Action**:
-1. Camera on plush cow + Pi #2 lens.
+1. Camera on plush cow + Pi lens.
 2. HerdHealthWatcher fires — dashboard: "A014 — pinkeye flag, severity: escalate."
 3. Dashboard draws vet-intake packet: animal ID, symptoms, GPS location, recommended vet visit window.
 4. Wes voice (lower urgency): *"Boss. A014's got something in her left eye. I pulled together a vet packet; take a look when you can."*
@@ -102,7 +109,7 @@ If a Pi shows red: `ssh pi@edge-fence sudo systemctl restart skyherd-edge` and w
 
 **Setup**: Dashboard full-screen on monitor.
 
-**Action**: Show the 3 background sim scenarios (water drop, calving, storm) running in parallel with live cost ticker. Narration: *"Behind that one coyote call, three more agents are running — water tanks, calving watch, storm routing — all on the same mesh, 24/7."*
+**Action**: Show the 3 background scenarios (water drop, calving, storm) running in parallel with live cost ticker. The water-drop scenario is driven by the real Galileo `edge-tank` node publishing a falling tank level; calving and storm run from sim. Narration: *"Behind that one coyote call, three more agents are running — the Galileo on the water tank is calling in a drop, calving watch and storm routing are on sim — all on the same mesh, 24/7. Different silicon, same MQTT topics, same agents."*
 
 ---
 
@@ -131,8 +138,9 @@ If a Pi shows red: `ssh pi@edge-fence sudo systemctl restart skyherd-edge` and w
 | Failure | Response |
 |---------|---------|
 | Mavic won't arm (GPS, battery) | Dashboard shows SITL drone; narration shifts to "sim while we reset" |
-| Pi #1 doesn't detect coyote within 180s | `skyherd-demo-hw` auto-triggers sim coyote scenario; narration: "Same reasoning, from sim — here's what just played on the real Pi half a second too late." |
-| Pi heartbeat red | `ssh pi@edge-fence sudo systemctl restart skyherd-edge` — 15s fix |
+| Pi doesn't detect coyote within 180s | `skyherd-demo-hw` auto-triggers sim coyote scenario; narration: "Same reasoning, from sim — here's what just played on the real Pi half a second too late." |
+| Pi heartbeat red | `ssh pi@edge-house sudo systemctl restart skyherd-edge` — 15s fix |
+| Galileo won't publish water-tank drop for Shot C water scenario | Flip `SENSOR_MODE=sim` in `/etc/skyherd/galileo.env` and restart; or run `hardware/galileo/sensor_publisher.py` on the laptop directly. Topics match, dashboard won't know the difference. |
 | Twilio call fails | Dashboard phone-ring animation plays + .wav written to `runtime/hardware_demo_runs/` |
 | Laptop API key missing | All 5 agents run sim path — still shows full tool-call cascade |
 

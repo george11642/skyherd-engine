@@ -82,9 +82,13 @@ if [[ -n "${SKYHERD_EDGE_SETUP_SKIP_PHASES:-}" ]]; then
 fi
 export DRY_RUN
 
-# Trough IDs per edge (plan §2).
+# Trough IDs per edge.
+# edge-house is now the sole Pi edge node (covers ALL six trough cameras); the
+# second telemetry node is a Galileo (see docs/HARDWARE_GALILEO.md).
+# edge-barn remains accepted as a legacy split (troughs 3-6) for backward
+# compatibility with the older two-Pi layout.
 case "$EDGE_ID" in
-    edge-house) TROUGH_IDS_JSON="[1,2]" ;;
+    edge-house) TROUGH_IDS_JSON="[1,2,3,4,5,6]" ;;
     edge-barn)  TROUGH_IDS_JSON="[3,4,5,6]" ;;
 esac
 
@@ -353,18 +357,38 @@ phase_b() {
         }
         trap "sudo umount '$boot_mount' 2>/dev/null || true" EXIT
 
-        inject_first_boot \
-            "$boot_mount" \
-            "$EDGE_ID" \
-            "$TROUGH_IDS_JSON" \
-            "${SKYHERD_WIFI_SSID}" \
-            "${SKYHERD_WIFI_PSK}" \
-            "$mqtt_url" \
-            "${SKYHERD_PI_PASSWORD}" || {
-            _fail "first-boot injection failed"
-            sudo umount "$boot_mount" 2>/dev/null || true
-            return 1
-        }
+        local _wifi_mode="${SKYHERD_WIFI_MODE:-psk}"
+        if [[ "$_wifi_mode" == "eap" ]]; then
+            inject_first_boot eap \
+                "$boot_mount" \
+                "$EDGE_ID" \
+                "$TROUGH_IDS_JSON" \
+                "${SKYHERD_WIFI_SSID}" \
+                "${SKYHERD_WIFI_EAP_IDENTITY}" \
+                "${SKYHERD_WIFI_EAP_PASSWORD}" \
+                "${SKYHERD_WIFI_EAP_PHASE2:-MSCHAPV2}" \
+                "$mqtt_url" \
+                "${SKYHERD_PI_PASSWORD}" \
+                "${SKYHERD_WIFI_EAP_METHOD:-PEAP}" \
+                "${SKYHERD_WIFI_COUNTRY:-US}" || {
+                _fail "first-boot injection failed (eap)"
+                sudo umount "$boot_mount" 2>/dev/null || true
+                return 1
+            }
+        else
+            inject_first_boot psk \
+                "$boot_mount" \
+                "$EDGE_ID" \
+                "$TROUGH_IDS_JSON" \
+                "${SKYHERD_WIFI_SSID}" \
+                "${SKYHERD_WIFI_PSK}" \
+                "$mqtt_url" \
+                "${SKYHERD_PI_PASSWORD}" || {
+                _fail "first-boot injection failed"
+                sudo umount "$boot_mount" 2>/dev/null || true
+                return 1
+            }
+        fi
         sync
         sudo umount "$boot_mount"
         trap - EXIT

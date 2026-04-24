@@ -7,9 +7,12 @@ The curl-pipe path from a blank SD card to a live SkyHerd edge node.
 From the laptop, with a Pi 4, SD card, and SD reader handy:
 
 ```bash
-make edge-pi-setup EDGE_ID=edge-house   # first Pi (troughs 1–2)
-make edge-pi-setup EDGE_ID=edge-barn    # second Pi (troughs 3–6)
+make edge-pi-setup EDGE_ID=edge-house   # sole Pi (troughs 1–6)
+# Legacy split (still accepted): EDGE_ID=edge-barn for troughs 3–6
 ```
+
+The telemetry half of the fleet (water tank + weather) runs on an Intel
+Galileo Gen 1 as `edge-tank` — see [`../galileo/README.md`](../galileo/README.md).
 
 The script `scripts/setup-edge-pi.sh` runs five phases:
 
@@ -85,6 +88,7 @@ exits 0.
 ## Pointers
 
 - Deep per-unit runbook: [`docs/HARDWARE_PI_EDGE.md`](../../docs/HARDWARE_PI_EDGE.md)
-- Two-Pi fleet topology: [`docs/HARDWARE_PI_FLEET.md`](../../docs/HARDWARE_PI_FLEET.md)
+- Pi + Galileo fleet topology: [`docs/HARDWARE_PI_FLEET.md`](../../docs/HARDWARE_PI_FLEET.md)
+- Galileo Gen 1 `edge-tank` runbook: [`docs/HARDWARE_GALILEO.md`](../../docs/HARDWARE_GALILEO.md)
 - Phase 5 consolidated runbook (judge-facing): [`docs/HARDWARE_H1_RUNBOOK.md`](../../docs/HARDWARE_H1_RUNBOOK.md)
 - Demo video tie-in: [`docs/HARDWARE_DEMO_RUNBOOK.md`](../../docs/HARDWARE_DEMO_RUNBOOK.md)

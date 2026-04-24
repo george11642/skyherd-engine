@@ -5,7 +5,8 @@ on the dashboard.
 
 > This runbook composes the following existing deep docs:
 > - [`HARDWARE_PI_EDGE.md`](HARDWARE_PI_EDGE.md) — per-unit Pi setup
-> - [`HARDWARE_PI_FLEET.md`](HARDWARE_PI_FLEET.md) — two-Pi fleet topology
+> - [`HARDWARE_PI_FLEET.md`](HARDWARE_PI_FLEET.md) — Pi + Galileo fleet topology
+> - [`HARDWARE_GALILEO.md`](HARDWARE_GALILEO.md) — Galileo `edge-tank` runbook
 > - [`HARDWARE_DEMO_RUNBOOK.md`](HARDWARE_DEMO_RUNBOOK.md) — 60-sec hero demo
 >
 > Read this page first; follow pointers for depth.
@@ -16,7 +17,8 @@ on the dashboard.
 
 1. **Flash SD card** — Raspberry Pi OS Bookworm 64-bit Lite via
    [Pi Imager](https://www.raspberrypi.com/software/). Advanced options: set
-   hostname (`edge-house` / `edge-barn`), enable SSH, configure wifi.
+   hostname (`edge-house`), enable SSH, configure wifi. For the Galileo
+   telemetry node (`edge-tank`), see [`HARDWARE_GALILEO.md`](HARDWARE_GALILEO.md).
 2. **Drop `skyherd-credentials.json` on the boot partition.** Schema is at
    [`hardware/pi/credentials.example.json`](../hardware/pi/credentials.example.json).
 3. **Boot the Pi and run bootstrap:**
@@ -58,7 +60,7 @@ Required fields:
   "mqtt_url": "mqtt://192.168.1.100:1883",
   "ranch_id": "ranch_a",
   "edge_id": "edge-house",
-  "trough_ids": "trough_1,trough_2"
+  "trough_ids": "trough_1,trough_2,trough_3,trough_4,trough_5,trough_6"
 }
 ```
 
@@ -202,7 +204,8 @@ uv run pytest --cov=src/skyherd
 | Topic | File |
 | --- | --- |
 | Full per-Pi bringup walkthrough | [`HARDWARE_PI_EDGE.md`](HARDWARE_PI_EDGE.md) |
-| Two-Pi fleet topology | [`HARDWARE_PI_FLEET.md`](HARDWARE_PI_FLEET.md) |
+| Pi + Galileo fleet topology | [`HARDWARE_PI_FLEET.md`](HARDWARE_PI_FLEET.md) |
+| Galileo `edge-tank` runbook | [`HARDWARE_GALILEO.md`](HARDWARE_GALILEO.md) |
 | 60-sec demo runbook | [`HARDWARE_DEMO_RUNBOOK.md`](HARDWARE_DEMO_RUNBOOK.md) |
 | Architecture (5-layer nervous system) | [`ARCHITECTURE.md`](ARCHITECTURE.md) |
 | Attestation chain (verifies edge events) | [`ATTESTATION.md`](ATTESTATION.md) |
