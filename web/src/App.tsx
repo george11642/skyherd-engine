@@ -58,11 +58,23 @@ export default function App() {
   // the replay driver on mount. Recorder scripts + share-links use this to
   // bypass the Start Simulation overlay so the map animates on first paint.
   // No-op outside replay mode (getReplayIfActive() returns null).
+  //
+  // Optional ?speed=N param overrides the replay default (3×). Used by the
+  // dashboard recorder so the 600 s sim plays inside the ~17 s clip window.
+  // setSpeed runs BEFORE start() so the first scheduled events honour the
+  // new cadence.
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
+    const replay = getReplayIfActive();
+    const speedRaw = params.get("speed");
+    if (replay && speedRaw) {
+      const n = Number(speedRaw);
+      if (Number.isFinite(n) && n > 0) {
+        replay.setSpeed(n);
+      }
+    }
     const flag = params.get("autostart");
     if (flag !== "1" && flag !== "true") return;
-    const replay = getReplayIfActive();
     if (replay && replay.isPaused()) replay.start();
   }, []);
 

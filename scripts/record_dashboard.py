@@ -60,8 +60,11 @@ OUTPUT_DIR = REPO_ROOT / "remotion-video" / "public" / "clips"
 DASHBOARD_ORIGIN = "http://127.0.0.1:8000"
 # `replay=v2` flips sse.ts into replay mode at runtime (build-independent);
 # `autostart=1` fires replay.start() on mount so the map animates without a
-# user click. Both are read by the dashboard bundle regardless of VITE_DEMO_MODE.
-DASHBOARD_URL = f"{DASHBOARD_ORIGIN}/demo?autostart=1&replay=v2"
+# user click. `speed=45` compresses the 600 s sim into ~13 s wall time so it
+# fits inside the 14-17 s recording window (default 3× was too slow — only
+# ~5% of sim motion landed in the clip). All three params are read by the
+# dashboard bundle regardless of VITE_DEMO_MODE.
+DASHBOARD_URL = f"{DASHBOARD_ORIGIN}/demo?autostart=1&replay=v2&speed=45"
 VIDEO_WIDTH = 1920
 VIDEO_HEIGHT = 1080
 FPS = 30

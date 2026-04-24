@@ -6,7 +6,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, useSpring, useTransform } from "framer-motion";
 import { cn } from "@/lib/cn";
-import { getSSE } from "@/lib/sse";
+import { getSSE, getReplayIfActive } from "@/lib/sse";
 import { Sparkline } from "@/components/shared/Sparkline";
 
 interface AgentCost {
@@ -82,12 +82,24 @@ export function CostTicker(props: CostTickerProps = {}) {
   const [tick, setTick] = useState<CostTickPayload | null>(null);
   const sparkRef = useRef<number[]>([]);
   const [sparkline, setSparkline] = useState<number[]>([]);
+  // Resolved once on mount — used to override the "PAUSED (idle)" chip when
+  // a replay session is running but momentary `all_idle=true` ticks would
+  // otherwise label the meter paused (misleading for the recorder + judges).
+  const [replay] = useState(() => getReplayIfActive());
+  // Tick state for the replay-running override; we re-poll on each cost.tick
+  // so a manual pause from the UI flips the label back to PAUSED.
+  const [replayRunning, setReplayRunning] = useState<boolean>(
+    () => replay !== null && !replay.isPaused(),
+  );
 
   const handleTick = useCallback((payload: CostTickPayload) => {
     setTick(payload);
     sparkRef.current = [...sparkRef.current, payload.rate_per_hr_usd].slice(-MAX_SPARKLINE);
     setSparkline([...sparkRef.current]);
-  }, []);
+    if (replay !== null) {
+      setReplayRunning(!replay.isPaused());
+    }
+  }, [replay]);
 
   useEffect(() => {
     const sse = getSSE();
@@ -96,7 +108,14 @@ export function CostTicker(props: CostTickerProps = {}) {
   }, [handleTick]);
 
   // Prop overrides win over SSE-derived state; falls back to tick payload.
-  const allIdle = props.all_idle ?? tick?.all_idle ?? true;
+  // In an active replay session we never want to render "PAUSED (idle)" —
+  // the user/recorder sees the map animating and the meter labelled paused
+  // is contradictory. Replay overrides only the chip/sparkline labelling
+  // (they're tied to allIdle), but tests that pass `all_idle` explicitly
+  // bypass this — `props.all_idle` still wins.
+  const rawAllIdle = props.all_idle ?? tick?.all_idle ?? true;
+  const allIdle =
+    props.all_idle === undefined && replayRunning ? false : rawAllIdle;
   const totalCost = props.total_cumulative_usd ?? tick?.total_cumulative_usd ?? 0;
   const rateUsd = props.rate_per_hr_usd ?? tick?.rate_per_hr_usd ?? 0;
   const effectiveAgents = props.agents ?? tick?.agents;
