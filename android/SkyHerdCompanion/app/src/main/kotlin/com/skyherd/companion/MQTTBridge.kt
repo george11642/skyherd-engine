@@ -13,12 +13,19 @@ import org.eclipse.paho.client.mqttv3.MqttMessage
 /**
  * Paho MQTT client bridge connecting to the laptop's Mosquitto broker.
  *
- * Topic scheme:
- *   Inbound  (broker → app): ``skyherd/drone/cmd/#``
- *   Outbound (app → broker): ``skyherd/drone/state/#``
+ * **Topic scheme** (unified with iOS — see `docs/MAVIC_MISSION_SCHEMA.md` §5):
+ * - Inbound  (broker → app): ``skyherd/drone/cmd/#``
+ * - Outbound ACKs:           ``skyherd/drone/ack/android``
+ * - Outbound state/telemetry: ``skyherd/drone/state/android``
+ * - Status / online-offline:  ``skyherd/drone/status/android``
+ *
+ * The `/android` suffix identifies the sending platform to the backend;
+ * iOS publishes to `/ios` on the same base. Topic strings used by
+ * [DroneControl] are the constants above, pinned here to keep the
+ * two files in sync.
  *
  * Command messages arrive as JSON: ``{"cmd":"takeoff","args":{"alt_m":5.0},"seq":1}``
- * ACK messages are published as JSON: ``{"ack":"takeoff","result":"ok","seq":1}``
+ * OR as a MissionV1 envelope (`{version:1, metadata:{...}, command:{cmd,args}, seq}`).
  *
  * The bridge simply receives raw bytes and forwards them to [DroneControl]
  * via the registered [commandListener].  DroneControl handles parsing and
@@ -29,6 +36,8 @@ class MQTTBridge(private val context: Context) {
     companion object {
         private const val TAG = "SkyHerdMQTT"
         const val TOPIC_CMD = "skyherd/drone/cmd/#"
+        /** @deprecated Use [DroneControl.STATE_TOPIC] / [DroneControl.ACK_TOPIC]. */
+        @Deprecated("Split into per-platform ack/state topics in Phase 7.2")
         const val TOPIC_STATE_BASE = "skyherd/drone/state/"
         private const val CLIENT_ID = "skyherd-companion-android"
     }

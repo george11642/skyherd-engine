@@ -16,22 +16,29 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import org.json.JSONObject
+import org.json.JSONArray
 
 /**
  * Translates MQTT commands from [MQTTBridge] into DJI SDK V5 calls.
  *
  * Supported commands (received as JSON on ``skyherd/drone/cmd/+``):
  *
- * | cmd                  | args                                     | DJI call                            |
- * |----------------------|------------------------------------------|-------------------------------------|
- * | ``takeoff``          | ``{alt_m: Float}``                       | FlightController.startTakeoff       |
- * | ``goto``             | ``{lat: Double, lon: Double, alt_m: Float}`` | FlightController.startGoHome (approx) |
- * | ``return_to_home``   | ``{}``                                   | FlightController.startGoHome        |
- * | ``play_deterrent``   | ``{tone_hz: Int, duration_ms: Int}``     | speaker / log                       |
- * | ``capture_visual_clip`` | ``{duration_s: Float}``               | camera capture                      |
- * | ``get_state``        | ``{}``                                   | telemetry snapshot                  |
+ * | cmd                  | args                                         | DJI call                            |
+ * |----------------------|----------------------------------------------|-------------------------------------|
+ * | ``takeoff``          | ``{alt_m: Float}``                           | FlightController.startTakeoff       |
+ * | ``goto``             | ``{lat: Double, lon: Double, alt_m: Float}`` | FlightController.startGoHome (stub) |
+ * | ``return_to_home``   | ``{}``                                       | FlightController.startGoHome        |
+ * | ``play_deterrent``   | ``{tone_hz: Int, duration_ms: Int}``         | speaker / log                       |
+ * | ``capture_visual_clip`` | ``{duration_s: Float}``                   | camera capture (stub)               |
+ * | ``get_state``        | ``{}``                                       | telemetry snapshot                  |
  *
- * ACKs are published to ``skyherd/drone/state/ack``.
+ * The command envelope may be legacy flat (`{cmd, args, seq}`) OR
+ * MissionV1 (`{version:1, metadata:{...}, command:{cmd,args}, seq}`). V1
+ * `metadata.battery_floor_pct` / `wind_kt` / `geofence_version` are honoured.
+ *
+ * ACKs are published to ``skyherd/drone/ack/android`` (unified scheme —
+ * see `docs/MAVIC_MISSION_SCHEMA.md` §5); telemetry on
+ * ``skyherd/drone/state/android``.
  *
  * [SafetyGuards] is checked before every actuator command.  If a guard
  * fires, an error ACK is returned and the command is not forwarded to the
@@ -43,8 +50,10 @@ class DroneControl(
 ) {
     companion object {
         private const val TAG = "SkyHerdDroneControl"
-        private const val ACK_TOPIC = "${MQTTBridge.TOPIC_STATE_BASE}ack"
-        private const val TELEMETRY_TOPIC = "${MQTTBridge.TOPIC_STATE_BASE}telemetry"
+        /** Unified ACK topic — see `docs/MAVIC_MISSION_SCHEMA.md` §5. */
+        const val ACK_TOPIC = "skyherd/drone/ack/android"
+        /** Unified state/telemetry topic for this platform. */
+        const val STATE_TOPIC = "skyherd/drone/state/android"
 
         /** Lost-signal watchdog poll interval (ms). */
         private const val WATCHDOG_POLL_MS = 5_000L
@@ -83,15 +92,6 @@ class DroneControl(
     // Lost-signal watchdog (H3-01, Rule-2)
     // ------------------------------------------------------------------
 
-    /**
-     * Polls [MQTTBridge.isConnected] every [WATCHDOG_POLL_MS]; if MQTT stays
-     * disconnected for [WATCHDOG_GRACE_MS] while [inAirState] is true, fires
-     * ``fc.startGoHome`` to bring the drone home autonomously.
-     *
-     * This is a safety-net only — the DJI SDK already has its own RTH-on-RC-
-     * signal-lost logic; this watchdog covers the separate case where the
-     * **companion-to-broker** link drops but the RC link stays up.
-     */
     private fun startLostSignalWatchdog() {
         watchdogJob?.cancel()
         watchdogJob = scope.launch {
@@ -130,26 +130,80 @@ class DroneControl(
     // Command dispatch
     // ------------------------------------------------------------------
 
+    /**
+     * Parse either a legacy `{cmd, args, seq}` payload or a MissionV1 envelope
+     * into a normalised tuple `(cmd, args, seq, metadata?)`. Returns null if
+     * the payload is malformed.
+     */
+    internal data class Parsed(
+        val cmd: String,
+        val args: JSONObject,
+        val seq: Int,
+        val metadata: JSONObject?,
+    )
+
+    internal fun parseEnvelope(payload: String): Parsed? {
+        val json = runCatching { JSONObject(payload) }.getOrNull() ?: return null
+        return if (json.has("version")) {
+            // V1 envelope
+            val v = json.optInt("version", -1)
+            if (v != 1) {
+                Log.w(TAG, "Unsupported envelope version: $v")
+                return null
+            }
+            val cmdObj = json.optJSONObject("command") ?: return null
+            Parsed(
+                cmd = cmdObj.optString("cmd", ""),
+                args = cmdObj.optJSONObject("args") ?: JSONObject(),
+                seq = json.optInt("seq", 0),
+                metadata = json.optJSONObject("metadata"),
+            )
+        } else {
+            Parsed(
+                cmd = json.optString("cmd", ""),
+                args = json.optJSONObject("args") ?: JSONObject(),
+                seq = json.optInt("seq", 0),
+                metadata = null,
+            )
+        }
+    }
+
     private fun handleCommand(topic: String, payload: String) {
-        val json = runCatching { JSONObject(payload) }.getOrNull() ?: run {
-            Log.w(TAG, "Malformed JSON on $topic: $payload")
+        val parsed = parseEnvelope(payload) ?: run {
+            Log.w(TAG, "Malformed payload on $topic: $payload")
             return
         }
+        applyMissionMetadata(parsed.metadata)
 
-        val cmd = json.optString("cmd", "")
-        val args = json.optJSONObject("args") ?: JSONObject()
-        val seq = json.optInt("seq", 0)
+        Log.d(TAG, "Command: ${parsed.cmd} seq=${parsed.seq} args=${parsed.args} " +
+                "metaPresent=${parsed.metadata != null}")
 
-        Log.d(TAG, "Command: $cmd seq=$seq args=$args")
+        when (parsed.cmd) {
+            "takeoff" -> cmdTakeoff(parsed.args, parsed.seq, parsed.metadata)
+            "goto" -> cmdGoto(parsed.args, parsed.seq)
+            "patrol" -> cmdPatrol(parsed.args, parsed.seq, parsed.metadata)
+            "return_to_home" -> cmdReturnToHome(parsed.args, parsed.seq)
+            "play_deterrent" -> cmdPlayDeterrent(parsed.args, parsed.seq)
+            "capture_visual_clip" -> cmdCaptureVisualClip(parsed.args, parsed.seq)
+            "get_state" -> cmdGetState(parsed.seq)
+            else -> ackError(parsed.cmd, parsed.seq, "Unknown command: ${parsed.cmd}")
+        }
+    }
 
-        when (cmd) {
-            "takeoff" -> cmdTakeoff(args, seq)
-            "goto" -> cmdGoto(args, seq)
-            "return_to_home" -> cmdReturnToHome(args, seq)
-            "play_deterrent" -> cmdPlayDeterrent(args, seq)
-            "capture_visual_clip" -> cmdCaptureVisualClip(args, seq)
-            "get_state" -> cmdGetState(seq)
-            else -> ackError(cmd, seq, "Unknown command: $cmd")
+    /**
+     * Apply MissionV1 metadata overrides to the safety guards (battery
+     * floor, wind ceiling reference). Geofence version is logged for
+     * attestation; the polygon itself is loaded out-of-band via MQTT.
+     */
+    internal fun applyMissionMetadata(meta: JSONObject?) {
+        meta ?: return
+        if (meta.has("battery_floor_pct")) {
+            val pct = meta.optDouble("battery_floor_pct").toFloat()
+            safety.batteryFloorPct = pct
+            Log.d(TAG, "Mission metadata: battery_floor_pct=$pct")
+        }
+        if (meta.has("geofence_version")) {
+            Log.i(TAG, "Mission geofence_version=${meta.optString("geofence_version")}")
         }
     }
 
@@ -157,9 +211,12 @@ class DroneControl(
     // Command handlers
     // ------------------------------------------------------------------
 
-    private fun cmdTakeoff(args: JSONObject, seq: Int) {
+    private fun cmdTakeoff(args: JSONObject, seq: Int, meta: JSONObject?) {
         val altM = args.optDouble("alt_m", 30.0).toFloat()
-        val windKt = args.opt("wind_kt")?.let { (it as? Number)?.toFloat() }
+        // Prefer metadata wind_kt over args (metadata is canonical per schema).
+        val windKt: Float? = meta?.takeIf { it.has("wind_kt") }
+            ?.optDouble("wind_kt")?.toFloat()
+            ?: args.opt("wind_kt")?.let { (it as? Number)?.toFloat() }
 
         val batteryPct = getBatteryPercent()
         try {
@@ -192,14 +249,45 @@ class DroneControl(
     }
 
     private fun cmdGoto(args: JSONObject, seq: Int) {
-        // DJI SDK V5 waypoint / precision-fly requires WaypointV2 mission.
-        // This simplified implementation logs intent and ACKs ok.
-        // Full WaypointV2Mission implementation: see docs/HARDWARE_MAVIC_ANDROID.md
         val lat = args.optDouble("lat", 0.0)
         val lon = args.optDouble("lon", 0.0)
         val altM = args.optDouble("alt_m", 30.0)
-        Log.i(TAG, "Goto: lat=$lat lon=$lon alt=${altM}m (waypoint mission not yet wired)")
-        ackOk("goto", seq)
+        try {
+            safety.checkGeofence(lat, lon)
+        } catch (e: SafetyGuards.SafetyViolation) {
+            ackError("goto", seq, e.message ?: "geofence reject")
+            return
+        }
+        // DJI SDK V5 waypoint / precision-fly requires WaypointV2 mission.
+        // Parity with iOS: surface E_UNSUPPORTED rather than silent-ACK.
+        Log.w(TAG, "Goto: lat=$lat lon=$lon alt=${altM}m — DJIWaypointV2 not wired (unsupported)")
+        ackError("goto", seq, "E_UNSUPPORTED: gotoLocation requires DJIWaypointV2Mission — not yet implemented")
+    }
+
+    private fun cmdPatrol(args: JSONObject, seq: Int, meta: JSONObject?) {
+        val waypoints = args.optJSONArray("waypoints")
+        if (waypoints == null || waypoints.length() == 0) {
+            ackError("patrol", seq, "patrol requires 'waypoints' array")
+            return
+        }
+        // Geofence-check each waypoint
+        for (i in 0 until waypoints.length()) {
+            val wp = waypoints.optJSONObject(i) ?: continue
+            val lat = wp.optDouble("lat", Double.NaN)
+            val lon = wp.optDouble("lon", Double.NaN)
+            if (lat.isNaN() || lon.isNaN()) {
+                ackError("patrol", seq, "waypoint #$i missing lat/lon")
+                return
+            }
+            try {
+                safety.checkGeofence(lat, lon)
+            } catch (e: SafetyGuards.SafetyViolation) {
+                ackError("patrol", seq, e.message ?: "geofence reject")
+                return
+            }
+        }
+        // Per iOS parity: unsupported until DJIWaypointV2 wiring lands.
+        ackError("patrol", seq, "E_UNSUPPORTED: patrol requires DJIWaypointV2Mission — not yet implemented")
     }
 
     private fun cmdReturnToHome(args: JSONObject, seq: Int) {
@@ -225,21 +313,13 @@ class DroneControl(
     private fun cmdPlayDeterrent(args: JSONObject, seq: Int) {
         val toneHz = args.optInt("tone_hz", 12000)
         val durationMs = (args.optDouble("duration_s", 6.0) * 1000).toInt()
-
-        // Attempt to play via accessory speaker if paired.
-        // On most setups this logs the intent; hardware speaker integration
-        // requires a DJI-compatible accessory mounted to the drone.
         Log.i(TAG, "Deterrent: ${toneHz}Hz for ${durationMs}ms — logging (no speaker paired)")
-
-        // Future: PayloadCenter.getInstance().playAudio(toneHz, durationMs)
         ackOk("play_deterrent", seq)
     }
 
     private fun cmdCaptureVisualClip(args: JSONObject, seq: Int) {
         val durationS = args.optDouble("duration_s", 5.0)
-        // DJI SDK V5 camera capture: MediaManager / CameraManager
-        // Stub ACKs ok — full implementation attaches to CameraManager.startRecordVideo
-        Log.i(TAG, "Capture visual clip: ${durationS}s (stub — wiring CameraManager)")
+        Log.i(TAG, "Capture visual clip: ${durationS}s (stub — CameraManager wiring deferred)")
         ackOk("capture_visual_clip", seq)
     }
 
@@ -252,7 +332,7 @@ class DroneControl(
             put("data", state)
         }
         mqttBridge.publish(ACK_TOPIC, ack.toString())
-        mqttBridge.publish(TELEMETRY_TOPIC, state.toString())
+        mqttBridge.publish(STATE_TOPIC, state.toString())
     }
 
     // ------------------------------------------------------------------
@@ -265,24 +345,20 @@ class DroneControl(
 
     private fun getBatteryPercent(): Float {
         return runCatching {
-            // DJI SDK V5: BatteryManager.getInstance() exposes aggregate battery
-            // info.  chargeRemainingInPercent returns 0-100 as Int.
-            // When the SDK is absent (unit tests) or no battery is paired,
-            // runCatching traps the NPE/RuntimeException and we fall back to
-            // 100f so the safety guard doesn't spuriously trip.
             BatteryManager.getInstance().chargeRemainingInPercent.toFloat()
         }.getOrDefault(100f)
     }
 
     private fun buildStateJson(): JSONObject {
         return JSONObject().apply {
-            put("armed", false)       // FlightControllerManager.isMotorsOn
-            put("in_air", false)      // FlightControllerManager.isFlying
-            put("altitude_m", 0.0)   // from RTKManager or GPS telemetry
+            put("armed", false)
+            put("in_air", inAirState)
+            put("altitude_m", 0.0)
             put("battery_pct", getBatteryPercent())
             put("mode", "STANDBY")
             put("lat", 0.0)
             put("lon", 0.0)
+            put("gps_valid", true)
         }
     }
 
