@@ -1,0 +1,76 @@
+# Elisa — Raw Gemini Multimodal Analysis
+
+**Source:** `/tmp/skyherd-winners/elisa.mp4` (4.4 MB)
+**Tool:** `mcp__gemini__gemini_analyze` (Gemini 3.1 Pro)
+**Analyzed:** 2026-04-24
+**Place:** 2nd place — Built with Opus 4.6
+**Founder:** Jon McBee (block-IDE for kids/microcontrollers)
+
+---
+
+TIMING
+- Total runtime (mm:ss): 02:56
+- Inferred act structure:
+  - Setup: 00:00 - 00:10 (Context setting about daughter's project)
+  - Demo: 00:10 - 01:47 (UI walkthrough, agent execution, and hardware flashing)
+  - Close: 01:48 - 02:56 (How it was built, GitHub proof, and future vision)
+
+HOOK (0-15s)
+- First words spoken: "My daughter Elisa is in seventh grade. She's currently working on a science fair project where she's using microcontrollers to collect temperature and humidity data..."
+- First visual element on screen: Medium close-up of the founder speaking directly to the camera against a dark blue wall and white window blinds.
+- Before/after metric placement: None in the first 15 seconds. (Closest proxy is at 00:13: "over the past three months, Claude Code has completely changed how I work," but no numerical metric is provided).
+- Title-card / typography design: None. The video opens immediately on the speaker with no introductory text or title card.
+
+ON-CAMERA RATIO
+- Total seconds of human face on screen / total runtime: 161s / 176s (91%)
+- [00:00-00:10] Founder talking directly to the camera, establishing the problem space.
+- [00:10-01:47] Daughter (Elisa) in a circular picture-in-picture (PiP) overlay in the bottom right, interacting with a mouse/keyboard while looking at a screen.
+- [01:48-02:02] Founder talking directly to the camera, explaining that he built the entire app using AI.
+- [02:16-02:37] Founder talking directly to the camera, sharing his thesis on the future of software creation.
+- [02:37-02:56] Daughter (Elisa) in the PiP overlay, smiling and playing the racing game built by the tool.
+
+CUT FREQUENCY
+- Average cuts per 10-second window: 0.45 cuts (8 total cuts across 176 seconds)
+- Classification: Slow
+
+B-ROLL INVENTORY
+- [00:10] screencast | Dragging and snapping conceptual programming blocks in the main workspace UI.
+- [01:05] screencast | "Mission Control" tab showing a live task execution graph and agent dialogue logs.
+- [01:24] screencast | Workspace UI showing the process of compiling and flashing code to an ESP32 board via USB.
+- [02:02] screencast | Fast scrolling through the project's dense GitHub file tree and extensive README documentation.
+- [02:37] screencast | Playing a 2D browser-based car racing game built entirely using the tool.
+- [02:50] screencast | "Nugget Completed" summary modal displaying the final build metrics and concepts learned over the task graph.
+
+ON-SCREEN TEXT
+- Caption / lower-third frequency: Rarely (No post-production captions or lower-thirds are used at all).
+- Font characteristics: Text is strictly constrained to the app UI and GitHub. It is sans-serif, standard weight for body copy, bold for headers, with zero animation.
+- Color palette: App UI utilizes a light theme (white/light gray) with muted, pastel block colors (green, purple, orange, brown).
+- Kinetic typography moments: None.
+
+AUDIO
+- Music genre + intensity: None.
+- Music ducks under VO?: No.
+- SFX presence: None. (No UI clicks, whooshes, or environmental sounds are added).
+- Microphone quality estimate: Camera-mic / desktop-mic. The audio is clear and highly intelligible, but lacks the low-end richness and acoustic deadness of a treated studio setup, possessing a very slight room tone.
+
+PACING ARC
+- Energy peaks:
+  - [01:24-01:42] The "payoff" moment where the conceptual blocks are compiled, the board is connected via a portal, and the success state is reached.
+  - [01:55-02:15] The "proof of depth" sequence where the founder rapidly fires off impressive engineering stats while a dense GitHub repository scrolls on screen.
+- Mid-section sag: [00:25-01:00] Pacing drags slightly as the founder meticulously details the taxonomy of the visual language (Goals, Requirements, Minions, Skills, Portals) while the UI interactions remain relatively static block-snapping.
+
+PRODUCTION POLISH
+- Color grade: Neutral / natural. No stylized LUTs are applied; lighting on the founder is functional and flat.
+- Shot composition: Centered. The founder is dead-center in the frame. Screencasts are standard full-screen captures with a bottom-right PiP.
+- Transition types: Hard cuts exclusively.
+- Aspect ratio: 16:9.
+- Resolution sense: Sharp. Code, UI text, and architectural diagrams in the screencasts are crisp and easily legible.
+
+HACKATHON CRITERIA COVERAGE
+- Impact moments: [00:20] Building an accessible interface for a 12-year-old; [02:26] Thesis on making software creation accessible for the next generation.
+- Demo moments: [00:10-01:47] End-to-end walkthrough of defining a spec and watching agents build it; [02:37-02:49] Live gameplay of a product generated by the tool.
+- Opus 4.6 use moments (AI capabilities): [00:12] Credit to Claude Code for workflow transformation; [00:43] Explanation of "Minions" as AI agents; [01:08] Showing the meta-planner and agents executing tasks in real-time; [01:50] Claiming the entire app was built with Claude Code without writing a single line manually.
+- Depth moments: [00:49] Supporting MCP servers, CLI tools, and hardware over serial/ethernet; [01:10] Real-time task graph with dependency ordering and retries; [01:55] Listing 30 hours, 76 commits, 39k+ lines of code, and 1500+ tests; [02:03] Scrolling the dense technical documentation.
+
+SINGLE MOST COPYABLE MOMENT
+- The "Stats Barrage + Repo Scroll" at [01:55]. The founder quickly recites heavy engineering metrics (hours, commits, lines of code, test coverage) while the video rapidly scrolls through a massive, beautifully documented GitHub README and file structure. To adapt this for a sim-first ranching dashboard demo, include a fast 10-second sequence where the VO lists raw operational metrics (e.g., "simulating 10,000 head of cattle, processing 50 weather variables per second, routing through 12 real-time API endpoints") while visually doing a high-speed scroll through your complex backend data schema, dense terminal logs, or a sprawling architectural diagram. It proves immense technical depth in a fraction of the time.
