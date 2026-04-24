@@ -51,6 +51,7 @@ GRAZING_OPTIMIZER_SPEC = AgentSpec(
     checkpoint_interval_s=86400,  # nightly checkpoints between weekly wakes
     max_idle_s_before_checkpoint=3600,
     model="claude-opus-4-7",
+    disable_tools=["web_search", "web_fetch"],  # MEM-11: deterministic offline agent
 )
 
 _SYSTEM_PROMPT_INLINE = """\

@@ -52,6 +52,7 @@ CALVING_WATCH_SPEC = AgentSpec(
     checkpoint_interval_s=43200,  # twice-daily checkpoints during calving season
     max_idle_s_before_checkpoint=900,
     model="claude-opus-4-7",
+    disable_tools=["web_search", "web_fetch"],  # MEM-11: deterministic offline agent
 )
 
 _SYSTEM_PROMPT_INLINE = """\
