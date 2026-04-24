@@ -25,8 +25,10 @@
 
 import type { SSEHandler } from "./sse";
 
-// Speed multiplier: 3× means a 600 s scenario plays in ~200 s.
-const SPEED = 3;
+// Internal speed multiplier baseline: 3× compresses a 600 s scenario to
+// ~200 s of wall time. The UI exposes this as "1×"; choosing "2×" in the UI
+// sets the internal multiplier to 6×.
+const DEFAULT_SPEED = 3;
 
 // Agent identities — same names as the live mesh.
 const AGENTS = [
@@ -138,11 +140,31 @@ interface AmbientCow {
   bcs: number;
 }
 
+// Drone patrol waypoints (normalized [0..1]). Figure-8 through the ranch
+// so the drone visits every quadrant instead of circling forever.
+const DRONE_WAYPOINTS: [number, number][] = [
+  [0.15, 0.2],   // SW corner
+  [0.38, 0.35],  // interior west
+  [0.5, 0.12],   // S midpoint
+  [0.82, 0.2],   // SE corner
+  [0.68, 0.42],  // interior south
+  [0.88, 0.55],  // E midpoint
+  [0.82, 0.82],  // NE corner
+  [0.55, 0.72],  // interior east
+  [0.5, 0.9],    // N midpoint
+  [0.18, 0.82],  // NW corner
+  [0.32, 0.6],   // interior north
+  [0.12, 0.5],   // W midpoint
+];
+
 export class SkyHerdReplay {
   private handlers: Map<string, SSEHandler[]> = new Map();
   private paused = true;
   private timeouts: ReturnType<typeof setTimeout>[] = [];
   private intervals: ReturnType<typeof setInterval>[] = [];
+
+  // UI "1×" maps to this internal multiplier. Mutated by setSpeed().
+  private speed = DEFAULT_SPEED;
 
   // Ambient synthesiser state — persists across pause/start so the world
   // doesn't reset to pristine on every resume.
@@ -151,6 +173,11 @@ export class SkyHerdReplay {
   private ambientLogIdx = 0;
   private ambientAgentIdx = 0;
   private ambientCows: AmbientCow[] | null = null;
+
+  // Drone patrol state — waypoint-to-waypoint with eased travel + a small
+  // perpendicular wobble so the path doesn't look mechanical.
+  private droneLegIdx = 0;
+  private droneLegStartMs = 0;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   on(eventType: string, handler: (payload: any) => void): this {
@@ -189,7 +216,7 @@ export class SkyHerdReplay {
     this._emit("scenario.active", {
       name: "coyote",
       pass_idx: 0,
-      speed: SPEED,
+      speed: this.speed,
       started_at: new Date().toISOString(),
     });
 
@@ -215,6 +242,26 @@ export class SkyHerdReplay {
 
   isPaused(): boolean {
     return this.paused;
+  }
+
+  getSpeed(): number {
+    return this.speed;
+  }
+
+  /**
+   * Set the playback speed (internal scalar; UI exposes 0.5× = 1.5, 1× = 3,
+   * 2× = 6, 4× = 12). While running, restarts ambient intervals so their
+   * cadence matches. Scenario event timing is frozen at schedule-time, so
+   * new speeds take full effect on the next loop iteration.
+   */
+  setSpeed(speed: number): this {
+    this.speed = Math.max(0.25, speed);
+    if (!this.paused) {
+      for (const i of this.intervals) clearInterval(i);
+      this.intervals = [];
+      this._startAmbient();
+    }
+    return this;
   }
 
   /** Alias kept for SkyHerdSSE compatibility — close() == pause(). */
@@ -261,16 +308,34 @@ export class SkyHerdReplay {
       ];
     }
 
-    // Drone patrols a clockwise orbit around the ranch centroid.
-    const cx = 0.5;
-    const cy = 0.5;
-    const r = 0.3;
-    const theta = (Date.now() / 6000) % (Math.PI * 2);
+    // Waypoint patrol: ease between DRONE_WAYPOINTS, ~5 s per leg at 1×.
+    const now = Date.now();
+    const LEG_MS = 5000 * (DEFAULT_SPEED / this.speed);
+    if (this.droneLegStartMs === 0) this.droneLegStartMs = now;
+    if (now - this.droneLegStartMs >= LEG_MS) {
+      this.droneLegIdx = (this.droneLegIdx + 1) % DRONE_WAYPOINTS.length;
+      this.droneLegStartMs = now;
+    }
+    const from = DRONE_WAYPOINTS[this.droneLegIdx];
+    const to = DRONE_WAYPOINTS[(this.droneLegIdx + 1) % DRONE_WAYPOINTS.length];
+    const t = Math.min(1, (now - this.droneLegStartMs) / LEG_MS);
+    // Ease-in-out cubic so the drone accelerates/decelerates at waypoints.
+    const easeT = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    // Perpendicular bank so the path isn't a straight line — gives the
+    // drone a subtle S-curve between waypoints.
+    const dx = to[0] - from[0];
+    const dy = to[1] - from[1];
+    const perpX = -dy;
+    const perpY = dx;
+    const bank = Math.sin(easeT * Math.PI) * 0.035;
     const drone = {
-      pos: [cx + r * Math.cos(theta), cy + r * Math.sin(theta)] as [number, number],
+      pos: [
+        from[0] + dx * easeT + perpX * bank,
+        from[1] + dy * easeT + perpY * bank,
+      ] as [number, number],
       state: "patrolling",
-      battery_pct: Math.round(70 + 20 * Math.sin(Date.now() / 60_000)),
-      alt_m: 35,
+      battery_pct: Math.round(70 + 20 * Math.sin(now / 60_000)),
+      alt_m: 35 + Math.round(8 * Math.sin(now / 4200)),
     };
 
     this._emit("world.snapshot", {
@@ -285,9 +350,13 @@ export class SkyHerdReplay {
   }
 
   private _startAmbient(): void {
+    // Scale every ambient cadence by current speed — at 1× (speed=3) the
+    // factor is 1.0; faster speeds shrink the interval proportionally.
+    const k = DEFAULT_SPEED / this.speed;
+
     // world.snapshot — 700ms wall (mirrors live 2 s / 3× playback)
     this.intervals.push(
-      setInterval(() => this._emitWorldSnapshot(), 700),
+      setInterval(() => this._emitWorldSnapshot(), 700 * k),
     );
 
     // cost.tick — 1.2 s wall, monotonically increasing total so the ticker animates
@@ -300,7 +369,7 @@ export class SkyHerdReplay {
           total_usd: this.ambientCost,
           cost_usd_hr: 0.17,
         });
-      }, 1200),
+      }, 1200 * k),
     );
 
     // attest.append — 1.1 s wall, incrementing seq so the LEDGER counter climbs
@@ -318,7 +387,7 @@ export class SkyHerdReplay {
           agent,
           ts: Date.now() / 1000,
         });
-      }, 1100),
+      }, 1100 * k),
     );
 
     // memory.written — 2 s wall (MemoryPanel rows flash in)
@@ -334,7 +403,7 @@ export class SkyHerdReplay {
           path: `/patterns/${agent.toLowerCase()}/${hex(4)}`,
           content_sha256: hex(64),
         });
-      }, 2000),
+      }, 2000 * k),
     );
 
     // agent.log — 380ms wall, rotating across all 5 agents
@@ -351,7 +420,7 @@ export class SkyHerdReplay {
           state: "active",
           level: "INFO",
         });
-      }, 380),
+      }, 380 * k),
     );
   }
 
@@ -378,14 +447,14 @@ export class SkyHerdReplay {
         this._emit("scenario.active", {
           name: scenario.name,
           pass_idx: 0,
-          speed: SPEED,
+          speed: this.speed,
           started_at: new Date().toISOString(),
         });
       }, offsetMs);
       this.timeouts.push(activeAt);
 
       for (const ev of scenario.events) {
-        const wallMs = offsetMs + (ev.ts_rel / SPEED) * 1000;
+        const wallMs = offsetMs + (ev.ts_rel / this.speed) * 1000;
         lastTsRel = ev.ts_rel;
         const t = setTimeout(() => {
           // Emit under original event kind + also synthesise compatible
@@ -436,7 +505,7 @@ export class SkyHerdReplay {
       }
 
       // Scenario-end beacon (3 s after the last event).
-      const endMs = offsetMs + (lastTsRel / SPEED) * 1000 + 3000;
+      const endMs = offsetMs + (lastTsRel / this.speed) * 1000 + 3000;
       const endedAt = setTimeout(() => {
         this._emit("scenario.ended", { name: scenario.name });
       }, endMs);

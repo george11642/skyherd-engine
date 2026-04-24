@@ -88,8 +88,38 @@ export function ScenarioStrip({ replay: replayProp }: ScenarioStripProps = {}) {
     if (!replay) return;
     replay.start();
     setOverlayVisible(false);
+    setIsPaused(false);
     setAnnounce("Simulation started");
   }, [replay]);
+
+  const [isPaused, setIsPaused] = useState<boolean>(() =>
+    replay !== null ? replay.isPaused() : false,
+  );
+  const [speedMult, setSpeedMult] = useState<number>(1);
+
+  const togglePause = useCallback(() => {
+    if (!replay) return;
+    if (replay.isPaused()) {
+      replay.start();
+      setIsPaused(false);
+      setAnnounce("Simulation resumed");
+    } else {
+      replay.pause();
+      setIsPaused(true);
+      setAnnounce("Simulation paused");
+    }
+  }, [replay]);
+
+  const changeSpeed = useCallback(
+    (mult: number) => {
+      if (!replay) return;
+      setSpeedMult(mult);
+      // Internal speed scalar: UI 1× = default (3), 2× = 6, 0.5× = 1.5, etc.
+      replay.setSpeed(3 * mult);
+      setAnnounce(`Playback speed ${mult}×`);
+    },
+    [replay],
+  );
 
   return (
     <div className="relative">
@@ -194,30 +224,89 @@ export function ScenarioStrip({ replay: replayProp }: ScenarioStripProps = {}) {
         {announce}
       </div>
 
-      <nav
-        className="flex items-center gap-1 overflow-x-auto"
-        aria-label="Active scenario"
-      >
-        {SCENARIOS.map((s) => {
-          const isActive = active === s.id;
-          return (
+      <div className="flex items-center gap-3">
+        <nav
+          className="flex flex-1 items-center gap-1 overflow-x-auto"
+          aria-label="Active scenario"
+        >
+          {SCENARIOS.map((s) => {
+            const isActive = active === s.id;
+            return (
+              <button
+                key={s.id}
+                className={cn(
+                  "chip shrink-0 cursor-pointer transition-all",
+                  isActive
+                    ? `chip-${s.color} scenario-active`
+                    : "border-[var(--color-line)] text-[var(--color-text-2)] hover:text-[var(--color-text-1)] hover:border-[var(--color-text-2)]",
+                )}
+                onClick={() => setActive(isActive ? null : s.id)}
+                aria-pressed={isActive}
+                aria-label={`Scenario: ${s.label}`}
+              >
+                {s.label}
+              </button>
+            );
+          })}
+        </nav>
+
+        {replay !== null && !overlayVisible && (
+          <div
+            className="flex shrink-0 items-center gap-2"
+            aria-label="Playback controls"
+          >
             <button
-              key={s.id}
+              type="button"
+              onClick={togglePause}
+              aria-pressed={isPaused}
+              aria-label={isPaused ? "Resume simulation" : "Pause simulation"}
+              title={isPaused ? "Resume" : "Pause"}
               className={cn(
-                "chip shrink-0 cursor-pointer transition-all",
-                isActive
-                  ? `chip-${s.color} scenario-active`
-                  : "border-[var(--color-line)] text-[var(--color-text-2)] hover:text-[var(--color-text-1)] hover:border-[var(--color-text-2)]",
+                "flex h-7 w-7 items-center justify-center rounded-full",
+                "border border-[var(--color-line)] text-[var(--color-text-1)]",
+                "transition-colors hover:border-[var(--color-accent-sage)] hover:text-[var(--color-accent-sage)]",
+                "focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent-sage)]",
+                isPaused && "border-[var(--color-accent-sage)] text-[var(--color-accent-sage)]",
               )}
-              onClick={() => setActive(isActive ? null : s.id)}
-              aria-pressed={isActive}
-              aria-label={`Scenario: ${s.label}`}
             >
-              {s.label}
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                {isPaused ? (
+                  <path d="M8 5v14l11-7z" />
+                ) : (
+                  <path d="M6 5h4v14H6zM14 5h4v14h-4z" />
+                )}
+              </svg>
             </button>
-          );
-        })}
-      </nav>
+
+            <div
+              className="flex items-center rounded-full border border-[var(--color-line)] p-0.5"
+              role="group"
+              aria-label="Playback speed"
+            >
+              {[0.5, 1, 2, 4].map((mult) => {
+                const selected = speedMult === mult;
+                return (
+                  <button
+                    key={mult}
+                    type="button"
+                    onClick={() => changeSpeed(mult)}
+                    aria-pressed={selected}
+                    aria-label={`${mult}× playback speed`}
+                    className={cn(
+                      "min-w-[2.25rem] rounded-full px-2 py-0.5 font-mono text-[0.6875rem] transition-colors",
+                      selected
+                        ? "bg-[var(--color-accent-sage)] text-[#0a0c10]"
+                        : "text-[var(--color-text-2)] hover:text-[var(--color-text-1)]",
+                    )}
+                  >
+                    {mult}×
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
