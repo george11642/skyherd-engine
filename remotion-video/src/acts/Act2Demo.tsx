@@ -190,6 +190,13 @@ const BeatEstablish = () => {
   // Vertical pan via CSS transform.
   const translateY = interpolate(frame, [0, durationInFrames], [0, -120]);
 
+  // Fade in from black over first 25 frames so the Act1→Act2 cut
+  // cross-dissolves with Act1's final hold frame.
+  const fadeIn = interpolate(frame, [0, 25], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+
   const titleProgress = interpolate(frame, [40, 90], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
@@ -198,7 +205,7 @@ const BeatEstablish = () => {
   const titleY = interpolate(titleProgress, [0, 1], [30, 0]);
 
   return (
-    <AbsoluteFill style={{ backgroundColor: "rgb(8 10 14)" }}>
+    <AbsoluteFill style={{ backgroundColor: "rgb(8 10 14)", opacity: fadeIn }}>
       <Audio src={staticFile("voiceover/wes-establish.mp3")} />
       <div
         style={{
