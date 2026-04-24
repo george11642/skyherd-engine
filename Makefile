@@ -1,4 +1,4 @@
-.PHONY: setup sim demo dashboard dashboard-mock test lint format typecheck clean ci sitl-up sitl-down bus-up bus-down mesh-smoke one-pager hardware-demo hardware-demo-sim hardware-demo-sim-down h2-smoke h3-smoke mavic-bridge f3-bridge drone-smoke sitl-smoke determinism-3x gate-check voice-demo
+.PHONY: setup sim demo dashboard dashboard-mock test lint format typecheck clean ci sitl-up sitl-down bus-up bus-down mesh-smoke one-pager hardware-demo hardware-demo-sim hardware-demo-sim-down h2-smoke h3-smoke h4-smoke h4-docs mavic-bridge f3-bridge drone-smoke sitl-smoke determinism-3x gate-check voice-demo rehearsal record-ready preflight
 
 SEED ?= 42
 SCENARIO ?= all
@@ -120,3 +120,53 @@ h2-smoke:  ## Fast unit-level smoke of the H2 chain (<5s, no docker)
 
 h3-smoke:  ## Fast unit-level smoke of the H3 Mavic DJI replay chain (<2s, no drone)
 	uv run pytest tests/hardware/test_h3_dji_replay.py -v --no-cov
+
+# ---------------------------------------------------------------------------
+# Phase 8 (H4): DIY LoRa GPS collar + ChirpStack bridge smoke
+# ---------------------------------------------------------------------------
+
+h4-smoke:  ## Fast unit+integration smoke of the H4 collar -> bridge chain (<2s, no collar)
+	uv run pytest tests/hardware/test_h4_chirpstack_bridge.py tests/hardware/test_h4_end_to_end.py tests/sensors/test_collar_sim.py -v --no-cov
+
+h4-docs:  ## Print path to the H4 runbook
+	@echo "H4 runbook: docs/HARDWARE_H4_RUNBOOK.md"
+	@echo "H4 BOM:     hardware/collar/BOM.md"
+	@echo "H4 flash:   hardware/collar/flash.sh --help"
+
+# ---------------------------------------------------------------------------
+# Phase 9: Demo video rehearsal + record-ready preflight + preflight E2E
+# See docs/DEMO_VIDEO_SCRIPT.md for the scrub-points these targets surface.
+# ---------------------------------------------------------------------------
+
+rehearsal:  ## VIDEO-06: loop make demo SEED=$(SEED) SCENARIO=$(SCENARIO) for voiceover practice (Ctrl-C to stop)
+	@echo "=== SkyHerd rehearsal loop — press Ctrl-C to stop ==="
+	@echo "Seed=$(SEED)  Scenario=$(SCENARIO)"
+	@while true; do \
+		$(MAKE) demo SEED=$(SEED) SCENARIO=$(SCENARIO) || break; \
+		echo "--- loop: restarting in 2s (Ctrl-C to stop) ---"; \
+		sleep 2; \
+	done
+
+record-ready:  ## VIDEO-06: pre-shoot preflight — warm dashboard, print scrub-points, launch at :8000
+	@echo "=== SkyHerd record-ready preflight ==="
+	@echo "[1/4] Checking dashboard build artifacts..."
+	@if [ ! -f web/dist/index.html ]; then \
+		echo "    Dashboard not built — building now"; \
+		(cd web && (pnpm install --frozen-lockfile || pnpm install) && pnpm run build); \
+	else \
+		echo "    OK — web/dist/index.html present"; \
+	fi
+	@echo "[2/4] Seed determinism sanity check (coyote scenario)..."
+	@uv run skyherd-demo play coyote --seed $(SEED) >/dev/null 2>&1 \
+		&& echo "    OK — coyote scenario runs clean" \
+		|| echo "    WARN — coyote scenario exit non-zero (inspect separately)"
+	@echo "[3/4] Scrub-points from docs/DEMO_VIDEO_SCRIPT.md:"
+	@grep -E '^### [0-9]+:[0-9]+ ' docs/DEMO_VIDEO_SCRIPT.md 2>/dev/null | head -20 || echo "    (script not yet present)"
+	@echo "[4/4] Launching dashboard at http://localhost:8000"
+	@echo ""
+	@echo "=== READY TO RECORD ==="
+	@echo "Silence system notifications now. Ctrl-C the dashboard when finished."
+	uv run python -m skyherd.server.live --port 8000 --host 127.0.0.1 --seed $(SEED)
+
+preflight:  ## PF-04: run the Phase 9 preflight E2E suite (<30s, fully mocked)
+	uv run pytest tests/hardware/test_preflight_e2e.py -v --no-cov --timeout=60
