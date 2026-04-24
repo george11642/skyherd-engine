@@ -152,7 +152,8 @@
 
 ## Deliverables (7)
 
-- [ ] 3-min demo video (YouTube unlisted)
+- [x] 3-min demo video — v1 guaranteed sim-first video: **DONE** (commit {FINAL_COMMIT_HASH}, see docs/DEMO_VIDEO_AUTOMATION.md)
+- [ ] v2 hybrid hardware video: **PENDING Fri shoot**
 - [x] `docs/ARCHITECTURE.md` — tier-MVP architecture map
 - [x] `docs/MANAGED_AGENTS.md` — $5k prize essay for judges
 - [x] `docs/ONE_PAGER.pdf` — judge one-pager (md + pdf, weasyprint, 24 KB)

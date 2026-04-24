@@ -1,4 +1,4 @@
-.PHONY: setup sim demo dashboard dashboard-mock test lint format typecheck clean ci sitl-up sitl-down bus-up bus-down mosquitto-up mosquitto-down mesh-smoke one-pager hardware-demo hardware-demo-sim hardware-demo-sim-down h2-smoke h3-smoke h4-smoke h4-docs mavic-bridge f3-bridge drone-smoke sitl-smoke determinism-3x gate-check voice-demo rehearsal record-ready preflight laptop-drone-smoke edge-pi-setup video-record-clips
+.PHONY: setup sim demo dashboard dashboard-mock test lint format typecheck clean ci sitl-up sitl-down bus-up bus-down mosquitto-up mosquitto-down mesh-smoke one-pager hardware-demo hardware-demo-sim hardware-demo-sim-down h2-smoke h3-smoke h4-smoke h4-docs mavic-bridge f3-bridge drone-smoke sitl-smoke determinism-3x gate-check voice-demo rehearsal record-ready preflight laptop-drone-smoke edge-pi-setup video-record-clips video-pipeline video-iterate video-render
 
 SEED ?= 42
 SCENARIO ?= all
@@ -176,6 +176,28 @@ preflight:  ## PF-04: run the Phase 9 preflight E2E suite (<30s, fully mocked)
 
 video-record-clips:  ## Record 7+2 dashboard clips for Remotion composition (needs `make record-ready` running)
 	uv run --with playwright python scripts/record_dashboard.py --all
+
+# ---------------------------------------------------------------------------
+# Phase 7 (demo video automation): autonomous 3-min sim-first demo video.
+# See docs/DEMO_VIDEO_AUTOMATION.md for architecture + submission decision tree.
+# ---------------------------------------------------------------------------
+
+video-pipeline:  ## VIDEO-FULL: end-to-end — audio → clips → composition → render → package
+	@bash scripts/render_vo_phase1.sh
+	@$(MAKE) video-record-clips
+	@cd remotion-video && pnpm install && pnpm run render
+	@bash scripts/video_iterate.sh  # (Phase 5 loop — 6-iter cap)
+	@$(MAKE) video-render
+
+# TODO: scripts/video_iterate.sh produced by Phase 5 agent
+video-iterate:  ## VIDEO-ITER: dual-vision iteration loop (cap 6)
+	@bash scripts/video_iterate.sh
+
+video-render:  ## VIDEO-FINAL: render 1080p60 + loudnorm to -16 LUFS
+	@cd remotion-video && pnpm run render
+	@ffmpeg -y -i remotion-video/out/skyherd-demo.mp4 -af loudnorm=I=-16:TP=-1:LRA=11 -c:v copy docs/demo-assets/video/skyherd-demo-v1-sim-first.mp4
+	@ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 docs/demo-assets/video/skyherd-demo-v1-sim-first.mp4
+	@ls -lh docs/demo-assets/video/skyherd-demo-v1-sim-first.mp4
 
 # ---------------------------------------------------------------------------
 # Phase 7.1: Laptop-as-drone-controller (no-mobile-app path)
