@@ -387,6 +387,7 @@ async def _run_async_shared(
     speed: float = 15.0,
     assert_outcome: bool = False,
     dry_run: bool = False,
+    broadcaster: Any | None = None,
 ) -> ScenarioResult:
     """Run *scenario* against caller-provided ``world`` / ``ledger`` / ``mesh``.
 
@@ -422,6 +423,22 @@ async def _run_async_shared(
     throttle = speed > 0
     sleep_dt = _STEP_DT / speed if throttle else 0.0
 
+    # Emit scenario.active bookend (sim-time=0) if a broadcaster is present.
+    if broadcaster is not None:
+        try:
+            broadcaster._broadcast(
+                "scenario.active",
+                {
+                    "name": scenario.name,
+                    "sim_time_s": 0.0,
+                    "seed": seed,
+                    "speed": speed,
+                    "duration_s": scenario.duration_s,
+                },
+            )
+        except Exception as exc:  # noqa: BLE001
+            logger.debug("broadcaster.scenario.active failed: %s", exc)
+
     if not dry_run:
         elapsed = 0.0
         while elapsed < scenario.duration_s:
@@ -449,6 +466,21 @@ async def _run_async_shared(
                 await asyncio.sleep(sleep_dt)
 
     wall_time_s = time.monotonic() - wall_start
+
+    # Emit scenario.ended bookend with final sim-time.
+    if broadcaster is not None:
+        try:
+            broadcaster._broadcast(
+                "scenario.ended",
+                {
+                    "name": scenario.name,
+                    "sim_time_s": scenario.duration_s,
+                    "outcome": "passed",
+                    "seed": seed,
+                },
+            )
+        except Exception as exc:  # noqa: BLE001
+            logger.debug("broadcaster.scenario.ended failed: %s", exc)
 
     # Collect attestation entries
     attest_entries = [e.model_dump() for e in ledger.iter_events()]
