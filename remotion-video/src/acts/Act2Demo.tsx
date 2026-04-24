@@ -434,9 +434,11 @@ const BeatSynthesis = () => {
     },
   ];
 
+  // Extended fade-out (45 frames / 1.5 s) for a deeper cross-dissolve into
+  // Act 3 BeatAttest (which also extends its fade-in to 35 frames).
   const fadeOut = interpolate(
     frame,
-    [durationInFrames - 30, durationInFrames],
+    [durationInFrames - 45, durationInFrames],
     [1, 0],
     { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
   );
@@ -620,7 +622,7 @@ export const Act2Demo = ({ voDurationsFrames }: Act2Props) => {
           <BeatScenario
             clipName="coyote.mp4"
             voFile="voiceover/wes-coyote.mp3"
-            voStartFrame={300}
+            voStartFrame={150}
             agent="FenceLineDispatcher"
             detail="Coyote · 91% confidence · Fence W-12 · Mavic dispatched"
             accent="thermal"
@@ -634,7 +636,7 @@ export const Act2Demo = ({ voDurationsFrames }: Act2Props) => {
           <BeatScenario
             clipName="sick_cow.mp4"
             voFile="voiceover/wes-sick-cow.mp3"
-            voStartFrame={300}
+            voStartFrame={150}
             agent="HerdHealthWatcher"
             detail="Cow A014 · pinkeye 83% · Vet packet generated"
             accent="warn"
@@ -662,7 +664,7 @@ export const Act2Demo = ({ voDurationsFrames }: Act2Props) => {
           <BeatScenario
             clipName="calving.mp4"
             voFile="voiceover/wes-calving.mp3"
-            voStartFrame={300}
+            voStartFrame={150}
             agent="CalvingWatch"
             detail="Cow 117 · pre-labor · Rancher paged (priority)"
             accent="sage"
@@ -676,7 +678,7 @@ export const Act2Demo = ({ voDurationsFrames }: Act2Props) => {
           <BeatScenario
             clipName="storm.mp4"
             voFile="voiceover/wes-storm.mp3"
-            voStartFrame={300}
+            voStartFrame={150}
             agent="Weather-Redirect"
             detail="Hail ETA 45 min · Paddock B → Shelter 2"
             accent="dust"

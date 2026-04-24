@@ -94,14 +94,17 @@ export const Main = ({ actDurations, voDurationsFrames }: MainProps) => {
   const scenarioStart = (index: number) =>
     act2Start + act2EstablishFrames + index * scenarioFrames;
 
-  const coyoteVoStart = scenarioStart(0) + 300;
+  // VO now starts 5 s into each 14 s scenario (was 10 s) so it lands closer
+  // to the visual cue — Gemini flagged the long pre-VO silence as awkward.
+  const SCENARIO_VO_OFFSET = 150;
+  const coyoteVoStart = scenarioStart(0) + SCENARIO_VO_OFFSET;
   const coyoteVoEnd = coyoteVoStart + voDurationsFrames.coyote;
-  const sickCowVoStart = scenarioStart(1) + 300;
+  const sickCowVoStart = scenarioStart(1) + SCENARIO_VO_OFFSET;
   const sickCowVoEnd = sickCowVoStart + voDurationsFrames.sickCow;
   // (water scenario has no dedicated VO, lower-third only)
-  const calvingVoStart = scenarioStart(3) + 300;
+  const calvingVoStart = scenarioStart(3) + SCENARIO_VO_OFFSET;
   const calvingVoEnd = calvingVoStart + voDurationsFrames.calving;
-  const stormVoStart = scenarioStart(4) + 300;
+  const stormVoStart = scenarioStart(4) + SCENARIO_VO_OFFSET;
   const stormVoEnd = stormVoStart + voDurationsFrames.storm;
 
   const synthesisStart = scenarioStart(5);

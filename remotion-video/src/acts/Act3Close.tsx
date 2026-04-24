@@ -23,7 +23,10 @@ const BeatAttest = () => {
   const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
 
-  const fadeIn = interpolate(frame, [0, 20], [0, 1], {
+  // Extended fade-in (35 frames) to cross-dissolve with Act 2 BeatSynthesis's
+  // 45-frame fade-out — makes the Act 2→3 boundary feel like one breath
+  // instead of a hard cut.
+  const fadeIn = interpolate(frame, [0, 35], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
