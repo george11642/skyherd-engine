@@ -235,22 +235,44 @@ const BeatWhy = () => {
     <AbsoluteFill style={{ backgroundColor: "rgb(6 8 12)" }}>
       <Audio src={staticFile("voiceover/wes-why.mp3")} />
 
-      {/* Ken-Burns gradient backdrop */}
+      {/* Re-use ambient establish clip (dashboard pan) as Ken-Burns backdrop,
+          heavily tinted + blurred so it reads as textured ranch atmosphere
+          rather than UI. Stops the flat CSS-only look. */}
       <div
         style={{
           position: "absolute",
           inset: -80,
           transform: `scale(${scale}) translateX(${panX}px)`,
-          background:
-            "radial-gradient(circle at 30% 45%, rgba(210,178,138,0.28) 0%, rgba(148,176,136,0.12) 35%, rgba(10,12,16,1) 75%)",
-          opacity,
+          opacity: opacity * 0.45,
+          filter: "blur(6px) saturate(0.55) brightness(0.8) hue-rotate(-10deg)",
         }}
-      />
-      {/* Grain-like noise via second gradient */}
+      >
+        <Video
+          src={staticFile("clips/ambient_establish.mp4")}
+          startFrom={60}
+          endAt={450}
+          muted
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+          }}
+        />
+      </div>
+      {/* Warm sage+dust radial wash on top of the clip */}
       <AbsoluteFill
         style={{
           background:
-            "linear-gradient(180deg, rgba(6,8,12,0.2) 0%, rgba(6,8,12,0.65) 100%)",
+            "radial-gradient(circle at 30% 45%, rgba(210,178,138,0.32) 0%, rgba(148,176,136,0.14) 40%, rgba(10,12,16,0.92) 78%)",
+          opacity,
+          mixBlendMode: "screen",
+        }}
+      />
+      {/* Darken bottom third so text reads */}
+      <AbsoluteFill
+        style={{
+          background:
+            "linear-gradient(180deg, rgba(6,8,12,0.25) 0%, rgba(6,8,12,0.78) 100%)",
           opacity,
         }}
       />
@@ -262,7 +284,8 @@ const BeatWhy = () => {
           right: 0,
           top: "62%",
           height: 1,
-          backgroundColor: "rgba(210,178,138,0.22)",
+          backgroundColor: "rgba(210,178,138,0.28)",
+          boxShadow: "0 0 18px rgba(210,178,138,0.22)",
           opacity,
         }}
       />

@@ -203,7 +203,8 @@ const Beat3George = ({ voDurationsFrames }: Act1Props) => {
           style={{
             display: "flex",
             flexWrap: "wrap",
-            gap: "0.55ch",
+            columnGap: "0.9em",
+            rowGap: "0.25em",
             justifyContent: "center",
             maxWidth: 1400,
           }}
@@ -232,15 +233,16 @@ const Beat3George = ({ voDurationsFrames }: Act1Props) => {
                   display: "inline-block",
                   fontFamily: "Inter, sans-serif",
                   fontWeight: 700,
-                  fontSize: 88,
-                  lineHeight: 1.05,
+                  fontSize: 78,
+                  lineHeight: 1.08,
                   color: isAccent
                     ? "rgb(210 178 138)"
                     : "rgb(236 239 244)",
                   transform: `translateY(${translateY}px)`,
                   opacity,
-                  letterSpacing: "-0.02em",
+                  letterSpacing: "-0.025em",
                   textShadow: "0 4px 28px rgba(0,0,0,0.55)",
+                  whiteSpace: "nowrap",
                 }}
               >
                 {word}

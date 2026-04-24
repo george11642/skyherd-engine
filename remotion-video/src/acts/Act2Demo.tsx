@@ -2,6 +2,7 @@ import {
   AbsoluteFill,
   Audio,
   Easing,
+  Loop,
   Sequence,
   Series,
   Video,
@@ -208,8 +209,8 @@ const BeatEstablish = () => {
       >
         <Video
           src={staticFile("clips/ambient_establish.mp4")}
-          startFrom={150}
-          endAt={540}
+          startFrom={100}
+          endAt={490}
           muted
           style={{
             width: "100%",
@@ -437,18 +438,22 @@ const BeatSynthesis = () => {
     <AbsoluteFill style={{ backgroundColor: "rgb(8 10 14)" }}>
       <Audio src={staticFile("voiceover/wes-synthesis.mp3")} />
       <div style={{ width: "100%", height: "100%", opacity: fadeOut }}>
-        <Video
-          src={staticFile("clips/ambient_30x_synthesis.mp4")}
-          startFrom={0}
-          endAt={960}
-          muted
-          style={{
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-            filter: "saturate(0.9)",
-          }}
-        />
+        {/* Clip is only 531 frames (17.7 s) but synthesis slot is ~960 frames
+            (32 s). Loop the clip so we never freeze on its last frame. */}
+        <Loop durationInFrames={520}>
+          <Video
+            src={staticFile("clips/ambient_30x_synthesis.mp4")}
+            startFrom={0}
+            endAt={520}
+            muted
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              filter: "saturate(0.9)",
+            }}
+          />
+        </Loop>
       </div>
       <AbsoluteFill
         style={{

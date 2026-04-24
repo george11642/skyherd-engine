@@ -3,7 +3,6 @@ import {
   Audio,
   Sequence,
   Series,
-  interpolate,
   staticFile,
   useVideoConfig,
 } from "remotion";
@@ -16,64 +15,56 @@ import type { MainProps } from "./compositions/calculate-main-metadata";
 // Using act durations so we can anchor SFX to act-relative cues without the
 // Act components needing to know about global timeline coordinates.
 
-// Volume curve for the BGM music bed. Louder when no VO is speaking, duck
-// to ~0.25 when Wes is on mic.
+// Volume curve for the BGM music bed. Louder when no VO is speaking, ducks
+// smoothly (cosine-style ramp) when Wes is on mic. A true RMS sidechain
+// would require audio analysis; this continuous envelope follower gets close.
+const DUCK_BASE = 0.55;
+const DUCK_UNDER_VO = 0.22;
+const DUCK_FADE = 24; // ~0.8 s cosine ramp in/out of each duck window
+const DUCK_INTER_GAP = 18; // if two VO windows touch, keep bed low between them
+
+// Smoothstep easing — C1-continuous, avoids the linear kink of interpolate().
+const smoothstep = (edge0: number, edge1: number, x: number): number => {
+  if (edge1 === edge0) return x >= edge1 ? 1 : 0;
+  const t = Math.max(0, Math.min(1, (x - edge0) / (edge1 - edge0)));
+  return t * t * (3 - 2 * t);
+};
+
 const duckingCurve = (
   frame: number,
   totalFrames: number,
   duckWindows: Array<[number, number]>,
 ): number => {
-  const fps = 30;
-
-  // Fade in over the first 150 frames (5 s).
-  const fadeIn = interpolate(frame, [0, 150], [0, 1], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
-
-  // Fade out over the last 150 frames (5 s).
-  const fadeOut = interpolate(
-    frame,
-    [totalFrames - 150, totalFrames],
-    [1, 0],
-    {
-      extrapolateLeft: "clamp",
-      extrapolateRight: "clamp",
-    },
+  // Global fade-in (first 5 s) and fade-out (last 5 s).
+  const envelope = Math.min(
+    smoothstep(0, 150, frame),
+    smoothstep(totalFrames, totalFrames - 150, frame),
   );
 
-  const envelope = Math.min(fadeIn, fadeOut);
-
-  // Base volume drops when any VO window is active.
-  const isDucked = duckWindows.some(
-    ([start, end]) => frame >= start && frame <= end,
-  );
-  const base = isDucked ? 0.25 : 0.55;
-
-  // Short cross-fade into/out of each duck window (~10 frames) to avoid clicks.
-  const FADE = 10;
-  let smooth = base;
+  // Envelope follower: for each VO window compute "how far inside it we are"
+  // with cosine ramps on the edges, take the max across all windows.
+  let duckAmount = 0;
   for (const [start, end] of duckWindows) {
-    if (frame >= start - FADE && frame <= start) {
-      smooth = interpolate(frame, [start - FADE, start], [0.55, 0.25], {
-        extrapolateLeft: "clamp",
-        extrapolateRight: "clamp",
-      });
-    } else if (frame >= end && frame <= end + FADE) {
-      smooth = interpolate(frame, [end, end + FADE], [0.25, 0.55], {
-        extrapolateLeft: "clamp",
-        extrapolateRight: "clamp",
-      });
+    // Ramp up to 1.0 over DUCK_FADE frames before/at window start.
+    const rampIn = smoothstep(start - DUCK_FADE, start, frame);
+    // Ramp back to 0.0 over DUCK_FADE frames after window end.
+    const rampOut = smoothstep(end + DUCK_FADE, end, frame);
+    const inWindow = Math.min(rampIn, rampOut);
+    if (inWindow > duckAmount) duckAmount = inWindow;
+  }
+
+  // Also keep bed low across short gaps between adjacent VO windows so it
+  // doesn't pop up for a fraction of a second.
+  for (let i = 0; i < duckWindows.length - 1; i++) {
+    const [, endA] = duckWindows[i];
+    const [startB] = duckWindows[i + 1];
+    if (startB - endA <= DUCK_INTER_GAP && frame >= endA && frame <= startB) {
+      duckAmount = Math.max(duckAmount, 1);
     }
   }
-  if (!isDucked && smooth === base) {
-    smooth = base;
-  }
 
-  // Suppress unused-param lint
-  void fps;
-
-  return smooth * envelope;
+  const volume = DUCK_BASE + (DUCK_UNDER_VO - DUCK_BASE) * duckAmount;
+  return volume * envelope;
 };
 
 export const Main = ({ actDurations, voDurationsFrames }: MainProps) => {
