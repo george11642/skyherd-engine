@@ -235,60 +235,88 @@ const BeatWhy = () => {
     <AbsoluteFill style={{ backgroundColor: "rgb(6 8 12)" }}>
       <Audio src={staticFile("voiceover/wes-why.mp3")} />
 
-      {/* Re-use ambient establish clip (dashboard pan) as Ken-Burns backdrop,
-          heavily tinted + blurred so it reads as textured ranch atmosphere
-          rather than UI. Stops the flat CSS-only look. */}
+      {/* Layered gradient sky/land backdrop — reads as open country at dusk,
+          no UI artifacts. Top half: warm indigo sky with sage-dust glow near
+          horizon. Bottom half: dark dust/earth wash. Subtle Ken-Burns zoom. */}
       <div
         style={{
           position: "absolute",
           inset: -80,
           transform: `scale(${scale}) translateX(${panX}px)`,
-          opacity: opacity * 0.45,
-          filter: "blur(6px) saturate(0.55) brightness(0.8) hue-rotate(-10deg)",
+          opacity,
         }}
       >
-        <Video
-          src={staticFile("clips/ambient_establish.mp4")}
-          startFrom={60}
-          endAt={450}
-          muted
+        {/* Sky layer */}
+        <AbsoluteFill
           style={{
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
+            background:
+              "linear-gradient(180deg, rgb(18 22 34) 0%, rgb(34 32 44) 38%, rgb(90 72 56) 62%, rgb(42 38 38) 72%, rgb(16 16 20) 100%)",
+          }}
+        />
+        {/* Sun-glow on horizon */}
+        <AbsoluteFill
+          style={{
+            background:
+              "radial-gradient(ellipse 60% 24% at 32% 62%, rgba(242,195,120,0.55) 0%, rgba(210,150,90,0.22) 40%, rgba(10,12,16,0) 70%)",
+            mixBlendMode: "screen",
+          }}
+        />
+        {/* Sage atmosphere */}
+        <AbsoluteFill
+          style={{
+            background:
+              "radial-gradient(ellipse 75% 50% at 70% 40%, rgba(148,176,136,0.18) 0%, rgba(148,176,136,0) 60%)",
+            mixBlendMode: "screen",
+          }}
+        />
+        {/* Earth-darken bottom */}
+        <AbsoluteFill
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(6,8,12,0) 55%, rgba(6,8,12,0.85) 100%)",
+          }}
+        />
+        {/* SVG grain/turbulence — breaks the flat gradient appearance, gives
+            a photographic film-grain texture so the frame doesn't look like
+            pure CSS. */}
+        <svg
+          width="100%"
+          height="100%"
+          style={{
+            position: "absolute",
+            inset: 0,
+            mixBlendMode: "overlay",
+            opacity: 0.35,
+          }}
+        >
+          <filter id="why-grain">
+            <feTurbulence
+              type="fractalNoise"
+              baseFrequency="0.9"
+              numOctaves="2"
+              stitchTiles="stitch"
+            />
+            <feColorMatrix
+              type="matrix"
+              values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.55 0"
+            />
+          </filter>
+          <rect width="100%" height="100%" filter="url(#why-grain)" />
+        </svg>
+        {/* Soft distant ridge silhouette for ranch depth */}
+        <div
+          style={{
+            position: "absolute",
+            left: 0,
+            right: 0,
+            bottom: "30%",
+            height: 2,
+            background:
+              "linear-gradient(90deg, rgba(42,42,48,0) 0%, rgba(42,42,48,0.7) 25%, rgba(60,48,42,0.8) 50%, rgba(42,42,48,0.7) 75%, rgba(42,42,48,0) 100%)",
+            filter: "blur(1px)",
           }}
         />
       </div>
-      {/* Warm sage+dust radial wash on top of the clip */}
-      <AbsoluteFill
-        style={{
-          background:
-            "radial-gradient(circle at 30% 45%, rgba(210,178,138,0.32) 0%, rgba(148,176,136,0.14) 40%, rgba(10,12,16,0.92) 78%)",
-          opacity,
-          mixBlendMode: "screen",
-        }}
-      />
-      {/* Darken bottom third so text reads */}
-      <AbsoluteFill
-        style={{
-          background:
-            "linear-gradient(180deg, rgba(6,8,12,0.25) 0%, rgba(6,8,12,0.78) 100%)",
-          opacity,
-        }}
-      />
-      {/* Horizon line */}
-      <div
-        style={{
-          position: "absolute",
-          left: 0,
-          right: 0,
-          top: "62%",
-          height: 1,
-          backgroundColor: "rgba(210,178,138,0.28)",
-          boxShadow: "0 0 18px rgba(210,178,138,0.22)",
-          opacity,
-        }}
-      />
 
       {/* Stacked lines */}
       <AbsoluteFill
