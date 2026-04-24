@@ -369,3 +369,41 @@ h1, h2, .display {
 .btn-danger:hover:not(:disabled) {
   background: rgb(224 100 90 / 0.25);
 }
+
+.skyherd-speed-slider {
+  background: linear-gradient(
+    to right,
+    var(--color-accent-sage) 0%,
+    var(--color-accent-sage) calc(var(--fill, 13) * 1%),
+    rgba(255, 255, 255, 0.08) calc(var(--fill, 13) * 1%),
+    rgba(255, 255, 255, 0.08) 100%
+  );
+}
+.skyherd-speed-slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 9999px;
+  background: var(--color-text-1);
+  border: 2px solid var(--color-accent-sage);
+  cursor: pointer;
+  transition: transform 0.1s ease;
+  box-shadow: 0 0 0 2px rgba(148, 176, 136, 0.15);
+}
+.skyherd-speed-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+  box-shadow: 0 0 0 3px rgba(148, 176, 136, 0.25);
+}
+.skyherd-speed-slider::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: 9999px;
+  background: var(--color-text-1);
+  border: 2px solid var(--color-accent-sage);
+  cursor: pointer;
+  box-shadow: 0 0 0 2px rgba(148, 176, 136, 0.15);
+}
+.skyherd-speed-slider:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--color-accent-sage);
+}

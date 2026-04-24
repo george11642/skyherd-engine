@@ -135,7 +135,8 @@ export function ScenarioStrip({ replay: replayProp }: ScenarioStripProps = {}) {
       setSpeedMult(mult);
       // Internal speed scalar: UI 1× = default (3), 2× = 6, 0.5× = 1.5, etc.
       replay.setSpeed(3 * mult);
-      setAnnounce(`Playback speed ${mult}×`);
+      const label = mult < 10 ? mult.toFixed(1) : Math.round(mult).toString();
+      setAnnounce(`Playback speed ${label}×`);
     },
     [replay],
   );
@@ -298,30 +299,38 @@ export function ScenarioStrip({ replay: replayProp }: ScenarioStripProps = {}) {
             </button>
 
             <div
-              className="flex items-center rounded-full border border-[var(--color-line)] p-0.5"
+              className="flex items-center gap-2 rounded-full border border-[var(--color-line)] px-3 py-1"
               role="group"
               aria-label="Playback speed"
             >
-              {[0.5, 1, 2, 4].map((mult) => {
-                const selected = speedMult === mult;
-                return (
-                  <button
-                    key={mult}
-                    type="button"
-                    onClick={() => changeSpeed(mult)}
-                    aria-pressed={selected}
-                    aria-label={`${mult}× playback speed`}
-                    className={cn(
-                      "min-w-[2.25rem] rounded-full px-2 py-0.5 font-mono text-[0.6875rem] transition-colors",
-                      selected
-                        ? "bg-[var(--color-accent-sage)] text-[#0a0c10]"
-                        : "text-[var(--color-text-2)] hover:text-[var(--color-text-1)]",
-                    )}
-                  >
-                    {mult}×
-                  </button>
+              {(() => {
+                const sliderValue = Math.round(
+                  (Math.log(speedMult / 0.5) / Math.log(200)) * 100,
                 );
-              })}
+                return (
+                  <input
+                    type="range"
+                    min={0}
+                    max={100}
+                    step={1}
+                    value={sliderValue}
+                    onChange={(e) => {
+                      const v = Number(e.target.value);
+                      const mult = 0.5 * Math.pow(200, v / 100);
+                      changeSpeed(mult);
+                    }}
+                    aria-label="Playback speed slider (0.5× to 100×)"
+                    className="skyherd-speed-slider h-1 w-28 cursor-pointer appearance-none rounded-full"
+                    style={{ ["--fill" as string]: sliderValue }}
+                  />
+                );
+              })()}
+              <span
+                className="min-w-[3.25rem] text-right font-mono text-[0.6875rem] tabular-nums text-[var(--color-text-1)]"
+                aria-live="off"
+              >
+                {speedMult < 10 ? speedMult.toFixed(1) : Math.round(speedMult)}×
+              </span>
             </div>
           </div>
         )}
