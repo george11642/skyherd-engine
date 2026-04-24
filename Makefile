@@ -138,14 +138,10 @@ h4-docs:  ## Print path to the H4 runbook
 # See docs/DEMO_VIDEO_SCRIPT.md for the scrub-points these targets surface.
 # ---------------------------------------------------------------------------
 
-rehearsal:  ## VIDEO-06: loop make demo SEED=$(SEED) SCENARIO=$(SCENARIO) for voiceover practice (Ctrl-C to stop)
+rehearsal:  ## VIDEO-06: loop `skyherd-demo play` SCENARIO=$(SCENARIO) SEED=$(SEED) for voiceover practice (Ctrl-C to stop)
 	@echo "=== SkyHerd rehearsal loop — press Ctrl-C to stop ==="
-	@echo "Seed=$(SEED)  Scenario=$(SCENARIO)"
-	@while true; do \
-		$(MAKE) demo SEED=$(SEED) SCENARIO=$(SCENARIO) || break; \
-		echo "--- loop: restarting in 2s (Ctrl-C to stop) ---"; \
-		sleep 2; \
-	done
+	@echo "Seed=$(SEED)  Scenario=$(SCENARIO)  (target: demo)"
+	@scripts/rehearsal-loop.sh $(SEED) $(SCENARIO)
 
 record-ready:  ## VIDEO-06: pre-shoot preflight — warm dashboard, print scrub-points, launch at :8000
 	@echo "=== SkyHerd record-ready preflight ==="
