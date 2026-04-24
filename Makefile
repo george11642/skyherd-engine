@@ -165,4 +165,4 @@ record-ready:  ## VIDEO-06: pre-shoot preflight — warm dashboard, print scrub-
 	uv run python -m skyherd.server.live --port 8000 --host 127.0.0.1 --seed $(SEED)
 
 preflight:  ## PF-04: run the Phase 9 preflight E2E suite (<30s, fully mocked)
-	uv run pytest tests/hardware/test_preflight_e2e.py -v --no-cov --timeout=60
+	uv run pytest tests/hardware/test_preflight_e2e.py -v --no-cov

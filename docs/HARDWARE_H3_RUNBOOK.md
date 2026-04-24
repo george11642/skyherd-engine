@@ -198,3 +198,87 @@ uv run pytest tests/drone tests/hardware -v
 
 _See also: `docs/H3_DJI_AUDIT.md`, `docs/MAVIC_MISSION_SCHEMA.md`,
 `docs/HARDWARE_MAVIC_PROTOCOL.md`, `docs/HARDWARE_H2_RUNBOOK.md`._
+
+---
+
+## 9. Companion App APK Download (Phase 9 · 2026-04-24)
+
+**For Friday morning plug-in.** Two paths — primary (CI artifact) and
+fallback (local build). The local build is always available and requires no
+CI state, so it is safe to use as the default.
+
+### Path A — GitHub Actions APK artifact (primary, when available)
+
+Workflow: `.github/workflows/android-app.yml` (runs on every push to
+`android/**`).
+
+1. Confirm a recent run exists:
+   ```bash
+   gh run list --workflow=android-app.yml --repo george11642/skyherd-engine --limit 3
+   ```
+2. Download the latest artifact:
+   ```bash
+   gh run download --repo george11642/skyherd-engine \
+       --name skyherd-companion-android-apk \
+       --dir ~/Downloads/skyherd-apk
+   ```
+3. Install on phone:
+   ```bash
+   adb install ~/Downloads/skyherd-apk/app-debug.apk
+   ```
+
+**Web UI URL pattern:**
+`https://github.com/george11642/skyherd-engine/actions/runs/<RUN_ID>/artifacts`
+
+**Status as of 2026-04-24 (Phase 9 audit):** The `android-app.yml` and
+`ios-app.yml` workflows are committed in this working tree but may not have
+been pushed to `origin/main` yet — the workflow list on the GitHub side only
+showed `ci`, `collar-firmware`, `fresh-clone-smoke`, `lighthouse` at the
+time of the audit. **Friday prep:** after `git push origin main`, the first
+push that touches `android/**` will trigger the build automatically; watch
+`Actions` → `Android Companion App Build` and grab the APK from the artifact
+tab. No workflow edits are required.
+
+### Path B — Local build (fallback, always works)
+
+Takes ~3 minutes on a laptop with JDK 17 + Android SDK installed. Zero CI
+dependencies.
+
+```bash
+cd android/SkyHerdCompanion
+
+# Generate Gradle wrapper if needed (first-time):
+if [ ! -f gradlew ]; then
+    gradle wrapper --gradle-version 8.5
+fi
+chmod +x gradlew
+
+# Build the debug APK:
+./gradlew assembleDebug --no-daemon --stacktrace
+
+# Output:
+#   app/build/outputs/apk/debug/app-debug.apk
+
+# Install to phone:
+adb install app/build/outputs/apk/debug/app-debug.apk
+```
+
+On Android, enable **Install unknown apps** for your file-manager before
+sideloading. The APK is unsigned; DJI SDK artifacts are fetched by Gradle
+(see `HARDWARE_MAVIC_ANDROID.md` §3 for the DJI dev account flow).
+
+### Path C — iOS (if filming on iPhone)
+
+iOS side is Xcode-only (no CI-downloadable build). Use:
+
+```bash
+cd ios/SkyHerdCompanion
+./bootstrap.sh
+# edit SupportingFiles/Config.xcconfig — add DJI_API_KEY=<your_key>
+xcodegen generate
+open SkyHerdCompanion.xcodeproj
+# Xcode → Product → Run on paired iPhone (requires Apple Developer account)
+```
+
+Unsigned stub-mode builds run in CI (`.github/workflows/ios-app.yml`) but
+cannot be sideloaded without a signed cert — Xcode+phone is the path.
