@@ -1,25 +1,53 @@
 /**
- * SkyHerd DIY LoRa GPS Cattle Collar — Firmware
+ * SkyHerd DIY LoRa GPS Cattle Collar — Firmware (polished Apr 2026)
  * Target: RAK3172 (STM32WL53 + SX1262) running RAK RUI3
  *
- * Behaviour (every SEND_INTERVAL_MIN minutes):
- *   1. Wake from deep sleep
- *   2. Power-on GPS, wait for fix (timeout GPS_FIX_TIMEOUT_S seconds)
- *   3. Read MPU-6050, compute 10s rolling activity score
- *   4. Sample battery ADC
- *   5. Encode 16-byte payload (see CollarPayload struct)
- *   6. LoRaWAN uplink, port 2, unconfirmed
- *   7. Handle downlinks (port 1 = set interval, port 99 = reboot)
- *   8. Deep sleep until next cycle
+ * ─── PIN MAP (RAK3172 WisBlock pinout) ──────────────────────────────────────
+ *   GPS UART (Serial1)  : PA9 (TX) / PA10 (RX)   @ 9600 baud NMEA
+ *   IMU I²C (Wire)      : PB6 (SCL) / PB7 (SDA)  @ 0x68  (MPU-6050)
+ *   Battery ADC         : PA0  (voltage divider 100k/47k, VDIV_RATIO=0.3197)
+ *   GPS power control   : PA2  (MOSFET gate, HIGH=ON) — optional, see GPS_PWR_PIN
+ *   LED (status, opt.)  : PA8  (board-LED; toggled on uplink)
  *
- * Payload layout (little-endian, 16 bytes):
- *   [0..3]  int32  lat_e7         latitude  x 1e7 (e.g. 340523401)
- *   [4..7]  int32  lon_e7         longitude x 1e7 (e.g. -1065342812)
- *   [8..9]  int16  alt_m          altitude in whole metres
- *   [10]    uint8  activity_code  0=resting 1=grazing 2=walking
- *   [11]    uint8  battery_pct    0-100
- *   [12..13]uint16 fix_age_s      age of GPS fix in seconds (0 = fresh)
- *   [14..15]uint16 uptime_s       seconds since last reboot (wraps at 65535)
+ * ─── POWER TREE ─────────────────────────────────────────────────────────────
+ *   LiPo 3.7V 2500 mAh
+ *     └─► TP4056 charger + protection
+ *           └─► 3V3 LDO (on RAK3172 module, ~50 µA quiescent)
+ *                 ├─► RAK3172 STM32WL + SX1262
+ *                 ├─► u-blox MAX-M10S GPS  (via MOSFET @ PA2, OFF during sleep)
+ *                 └─► MPU-6050 IMU         (3.3V, I²C pull-ups on board)
+ *
+ * ─── POWER BUDGET (15-min cycle, grazing mode, US915 SF7) ───────────────────
+ *   Active uplink window   ≈ 102 s total:
+ *     90 s  GPS fix (~30 mA avg, cold-to-warm)
+ *     10 s  IMU sampling   (~4 mA)
+ *      2 s  LoRa TX         (~100 mA peak, 800 ms actual airtime)
+ *   Deep sleep               ≈ 798 s @ ~10 µA (MCU+SX1262+GPS-OFF)
+ *   Average draw             ≈ 3.7 mA → ~675 h ≈ 28 days on 2500 mAh (60% eff.)
+ *   With BATSAVE active (1 h cycle): ~8× longer between cycles → ~50 days.
+ *
+ * ─── LORAWAN ────────────────────────────────────────────────────────────────
+ *   Default region   : US915 (set via `-D LORAWAN_REGION_US915`)
+ *   Alt regions      : EU868 / AS923 / AU915 — change build flag + antenna.
+ *   Class            : A (RX1/RX2 after uplink only; battery optimal)
+ *   Join             : OTAA, 8 retries, 5s each
+ *   Port 2           : uplink (16-byte CollarPayload)
+ *   Port 1 downlink  : set interval (1 byte: minutes 1..240)
+ *   Port 99 downlink : reboot
+ *
+ * ─── BATTERY-SAVE MODE ──────────────────────────────────────────────────────
+ *   When battery_pct < LOW_BATTERY_THRESHOLD_PCT (default 15%), the sleep
+ *   interval is multiplied by BATSAVE_MULTIPLIER (default 4). This cuts uplink
+ *   frequency from 15 min → 1 h, extending runtime until recharge.
+ *
+ * ─── PAYLOAD LAYOUT (little-endian, 16 bytes — frozen schema v1) ────────────
+ *   [0..3]   int32   lat_e7          latitude  x 1e7
+ *   [4..7]   int32   lon_e7          longitude x 1e7
+ *   [8..9]   int16   alt_m           altitude metres
+ *   [10]     uint8   activity_code   0=resting 1=grazing 2=walking
+ *   [11]     uint8   battery_pct     0-100
+ *   [12..13] uint16  fix_age_s       GPS fix age in seconds (65535 = no fix)
+ *   [14..15] uint16  uptime_s        seconds since last boot (wraps 65535)
  */
 
 #include <Arduino.h>
@@ -51,6 +79,11 @@
 #ifndef LOW_BATTERY_THRESHOLD_PCT
   #define LOW_BATTERY_THRESHOLD_PCT 15
 #endif
+#ifndef BATSAVE_MULTIPLIER
+  #define BATSAVE_MULTIPLIER    4   // 4x longer sleep when battery < threshold
+#endif
+// GPS_PWR_PIN is optional: when defined, the firmware power-gates the GPS.
+// Leave undefined on boards without a MOSFET on the GPS VCC rail.
 
 // ---- ADC voltage divider constants -----------------------------------------
 // LiPo+ --100k-- PA0 --47k-- GND  -> ratio = 47/147 = 0.3197
@@ -96,6 +129,31 @@ static uint8_t    read_activity_code();
 static bool       acquire_gps_fix(uint32_t timeout_ms);
 static void       handle_downlink(uint8_t port, uint8_t *data, uint16_t len);
 static CollarPayload build_payload();
+static void       gps_power_on();
+static void       gps_power_off();
+
+// ============================================================================
+// GPS power-gating helpers
+//   When GPS_PWR_PIN is defined (e.g. RAK3172 with PA2 driving a MOSFET gate
+//   on the GPS VCC rail), we cut power between cycles to save ~30 mA.
+//   On boards without the MOSFET, both helpers compile to no-ops.
+// ============================================================================
+static void gps_power_on() {
+#ifdef GPS_PWR_PIN
+    pinMode(GPS_PWR_PIN, OUTPUT);
+    digitalWrite(GPS_PWR_PIN, HIGH);
+    delay(50);  // let GPS LDO settle before UART opens
+    // Re-initialise UART after power-cycle (driver may have closed it).
+    Serial1.begin(GPS_UART_BAUD);
+#endif
+}
+
+static void gps_power_off() {
+#ifdef GPS_PWR_PIN
+    Serial1.end();  // release UART so GPS can brown out cleanly
+    digitalWrite(GPS_PWR_PIN, LOW);
+#endif
+}
 
 // ============================================================================
 // Setup -- runs once after power-on / wake from reset
@@ -104,10 +162,14 @@ void setup() {
     boot_time_ms = millis();
     Serial.begin(115200);
     delay(500);
-    Serial.println("[SkyHerd] collar firmware v1.0 booting");
+    Serial.println("[SkyHerd] collar firmware v1.1 booting");
 
-    // ---- GPS UART (Serial1 = PA9/PA10 on RAK3172) --------------------------
+    // ---- GPS power + UART ---------------------------------------------------
+    gps_power_on();  // no-op if GPS_PWR_PIN undefined
+#ifndef GPS_PWR_PIN
+    // Fallback: open UART unconditionally when we're not power-gating.
     Serial1.begin(GPS_UART_BAUD);
+#endif
     delay(100);
     Serial.println("[GPS] UART ready at " + String(GPS_UART_BAUD));
 
@@ -144,6 +206,9 @@ void setup() {
 void loop() {
     Serial.println("[loop] wake -- acquiring GPS fix");
 
+    // ---- 0. Re-power GPS on wake (no-op if not power-gated) -----------------
+    gps_power_on();
+
     // ---- 1. GPS fix ----------------------------------------------------------
     bool has_fix = acquire_gps_fix((uint32_t)GPS_FIX_TIMEOUT_S * 1000);
     if (!has_fix) {
@@ -164,11 +229,21 @@ void loop() {
                      false,   // unconfirmed
                      0);      // fport retry 0 = no retry
 
-    Serial.println("[LoRa] uplink sent -- sleeping " + String(SEND_INTERVAL_MIN) + " min");
+    // ---- 4. Battery-save: extend interval when running low ------------------
+    uint32_t sleep_ms = send_interval_ms;
+    if (pkt.battery_pct < LOW_BATTERY_THRESHOLD_PCT) {
+        sleep_ms = send_interval_ms * (uint32_t)BATSAVE_MULTIPLIER;
+        Serial.printf("[batsave] battery %d%% < %d%% -- extending interval %dx to %lu ms\n",
+                      pkt.battery_pct, LOW_BATTERY_THRESHOLD_PCT,
+                      BATSAVE_MULTIPLIER, (unsigned long)sleep_ms);
+    }
 
-    // ---- 4. Deep sleep ------------------------------------------------------
+    Serial.println("[LoRa] uplink sent -- sleeping " + String(sleep_ms / 1000) + " s");
+
+    // ---- 5. Deep sleep (cut GPS power first) --------------------------------
+    gps_power_off();
     // RAK RUI3: api.system.sleep.all(ms) puts MCU + SX1262 into deep sleep
-    api.system.sleep.all(send_interval_ms);
+    api.system.sleep.all(sleep_ms);
 
     // Execution resumes here after wake (STM32WL reset vector via RTC alarm)
 }
@@ -302,11 +377,30 @@ static void handle_downlink(uint8_t port, uint8_t *data, uint16_t len) {
 }
 
 // ============================================================================
-// OTA scaffold (RAK3172 supports BLE DFU in RUI3 bootloader)
-// Uncomment and implement when RAK BLE OTA library is stable.
+// OTA update — sign-post for post-MVP work
+//
+// When OTA_ENABLED is defined at build time, the firmware will eventually
+// support one of two paths. Neither is implemented in v1.1 — both need a real
+// RAK3172 to validate and therefore live in `deferred-features.md`.
+//
+// Path A — LoRaWAN FUOTA (Firmware Update Over The Air)
+//   • Uses LoRaWAN class B/C multicast fragments (RFC draft)
+//   • RAK RUI3 AT command: `AT+FUOTA=<fragsize>,<blockcnt>,<sessionid>`
+//     ref: https://docs.rakwireless.com/RUI3/
+//   • Requires ChirpStack FUOTA plug-in + bandwidth budget
+//   • TODO: choose between FragmentedDataBlockTransport + McClassC vs
+//           application-layer fragments on Port 3.
+//   • TODO: integrate `api.system.flashUpdate()` callback
+//
+// Path B — BLE DFU (RAK bootloader, alt. on ESP32)
+//   • RAK RUI3 bootloader advertises a DFU service on reset
+//   • ESP32 variant uses `esp_ota_*` via BLE GATT
+//   • Requires a phone/laptop within 10 m — demo-only
+//   • TODO: RAK BLE OTA example at https://github.com/RAKWireless/WisBlock
+//
+// For now we advertise neither; OTA is a Phase 10 item.
 // ============================================================================
 #ifdef OTA_ENABLED
-  // TODO: initialise RAK BLE OTA service
-  // api.ble.advertise.start(30000);  // advertise 30s on boot
-  // Firmware images delivered as 256-byte LoRa downlink fragments -- TBD
+  // Placeholder: leave empty until real hardware is on hand.
+  // Uncomment the relevant TODO block above when Path A or Path B is chosen.
 #endif

@@ -8,6 +8,11 @@
  *  - Activity codes match collar.py _classify_activity thresholds
  *  - Battery ADC mapping to percentage
  *  - Boundary values (zero coords, maxed fix_age, uptime wrap)
+ *
+ * Sandbox note (Apr 2026): PlatformIO is not installed in the hackathon CI
+ * sandbox; run these locally before flashing real hardware. The same payload
+ * layout is exercised round-trip in Python via
+ * tests/hardware/test_decode_payload.py, which IS part of `make ci`.
  */
 
 #include <unity.h>
