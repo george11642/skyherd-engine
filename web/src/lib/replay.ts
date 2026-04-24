@@ -84,20 +84,22 @@ const AGENT_MESSAGES: Record<AgentName, readonly string[]> = {
   ],
 };
 
-// Ranch coordinate frame (meters from SW corner of ranch_a).
-// Wide enough to look populated without overflowing the map viewport.
-const RANCH_BOUNDS = { x_min: 0, x_max: 1800, y_min: 0, y_max: 1400 };
+// Ranch coordinate frame — RanchMap uses normalized [0..1] coords for both
+// paddock bounds and entity positions (see RanchMap fallback). Keep every
+// value in that range.
+const RANCH_BOUNDS = { x_min: 0.04, x_max: 0.96, y_min: 0.04, y_max: 0.96 };
 
+// 4-quadrant split matching ranch_a.yaml (p_nw / p_ne / p_sw / p_se).
 const AMBIENT_PADDOCKS = [
-  { id: "paddock-nw", bounds: [0, 700, 900, 1400] as [number, number, number, number], forage_pct: 72 },
-  { id: "paddock-ne", bounds: [900, 700, 1800, 1400] as [number, number, number, number], forage_pct: 54 },
-  { id: "paddock-sw", bounds: [0, 0, 900, 700] as [number, number, number, number], forage_pct: 88 },
-  { id: "paddock-se", bounds: [900, 0, 1800, 700] as [number, number, number, number], forage_pct: 41 },
+  { id: "north", bounds: [0, 0, 0.5, 0.5] as [number, number, number, number], forage_pct: 72 },
+  { id: "south", bounds: [0.5, 0, 1, 0.5] as [number, number, number, number], forage_pct: 58 },
+  { id: "east", bounds: [0.5, 0.5, 1, 1] as [number, number, number, number], forage_pct: 84 },
+  { id: "west", bounds: [0, 0.5, 0.5, 1] as [number, number, number, number], forage_pct: 43 },
 ];
 
 const AMBIENT_TANKS = [
-  { id: "wt_n", pos: [900, 1250] as [number, number], level_pct: 82 },
-  { id: "wt_s", pos: [900, 150] as [number, number], level_pct: 64 },
+  { id: "wt_n", pos: [0.5, 0.18] as [number, number], level_pct: 82 },
+  { id: "wt_s", pos: [0.5, 0.82] as [number, number], level_pct: 64 },
 ];
 
 function hex(len: number): string {
@@ -249,10 +251,10 @@ export class SkyHerdReplay {
   /** Drift cows + orbit drone, then emit a world.snapshot. */
   private _emitWorldSnapshot(): void {
     if (!this.ambientCows) this.ambientCows = this._seedCows();
-    // Brownian drift: each cow wanders ±8 m per tick.
+    // Brownian drift: each cow wanders ~0.4% of the map per tick.
     for (const cow of this.ambientCows) {
-      const dx = (Math.random() - 0.5) * 16;
-      const dy = (Math.random() - 0.5) * 16;
+      const dx = (Math.random() - 0.5) * 0.008;
+      const dy = (Math.random() - 0.5) * 0.008;
       cow.pos = [
         Math.max(RANCH_BOUNDS.x_min, Math.min(RANCH_BOUNDS.x_max, cow.pos[0] + dx)),
         Math.max(RANCH_BOUNDS.y_min, Math.min(RANCH_BOUNDS.y_max, cow.pos[1] + dy)),
@@ -260,9 +262,9 @@ export class SkyHerdReplay {
     }
 
     // Drone patrols a clockwise orbit around the ranch centroid.
-    const cx = (RANCH_BOUNDS.x_min + RANCH_BOUNDS.x_max) / 2;
-    const cy = (RANCH_BOUNDS.y_min + RANCH_BOUNDS.y_max) / 2;
-    const r = 500;
+    const cx = 0.5;
+    const cy = 0.5;
+    const r = 0.3;
     const theta = (Date.now() / 6000) % (Math.PI * 2);
     const drone = {
       pos: [cx + r * Math.cos(theta), cy + r * Math.sin(theta)] as [number, number],
