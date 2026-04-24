@@ -10,6 +10,7 @@ import { useState, useEffect, useCallback } from "react";
 import { cn } from "@/lib/cn";
 import { getSSE, getReplayIfActive } from "@/lib/sse";
 import type { SkyHerdReplay } from "@/lib/replay";
+import { getAudio } from "@/lib/audio";
 
 /**
  * scenario.active / scenario.ended SSE contract (Part A, v1.1):
@@ -84,8 +85,26 @@ export function ScenarioStrip({ replay: replayProp }: ScenarioStripProps = {}) {
     };
   }, [handleLog, handleScenarioActive, handleScenarioEnded]);
 
+  // Autostart (?autostart=1): skip the overlay CTA and kick off replay on
+  // mount. Used by the recorder so clips show an animated map from frame 0.
+  // Runs once on mount — intentionally omits `replay` from deps so it can't
+  // re-fire if the singleton identity changes.
+  useEffect(() => {
+    if (!replay) return;
+    if (typeof window === "undefined") return;
+    const flag = new URLSearchParams(window.location.search).get("autostart");
+    if (flag !== "1" && flag !== "true") return;
+    if (replay.isPaused()) {
+      replay.start();
+      setOverlayVisible(false);
+      setIsPaused(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleStart = useCallback(() => {
     if (!replay) return;
+    getAudio().resume();
     replay.start();
     setOverlayVisible(false);
     setIsPaused(false);

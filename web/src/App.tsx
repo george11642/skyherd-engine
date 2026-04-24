@@ -29,6 +29,7 @@ import {
   type AccordionTab,
 } from "@/components/shared/RightRailAccordion";
 import { KeyboardHelp } from "@/components/shared/KeyboardHelp";
+import { ScenarioBanner } from "@/components/shared/ScenarioBanner";
 import { getSSE, getReplayIfActive } from "@/lib/sse";
 
 export default function App() {
@@ -138,6 +139,9 @@ export default function App() {
     >
       {/* ── Top band ── */}
       <StatBand />
+
+      {/* ── Scenario narration banner ── */}
+      <ScenarioBanner />
 
       {/* ── Center: map + right column ── */}
       <div className="flex flex-1 min-h-0 overflow-hidden gap-2 p-2">
