@@ -125,17 +125,35 @@ export class SkyHerdSSE {
 let _globalSSE: SkyHerdSSE | null = null;
 
 /**
+ * Detect replay mode at runtime. Build-time `VITE_DEMO_MODE=replay` is the
+ * production path (Vercel), but the recorder needs a way to flip into replay
+ * against a live/non-demo build too — it injects `?replay=v2` in the URL.
+ * Also accepts `?replay=1` / `?replay=true` for symmetry with `autostart`.
+ */
+function _isReplayModeActive(): boolean {
+  if (import.meta.env.VITE_DEMO_MODE === "replay") return true;
+  if (typeof window === "undefined") return false;
+  try {
+    const flag = new URLSearchParams(window.location.search).get("replay");
+    return flag === "v2" || flag === "1" || flag === "true";
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Returns the active event driver.
- * - In replay/demo mode (VITE_DEMO_MODE=replay): returns a SkyHerdReplay in
- *   its default *paused* state. Nothing flows until a UI affordance (e.g.
- *   ScenarioStrip "Start Simulation") calls `.start()`.
+ * - In replay/demo mode (VITE_DEMO_MODE=replay or ?replay=v2 at runtime):
+ *   returns a SkyHerdReplay in its default *paused* state. Nothing flows
+ *   until a UI affordance (e.g. ScenarioStrip "Start Simulation") calls
+ *   `.start()`.
  * - Otherwise: returns a live SkyHerdSSE connected to /events.
  *
  * Both classes share the same on/off/connect/close interface via SSEHandler,
  * so callers need no changes when the mode changes.
  */
 export function getSSE(): SkyHerdSSE | SkyHerdReplay {
-  if (import.meta.env.VITE_DEMO_MODE === "replay") {
+  if (_isReplayModeActive()) {
     return getReplay();
   }
   if (!_globalSSE) {
@@ -151,7 +169,7 @@ export function getSSE(): SkyHerdSSE | SkyHerdReplay {
  * without owning the mode-selection logic.
  */
 export function getReplayIfActive(): SkyHerdReplay | null {
-  if (import.meta.env.VITE_DEMO_MODE === "replay") {
+  if (_isReplayModeActive()) {
     return getReplay();
   }
   return null;

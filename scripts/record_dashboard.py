@@ -53,7 +53,15 @@ except ImportError:  # pragma: no cover - handled at runtime
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 OUTPUT_DIR = REPO_ROOT / "remotion-video" / "public" / "clips"
-DASHBOARD_URL = "http://127.0.0.1:8000"
+# Base origin for health checks. The recorder navigates to DASHBOARD_URL below
+# — which hits `/demo?autostart=1` so the dashboard (not the landing page)
+# mounts and fires replay.start() immediately on load. See App.tsx and
+# commit 1106367 (landing became `/`, dashboard moved to `/demo`).
+DASHBOARD_ORIGIN = "http://127.0.0.1:8000"
+# `replay=v2` flips sse.ts into replay mode at runtime (build-independent);
+# `autostart=1` fires replay.start() on mount so the map animates without a
+# user click. Both are read by the dashboard bundle regardless of VITE_DEMO_MODE.
+DASHBOARD_URL = f"{DASHBOARD_ORIGIN}/demo?autostart=1&replay=v2"
 VIDEO_WIDTH = 1920
 VIDEO_HEIGHT = 1080
 FPS = 30
@@ -136,7 +144,7 @@ def _check_dashboard() -> bool:
     import urllib.request
 
     try:
-        with urllib.request.urlopen(f"{DASHBOARD_URL}/health", timeout=3) as resp:
+        with urllib.request.urlopen(f"{DASHBOARD_ORIGIN}/health", timeout=3) as resp:
             return resp.status == 200
     except Exception:  # noqa: BLE001
         return False
@@ -281,7 +289,8 @@ def record_scenario(browser: Browser, clip: ScenarioClip, workdir: Path) -> Path
     # ffmpeg speed-up fallback below.
     url = DASHBOARD_URL
     if clip.ambient_speed is not None:
-        url = f"{DASHBOARD_URL}/?ambient_speed={clip.ambient_speed:g}"
+        # Append ambient_speed to the existing query string (`/demo?autostart=1`).
+        url = f"{DASHBOARD_URL}&ambient_speed={clip.ambient_speed:g}"
 
     def during_record(page: Page) -> None:
         if clip.idle_only or not clip.cli_scenario:
