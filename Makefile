@@ -1,4 +1,4 @@
-.PHONY: setup sim demo dashboard dashboard-mock test lint format typecheck clean ci sitl-up sitl-down bus-up bus-down mesh-smoke one-pager hardware-demo hardware-demo-sim hardware-demo-sim-down h2-smoke mavic-bridge f3-bridge drone-smoke sitl-smoke determinism-3x gate-check voice-demo
+.PHONY: setup sim demo dashboard dashboard-mock test lint format typecheck clean ci sitl-up sitl-down bus-up bus-down mesh-smoke one-pager hardware-demo hardware-demo-sim hardware-demo-sim-down h2-smoke h3-smoke mavic-bridge f3-bridge drone-smoke sitl-smoke determinism-3x gate-check voice-demo
 
 SEED ?= 42
 SCENARIO ?= all
@@ -117,3 +117,6 @@ hardware-demo-sim-down:  ## Stop the H2 laptop demo stack
 
 h2-smoke:  ## Fast unit-level smoke of the H2 chain (<5s, no docker)
 	uv run pytest tests/hardware/test_h2_e2e.py -v --no-cov
+
+h3-smoke:  ## Fast unit-level smoke of the H3 Mavic DJI replay chain (<2s, no drone)
+	uv run pytest tests/hardware/test_h3_dji_replay.py -v --no-cov

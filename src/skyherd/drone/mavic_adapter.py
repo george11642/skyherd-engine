@@ -179,7 +179,7 @@ class MavicAdapter(DroneBackend):
             self._record_event("adapter.leg_selected", {"leg": _LEG_DJI})
             logger.info("MavicAdapter: DJI leg selected")
             return
-        except (DroneUnavailable, DroneError, TimeoutError, asyncio.TimeoutError) as exc:
+        except (DroneUnavailable, DroneError, TimeoutError) as exc:
             dji_err = str(exc)
             logger.warning("MavicAdapter: DJI leg unavailable — %s", dji_err)
 
@@ -196,7 +196,7 @@ class MavicAdapter(DroneBackend):
             )
             logger.info("MavicAdapter: MAVSDK leg selected (DJI failed: %s)", dji_err)
             return
-        except (DroneUnavailable, DroneError, TimeoutError, asyncio.TimeoutError) as exc:
+        except (DroneUnavailable, DroneError, TimeoutError) as exc:
             mav_err = str(exc)
 
         # Both failed — terminal

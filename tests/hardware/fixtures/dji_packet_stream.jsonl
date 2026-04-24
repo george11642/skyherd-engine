@@ -1,0 +1,7 @@
+{"ack":"get_state","result":"ok","seq":1,"data":{"armed":false,"in_air":false,"altitude_m":0.0,"battery_pct":82.0,"mode":"STANDBY","lat":34.1234,"lon":-106.5678}}
+{"ack":"takeoff","result":"ok","seq":2}
+{"ack":"get_state","result":"ok","seq":3,"data":{"armed":true,"in_air":true,"altitude_m":30.0,"battery_pct":81.0,"mode":"GUIDED","lat":34.1234,"lon":-106.5678}}
+{"ack":"patrol","result":"error","seq":4,"message":"signal_lost: RC feedback lost for >1.5s"}
+{"ack":"play_deterrent","result":"ok","seq":6}
+{"ack":"return_to_home","result":"ok","seq":7}
+{"ack":"get_state","result":"ok","seq":8,"data":{"armed":false,"in_air":false,"altitude_m":0.0,"battery_pct":78.0,"mode":"LAND","lat":34.1234,"lon":-106.5678}}

@@ -22,7 +22,6 @@ from skyherd.drone.interface import (
 )
 from skyherd.drone.mavic_adapter import MavicAdapter
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------

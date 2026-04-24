@@ -1,0 +1,51 @@
+name: iOS Companion App Build
+
+on:
+  push:
+    paths:
+      - 'ios/**'
+      - '.github/workflows/ios-app.yml'
+  pull_request:
+    paths:
+      - 'ios/**'
+      - '.github/workflows/ios-app.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: xcodebuild (unsigned, stub mode)
+    runs-on: macos-14
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        working-directory: ios/SkyHerdCompanion
+        run: xcodegen generate
+
+      - name: Build (stub mode — no DJI xcframework, no signing)
+        working-directory: ios/SkyHerdCompanion
+        run: |
+          xcodebuild \
+            -scheme SkyHerdCompanion \
+            -configuration Debug \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            build | tee xcodebuild.log
+        continue-on-error: true     # H3-05: DJI xcframework may be missing
+
+      - name: Upload build products (if built)
+        if: success() || failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: skyherd-companion-ios-build
+          path: |
+            ios/SkyHerdCompanion/build/Build/Products/
+            ios/SkyHerdCompanion/xcodebuild.log
+          if-no-files-found: warn
+          retention-days: 30
