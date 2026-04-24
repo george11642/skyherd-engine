@@ -44,6 +44,7 @@ interface Cow {
   pos: [number, number];
   state?: string;
   bcs?: number;
+  heading_deg?: number;
 }
 
 interface Predator {
@@ -650,18 +651,67 @@ export function RanchMap({ snapshot: snapshotProp }: RanchMapProps = {}) {
         ctx.stroke();
       }
 
-      // Core dot
+      const bW = Math.max(6, Math.round(W * 0.008));
+      const bH = Math.max(4, Math.round(bW * 0.6));
+      const headR = Math.max(2, Math.round(bW * 0.35));
+
+      const prevDispX = rec ? tweenValue(rec.xTween, nowMs - 16) : dispX;
+      const prevDispY = rec ? tweenValue(rec.yTween, nowMs - 16) : dispY;
+      const dx2 = dispX - prevDispX;
+      const dy2 = dispY - prevDispY;
+      const hasMotion = Math.abs(dx2) > 1e-5 || Math.abs(dy2) > 1e-5;
+      const headingRad = cow.heading_deg !== undefined
+        ? (cow.heading_deg * Math.PI) / 180
+        : hasMotion ? Math.atan2(dy2, dx2) : -Math.PI / 2;
+
+      const isIdle = rec
+        ? (() => {
+            const px2 = tweenValue(rec.xTween, nowMs - 2000);
+            const py2 = tweenValue(rec.yTween, nowMs - 2000);
+            return Math.abs(dispX - px2) < 1e-4 && Math.abs(dispY - py2) < 1e-4;
+          })()
+        : false;
+
+      const nowS2 = nowMs / 1000;
+      const bob = (!isIdle && hasMotion) ? Math.sin(nowS2 * Math.PI * 2 * 1.2) * 0.5 : 0;
+      const headDrop = isIdle ? 1 : 0;
+
+      const tailAngle = headingRad + Math.PI;
+      const tailWag = Math.sin(nowS2 * Math.PI * 2 * 0.5) * (isIdle ? 0.5 : 1.5);
+      const tailLen = bW * 0.55;
+      const tailBaseX = ppx + Math.cos(tailAngle) * bW * 0.55;
+      const tailBaseY = ppy + bob + Math.sin(tailAngle) * bW * 0.3;
+      const tailTipX = tailBaseX + Math.cos(tailAngle + Math.PI * 0.5) * tailWag + Math.cos(tailAngle) * tailLen;
+      const tailTipY = tailBaseY + Math.sin(tailAngle + Math.PI * 0.5) * tailWag + Math.sin(tailAngle) * tailLen;
+
+      ctx.save();
+      ctx.translate(ppx, ppy + bob);
+      ctx.rotate(headingRad + Math.PI / 2);
       ctx.beginPath();
-      ctx.arc(ppx, ppy, r, 0, Math.PI * 2);
+      ctx.ellipse(0, 0, bH, bW, 0, 0, Math.PI * 2);
       ctx.fillStyle = `${rgbStr}${0.92 * fadeT})`;
       ctx.fill();
+      ctx.restore();
 
-      // Tag label for non-healthy cows
+      const headOffX = Math.cos(headingRad) * (bW * 0.65);
+      const headOffY = Math.sin(headingRad) * (bW * 0.4);
+      ctx.beginPath();
+      ctx.arc(ppx + headOffX, ppy + bob + headOffY + headDrop, headR, 0, Math.PI * 2);
+      ctx.fillStyle = `${rgbStr}${0.95 * fadeT})`;
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(tailBaseX, tailBaseY);
+      ctx.lineTo(tailTipX, tailTipY);
+      ctx.strokeStyle = `${rgbStr}${0.7 * fadeT})`;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
       if (cow.tag && health !== "healthy") {
         ctx.font = `bold ${Math.round(W * 0.013)}px "JetBrains Mono Variable", monospace`;
         ctx.fillStyle = `${rgbStr}${1 * fadeT})`;
         ctx.textAlign = "left";
-        ctx.fillText(cow.tag, ppx + r + 4, ppy + 3);
+        ctx.fillText(cow.tag, ppx + bW + 4, ppy + 3);
       }
     }
 
@@ -694,15 +744,62 @@ export function RanchMap({ snapshot: snapshotProp }: RanchMapProps = {}) {
       ctx.stroke();
     }
 
-    // Drone triangle
     const dSize = Math.max(7, Math.round(W * 0.022));
     const dx = px(droneX),
       dy = py(droneY);
+    const droneSnap = snapshotRef.current?.drone;
+    const altM = droneSnap?.alt_m ?? 0;
+    const shadowOffY = altM / 100 * 8;
     ctx.beginPath();
-    ctx.moveTo(dx, dy - dSize);
-    ctx.lineTo(dx + dSize * 0.65, dy + dSize * 0.55);
-    ctx.lineTo(dx - dSize * 0.65, dy + dSize * 0.55);
-    ctx.closePath();
+    ctx.ellipse(dx, dy + shadowOffY + 4, dSize * 0.7, dSize * 0.25, 0, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(0,0,0,${Math.min(0.35, 0.12 + altM / 300)})`;
+    ctx.fill();
+
+    const bodyR = Math.max(4, Math.round(W * 0.009));
+    const armLen = dSize * 0.85;
+    const armAngles = [Math.PI * 0.25, Math.PI * 0.75, Math.PI * 1.25, Math.PI * 1.75];
+    ctx.strokeStyle = "rgba(120,180,220,0.7)";
+    ctx.lineWidth = 1.5;
+    for (const ang of armAngles) {
+      ctx.beginPath();
+      ctx.moveTo(dx, dy);
+      ctx.lineTo(dx + Math.cos(ang) * armLen, dy + Math.sin(ang) * armLen);
+      ctx.stroke();
+    }
+
+    const propPhase = nowMs / 50;
+    for (let pi = 0; pi < 4; pi++) {
+      const ang = armAngles[pi];
+      const px2 = dx + Math.cos(ang) * armLen;
+      const py2 = dy + Math.sin(ang) * armLen;
+      const propR = Math.max(3, Math.round(W * 0.006));
+      ctx.beginPath();
+      ctx.arc(px2, py2, propR, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(120,180,220,0.85)";
+      ctx.fill();
+      const blurAlpha = 0.15 + 0.1 * Math.sin(propPhase + pi * Math.PI * 0.5);
+      ctx.beginPath();
+      ctx.arc(px2, py2, propR * 1.8, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(120,180,220,${blurAlpha})`;
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+
+    const ledR = Math.max(2, Math.round(W * 0.004));
+    const rearLeft = armAngles[1];
+    const rearRight = armAngles[2];
+    ctx.beginPath();
+    ctx.arc(dx + Math.cos(rearLeft) * armLen, dy + Math.sin(rearLeft) * armLen, ledR, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(220,60,60,0.9)";
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(dx + Math.cos(rearRight) * armLen, dy + Math.sin(rearRight) * armLen, ledR, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(60,220,80,0.9)";
+    ctx.fill();
+
+    const roundedR = bodyR * 0.35;
+    ctx.beginPath();
+    ctx.roundRect(dx - bodyR, dy - bodyR, bodyR * 2, bodyR * 2, roundedR);
     ctx.fillStyle = "rgba(120,180,220,0.9)";
     ctx.fill();
     ctx.strokeStyle = C.drone;
@@ -760,21 +857,65 @@ export function RanchMap({ snapshot: snapshotProp }: RanchMapProps = {}) {
       ctx.lineWidth = 1;
       ctx.stroke();
 
-      // X mark
-      ctx.strokeStyle = lerpRgb(
-        [224, 100, 90],
-        [224, 100, 90],
-        0,
-        fadeT,
-      );
-      ctx.lineWidth = 2;
+      const isFleeing =
+        pred.threat_level === "retreating" ||
+        (pred as unknown as { fleeing?: boolean }).fleeing === true;
+
+      const bodyBW = Math.max(8, Math.round(W * 0.013));
+      const bodyBH = Math.max(3, Math.round(bodyBW * 0.38));
+      const earSize = Math.max(2, Math.round(bodyBW * 0.22));
+
+      let bodyAngle: number;
+      if (isFleeing) {
+        const mcx = W / 2;
+        const mcy = H / 2;
+        bodyAngle = Math.atan2(ppy - mcy, ppx - mcx);
+      } else {
+        bodyAngle = -Math.PI / 6;
+      }
+
+      const tailSwing = isFleeing
+        ? Math.PI * 0.4 + Math.sin(nowMs / 120) * 0.15
+        : Math.sin(nowMs / 600) * 0.3;
+      const tailBaseAngle = bodyAngle + Math.PI;
+      const tailLen2 = bodyBW * 0.7;
+      const tailTx = ppx + Math.cos(tailBaseAngle + tailSwing) * tailLen2;
+      const tailTy = ppy + Math.sin(tailBaseAngle + tailSwing) * tailLen2;
+
+      const bodyLow = isFleeing ? 0 : bodyBH * 0.4;
+
+      ctx.save();
+      ctx.translate(ppx, ppy + bodyLow);
+      ctx.rotate(bodyAngle + Math.PI / 2);
       ctx.beginPath();
-      ctx.moveTo(ppx - xSize, ppy - xSize);
-      ctx.lineTo(ppx + xSize, ppy + xSize);
-      ctx.stroke();
+      ctx.ellipse(0, 0, bodyBH, bodyBW, 0, 0, Math.PI * 2);
+      ctx.fillStyle = lerpRgb([224, 100, 90], [224, 100, 90], 0, fadeT);
+      ctx.fill();
+      ctx.restore();
+
+      const frontX = ppx + Math.cos(bodyAngle) * bodyBW * 0.7;
+      const frontY = ppy + bodyLow + Math.sin(bodyAngle) * bodyBW * 0.4;
+      const earLAng = bodyAngle - 0.35;
+      const earRAng = bodyAngle + 0.35;
       ctx.beginPath();
-      ctx.moveTo(ppx + xSize, ppy - xSize);
-      ctx.lineTo(ppx - xSize, ppy + xSize);
+      ctx.moveTo(frontX, frontY);
+      ctx.lineTo(frontX + Math.cos(earLAng) * earSize, frontY + Math.sin(earLAng) * earSize);
+      ctx.lineTo(frontX + Math.cos(bodyAngle) * earSize * 0.6, frontY + Math.sin(bodyAngle) * earSize * 0.6);
+      ctx.closePath();
+      ctx.fillStyle = lerpRgb([224, 100, 90], [224, 100, 90], 0, fadeT);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(frontX, frontY);
+      ctx.lineTo(frontX + Math.cos(earRAng) * earSize, frontY + Math.sin(earRAng) * earSize);
+      ctx.lineTo(frontX + Math.cos(bodyAngle) * earSize * 0.6, frontY + Math.sin(bodyAngle) * earSize * 0.6);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(ppx + Math.cos(tailBaseAngle) * bodyBW * 0.6, ppy + bodyLow + Math.sin(tailBaseAngle) * bodyBW * 0.3);
+      ctx.lineTo(tailTx, tailTy);
+      ctx.strokeStyle = lerpRgb([224, 100, 90], [224, 100, 90], 0, fadeT);
+      ctx.lineWidth = 1.5;
       ctx.stroke();
 
       // Species label
@@ -784,13 +925,13 @@ export function RanchMap({ snapshot: snapshotProp }: RanchMapProps = {}) {
       const sPad = 4;
       ctx.fillStyle = `rgba(10,12,16,${0.72 * fadeT})`;
       ctx.fillRect(
-        ppx + xSize + 2,
+        ppx + bodyBW + 2,
         ppy - Math.round(W * 0.016),
         specMetrics.width + sPad * 2,
         Math.round(W * 0.016) + 4,
       );
       ctx.fillStyle = `rgba(224,100,90,${fadeT})`;
-      ctx.fillText(speciesText, ppx + xSize + 2 + sPad, ppy + 2);
+      ctx.fillText(speciesText, ppx + bodyBW + 2 + sPad, ppy + 2);
     }
 
     // --- Weather overlay ---
