@@ -28,8 +28,9 @@ final class AppState {
         let sse = SSEClient(baseURL: baseURL, decoder: JSONDecoder())
         self.sseClient = sse
 
-        self.liveVM = LiveViewModel()
-        self.mapVM = MapViewModel()
+        let live = LiveViewModel(apiClient: client)
+        self.liveVM = live
+        self.mapVM = MapViewModel(apiClient: client)
         self.agentsVM = AgentsViewModel()
         self.alertsVM = AlertsViewModel()
         self.ledgerVM = LedgerViewModel()

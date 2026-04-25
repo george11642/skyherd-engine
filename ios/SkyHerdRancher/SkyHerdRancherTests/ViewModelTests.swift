@@ -185,6 +185,68 @@ final class AlertsViewModelTests: XCTestCase {
         vm.handle(event)
         XCTAssertEqual(vm.alerts.count, 1)
     }
+
+    // Wave C additions
+
+    func testSeverityFilterShowsOnlyMatchingAlerts() {
+        let vm = AlertsViewModel()
+        // critical vet intake
+        vm.handle(VetIntakeDraftedEvent(id: "A001_test", cowTag: "A001",
+                                         severity: "escalate", path: "/tmp/a.md", ts: 1.0))
+        // medium neighbor alert (confidence < 0.8)
+        vm.handle(NeighborAlertEvent(fromRanch: "ranch_a", toRanch: "ranch_b",
+                                      species: "coyote", sharedFence: "F01",
+                                      confidence: 0.6, ts: 2.0,
+                                      attestationHash: "abc123"))
+        XCTAssertEqual(vm.alerts.count, 2)
+
+        vm.severityFilter = .critical
+        XCTAssertEqual(vm.activeAlerts.count, 1)
+        XCTAssertEqual(vm.activeAlerts[0].severity, .critical)
+
+        vm.severityFilter = .medium
+        XCTAssertEqual(vm.activeAlerts.count, 1)
+        XCTAssertEqual(vm.activeAlerts[0].severity, .medium)
+
+        vm.severityFilter = nil
+        XCTAssertEqual(vm.activeAlerts.count, 2)
+    }
+
+    func testSnoozeHidesAlertFromActiveList() {
+        let vm = AlertsViewModel()
+        vm.handle(VetIntakeDraftedEvent(id: "A002_test", cowTag: "A002",
+                                         severity: "escalate", path: "/tmp/b.md", ts: 1.0))
+        XCTAssertEqual(vm.activeAlerts.count, 1)
+        vm.snooze(vm.alerts[0].id, hours: 1.0)
+        XCTAssertEqual(vm.activeAlerts.count, 0)
+    }
+
+    func testEscalateAcknowledgesAndSetsToast() {
+        let vm = AlertsViewModel()
+        vm.handle(VetIntakeDraftedEvent(id: "A003_test", cowTag: "A003",
+                                         severity: "escalate", path: "/tmp/c.md", ts: 1.0))
+        let alertId = vm.alerts[0].id
+        vm.escalate(alertId)
+        XCTAssertTrue(vm.acknowledgedIds.contains(alertId))
+        XCTAssertNotNil(vm.toastMessage)
+    }
+
+    func testMultipleEventTypesSynthesized() {
+        let vm = AlertsViewModel()
+        vm.handle(VetIntakeDraftedEvent(id: "A004_test", cowTag: "A004",
+                                         severity: "escalate", path: "/tmp/d.md", ts: 1.0))
+        vm.handle(NeighborAlertEvent(fromRanch: "ranch_a", toRanch: "ranch_b",
+                                      species: "coyote", sharedFence: "F02",
+                                      confidence: 0.9, ts: 2.0,
+                                      attestationHash: "def456"))
+        vm.handle(NeighborHandoffEvent(fromRanch: "ranch_a", toRanch: "ranch_b",
+                                        species: "coyote", sharedFence: "F02",
+                                        responseMode: "deterrent", toolCalls: [],
+                                        rancherPaged: true, ts: 3.0))
+        XCTAssertEqual(vm.alerts.count, 3)
+        // Newest first
+        XCTAssertGreaterThan(vm.alerts[0].ts, vm.alerts[1].ts)
+    }
 }
 
 // MARK: - AgentsViewModel Tests
@@ -227,5 +289,110 @@ final class AgentsViewModelTests: XCTestCase {
             vm.handle(tick)
         }
         XCTAssertLessThanOrEqual(vm.costHistory["GrazingOptimizer"]?.count ?? 0, 20)
+    }
+
+    // Wave C additions
+
+    func testAgentLogEventRoutedToPerAgentBuffer() {
+        let vm = AgentsViewModel()
+        let log = AgentLogEvent(ts: 1.0, agent: "FenceLineDispatcher", state: "active",
+                                message: "Breach detected", level: "info", tool: nil, line: nil, seq: 1)
+        vm.handle(log)
+        XCTAssertEqual(vm.agentLogs["FenceLineDispatcher"]?.count, 1)
+        XCTAssertEqual(vm.agentLogs["FenceLineDispatcher"]?.first?.message, "Breach detected")
+    }
+
+    func testAgentLogBufferCapAt50() {
+        let vm = AgentsViewModel()
+        for i in 0..<60 {
+            let log = AgentLogEvent(ts: Double(i), agent: "CalvingWatch", state: nil,
+                                    message: "msg \(i)", level: nil, tool: nil, line: nil, seq: i)
+            vm.handle(log)
+        }
+        XCTAssertLessThanOrEqual(vm.agentLogs["CalvingWatch"]?.count ?? 0, 50)
+    }
+
+    func testAgentLogNewestAtFront() {
+        let vm = AgentsViewModel()
+        let log1 = AgentLogEvent(ts: 1.0, agent: "GrazingOptimizer", state: nil,
+                                  message: "first", level: nil, tool: nil, line: nil, seq: 1)
+        let log2 = AgentLogEvent(ts: 2.0, agent: "GrazingOptimizer", state: nil,
+                                  message: "second", level: nil, tool: nil, line: nil, seq: 2)
+        vm.handle(log1)
+        vm.handle(log2)
+        XCTAssertEqual(vm.agentLogs["GrazingOptimizer"]?.first?.message, "second")
+    }
+
+    func testCacheHitRateAllHits() {
+        let vm = AgentsViewModel()
+        // Feed zero-cost ticks (cache hits = zero delta)
+        for i in 0..<5 {
+            let entry = AgentCostEntry(name: "HerdHealthWatcher", state: "active",
+                                       costDeltaUsd: 0.0, cumulativeCostUsd: 0.0,
+                                       tokensIn: 0, tokensOut: 0)
+            let tick = CostTick(ts: Double(i), seq: i, agents: [entry], allIdle: true,
+                                ratePerHrUsd: 0.0, totalCumulativeUsd: 0.0)
+            vm.handle(tick)
+        }
+        let rate = vm.agentCacheHitRates["HerdHealthWatcher"] ?? 0
+        XCTAssertEqual(rate, 1.0, accuracy: 0.01)
+    }
+
+    func testSelectedAgentForSheet() {
+        let vm = AgentsViewModel()
+        XCTAssertNil(vm.selectedAgent)
+        vm.selectedAgent = "FenceLineDispatcher"
+        XCTAssertEqual(vm.selectedAgent, "FenceLineDispatcher")
+    }
+
+    func testFormattedTokensKSuffix() {
+        let vm = AgentsViewModel()
+        vm.handleInitial([
+            AgentStatus(name: "PredatorPatternLearner", sessionId: "s1",
+                        state: "idle", lastWake: nil,
+                        cumulativeTokensIn: 8500, cumulativeTokensOut: 2000,
+                        cumulativeCostUsd: 0.01)
+        ])
+        let display = vm.formattedTokens(for: "PredatorPatternLearner")
+        XCTAssertTrue(display.hasSuffix("K"), "Expected K suffix, got: \(display)")
+    }
+}
+
+// MARK: - LedgerViewModel Wave C additions
+
+extension LedgerViewModelTests {
+
+    func testPaginationCursorTrackingFromAppendMore() {
+        let vm = LedgerViewModel()
+        vm.handleInitial([makeEntry(seq: 1, hash: "a", source: "A")])
+        XCTAssertEqual(vm.lastSeq, 1)
+        vm.appendMore([makeEntry(seq: 5, hash: "b", source: "B")])
+        XCTAssertEqual(vm.lastSeq, 5)
+    }
+
+    func testAttestEntryPrependedFromSSE() {
+        let vm = LedgerViewModel()
+        vm.handleInitial([makeEntry(seq: 1, hash: "a", source: "A")])
+        let newer = makeEntry(seq: 2, hash: "newentry", source: "CalvingWatch")
+        vm.handle(newer)
+        XCTAssertEqual(vm.entries.first?.seq, 2, "Newer entry should be at front")
+    }
+
+    func testHasMorePagesSetFalseWhenAppendMoreIsEmpty() {
+        let vm = LedgerViewModel()
+        vm.handleInitial([makeEntry(seq: 1, hash: "a", source: "A")])
+        vm.appendMore([])  // empty page
+        XCTAssertFalse(vm.hasMorePages)
+    }
+
+    func testSearchFilterByKind() {
+        let vm = LedgerViewModel()
+        vm.entries = [
+            makeEntry(seq: 1, hash: "aaa", source: "AgentA"),
+            makeEntry(seq: 2, hash: "bbb", source: "AgentB"),
+        ]
+        // kind is "sensor.reading" in makeEntry — search for it
+        vm.searchText = "sensor"
+        XCTAssertEqual(vm.filteredEntries.count, 2)
     }
 }
