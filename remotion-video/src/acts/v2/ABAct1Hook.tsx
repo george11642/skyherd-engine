@@ -89,12 +89,13 @@ const HookContrarian = () => (
     <KineticPunch
       words={[
         {
-          // iter-6 fix: spring pre-roll left frame 0 visually blank because the
-          // overdamped spring still sat near ~0.4 opacity at f0001. Switch to a
-          // fast 6-frame linear fade starting at frame 0 so the word is fully
-          // landed by 0.2s — no blank opener.
+          // iter-7 A fix: iter-6 used appearFrame:0 + fastFade:6, but the
+          // linear interpolate evaluated to 0% at frame 0 and ~17% at f0001
+          // — still visually blank. Shift appearFrame to -3 so the 6-frame
+          // fade is already half-landed at frame 0 (~50%) and fully visible
+          // by frame 3. f0001 now reads at ~67% opacity.
           text: "Everyone thinks",
-          appearFrame: 0,
+          appearFrame: -3,
           fastFade: 6,
           weight: 500,
           size: 56,
