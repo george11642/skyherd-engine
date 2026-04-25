@@ -50,7 +50,7 @@ SkyHerd is a 5-agent Claude Managed Agents mesh for American ranches. Five scena
 4. **Calving** — CalvingWatch pre-labor → priority rancher page
 5. **Storm incoming** — Weather-Redirect → GrazingOptimizer herd-move → acoustic nudge
 
-Key differentiators: $4.17/week cost, Ed25519 attestation ledger, 1106 tests 87% coverage, deterministic replay `SEED=42`, prompt-cached managed agents, meta-loop (Opus 4.7 styled the captions you're watching).
+Key differentiators: $4.17/week cost, 1106 tests 87% coverage, deterministic replay `SEED=42`, prompt-cached managed agents, meta-loop (Opus 4.7 styled the captions you're watching).
 
 ---
 
