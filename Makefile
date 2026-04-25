@@ -1,4 +1,4 @@
-.PHONY: setup sim demo dashboard dashboard-mock test lint format typecheck clean ci sitl-up sitl-down bus-up bus-down mosquitto-up mosquitto-down mesh-smoke one-pager hardware-demo hardware-demo-sim hardware-demo-sim-down h2-smoke h3-smoke h4-smoke h4-docs mavic-bridge f3-bridge drone-smoke sitl-smoke determinism-3x gate-check voice-demo rehearsal record-ready preflight laptop-drone-smoke edge-pi-setup edge-galileo-setup video-record-clips video-pipeline video-iterate video-render video-captions video-captions-A video-captions-B video-captions-C video-style-captions video-style-captions-A video-style-captions-B video-style-captions-C video-broll-sync
+.PHONY: setup sim demo dashboard dashboard-mock test lint format typecheck clean ci sitl-up sitl-down bus-up bus-down mosquitto-up mosquitto-down mesh-smoke one-pager hardware-demo hardware-demo-sim hardware-demo-sim-down h2-smoke h3-smoke h4-smoke h4-docs mavic-bridge f3-bridge drone-smoke sitl-smoke determinism-3x gate-check voice-demo rehearsal record-ready preflight laptop-drone-smoke edge-pi-setup edge-galileo-setup video-record-clips video-pipeline video-iterate video-iterate-A video-iterate-B video-iterate-C video-iterate-all video-loop video-render video-captions video-captions-A video-captions-B video-captions-C video-style-captions video-style-captions-A video-style-captions-B video-style-captions-C video-broll-sync
 
 SEED ?= 42
 SCENARIO ?= all
@@ -229,9 +229,39 @@ video-vo-audition:  ## VIDEO-VO-AUD: render 4 Inworld presets + ElevenLabs Will,
 	ffmpeg -y -hide_banner -loglevel error -f concat -safe 0 -i "$$TMP/concat.txt" -c:a libmp3lame -b:a 192k -ar 44100 -ac 2 out/vo-audition.mp3 && \
 	echo "[audition] out/vo-audition.mp3 ready — edit scripts/vo_voices.json to mark default:true on chosen preset"
 
-# TODO: scripts/video_iterate.sh produced by Phase 5 agent
-video-iterate:  ## VIDEO-ITER: dual-vision iteration loop (cap 6)
-	@bash scripts/video_iterate.sh
+video-iterate:  ## VIDEO-ITER: one iteration round for all 3 variants (uses iter-history for iter #)
+	@bash scripts/video_iterate.sh A
+	@bash scripts/video_iterate.sh B
+	@bash scripts/video_iterate.sh C
+
+video-iterate-A:  ## VIDEO-ITER-A: one iteration round for variant A
+	@bash scripts/video_iterate.sh A $(if $(ITER),--iter $(ITER),)
+
+video-iterate-B:  ## VIDEO-ITER-B: one iteration round for variant B
+	@bash scripts/video_iterate.sh B $(if $(ITER),--iter $(ITER),)
+
+video-iterate-C:  ## VIDEO-ITER-C: one iteration round for variant C
+	@bash scripts/video_iterate.sh C $(if $(ITER),--iter $(ITER),)
+
+video-iterate-all:  ## VIDEO-ITER-ALL: parallel iteration for all 3 variants (one round each)
+	@bash scripts/video_iterate.sh A & \
+	 bash scripts/video_iterate.sh B & \
+	 bash scripts/video_iterate.sh C & \
+	 wait
+
+video-loop:  ## VIDEO-LOOP: autonomous loop for variant B until ship gate or plateau (max 12 iters)
+	@ITER=0; \
+	while true; do \
+	  ITER=$$((ITER + 1)); \
+	  echo "==> video-loop: iter $$ITER/12"; \
+	  bash scripts/video_iterate.sh $(or $(VARIANT),B) --iter $$ITER; \
+	  CODE=$$?; \
+	  if [ $$CODE -eq 2 ]; then echo "SHIP GATE PASSED — stopping loop"; break; fi; \
+	  if [ $$CODE -eq 3 ]; then echo "PLATEAU REACHED — stopping loop"; break; fi; \
+	  if [ $$CODE -eq 4 ]; then echo "HARD CAP — stopping loop"; break; fi; \
+	  if [ $$CODE -ne 0 ]; then echo "ERROR exit $$CODE — stopping loop"; break; fi; \
+	  if [ $$ITER -ge 12 ]; then echo "Max 12 iters reached"; break; fi; \
+	done
 
 video-render:  ## VIDEO-FINAL: render 1080p60 + loudnorm to -16 LUFS
 	@cd remotion-video && pnpm run render
