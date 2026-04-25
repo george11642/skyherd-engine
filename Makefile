@@ -1,4 +1,4 @@
-.PHONY: setup sim demo dashboard dashboard-mock test lint format typecheck clean ci sitl-up sitl-down bus-up bus-down mosquitto-up mosquitto-down mesh-smoke one-pager hardware-demo hardware-demo-sim hardware-demo-sim-down h2-smoke h3-smoke h4-smoke h4-docs mavic-bridge f3-bridge drone-smoke sitl-smoke determinism-3x gate-check voice-demo rehearsal record-ready preflight laptop-drone-smoke edge-pi-setup edge-galileo-setup video-record-clips video-pipeline video-iterate video-render
+.PHONY: setup sim demo dashboard dashboard-mock test lint format typecheck clean ci sitl-up sitl-down bus-up bus-down mosquitto-up mosquitto-down mesh-smoke one-pager hardware-demo hardware-demo-sim hardware-demo-sim-down h2-smoke h3-smoke h4-smoke h4-docs mavic-bridge f3-bridge drone-smoke sitl-smoke determinism-3x gate-check voice-demo rehearsal record-ready preflight laptop-drone-smoke edge-pi-setup edge-galileo-setup video-record-clips video-pipeline video-iterate video-render ios-rancher-build ios-rancher-test
 
 SEED ?= 42
 SCENARIO ?= all
@@ -217,3 +217,22 @@ video-render:  ## VIDEO-FINAL: render 1080p60 + loudnorm to -16 LUFS
 
 laptop-drone-smoke:  ## 7.1 LDC-01/03/06: mocked MAVSDK-over-USB-C + manual-override API smoke (<10s, no drone)
 	uv run pytest tests/hardware/test_laptop_drone_control.py tests/server/test_drone_control.py -v --no-cov
+
+# ---------------------------------------------------------------------------
+# iOS SkyHerdRancher app — Wave A build + test targets
+# ---------------------------------------------------------------------------
+
+ios-rancher-build:  ## Build SkyHerdRancher for iOS Simulator (generic destination, fast)
+	xcodebuild \
+	  -project ios/SkyHerdRancher/SkyHerdRancher.xcodeproj \
+	  -scheme SkyHerdRancher \
+	  -destination 'generic/platform=iOS Simulator' \
+	  -configuration Debug \
+	  build 2>&1 | grep -E "(error:|warning:|BUILD)"
+
+ios-rancher-test:  ## Run SkyHerdRancher unit tests on iPhone 15 Pro Simulator
+	xcodebuild \
+	  -project ios/SkyHerdRancher/SkyHerdRancher.xcodeproj \
+	  -scheme SkyHerdRancher \
+	  -destination 'platform=iOS Simulator,name=iPhone 15 Pro' \
+	  test 2>&1 | grep -E "(Test Suite|Test Case|Executed|error:|BUILD)"

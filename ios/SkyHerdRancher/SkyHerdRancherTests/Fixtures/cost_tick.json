@@ -1,0 +1,57 @@
+{
+  "ts": 1745200001.5,
+  "seq": 42,
+  "agents": [
+    {
+      "name": "FenceLineDispatcher",
+      "state": "active",
+      "cost_delta_usd": 0.000023,
+      "cumulative_cost_usd": 0.00234,
+      "tokens_in": 1500,
+      "tokens_out": 420
+    },
+    {
+      "name": "HerdHealthWatcher",
+      "state": "idle",
+      "cost_delta_usd": 0.0,
+      "cumulative_cost_usd": 0.00189,
+      "tokens_in": 1200,
+      "tokens_out": 380
+    },
+    {
+      "name": "PredatorPatternLearner",
+      "state": "idle",
+      "cost_delta_usd": 0.0,
+      "cumulative_cost_usd": 0.00145,
+      "tokens_in": 900,
+      "tokens_out": 290
+    },
+    {
+      "name": "GrazingOptimizer",
+      "state": "idle",
+      "cost_delta_usd": 0.0,
+      "cumulative_cost_usd": 0.00201,
+      "tokens_in": 1100,
+      "tokens_out": 340
+    },
+    {
+      "name": "CalvingWatch",
+      "state": "idle",
+      "cost_delta_usd": 0.0,
+      "cumulative_cost_usd": 0.00167,
+      "tokens_in": 800,
+      "tokens_out": 210
+    },
+    {
+      "name": "CrossRanchCoordinator",
+      "state": "idle",
+      "cost_delta_usd": 0.0,
+      "cumulative_cost_usd": 0.00098,
+      "tokens_in": 600,
+      "tokens_out": 180
+    }
+  ],
+  "all_idle": false,
+  "rate_per_hr_usd": 0.0829,
+  "total_cumulative_usd": 0.01034
+}

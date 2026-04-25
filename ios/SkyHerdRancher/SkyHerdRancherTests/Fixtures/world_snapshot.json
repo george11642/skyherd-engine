@@ -1,0 +1,46 @@
+{
+  "ts": 1745200000.123,
+  "sim_time_s": 3600.0,
+  "clock_iso": "2026-04-22T15:00:00Z",
+  "is_night": false,
+  "weather": {
+    "conditions": "clear",
+    "temp_f": 72.5,
+    "wind_kt": 8.2,
+    "humidity_pct": 45.0
+  },
+  "cows": [
+    {"id": "cow_001", "tag": "A001", "pos": [0.12, 0.23], "bcs": 5.5, "state": "grazing", "heading_deg": 45.0},
+    {"id": "cow_002", "tag": "A002", "pos": [0.34, 0.45], "bcs": 6.0, "state": "resting", "heading_deg": 0.0},
+    {"id": "cow_003", "tag": "A003", "pos": [0.55, 0.67], "bcs": 4.5, "state": "sick", "heading_deg": 180.0},
+    {"id": "cow_004", "tag": "A004", "pos": [0.78, 0.89], "bcs": 7.0, "state": "walking", "heading_deg": 90.0},
+    {"id": "cow_005", "tag": "A005", "pos": [0.23, 0.56], "bcs": 5.0, "state": "grazing", "heading_deg": 270.0},
+    {"id": "cow_006", "tag": "A006", "pos": [0.45, 0.78], "bcs": 6.5, "state": "resting", "heading_deg": 30.0},
+    {"id": "cow_007", "tag": "A007", "pos": [0.67, 0.12], "bcs": 5.5, "state": "grazing", "heading_deg": 150.0},
+    {"id": "cow_008", "tag": "A008", "pos": [0.89, 0.34], "bcs": 7.5, "state": "calving", "heading_deg": 200.0},
+    {"id": "cow_009", "tag": "A009", "pos": [0.11, 0.77], "bcs": 5.0, "state": "grazing", "heading_deg": 60.0},
+    {"id": "cow_010", "tag": "A010", "pos": [0.33, 0.22], "bcs": 6.0, "state": "walking", "heading_deg": 120.0},
+    {"id": "cow_011", "tag": "A011", "pos": [0.66, 0.55], "bcs": 5.5, "state": "resting", "heading_deg": 0.0},
+    {"id": "cow_012", "tag": "A012", "pos": [0.88, 0.66], "bcs": 4.0, "state": "sick", "heading_deg": 315.0}
+  ],
+  "predators": [
+    {"id": "pred_001", "pos": [0.05, 0.05], "species": "coyote", "threat_level": "high"}
+  ],
+  "drone": {
+    "lat": 34.1234,
+    "lon": -106.4567,
+    "alt_m": 30.0,
+    "state": "patrol",
+    "battery_pct": 82.5
+  },
+  "paddocks": [
+    {"id": "north", "bounds": [0.0, 0.0, 0.5, 0.5], "forage_pct": 78.5},
+    {"id": "south", "bounds": [0.5, 0.0, 1.0, 0.5], "forage_pct": 52.3},
+    {"id": "east",  "bounds": [0.5, 0.5, 1.0, 1.0], "forage_pct": 91.0},
+    {"id": "west",  "bounds": [0.0, 0.5, 0.5, 1.0], "forage_pct": 34.7}
+  ],
+  "water_tanks": [
+    {"id": "tank_a", "pos": [0.25, 0.25], "level_pct": 88.0},
+    {"id": "tank_b", "pos": [0.75, 0.75], "level_pct": 23.5}
+  ]
+}

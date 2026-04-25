@@ -1,0 +1,83 @@
+name: SkyHerdRancher
+options:
+  bundleIdPrefix: com.skyherd
+  deploymentTarget:
+    iOS: "17.0"
+  xcodeVersion: "16.0"
+  generateEmptyDirectories: true
+  createIntermediateGroups: true
+
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    IPHONEOS_DEPLOYMENT_TARGET: "17.0"
+    PRODUCT_BUNDLE_IDENTIFIER: com.skyherd.rancher
+    DEVELOPMENT_TEAM: ""
+    CODE_SIGN_STYLE: Automatic
+    ENABLE_BITCODE: NO
+    SWIFT_STRICT_CONCURRENCY: targeted
+    DEBUG_INFORMATION_FORMAT: dwarf-with-dsym
+
+targets:
+  SkyHerdRancher:
+    type: application
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - path: SkyHerdRancher
+        excludes:
+          - "**/*.md"
+    resources:
+      - path: SkyHerdRancher/Resources/Assets.xcassets
+    info:
+      path: SkyHerdRancher/Resources/Info.plist
+      properties:
+        CFBundleDisplayName: SkyHerd Rancher
+        CFBundleIdentifier: com.skyherd.rancher
+        CFBundleShortVersionString: "1.0.0"
+        CFBundleVersion: "1"
+        LSRequiresIPhoneOS: true
+        UIRequiredDeviceCapabilities:
+          - arm64
+        UILaunchScreen: {}
+        NSAppTransportSecurity:
+          NSAllowsLocalNetworking: true
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+    settings:
+      base:
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+    scheme:
+      testTargets:
+        - SkyHerdRancherTests
+      gatherCoverageData: true
+
+  SkyHerdRancherTests:
+    type: bundle.unit-test
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - path: SkyHerdRancherTests
+    resources:
+      - path: SkyHerdRancherTests/Fixtures
+    dependencies:
+      - target: SkyHerdRancher
+    info:
+      path: SkyHerdRancherTests/Info.plist
+      properties:
+        CFBundleIdentifier: com.skyherd.rancher.tests
+        CFBundleShortVersionString: "1.0.0"
+        CFBundleVersion: "1"
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/SkyHerdRancher.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/SkyHerdRancher"
+        BUNDLE_LOADER: "$(TEST_HOST)"
