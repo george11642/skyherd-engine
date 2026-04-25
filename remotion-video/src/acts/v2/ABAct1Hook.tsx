@@ -128,6 +128,58 @@ const HookContrarian = () => (
 );
 
 // ── Beat 1B — Variant B cold open: metric punch (8s, no VO) ──────────────────
+//
+// iter-2 B fix: f0001 was still blank because KineticPunch fastFade interpolates
+// opacity [0,6] → [0,1] — opacity is exactly 0 at frame 0. Establish stakes with
+// a pain-stat pre-roll ($1,800 lost per coyote kill) that holds full opacity
+// from frame 0, then crossfades into the price reveal at ~0.5s. Now f0001 is
+// information-rich, AND the contrast between cost-of-loss and cost-of-SkyHerd
+// gives the price reveal more punch.
+const HookPainPreroll = () => {
+  const frame = useCurrentFrame();
+  const opacity = interpolate(frame, [0, 12, 18], [1, 1, 0], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  return (
+    <AbsoluteFill
+      style={{
+        alignItems: "center",
+        justifyContent: "center",
+        opacity,
+      }}
+    >
+      <div
+        style={{
+          fontFamily: "Inter, sans-serif",
+          fontWeight: 800,
+          fontSize: 140,
+          color: ACCENT_MAP.dust,
+          letterSpacing: "-0.03em",
+          textAlign: "center",
+          lineHeight: 1.0,
+        }}
+      >
+        $1,800
+      </div>
+      <div
+        style={{
+          marginTop: 18,
+          fontFamily: "Inter, sans-serif",
+          fontWeight: 600,
+          fontSize: 28,
+          color: "rgb(60 72 56)",
+          letterSpacing: "0.18em",
+          textTransform: "uppercase",
+          textAlign: "center",
+        }}
+      >
+        lost · per coyote kill
+      </div>
+    </AbsoluteFill>
+  );
+};
+
 const HookMetric = () => (
   <AbsoluteFill
     style={{
@@ -136,14 +188,15 @@ const HookMetric = () => (
       justifyContent: "center",
     }}
   >
+    <HookPainPreroll />
     <KineticPunch
       words={[
         {
-          // iter-1 B fix: was appearFrame: 15 → 0.5s blank opener. Land the
-          // hook in the first ~200ms with a snappy scale-from-1.4-to-1.0 +
-          // fast linear opacity, starting at frame 0.
+          // iter-2 B fix: shifted appearFrame 0 → 15 so the price reveal lands
+          // after the pain pre-roll fades; pain stat covers frames 0–18 at high
+          // opacity, eliminating the blank f0001.
           text: "$4.17",
-          appearFrame: 0,
+          appearFrame: 15,
           fastFade: 6,
           scaleFrom: 1.4,
           weight: 800,
@@ -152,21 +205,21 @@ const HookMetric = () => (
         },
         {
           text: "a week",
-          appearFrame: 45,
+          appearFrame: 60,
           weight: 500,
           size: 48,
           color: "rgb(60 72 56)",
         },
         {
           text: "24 / 7  nervous system",
-          appearFrame: 90,
+          appearFrame: 105,
           weight: 800,
           size: 60,
           color: ACCENT_MAP.sage,
         },
         {
           text: "10,000-acre ranch",
-          appearFrame: 165,
+          appearFrame: 180,
           weight: 600,
           size: 42,
           color: "rgb(60 72 56)",
