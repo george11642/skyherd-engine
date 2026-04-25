@@ -10,6 +10,7 @@ import {
   interpolate,
   OffthreadVideo,
   spring,
+  staticFile,
   useCurrentFrame,
   useVideoConfig,
 } from "remotion";
@@ -76,7 +77,7 @@ export const AIBodyClose: React.FC = () => {
         }}
       >
         <OffthreadVideo
-          src="/broll/t1-pexels-drone-thermal.mp4"
+          src={staticFile("broll/t1-pexels-drone-thermal.mp4")}
           style={{ width: "100%", height: "100%", objectFit: "cover" }}
           volume={0}
           startFrom={0}

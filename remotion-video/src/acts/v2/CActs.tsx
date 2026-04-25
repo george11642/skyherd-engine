@@ -1,22 +1,25 @@
 /**
- * v2 — Variant C 5-act layout (20/50/55/35/20 = 180s).
+ * v4 — Variant C 9-scene layout (3:00 / 180s / 5400 frames @ 30fps).
  *
- * Hook (20s) → Story (50s) → Demo (55s, ≤8s/scenario + 15s synthesis) →
- * Substance (35s, dedicated Opus + depth beats) → Close (20s, bookend +
- * wordmark).
+ * Act 1 Hook  (18s / 540f)  : cold-open slam (3s) + hook VO (15s)
+ * Act 2 Story (34s / 1020f) : TraditionalWay (17s) + NervousSystemStack (17s)
+ * Act 3 Demo  (58s / 1740f) : live coyote dashboard (40s) + ScenarioGrid (18s)
+ * Act 4 Sub   (42s / 1260f) : SoftwareMVPBlocks (20s) + VisionTimeline (22s)
+ * Act 5 Close (28s / 840f)  : AIBodyClose (23s) + wordmark tail (5s)
  *
- * Word-level kinetic captions throughout — placeholder kinetic-typography
- * hero overlays for now; Phase E1 wires faster-whisper word-timestamps via
- * <KineticCaptions> component (not in Phase C scope).
+ * Each scene's animations are relative to its Series.Sequence mount frame.
+ * VO Audio tags fire at scene-relative frame 0.
  *
- * B-roll composited at z=1 by BrollTrack in CAct2Story (4 cuts, 20–70s)
- * and CAct5Close (bookend night-sky-stars at 160–173s).
- * Global offsets: Act1=0s, Act2=20s, Act3=70s, Act4=125s, Act5=160s.
+ * Removed in v4:
+ *   - StyledCaptionsRevealer (import + usage)
+ *   - COpusBeat, CDepthBeat, CSynthesisBeat, CMontageScene, CDeepCoyote
+ *   - "attestation", "Merkle", "Ed25519", "ledger", "signed.*byte" strings
+ *   - old VO references (vo-hook-C, vo-story-C, vo-coyote-deep, vo-opus-C,
+ *     vo-depth-C, vo-close-C, vo-montage-*)
  */
 import {
   AbsoluteFill,
   Audio,
-  Sequence,
   Series,
   Video,
   interpolate,
@@ -27,7 +30,6 @@ import {
 } from "remotion";
 import { C_LAYOUT } from "../../compositions/calculate-main-metadata";
 import { BrollTrack, type BrollCut } from "../../components/BrollTrack";
-import { StyledCaptionsRevealer } from "../../components/StyledCaptionsRevealer";
 import {
   ACCENT_MAP,
   type Accent,
@@ -36,29 +38,36 @@ import {
   LowerThird,
   useFadeInOut,
 } from "./shared";
+import { TraditionalWay } from "../../components/diagrams/TraditionalWay";
+import { NervousSystemStack } from "../../components/diagrams/NervousSystemStack";
+import { ScenarioGrid } from "../../components/diagrams/ScenarioGrid";
+import { SoftwareMVPBlocks } from "../../components/diagrams/SoftwareMVPBlocks";
+import { VisionTimeline } from "../../components/diagrams/VisionTimeline";
+import { AIBodyClose } from "../../components/diagrams/AIBodyClose";
 import brollCRaw from "../../data/broll-C.json";
 
 const BROLL_C: BrollCut[] = (brollCRaw as { cuts: BrollCut[] }).cuts;
 
-// Global act offsets in variant C (seconds)
-const C_ACT2_START = 20;   // Act 2 Story starts at 20s
-const C_ACT5_START = 160;  // Act 5 Close starts at 160s
+// Global act offsets (seconds) used by BrollTrack
+const C_ACT5_START = 160;
 
 const FPS = 30;
 
-// ── Act 1 (Hook, 20s) — metric punch + hookC VO ───────────────────────────────
+// ── Shared helpers ────────────────────────────────────────────────────────────
 
-const C_HOOK_PUNCH = C_LAYOUT.act1.punchSeconds * FPS; // 240
+// Keep AnchorChip and LowerThird imports alive (used in CoyoteDashboard below)
+void (AnchorChip as unknown);
+void (LowerThird as unknown);
 
-// iter-3 C fix: even with the iter-2 cold-open, f0001 still looked empty —
-// HookColdOpen renders a darkened b-roll (brightness 0.55 + heavy dark gradient)
-// and the stat text didn't fade in until f8. Add a 1.5s opening stat slam
-// ("1 rancher · 10,000 acres · 0 sleep") that holds full opacity from frame 0
-// over a solid dark backdrop, then crossfades out at f33→f48 so the existing
-// $1.8B / yr cold-open continues into the "$4.17" reveal at f90.
-const HookOpeningSlam = () => {
+// ── Scene 1: Cold Open (3s / 90 frames, silent) ───────────────────────────────
+
+/**
+ * "1 rancher · 10,000 acres · 0 sleep" slam.
+ * Holds from frame 0, exits at f75→90 to avoid bleeding into hook VO.
+ */
+const ColdOpenSlam = () => {
   const frame = useCurrentFrame();
-  const opacity = interpolate(frame, [0, 33, 48], [1, 1, 0], {
+  const opacityOut = interpolate(frame, [60, 90], [1, 0], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
@@ -68,7 +77,7 @@ const HookOpeningSlam = () => {
         backgroundColor: "rgb(8 10 14)",
         alignItems: "center",
         justifyContent: "center",
-        opacity,
+        opacity: opacityOut,
       }}
     >
       <div
@@ -93,32 +102,21 @@ const HookOpeningSlam = () => {
   );
 };
 
-// iter-2 C fix: f0001 was blank — KineticPunch's first word "$4.17" appeared at
-// frame 15 with no fastFade, so opacity at frame 0 was 0. Replace the blank
-// opener with a 3s visceral cold-open: aerial drone b-roll of the ranch under
-// a "$1.8B / yr · predators & strays" pain stat, fading 75→105f. The kinetic
-// "$4.17" reveal now lands at frame 90 (after the cold open exits) so the
-// quantified pain anchors the Impact rubric before the relief number arrives.
-const HookColdOpen = () => {
+/**
+ * "$1.8B / yr" aerial cut — appears at f8, exits at end of cold open.
+ */
+const ColdOpenAerial = () => {
   const frame = useCurrentFrame();
-  const opacity = interpolate(frame, [0, 75, 105], [1, 1, 0], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
   const statO = interpolate(frame, [8, 26], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
-  const statY = interpolate(frame, [8, 26], [18, 0], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
   return (
-    <AbsoluteFill style={{ opacity }}>
+    <AbsoluteFill>
       <Video
         src={staticFile("clips/ambient_establish.mp4")}
         startFrom={0}
-        endAt={120}
+        endAt={90}
         muted
         style={{
           width: "100%",
@@ -139,7 +137,6 @@ const HookColdOpen = () => {
           justifyContent: "center",
           padding: "0 8%",
           opacity: statO,
-          transform: `translateY(${statY}px)`,
           flexDirection: "column",
           gap: 18,
         }}
@@ -188,72 +185,17 @@ const HookColdOpen = () => {
   );
 };
 
-const CAct1HookPunch = () => (
-  <AbsoluteFill
-    style={{
-      backgroundColor: "rgb(248 244 234)",
-      alignItems: "center",
-      justifyContent: "center",
-    }}
-  >
-    <HookColdOpen />
-    <HookOpeningSlam />
-    <KineticPunch
-      words={[
-        {
-          // iter-2 C fix: shifted appearFrame 15 → 90 so the price reveal lands
-          // after HookColdOpen fades (75→105f). All subsequent words shifted by
-          // +75 to preserve the original stagger spacing.
-          text: "$4.17",
-          appearFrame: 90,
-          fastFade: 6,
-          scaleFrom: 1.4,
-          weight: 800,
-          size: 240,
-          color: ACCENT_MAP.dust,
-        },
-        {
-          text: "/ week",
-          appearFrame: 120,
-          weight: 500,
-          size: 52,
-          color: "rgb(60 72 56)",
-        },
-        {
-          text: "24 / 7",
-          appearFrame: 165,
-          weight: 800,
-          size: 96,
-          color: ACCENT_MAP.sage,
-        },
-        {
-          text: "nervous system",
-          appearFrame: 195,
-          weight: 800,
-          size: 64,
-          color: ACCENT_MAP.sage,
-        },
-        {
-          text: "10,000-acre ranch",
-          appearFrame: 225,
-          weight: 600,
-          size: 44,
-          color: "rgb(60 72 56)",
-        },
-      ]}
-    />
-  </AbsoluteFill>
-);
+// ── Scene 2: Hook + Intro VO (15s / 450 frames) ───────────────────────────────
 
-const CAct1HookVo = () => {
+const HookIntroVo = () => {
   const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
   const opacity = useFadeInOut(durationInFrames, 18, 18);
-  const zoom = interpolate(frame, [0, durationInFrames], [1.0, 1.1]);
+  const zoom = interpolate(frame, [0, durationInFrames], [1.0, 1.08]);
 
   return (
     <AbsoluteFill style={{ backgroundColor: "rgb(8 10 14)", opacity }}>
-      <Audio src={staticFile("voiceover/vo-hook-C.mp3")} />
+      <Audio src={staticFile("voiceover/vo-c-hook.mp3")} />
       <div
         style={{
           width: "100%",
@@ -279,6 +221,48 @@ const CAct1HookVo = () => {
           background:
             "linear-gradient(180deg, rgba(10,12,16,0) 50%, rgba(10,12,16,0.85) 100%)",
         }}
+      />
+      {/* Kinetic typography: key phrases appear over the VO */}
+      <KineticPunch
+        words={[
+          {
+            text: "$4.17",
+            appearFrame: 30,
+            fastFade: 6,
+            scaleFrom: 1.4,
+            weight: 800,
+            size: 200,
+            color: ACCENT_MAP.dust,
+          },
+          {
+            text: "/ week",
+            appearFrame: 60,
+            weight: 500,
+            size: 48,
+            color: "rgb(60 72 56)",
+          },
+          {
+            text: "24 / 7",
+            appearFrame: 120,
+            weight: 800,
+            size: 88,
+            color: ACCENT_MAP.sage,
+          },
+          {
+            text: "nervous system",
+            appearFrame: 160,
+            weight: 800,
+            size: 60,
+            color: ACCENT_MAP.sage,
+          },
+          {
+            text: "10,000-acre ranch",
+            appearFrame: 200,
+            weight: 600,
+            size: 42,
+            color: "rgb(60 72 56)",
+          },
+        ]}
       />
       <div
         style={{
@@ -321,351 +305,63 @@ const CAct1HookVo = () => {
   );
 };
 
+// ── Act 1 Export ──────────────────────────────────────────────────────────────
+
 export const CAct1Hook = () => {
-  const frame = useCurrentFrame();
-  const { durationInFrames } = useVideoConfig();
-  void frame;
-  const VO = durationInFrames - C_HOOK_PUNCH;
+  const COLD = C_LAYOUT.act1.coldOpenSeconds * FPS; // 3s = 90f
+  const HOOK = C_LAYOUT.act1.hookSeconds * FPS;     // 15s = 450f
 
   return (
     <AbsoluteFill>
-      <Sequence from={0} durationInFrames={C_HOOK_PUNCH} layout="none">
-        <CAct1HookPunch />
-      </Sequence>
-      <Sequence from={C_HOOK_PUNCH} durationInFrames={VO} layout="none">
-        <CAct1HookVo />
-      </Sequence>
+      <Series>
+        <Series.Sequence durationInFrames={COLD}>
+          <AbsoluteFill>
+            <ColdOpenAerial />
+            <ColdOpenSlam />
+          </AbsoluteFill>
+        </Series.Sequence>
+        <Series.Sequence durationInFrames={HOOK}>
+          <HookIntroVo />
+        </Series.Sequence>
+      </Series>
     </AbsoluteFill>
   );
 };
 
-// ── Act 2 (Story, 50s) — full market arc ─────────────────────────────────────
-
-const STORY_LINES: Array<{ at: number; text: string; size?: number; color?: string }> = [
-  { at: 30, text: "Beef · record highs", color: ACCENT_MAP.dust },
-  { at: 180, text: "Cow herd · 65-yr low", color: ACCENT_MAP.dust },
-  { at: 330, text: "Labor · gone", color: ACCENT_MAP.sage },
-  { at: 480, text: "Ranchers · aging out", color: ACCENT_MAP.sage },
-  { at: 660, text: "72 hours blind", size: 92, color: ACCENT_MAP.warn },
-  {
-    at: 900,
-    text: "The rancher does not.",
-    size: 96,
-    color: ACCENT_MAP.dust,
-  },
-  { at: 1110, text: "So we built one.", size: 64, color: ACCENT_MAP.sage },
-];
+// ── Act 2 Export ──────────────────────────────────────────────────────────────
 
 export const CAct2Story = () => {
-  const frame = useCurrentFrame();
-  const { durationInFrames } = useVideoConfig();
-  const opacity = useFadeInOut(durationInFrames, 30, 30);
+  const TRAD = C_LAYOUT.act2.traditionalSeconds * FPS; // 17s = 510f
+  const ANS  = C_LAYOUT.act2.answerSeconds * FPS;      // 17s = 510f
 
   return (
-    <AbsoluteFill style={{ backgroundColor: "rgb(8 10 14)", opacity }}>
-      <Audio src={staticFile("voiceover/vo-story-C.mp3")} />
-      {/* z=1 b-roll: 4 cinematic cuts per EDL (cattle, paddock, meadow, lightning, drone) */}
-      <BrollTrack track={BROLL_C} compositionStartSeconds={C_ACT2_START} />
-      {/* Dark base behind b-roll */}
-      <AbsoluteFill style={{ backgroundColor: "rgb(6 8 12)" }} />
-      <AbsoluteFill
-        style={{
-          background:
-            "linear-gradient(180deg, rgba(6,8,12,0.55) 0%, rgba(6,8,12,0.82) 100%)",
-        }}
-      />
-      {STORY_LINES.map((line, i) => {
-        const inAt = line.at;
-        const outAt = line.at + 165;
-        const o = interpolate(
-          frame,
-          [inAt, inAt + 18, outAt - 18, outAt],
-          [0, 1, 1, 0],
-          { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
-        );
-        const y = interpolate(frame - inAt, [0, 18], [22, 0], {
-          extrapolateLeft: "clamp",
-          extrapolateRight: "clamp",
-        });
-        return (
-          <AbsoluteFill
-            key={`s-${i}`}
-            style={{
-              alignItems: "center",
-              justifyContent: "center",
-              padding: "0 8%",
-              opacity: o,
-              transform: `translateY(${y}px)`,
-            }}
-          >
-            <div
-              style={{
-                fontFamily: "Inter, sans-serif",
-                fontWeight: 800,
-                fontSize: line.size ?? 68,
-                color: line.color ?? "rgb(236 239 244)",
-                letterSpacing: "-0.022em",
-                textAlign: "center",
-                lineHeight: 1.1,
-                textShadow: "0 6px 28px rgba(0,0,0,0.65)",
-              }}
-            >
-              {line.text}
-            </div>
+    <AbsoluteFill>
+      <Series>
+        <Series.Sequence durationInFrames={TRAD}>
+          <AbsoluteFill>
+            <Audio src={staticFile("voiceover/vo-c-traditional.mp3")} />
+            <TraditionalWay />
           </AbsoluteFill>
-        );
-      })}
+        </Series.Sequence>
+        <Series.Sequence durationInFrames={ANS}>
+          <AbsoluteFill>
+            <Audio src={staticFile("voiceover/vo-c-answer.mp3")} />
+            <NervousSystemStack />
+          </AbsoluteFill>
+        </Series.Sequence>
+      </Series>
     </AbsoluteFill>
   );
 };
 
-// ── Act 3 (Demo, 55s) — 5 scenarios @ 8s + 15s synthesis ─────────────────────
+// ── Scene: Live Coyote Dashboard (40s / 1200 frames) ─────────────────────────
 
-type CScenarioProps = {
-  scenarioNumber: number;
-  clipName: string;
-  voFile: string | null;
-  voStartFrame: number;
-  agent: string;
-  detail: string;
-  accent: Accent;
-  anchorLabel: string;
-  anchorTopic: string;
-  anchorHash: string;
-  anchorStatus: string;
-};
-
-const CScenario = ({
-  scenarioNumber,
-  clipName,
-  voFile,
-  voStartFrame,
-  agent,
-  detail,
-  accent,
-  anchorLabel,
-  anchorTopic,
-  anchorHash,
-  anchorStatus,
-}: CScenarioProps) => {
-  const frame = useCurrentFrame();
-  const { durationInFrames } = useVideoConfig();
-
-  const fadeIn = interpolate(frame, [0, 8], [0, 1], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
-  const fadeOut = interpolate(
-    frame,
-    [durationInFrames - 12, durationInFrames],
-    [1, 0.25],
-    { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
-  );
-  const opacity = Math.min(fadeIn, fadeOut);
-
-  return (
-    <AbsoluteFill style={{ backgroundColor: "rgb(6 8 12)" }}>
-      <div style={{ width: "100%", height: "100%", opacity }}>
-        <Video
-          src={staticFile(`clips/${clipName}`)}
-          startFrom={0}
-          endAt={300}
-          muted
-          style={{
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-          }}
-        />
-      </div>
-      <AbsoluteFill
-        style={{
-          background:
-            "radial-gradient(ellipse at center, rgba(0,0,0,0) 55%, rgba(6,8,12,0.55) 100%)",
-          opacity,
-        }}
-      />
-      <div
-        style={{
-          position: "absolute",
-          top: 80,
-          left: 80,
-          display: "flex",
-          alignItems: "center",
-          gap: 14,
-          opacity: fadeIn,
-        }}
-      >
-        <div
-          style={{
-            width: 48,
-            height: 48,
-            borderRadius: 24,
-            backgroundColor: ACCENT_MAP[accent],
-            color: "rgb(10 12 16)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontFamily: "Inter, sans-serif",
-            fontWeight: 800,
-            fontSize: 24,
-          }}
-        >
-          {scenarioNumber}
-        </div>
-        <div
-          style={{
-            fontFamily: "Inter, sans-serif",
-            fontSize: 14,
-            letterSpacing: "0.32em",
-            textTransform: "uppercase",
-            color: "rgb(236 239 244)",
-            fontWeight: 600,
-          }}
-        >
-          {scenarioNumber} / 5
-        </div>
-      </div>
-      {voFile ? (
-        <Sequence from={voStartFrame}>
-          <Audio src={staticFile(voFile)} />
-        </Sequence>
-      ) : null}
-      <LowerThird
-        agent={agent}
-        detail={detail}
-        accent={accent}
-        appearFrame={30}
-        durationInFrames={durationInFrames - 30}
-      />
-      <AnchorChip
-        label={anchorLabel}
-        topic={anchorTopic}
-        hash={anchorHash}
-        statusPill={anchorStatus}
-        appearFrame={Math.max(120, voStartFrame + 30)}
-        accent={accent}
-      />
-    </AbsoluteFill>
-  );
-};
-
-const CSynthesisBeat = () => {
-  const frame = useCurrentFrame();
-  const { durationInFrames, fps } = useVideoConfig();
-  const opacity = useFadeInOut(durationInFrames, 15, 15);
-
-  // iter2: short 5s synthesis with three fast cards. No VO — music carries,
-  // script retired vo-synthesis-C in the humanize pass.
-  const cards = [
-    {
-      at: 10,
-      title: "5 Managed Agents",
-      body: "Idle-pause billing.",
-      accent: "sage" as Accent,
-    },
-    {
-      at: 40,
-      title: "33 Skill Files",
-      body: "Per-task knowledge.",
-      accent: "dust" as Accent,
-    },
-    {
-      at: 80,
-      title: "$4.17 / week",
-      body: "24/7 coverage.",
-      accent: "sky" as Accent,
-    },
-  ];
-
-  return (
-    <AbsoluteFill style={{ backgroundColor: "rgb(8 10 14)", opacity }}>
-      <Video
-        src={staticFile("clips/ambient_30x_synthesis.mp4")}
-        startFrom={0}
-        endAt={durationInFrames + 60}
-        muted
-        style={{
-          width: "100%",
-          height: "100%",
-          objectFit: "cover",
-          filter: "saturate(0.9) brightness(0.7)",
-        }}
-      />
-      <AbsoluteFill
-        style={{
-          background:
-            "linear-gradient(180deg, rgba(6,8,12,0.4) 0%, rgba(6,8,12,0.82) 100%)",
-        }}
-      />
-      <div
-        style={{
-          position: "absolute",
-          top: "50%",
-          right: 100,
-          transform: "translateY(-50%)",
-          display: "flex",
-          flexDirection: "column",
-          gap: 18,
-          width: 540,
-        }}
-      >
-        {cards.map((c, i) => {
-          const p = spring({
-            frame: frame - c.at,
-            fps,
-            config: { damping: 100, stiffness: 200, mass: 0.7 },
-          });
-          const x = interpolate(p, [0, 1], [60, 0]);
-          const o = interpolate(p, [0, 1], [0, 1], {
-            extrapolateLeft: "clamp",
-            extrapolateRight: "clamp",
-          });
-          return (
-            <div
-              key={`c-${i}`}
-              style={{
-                transform: `translateX(${x}px)`,
-                opacity: o,
-                backgroundColor: "rgba(16,19,25,0.86)",
-                border: `1px solid ${ACCENT_MAP[c.accent]}`,
-                borderLeft: `5px solid ${ACCENT_MAP[c.accent]}`,
-                borderRadius: 8,
-                padding: "16px 22px",
-                fontFamily: "Inter, sans-serif",
-              }}
-            >
-              <div
-                style={{
-                  fontSize: 28,
-                  fontWeight: 700,
-                  color: "rgb(236 239 244)",
-                  letterSpacing: "-0.012em",
-                }}
-              >
-                {c.title}
-              </div>
-              <div
-                style={{
-                  fontSize: 16,
-                  color: "rgb(168 180 198)",
-                  marginTop: 4,
-                  fontWeight: 500,
-                }}
-              >
-                {c.body}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </AbsoluteFill>
-  );
-};
-
-// Deep coyote scenario for variant C — same visual grammar as AB deep beat
-// but uses the shared vo-coyote-deep.mp3 and keeps the dense-caption flow.
-const CDeepCoyote = () => {
+/**
+ * Jargon-free live coyote FenceLineDispatcher dashboard.
+ * VO is vo-c-coyote.mp3 (~16.4s); the remaining ~24s is the live dashboard
+ * continuing to play through the scenario.
+ */
+const CoyoteDashboard = () => {
   const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
 
@@ -681,7 +377,8 @@ const CDeepCoyote = () => {
   );
   const opacity = Math.min(fadeIn, fadeOut);
 
-  const SMS_AT = 19 * 30;
+  // SMS callout appears at ~19s into the scene
+  const SMS_AT = 19 * FPS;
   const smsO = interpolate(frame, [SMS_AT, SMS_AT + 20], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
@@ -689,7 +386,7 @@ const CDeepCoyote = () => {
 
   return (
     <AbsoluteFill style={{ backgroundColor: "rgb(6 8 12)" }}>
-      <Audio src={staticFile("voiceover/vo-coyote-deep.mp3")} />
+      <Audio src={staticFile("voiceover/vo-c-coyote.mp3")} />
       <div style={{ width: "100%", height: "100%", opacity }}>
         <Video
           src={staticFile("clips/coyote.mp4")}
@@ -710,6 +407,7 @@ const CDeepCoyote = () => {
           opacity,
         }}
       />
+      {/* Time badge */}
       <div
         style={{
           position: "absolute",
@@ -748,24 +446,27 @@ const CDeepCoyote = () => {
             fontWeight: 600,
           }}
         >
-          Deep scenario · Coyote
+          South fence · thermal alert
         </div>
       </div>
+      {/* Agent + result callout */}
       <LowerThird
         agent="FenceLineDispatcher"
         detail="Coyote · 91% · Mavic dispatched"
-        accent="thermal"
+        accent={"thermal" as Accent}
         appearFrame={45}
         durationInFrames={durationInFrames - 45}
       />
+      {/* Outcome chip — no jargon */}
       <AnchorChip
-        label="Attest"
+        label="Result"
         topic="Fence W-12 breach"
-        hash="a7c3…f91e"
-        statusPill="Signed"
-        appearFrame={22 * 30}
-        accent="thermal"
+        hash="Drone deterred"
+        statusPill="Resolved"
+        appearFrame={22 * FPS}
+        accent={"thermal" as Accent}
       />
+      {/* SMS card */}
       <div
         style={{
           position: "absolute",
@@ -802,533 +503,56 @@ const CDeepCoyote = () => {
   );
 };
 
-// Montage scene for C — 6-7s kinetic callout + optional VO.
-type CMontageProps = {
-  clipName: string;
-  callout: string;
-  agent: string;
-  detail: string;
-  accent: Accent;
-  anchorLabel: string;
-  anchorTopic: string;
-  anchorHash: string;
-  anchorStatus: string;
-  /** Optional VO file path relative to public/. Plays from frame 0. */
-  voFile?: string;
-};
-
-const CMontageScene = ({
-  clipName,
-  callout,
-  agent,
-  detail,
-  accent,
-  anchorLabel,
-  anchorTopic,
-  anchorHash,
-  anchorStatus,
-  voFile,
-}: CMontageProps) => {
-  const frame = useCurrentFrame();
-  const { durationInFrames } = useVideoConfig();
-
-  const fadeIn = interpolate(frame, [0, 6], [0, 1], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
-  const fadeOut = interpolate(
-    frame,
-    [durationInFrames - 8, durationInFrames],
-    [1, 0.2],
-    { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
-  );
-  const opacity = Math.min(fadeIn, fadeOut);
-
-  const calloutO = interpolate(frame, [12, 28], [0, 1], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
-
-  return (
-    <AbsoluteFill style={{ backgroundColor: "rgb(6 8 12)" }}>
-      {voFile ? <Audio src={staticFile(voFile)} /> : null}
-      <div style={{ width: "100%", height: "100%", opacity }}>
-        <Video
-          src={staticFile(`clips/${clipName}`)}
-          startFrom={0}
-          endAt={200}
-          muted
-          style={{
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-          }}
-        />
-      </div>
-      <AbsoluteFill
-        style={{
-          background:
-            "radial-gradient(ellipse at center, rgba(0,0,0,0) 50%, rgba(6,8,12,0.65) 100%)",
-          opacity,
-        }}
-      />
-      <div
-        style={{
-          position: "absolute",
-          top: 180,
-          left: 0,
-          right: 0,
-          textAlign: "center",
-          padding: "0 8%",
-          opacity: calloutO,
-        }}
-      >
-        <div
-          style={{
-            fontFamily: "Inter, sans-serif",
-            fontWeight: 800,
-            fontSize: 50,
-            color: ACCENT_MAP[accent],
-            letterSpacing: "-0.022em",
-            lineHeight: 1.1,
-            textShadow: "0 6px 30px rgba(0,0,0,0.75)",
-          }}
-        >
-          {callout}
-        </div>
-      </div>
-      <LowerThird
-        agent={agent}
-        detail={detail}
-        accent={accent}
-        appearFrame={20}
-        durationInFrames={durationInFrames - 20}
-      />
-      <AnchorChip
-        label={anchorLabel}
-        topic={anchorTopic}
-        hash={anchorHash}
-        statusPill={anchorStatus}
-        appearFrame={40}
-        accent={accent}
-      />
-    </AbsoluteFill>
-  );
-};
+// ── Act 3 Export ──────────────────────────────────────────────────────────────
 
 export const CAct3Demo = () => {
-  const DEEP = C_LAYOUT.act3.coyoteDeepMin * FPS; // ~750
-  const MONTAGE_TOTAL = C_LAYOUT.act3.montageSeconds * FPS; // 750
-  const SCENE = Math.floor(
-    MONTAGE_TOTAL / C_LAYOUT.act3.montageSceneCount,
-  );
-  const SYNTH = C_LAYOUT.act3.synthesisSeconds * FPS; // 150
-
-  // Keep CScenario import alive — it's used nowhere else now but we retain the
-  // export for backwards-compat with the caption track generator.
-  void CScenario;
+  const COYOTE = C_LAYOUT.act3.coyoteSeconds * FPS; // 40s = 1200f
+  const GRID   = C_LAYOUT.act3.gridSeconds * FPS;   // 18s = 540f
 
   return (
     <AbsoluteFill>
       <Series>
-        <Series.Sequence durationInFrames={DEEP}>
-          <CDeepCoyote />
+        <Series.Sequence durationInFrames={COYOTE}>
+          <CoyoteDashboard />
         </Series.Sequence>
-        <Series.Sequence durationInFrames={SCENE}>
-          <CMontageScene
-            clipName="sick_cow.mp4"
-            callout="A014 — vet packet in 12 seconds"
-            agent="HerdHealthWatcher"
-            detail="Cow A014 · pinkeye 83%"
-            accent="warn"
-            anchorLabel="Vet"
-            anchorTopic="Cow A014"
-            anchorHash="4d82…b03c"
-            anchorStatus="Sent"
-            voFile="voiceover/vo-montage-sick.mp3"
-          />
-        </Series.Sequence>
-        <Series.Sequence durationInFrames={SCENE}>
-          <CMontageScene
-            clipName="water.mp4"
-            callout="Tank 7 · 8 PSI · drone flew it"
-            agent="GrazingOptimizer"
-            detail="Tank 7 · pressure drop"
-            accent="sky"
-            anchorLabel="IR"
-            anchorTopic="Tank 7"
-            anchorHash="92e1…5a0d"
-            anchorStatus="Queued"
-            voFile="voiceover/vo-montage-tank.mp3"
-          />
-        </Series.Sequence>
-        <Series.Sequence durationInFrames={SCENE}>
-          <CMontageScene
-            clipName="calving.mp4"
-            callout="117's calving · 3:14am"
-            agent="CalvingWatch"
-            detail="Cow 117 · pre-labor"
-            accent="sage"
-            anchorLabel="Trace"
-            anchorTopic="Cow 117"
-            anchorHash="61bf…2c94"
-            anchorStatus="Paged"
-            voFile="voiceover/vo-montage-calving.mp3"
-          />
-        </Series.Sequence>
-        <Series.Sequence durationInFrames={SCENE}>
-          <CMontageScene
-            clipName="storm.mp4"
-            callout="Hail 45min · herd → Shelter 2"
-            agent="Weather-Redirect"
-            detail="Paddock B → Shelter 2"
-            accent="dust"
-            anchorLabel="Plan"
-            anchorTopic="Shelter 2"
-            anchorHash="d3a9…7e11"
-            anchorStatus="Active"
-            voFile="voiceover/vo-montage-storm.mp3"
-          />
-        </Series.Sequence>
-        <Series.Sequence durationInFrames={SYNTH}>
-          <CSynthesisBeat />
+        <Series.Sequence durationInFrames={GRID}>
+          <AbsoluteFill>
+            <Audio src={staticFile("voiceover/vo-c-grid.mp3")} />
+            <ScenarioGrid />
+          </AbsoluteFill>
         </Series.Sequence>
       </Series>
     </AbsoluteFill>
   );
 };
 
-// ── Act 4 (Substance, 35s) — Opus 4.7 (20s) + Depth (15s) ────────────────────
-
-const COpusBeat = () => {
-  const frame = useCurrentFrame();
-  const { durationInFrames } = useVideoConfig();
-  const opacity = useFadeInOut(durationInFrames, 25, 25);
-
-  const lines = [
-    "[FenceLineDispatcher]    beta-session-id=fls_8a2f  cache-hit=92%",
-    "[HerdHealthWatcher]      beta-session-id=hhw_3c91  cache-hit=88%",
-    "[PredatorPatternLearner] beta-session-id=ppl_4d7e  cache-hit=95%",
-    "[GrazingOptimizer]       beta-session-id=gop_b211  cache-hit=89%",
-    "[CalvingWatch]           beta-session-id=cwc_e604  cache-hit=91%",
-    "all 5 idle · cost ticker $4.17/week",
-  ];
-
-  return (
-    <AbsoluteFill style={{ backgroundColor: "rgb(8 10 14)", opacity }}>
-      <Audio src={staticFile("voiceover/vo-opus-C.mp3")} />
-
-      {/* Left half: title + headline */}
-      <div
-        style={{
-          position: "absolute",
-          left: 80,
-          top: 80,
-          width: "45%",
-          fontFamily: "Inter, sans-serif",
-        }}
-      >
-        <div
-          style={{
-            fontSize: 14,
-            color: ACCENT_MAP.sage,
-            letterSpacing: "0.34em",
-            textTransform: "uppercase",
-            fontWeight: 600,
-            marginBottom: 16,
-          }}
-        >
-          Act IV · Opus 4.7
-        </div>
-        <div
-          style={{
-            fontSize: 50,
-            fontWeight: 800,
-            color: "rgb(236 239 244)",
-            letterSpacing: "-0.022em",
-            lineHeight: 1.05,
-          }}
-        >
-          Five Managed Agents.
-          <br />
-          One platform session each.
-          <br />
-          <span style={{ color: ACCENT_MAP.sage }}>Idle-pause billing.</span>
-        </div>
-        <div
-          style={{
-            marginTop: 30,
-            fontSize: 20,
-            color: "rgb(168 180 198)",
-            fontWeight: 500,
-            lineHeight: 1.4,
-          }}
-        >
-          Beta header <code style={{ color: ACCENT_MAP.dust }}>managed-agents-2026-04-01</code>.
-          Cache control{" "}
-          <code style={{ color: ACCENT_MAP.dust }}>cache_control: ephemeral</code> on
-          system + skills prefix.
-        </div>
-        <div
-          style={{
-            marginTop: 24,
-            fontSize: 18,
-            color: ACCENT_MAP.sage,
-            fontWeight: 600,
-            letterSpacing: "0.02em",
-            lineHeight: 1.35,
-          }}
-        >
-          Opus 4.7 also authors the per-word caption styling JSON committed in
-          this repo. The text you're reading is editorial output of the model.
-        </div>
-      </div>
-
-      {/* Right half: terminal stream — hidden after frame 18s when StyledCaptionsRevealer takes over */}
-      <div
-        style={{
-          position: "absolute",
-          right: 80,
-          top: 90,
-          width: "42%",
-          backgroundColor: "rgb(6 8 12)",
-          border: `1px solid ${ACCENT_MAP.sage}`,
-          borderRadius: 10,
-          padding: "22px 26px",
-          fontFamily: "ui-monospace, JetBrains Mono, monospace",
-          fontSize: 16,
-          color: "rgb(180 200 188)",
-          lineHeight: 1.7,
-          boxShadow: "0 12px 40px rgba(0,0,0,0.55)",
-          opacity: interpolate(frame, [18 * 30 - 15, 18 * 30], [1, 0], {
-            extrapolateLeft: "clamp",
-            extrapolateRight: "clamp",
-          }),
-        }}
-      >
-        <div
-          style={{
-            color: ACCENT_MAP.sage,
-            marginBottom: 14,
-            fontSize: 13,
-            letterSpacing: "0.18em",
-            textTransform: "uppercase",
-            fontWeight: 700,
-          }}
-        >
-          $ skyherd-mesh smoke
-        </div>
-        {lines.map((l, i) => {
-          const o = interpolate(frame, [60 + i * 30, 75 + i * 30], [0, 1], {
-            extrapolateLeft: "clamp",
-            extrapolateRight: "clamp",
-          });
-          return (
-            <div key={`l-${i}`} style={{ opacity: o }}>
-              {l}
-            </div>
-          );
-        })}
-      </div>
-
-      {/* StyledCaptionsRevealer — appears at frame 18s, replaces terminal list for last 6s */}
-      <Sequence from={18 * 30} layout="none">
-        <StyledCaptionsRevealer variant="C" appearFrame={0} />
-      </Sequence>
-    </AbsoluteFill>
-  );
-};
-
-const CDepthBeat = () => {
-  const frame = useCurrentFrame();
-  const { durationInFrames } = useVideoConfig();
-  const opacity = useFadeInOut(durationInFrames, 25, 25);
-
-  const numbers = [
-    { at: 30, label: "tests", value: "1,106" },
-    { at: 90, label: "coverage", value: "87%" },
-    { at: 150, label: "signed events", value: "360" },
-    { at: 210, label: "seed", value: "42" },
-  ];
-
-  return (
-    <AbsoluteFill style={{ backgroundColor: "rgb(8 10 14)", opacity }}>
-      <Audio src={staticFile("voiceover/vo-depth-C.mp3")} />
-      <Video
-        src={staticFile("clips/attest_verify.mp4")}
-        startFrom={0}
-        endAt={durationInFrames + 60}
-        muted
-        style={{
-          width: "100%",
-          height: "100%",
-          objectFit: "cover",
-          filter: "brightness(0.55)",
-        }}
-      />
-      <AbsoluteFill
-        style={{
-          background:
-            "linear-gradient(180deg, rgba(6,8,12,0.55) 0%, rgba(6,8,12,0.85) 100%)",
-        }}
-      />
-
-      <div
-        style={{
-          position: "absolute",
-          left: 100,
-          top: "30%",
-          fontFamily: "Inter, sans-serif",
-        }}
-      >
-        <div
-          style={{
-            fontSize: 14,
-            color: ACCENT_MAP.sage,
-            letterSpacing: "0.34em",
-            textTransform: "uppercase",
-            fontWeight: 600,
-            marginBottom: 24,
-          }}
-        >
-          Same seed. Same bytes. Every time.
-        </div>
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(2, auto)",
-            columnGap: 80,
-            rowGap: 24,
-          }}
-        >
-          {numbers.map((n, i) => {
-            const o = interpolate(frame, [n.at, n.at + 18], [0, 1], {
-              extrapolateLeft: "clamp",
-              extrapolateRight: "clamp",
-            });
-            return (
-              <div key={`n-${i}`} style={{ opacity: o }}>
-                <div
-                  style={{
-                    fontSize: 76,
-                    fontWeight: 800,
-                    color: ACCENT_MAP.dust,
-                    letterSpacing: "-0.03em",
-                    lineHeight: 1,
-                  }}
-                >
-                  {n.value}
-                </div>
-                <div
-                  style={{
-                    fontSize: 16,
-                    color: "rgb(168 180 198)",
-                    letterSpacing: "0.22em",
-                    textTransform: "uppercase",
-                    fontWeight: 600,
-                    marginTop: 6,
-                  }}
-                >
-                  {n.label}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    </AbsoluteFill>
-  );
-};
+// ── Act 4 Export ──────────────────────────────────────────────────────────────
 
 export const CAct4Substance = () => {
-  const OPUS = C_LAYOUT.act4.opusMin * FPS;
-  const DEPTH = C_LAYOUT.act4.depthMin * FPS;
+  const MVP    = C_LAYOUT.act4.mvpSeconds * FPS;    // 20s = 600f
+  const VISION = C_LAYOUT.act4.visionSeconds * FPS; // 22s = 660f
 
   return (
     <AbsoluteFill>
       <Series>
-        <Series.Sequence durationInFrames={OPUS}>
-          <COpusBeat />
+        <Series.Sequence durationInFrames={MVP}>
+          <AbsoluteFill>
+            <Audio src={staticFile("voiceover/vo-c-mvp.mp3")} />
+            <SoftwareMVPBlocks />
+          </AbsoluteFill>
         </Series.Sequence>
-        <Series.Sequence durationInFrames={DEPTH}>
-          <CDepthBeat />
+        <Series.Sequence durationInFrames={VISION}>
+          <AbsoluteFill>
+            <Audio src={staticFile("voiceover/vo-c-vision.mp3")} />
+            <VisionTimeline />
+          </AbsoluteFill>
         </Series.Sequence>
       </Series>
     </AbsoluteFill>
   );
 };
 
-// ── Act 5 (Close, 20s) — bookend (13s) + wordmark (7s) ───────────────────────
-
-const CCloseBookend = () => {
-  const frame = useCurrentFrame();
-  const { durationInFrames } = useVideoConfig();
-  const opacity = useFadeInOut(durationInFrames, 25, 30);
-
-  const lines = [
-    { at: 30, text: "Beef at record highs.", color: ACCENT_MAP.dust },
-    { at: 120, text: "Cow herd at a 65-yr low.", color: ACCENT_MAP.dust },
-    {
-      at: 240,
-      text: "Now the ranch can watch itself.",
-      color: ACCENT_MAP.sage,
-      bold: true,
-    },
-  ];
-
-  return (
-    <AbsoluteFill style={{ backgroundColor: "rgb(8 10 14)", opacity }}>
-      <Audio src={staticFile("voiceover/vo-close-C.mp3")} />
-      {/* Dark base — BrollTrack composites night-sky-stars at z=1 */}
-      <AbsoluteFill style={{ backgroundColor: "rgb(6 8 12)" }} />
-      <AbsoluteFill
-        style={{
-          background:
-            "linear-gradient(180deg, rgba(6,8,12,0.4) 0%, rgba(6,8,12,0.82) 100%)",
-        }}
-      />
-      <AbsoluteFill
-        style={{
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "0 8%",
-          flexDirection: "column",
-          gap: 24,
-        }}
-      >
-        {lines.map((l, i) => {
-          const o = interpolate(frame, [l.at, l.at + 22], [0, 1], {
-            extrapolateLeft: "clamp",
-            extrapolateRight: "clamp",
-          });
-          const y = interpolate(frame - l.at, [0, 22], [30, 0], {
-            extrapolateLeft: "clamp",
-            extrapolateRight: "clamp",
-          });
-          return (
-            <div
-              key={`cl-${i}`}
-              style={{
-                fontFamily: "Inter, sans-serif",
-                fontWeight: l.bold ? 800 : 700,
-                fontSize: l.bold ? 80 : 56,
-                color: l.color,
-                letterSpacing: "-0.022em",
-                textAlign: "center",
-                lineHeight: 1.1,
-                opacity: o,
-                transform: `translateY(${y}px)`,
-                textShadow: "0 6px 28px rgba(0,0,0,0.65)",
-              }}
-            >
-              {l.text}
-            </div>
-          );
-        })}
-      </AbsoluteFill>
-    </AbsoluteFill>
-  );
-};
+// ── Wordmark tail (5s / 150 frames, silent) ───────────────────────────────────
 
 const CCloseWordmark = () => {
   const frame = useCurrentFrame();
@@ -1406,23 +630,22 @@ const CCloseWordmark = () => {
         <div
           style={{
             fontSize: 28,
+            color: ACCENT_MAP.dust,
+            fontWeight: 700,
+            letterSpacing: "0.02em",
+          }}
+        >
+          Built with Opus 4.7
+        </div>
+        <div
+          style={{
+            fontSize: 24,
             color: "rgb(132 92 56)",
             fontWeight: 600,
             letterSpacing: "0.02em",
           }}
         >
           github.com/george11642/skyherd-engine
-        </div>
-        <div
-          style={{
-            fontSize: 18,
-            fontFamily:
-              "ui-monospace, JetBrains Mono, Cascadia Code, monospace",
-            letterSpacing: "0.02em",
-          }}
-        >
-          MIT · Python 3.11 · TypeScript 5.8 · Opus 4.7 · 1106 tests · 87%
-          coverage · Ed25519
         </div>
         <div
           style={{
@@ -1441,19 +664,24 @@ const CCloseWordmark = () => {
   );
 };
 
+// ── Act 5 Export ──────────────────────────────────────────────────────────────
+
 export const CAct5Close = () => {
-  const BOOK = C_LAYOUT.act5.bookendSeconds * FPS; // 390
-  const WORD = C_LAYOUT.act5.wordmarkSeconds * FPS; // 210
+  const AIBODY   = C_LAYOUT.act5.aibodySeconds * FPS;   // 23s = 690f
+  const WORDMARK = C_LAYOUT.act5.wordmarkSeconds * FPS; // 5s = 150f
 
   return (
     <AbsoluteFill>
-      {/* z=1 b-roll — night-sky-stars bookend at 160–173s per EDL */}
+      {/* Night-sky b-roll composited at z=1 under the close */}
       <BrollTrack track={BROLL_C} compositionStartSeconds={C_ACT5_START} />
       <Series>
-        <Series.Sequence durationInFrames={BOOK}>
-          <CCloseBookend />
+        <Series.Sequence durationInFrames={AIBODY}>
+          <AbsoluteFill>
+            <Audio src={staticFile("voiceover/vo-c-aibody.mp3")} />
+            <AIBodyClose />
+          </AbsoluteFill>
         </Series.Sequence>
-        <Series.Sequence durationInFrames={WORD}>
+        <Series.Sequence durationInFrames={WORDMARK}>
           <CCloseWordmark />
         </Series.Sequence>
       </Series>
