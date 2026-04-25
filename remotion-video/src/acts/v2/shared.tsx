@@ -260,6 +260,9 @@ export type KineticPunchProps = {
     // When set, use a fast linear interpolate fade-in over this many frames
     // instead of the default spring. Eliminates blank-frame openers (iter-6).
     fastFade?: number;
+    // Optional starting scale for a snappy scale-to-1.0 punch-in alongside the
+    // fast fade. Used by variant B's "$4.17" hook to land within ~200ms.
+    scaleFrom?: number;
   }>;
   layout?: "stack" | "wrap";
 };
@@ -302,11 +305,20 @@ export const KineticPunch = ({
               extrapolateLeft: "clamp",
               extrapolateRight: "clamp",
             });
+        const scale =
+          typeof w.scaleFrom === "number"
+            ? interpolate(
+                frame,
+                [w.appearFrame, w.appearFrame + (w.fastFade ?? 6)],
+                [w.scaleFrom, 1],
+                { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
+              )
+            : 1;
         return (
           <div
             key={`punch-${i}`}
             style={{
-              transform: `translateY(${y}px)`,
+              transform: `translateY(${y}px) scale(${scale})`,
               opacity: o,
               fontFamily: "Inter, sans-serif",
               fontWeight: w.weight ?? 700,

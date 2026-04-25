@@ -139,8 +139,13 @@ const HookMetric = () => (
     <KineticPunch
       words={[
         {
+          // iter-1 B fix: was appearFrame: 15 → 0.5s blank opener. Land the
+          // hook in the first ~200ms with a snappy scale-from-1.4-to-1.0 +
+          // fast linear opacity, starting at frame 0.
           text: "$4.17",
-          appearFrame: 15,
+          appearFrame: 0,
+          fastFade: 6,
+          scaleFrom: 1.4,
           weight: 800,
           size: 220,
           color: ACCENT_MAP.dust,
