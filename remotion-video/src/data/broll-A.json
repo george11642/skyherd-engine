@@ -1,0 +1,68 @@
+{
+  "cuts": [
+    {
+      "startSeconds": 6.0,
+      "endSeconds": 22.0,
+      "src": "broll/t1-dawn-corral-golden.mp4",
+      "transition": "fade",
+      "transitionDurationFrames": 0,
+      "reason": "Dawn-corral fades in under the final punch line at 0:06, slow zoom holds through vo-intro. Warm 5500K grade per production note. PostVisit hospital-exterior bookend pattern."
+    },
+    {
+      "startSeconds": 22.0,
+      "endSeconds": 30.0,
+      "src": "broll/t1-cattle-grazing-wide.mp4",
+      "transition": "cut",
+      "transitionDurationFrames": 0,
+      "reason": "Market context cut 1: 'Beef \u00b7 record highs'. Wide grazing read as 'business as usual', undermined by overlay claim. Hard cut into next."
+    },
+    {
+      "startSeconds": 30.0,
+      "endSeconds": 36.0,
+      "src": "broll/t1-lightning-night.mp4",
+      "transition": "cut",
+      "transitionDurationFrames": 0,
+      "reason": "Stand-in for fence-line-dusk (SOURCE.md gap #5). Lightning-night gives ominous low-key cover for 'Cow herd \u00b7 65-yr low'."
+    },
+    {
+      "startSeconds": 36.0,
+      "endSeconds": 42.0,
+      "src": "broll/t3-meadow-landscape.mp4",
+      "transition": "cut",
+      "transitionDurationFrames": 0,
+      "reason": "Empty meadow under 'Labor \u00b7 gone'. Quiet landscape that reads as absence, not abundance."
+    },
+    {
+      "startSeconds": 42.0,
+      "endSeconds": 50.0,
+      "src": "broll/t1-drone-arid-mountains.mp4",
+      "transition": "cut",
+      "transitionDurationFrames": 0,
+      "reason": "NM high-desert flyover under 'Eyes \u00b7 fewer per acre'. Scale = vastness = the impossibility of human coverage."
+    },
+    {
+      "startSeconds": 50.0,
+      "endSeconds": 55.0,
+      "src": "broll/t1-cattle-herd-countryside.mp4",
+      "transition": "cut",
+      "transitionDurationFrames": 0,
+      "reason": "Hold the 'rancher does not' line over a herd-countryside shot. Forces the contrast \u2014 the herd is the thing that's connected; the rancher isn't."
+    },
+    {
+      "startSeconds": 55.0,
+      "endSeconds": 60.0,
+      "src": "clips/ambient_establish.mp4",
+      "transition": "cut",
+      "transitionDurationFrames": 0,
+      "reason": "Dashboard establish under vo-bridge \u2014 'So we built one'. Slow vertical pan, wordmark fade-in. Bridges narrative into demo without hard cut."
+    },
+    {
+      "startSeconds": 150.0,
+      "endSeconds": 168.0,
+      "src": "broll/t1-drone-rangeland-aerial.mp4",
+      "transition": "cut",
+      "transitionDurationFrames": 0,
+      "reason": "Substance act over warm dust-graded drone aerial. Three text blocks fade in over: 1106 tests, Ed25519 chain, fresh-clone < 3 min. CrossBeam suburban-drone close pattern."
+    }
+  ]
+}

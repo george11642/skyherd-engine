@@ -1,0 +1,100 @@
+{
+  "cuts": [
+    {
+      "startSeconds": 8.0,
+      "endSeconds": 20.0,
+      "src": "broll/t1-dawn-corral-golden.mp4",
+      "transition": "fade",
+      "transitionDurationFrames": 0,
+      "reason": "Dawn-corral under vo-hook-C (compressed 12s intro). Word-level captions begin here \u2014 every word renders via <KineticCaptions>."
+    },
+    {
+      "startSeconds": 20.0,
+      "endSeconds": 28.0,
+      "src": "broll/t1-cattle-grazing-wide.mp4",
+      "transition": "cut",
+      "transitionDurationFrames": 0,
+      "reason": "Story arc opens on cattle-grazing-wide. 'Beef is at record highs.' Word-level captions active."
+    },
+    {
+      "startSeconds": 28.0,
+      "endSeconds": 36.0,
+      "src": "broll/t3-cattle-windy-paddock.mp4",
+      "transition": "cut",
+      "transitionDurationFrames": 0,
+      "reason": "C-only b-roll: windy-paddock under '65-yr cow herd low'. Wind = volatility = market context. Differentiates from A/B's static fence/storm cuts."
+    },
+    {
+      "startSeconds": 36.0,
+      "endSeconds": 44.0,
+      "src": "broll/t3-meadow-landscape.mp4",
+      "transition": "cut",
+      "transitionDurationFrames": 0,
+      "reason": "'Labor \u00b7 gone. Ranchers \u00b7 aging out.' Empty meadow holds the absence beat. Same asset as A \u2014 variant b-roll budget reused efficiently."
+    },
+    {
+      "startSeconds": 44.0,
+      "endSeconds": 52.0,
+      "src": "broll/t1-lightning-night.mp4",
+      "transition": "cut",
+      "transitionDurationFrames": 0,
+      "reason": "C-ONLY: Lightning-silhouette under 'Hail doesn't wait for the next vet visit.' Adds the dramatic stake top-3 list slot #10 called for. Word-level captions get to render in dramatic light."
+    },
+    {
+      "startSeconds": 52.0,
+      "endSeconds": 60.0,
+      "src": "broll/t1-drone-rangeland-aerial.mp4",
+      "transition": "cut",
+      "transitionDurationFrames": 0,
+      "reason": "Drone aerial under '72 hours blind' line. Scale + isolation = the actual editorial hook of variant C."
+    },
+    {
+      "startSeconds": 60.0,
+      "endSeconds": 70.0,
+      "src": "broll/t1-cattle-grazing-wide.mp4",
+      "transition": "cut",
+      "transitionDurationFrames": 0,
+      "reason": "Hold the 'rancher does not. So we built one.' beat over a return-to-cattle shot. Bookends the story act. Hard cut into demo at 1:10."
+    },
+    {
+      "startSeconds": 110.0,
+      "endSeconds": 125.0,
+      "src": "clips/ambient_30x_synthesis.mp4",
+      "transition": "cut",
+      "transitionDurationFrames": 0,
+      "reason": "Synthesis beat: 30\u00d7 ambient dashboard with three callout cards stacking right. vo-synthesis-C: 'Five agents. Idle until a sensor wakes them. Skills loaded per-task. Cost ticker freezes between events.' Tight 15s \u2014 Elisa stats-barrage backing."
+    },
+    {
+      "startSeconds": 145.0,
+      "endSeconds": 160.0,
+      "src": "clips/attest_verify.mp4",
+      "transition": "cut",
+      "transitionDurationFrames": 0,
+      "reason": "Hard cut to terminal: skyherd-attest verify scrolling 360 entries, Ed25519 sigs blink green. vo-depth-C: tests/coverage/seed/bytes counter. Replaces A/B's 14s substance VO with a richer, terminal-led 15s."
+    },
+    {
+      "startSeconds": 145.0,
+      "endSeconds": 152.0,
+      "src": "broll/t2-hardware-circuit-board.mp4",
+      "transition": "cut",
+      "transitionDurationFrames": 0,
+      "reason": "C-ONLY b-roll inset: hardware circuit-board on a small picture-in-picture in lower-right during depth narration \u2014 ties Year-2 hardware fleet visually without forcing it into the main shot. Layer: overlay (PiP)."
+    },
+    {
+      "startSeconds": 152.0,
+      "endSeconds": 160.0,
+      "src": "broll/t2-hardware-microcircuit.mp4",
+      "transition": "cut",
+      "transitionDurationFrames": 0,
+      "reason": "C-ONLY: Microcircuit PiP follows circuit-board, same lower-right slot. Together they assert 'this is real hardware territory' in 15s without leaving the depth narrative."
+    },
+    {
+      "startSeconds": 160.0,
+      "endSeconds": 173.0,
+      "src": "broll/t3-night-sky-stars.mp4",
+      "transition": "cut",
+      "transitionDurationFrames": 0,
+      "reason": "C-ONLY: Night-sky-stars carries the 'Now \u2014 finally \u2014 the ranch can watch itself' bookend. Differentiates from A/B's drone-rangeland close. Stars = always-on, the metaphor lands."
+    }
+  ]
+}

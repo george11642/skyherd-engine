@@ -1,0 +1,68 @@
+{
+  "cuts": [
+    {
+      "startSeconds": 7.0,
+      "endSeconds": 22.0,
+      "src": "broll/t1-dawn-corral-golden.mp4",
+      "transition": "fade",
+      "transitionDurationFrames": 0,
+      "reason": "Same dawn-corral fade-in as A (shared Phase D source). Holds through vo-intro-B (credentials + product framing \u2014 no contrarian question)."
+    },
+    {
+      "startSeconds": 22.0,
+      "endSeconds": 30.0,
+      "src": "broll/t2-sunrise-clouds.mp4",
+      "transition": "cut",
+      "transitionDurationFrames": 0,
+      "reason": "Differentiate from A: B opens market arc with sunrise clouds (vs A's cattle-grazing). 'Beef \u00b7 record highs' on a hopeful sky reads more ironic than the literal grazing shot."
+    },
+    {
+      "startSeconds": 30.0,
+      "endSeconds": 36.0,
+      "src": "broll/t2-cowboy-sunset.mp4",
+      "transition": "cut",
+      "transitionDurationFrames": 0,
+      "reason": "Cowboy silhouette under 'Cow herd \u00b7 65-yr low'. The lone-figure framing carries the depopulation beat \u2014 not labor-gone yet, that's next."
+    },
+    {
+      "startSeconds": 36.0,
+      "endSeconds": 42.0,
+      "src": "broll/t2-rancher-horse-walk.mp4",
+      "transition": "cut",
+      "transitionDurationFrames": 0,
+      "reason": "'Labor \u00b7 gone' over a single rancher walking his horse. Reads as 'the work that's left is on him alone'. Mid-grade dust palette."
+    },
+    {
+      "startSeconds": 42.0,
+      "endSeconds": 50.0,
+      "src": "broll/t1-storm-cell-horizon.mp4",
+      "transition": "cut",
+      "transitionDurationFrames": 0,
+      "reason": "Storm cell on horizon under 'Eyes \u00b7 fewer per acre'. The ambient threat layer \u2014 reinforces why 24/7 coverage is the actual product, not the metric."
+    },
+    {
+      "startSeconds": 50.0,
+      "endSeconds": 56.0,
+      "src": "broll/t2-rancher-sunset-couple.mp4",
+      "transition": "cut",
+      "transitionDurationFrames": 0,
+      "reason": "Hold 'rancher does not' line over the rancher-couple sunset. Differentiates from A's herd-countryside pick \u2014 B's market arc closes on the human cost, not the herd-rancher gap. Subtler emotional register."
+    },
+    {
+      "startSeconds": 56.0,
+      "endSeconds": 60.0,
+      "src": "clips/ambient_establish.mp4",
+      "transition": "cut",
+      "transitionDurationFrames": 0,
+      "reason": "Tight 4s bridge (vs A's 5s) since vo-bridge-B is only 'So we built one. Watch.' \u2014 2s of VO. The brevity is the point."
+    },
+    {
+      "startSeconds": 150.0,
+      "endSeconds": 168.0,
+      "src": "broll/t1-drone-rangeland-aerial.mp4",
+      "transition": "cut",
+      "transitionDurationFrames": 0,
+      "reason": "Same substance close as A. Three text blocks: tests, ed25519 chain, fresh-clone repro."
+    }
+  ]
+}

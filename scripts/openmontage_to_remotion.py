@@ -154,18 +154,86 @@ def to_remotion(
     }
 
 
+BROLL_PUBLIC_PREFIX = "remotion-video/public/"
+BROLL_FPS = 30  # Remotion composition rate — always 30fps
+
+
+def to_broll_track(
+    edl: dict[str, Any],
+    *,
+    fps: int = BROLL_FPS,
+) -> dict[str, Any]:
+    """Translate an OpenMontage EDL to a BrollTrack JSON consumed by BrollTrack.tsx.
+
+    Filters cuts[] to entries where asset.kind == "asset" (drops scene-components).
+    Strips "remotion-video/public/" prefix from src paths so staticFile() works.
+    Returns {"cuts": [...]} — small enough to commit for reproducible renders.
+
+    Args:
+        edl: Parsed OpenMontage EDL dict (schema v1.0).
+        fps: Frame rate for transitionDurationFrames calculation (default 30).
+
+    Returns:
+        {"cuts": list of BrollCut dicts} where each BrollCut has:
+            startSeconds, endSeconds, src, transition, transitionDurationFrames,
+            and optionally reason.
+    """
+    cuts_raw = edl.get("cuts") or []
+    broll_cuts: list[dict[str, Any]] = []
+
+    for cut in sorted(cuts_raw, key=lambda c: float(c.get("in_seconds", 0.0))):
+        source = cut.get("source", "")
+        if not source:
+            # scene-component — skip
+            continue
+
+        # Strip the remotion-video/public/ prefix so staticFile() can resolve it
+        src = source
+        if src.startswith(BROLL_PUBLIC_PREFIX):
+            src = src[len(BROLL_PUBLIC_PREFIX):]
+
+        transition = cut.get("transition_in", "cut")
+        transition_duration_s = float(cut.get("transition_in_duration", 0.0))
+        transition_frames = round(transition_duration_s * fps)
+
+        broll_cut: dict[str, Any] = {
+            "startSeconds": float(cut.get("in_seconds", 0.0)),
+            "endSeconds": float(cut.get("out_seconds", 0.0)),
+            "src": src,
+            "transition": transition,
+            "transitionDurationFrames": transition_frames,
+        }
+        if "reason" in cut:
+            broll_cut["reason"] = cut["reason"]
+
+        broll_cuts.append(broll_cut)
+
+    return {"cuts": broll_cuts}
+
+
 def main(
     input_path: str,
     output_path: str,
     fps: int = DEFAULT_FPS,
+    emit_broll_track: bool = False,
 ) -> int:
-    """CLI entrypoint. Returns exit code: 0 ok, 2 validation error, 1 IO error."""
+    """CLI entrypoint. Returns exit code: 0 ok, 2 validation error, 1 IO error.
+
+    When emit_broll_track=True, writes a BrollTrack JSON instead of the full
+    Remotion props object. fps is always pinned to BROLL_FPS=30 for broll output.
+    """
     src = pathlib.Path(input_path)
     try:
         edl = load_edl(src)
     except (OSError, json.JSONDecodeError) as exc:
         print(f"ERROR: failed to load {src}: {exc}", file=sys.stderr)
         return 1
+
+    if emit_broll_track:
+        track = to_broll_track(edl, fps=BROLL_FPS)
+        pathlib.Path(output_path).write_text(json.dumps(track, indent=2) + "\n")
+        return 0
+
     try:
         remotion = to_remotion(edl, fps=fps)
     except (EdlWrongRuntime, EdlPathOutsideRepo, ValueError) as exc:
@@ -182,5 +250,13 @@ if __name__ == "__main__":
     parser.add_argument("input", help="Path to OpenMontage edit_decisions.json")
     parser.add_argument("output", help="Path to write Remotion props JSON")
     parser.add_argument("--fps", type=int, default=DEFAULT_FPS)
+    parser.add_argument(
+        "--emit-broll-track",
+        action="store_true",
+        help=(
+            "Emit a BrollTrack JSON (cuts filtered to asset-kind only, fps pinned "
+            "to 30) instead of the full Remotion props object."
+        ),
+    )
     args = parser.parse_args()
-    sys.exit(main(args.input, args.output, fps=args.fps))
+    sys.exit(main(args.input, args.output, fps=args.fps, emit_broll_track=args.emit_broll_track))
