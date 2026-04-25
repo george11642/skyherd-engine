@@ -1,4 +1,4 @@
-.PHONY: setup sim demo dashboard dashboard-mock test lint format typecheck clean ci sitl-up sitl-down bus-up bus-down mosquitto-up mosquitto-down mesh-smoke one-pager hardware-demo hardware-demo-sim hardware-demo-sim-down h2-smoke h3-smoke h4-smoke h4-docs mavic-bridge f3-bridge drone-smoke sitl-smoke determinism-3x gate-check voice-demo rehearsal record-ready preflight laptop-drone-smoke edge-pi-setup edge-galileo-setup video-record-clips video-pipeline video-iterate video-render ios-rancher-build ios-rancher-test
+.PHONY: setup sim demo dashboard dashboard-mock test lint format typecheck clean ci sitl-up sitl-down bus-up bus-down mosquitto-up mosquitto-down mesh-smoke one-pager hardware-demo hardware-demo-sim hardware-demo-sim-down h2-smoke h3-smoke h4-smoke h4-docs mavic-bridge f3-bridge drone-smoke sitl-smoke determinism-3x gate-check voice-demo rehearsal record-ready preflight laptop-drone-smoke edge-pi-setup edge-galileo-setup video-record-clips video-pipeline video-iterate video-render ios-rancher-build ios-rancher-test ios-rancher-run ios-rancher-demo
 
 SEED ?= 42
 SCENARIO ?= all
@@ -236,3 +236,25 @@ ios-rancher-test:  ## Run SkyHerdRancher unit tests on iPhone 15 Pro Simulator
 	  -scheme SkyHerdRancher \
 	  -destination 'platform=iOS Simulator,name=iPhone 15 Pro' \
 	  test 2>&1 | grep -E "(Test Suite|Test Case|Executed|error:|BUILD)"
+
+ios-rancher-run:  ## Build + install + launch SkyHerdRancher on iPhone 15 Pro Simulator
+	xcrun simctl boot "iPhone 15 Pro" 2>/dev/null || true
+	xcodebuild \
+	  -project ios/SkyHerdRancher/SkyHerdRancher.xcodeproj \
+	  -scheme SkyHerdRancher \
+	  -destination 'platform=iOS Simulator,name=iPhone 15 Pro' \
+	  -configuration Debug \
+	  -derivedDataPath /tmp/skyherd-derived \
+	  build 2>&1 | grep -E "(error:|warning:|BUILD)"
+	APP_PATH=$$(find /tmp/skyherd-derived -name "SkyHerdRancher.app" -type d | head -1) && \
+	  xcrun simctl install "iPhone 15 Pro" "$$APP_PATH" && \
+	  xcrun simctl launch "iPhone 15 Pro" com.skyherd.rancher
+	open -a Simulator
+
+ios-rancher-demo:  ## Start backend + launch iOS app in simulator (demo mode)
+	@echo "Starting backend in background…"
+	make dashboard > /tmp/skyherd-ios-demo.log 2>&1 &
+	@echo "Waiting 30s for backend to start…"
+	@sleep 30
+	@curl -fsS http://localhost:8000/api/status > /dev/null 2>&1 && echo "Backend ready" || echo "Backend not yet ready — launch may succeed anyway"
+	make ios-rancher-run
