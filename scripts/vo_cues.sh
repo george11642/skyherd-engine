@@ -107,17 +107,17 @@ CUES["vo-meta-B"]="And the captions you've been reading? Opus 4.7 styled every w
 #   vo-c-vision      → 130s
 #   vo-c-aibody      → 152s
 
-CUES["vo-c-hook"]="I'm George, senior at UNM. A lot of nights on New Mexico ranches. Beef is at record highs. The American cow herd's at a sixty-five-year low. Labor's gone. Ranchers are aging out. Every ranch left has to do more, with fewer eyes on it."
+CUES["vo-c-hook"]="I'm George, senior at UNM. I've spent a lot of nights on New Mexico ranches watching ranchers do impossible work. Right now beef prices are at record highs — but the American cow herd is at a sixty-five-year low. Labor's gone. Ranchers are aging out. Every ranch left has to do more, with fewer people watching it."
 
-CUES["vo-c-traditional"]="Here's how a ranch runs today. One person, two hundred miles a week. Six runs a day, best case. A coyote at three A-M, a sick cow at noon, a water tank at midnight — all missed."
+CUES["vo-c-traditional"]="Here's how a ranch runs today. One person, two-hundred miles a week — checking every fence, every trough, every cow. Six runs a day, best case. A coyote at 3 A-M, a sick cow at noon, an empty water tank at midnight — all missed."
 
-CUES["vo-c-answer"]="SkyHerd gives the ranch a nervous system. Five Claude agents, built on Opus four-point-seven. Every fence, every trough, every cow. Four dollars seventeen cents a week."
+CUES["vo-c-answer"]="SkyHerd gives the ranch a nervous system. Five Claude agents, built on Opus 4.7. They're idle until a sensor wakes them — vision, motion, pressure, weather. Then they decide and act. Four dollars and seventeen cents a week of compute, total."
 
-CUES["vo-c-coyote"]="Three-fourteen in the morning. Thermal on the south fence catches something. The agent wakes up, looks at the frame, calls it — coyote, ninety-one percent. Sends the drone. Drone scares it off, flies home. You get a text. Nobody woke up, nothing got eaten."
+CUES["vo-c-coyote"]="3:14 A-M. Thermal hits the south fence. The agent wakes up, looks at the frame, calls it — coyote, ninety-one percent confidence. It dispatches the drone autonomously. Drone flies the perimeter, scares the coyote off, returns home. The rancher gets a text. Nobody woke up. Nothing got eaten. The fence-line agent goes back to sleep — billing stops until the next sensor event."
 
-CUES["vo-c-grid"]="And it's not just the fence. Sick cow with pinkeye? Vet packet sent before sunrise. Tank pressure dropping? Drone flies the leak. Cow going into labor at three A-M? Priority page. Hailstorm in forty-five minutes? Herd auto-rotates to shelter."
+CUES["vo-c-grid"]="And it's not just the fence. Sick cow with pinkeye? An agent flags her, drafts the vet packet, schedules the visit — all before sunrise. Trough pressure dropping overnight? A drone flies the leak. A cow goes into labor at 3 A-M — the rancher gets a priority page, not a maybe. Hailstorm forty-five minutes out? The herd auto-rotates to shelter."
 
-CUES["vo-c-mvp"]="I built the full M-V-P. Web dashboard. iOS app. Android app. Deterministic simulator. Voice-A-I rancher persona over Twilio. Open-source. M-I-T-licensed. Eleven-hundred tests."
+CUES["vo-c-mvp"]="I built the full software M-V-P solo. Web dashboard. iOS app. Android app. A deterministic simulator that replays any scenario from a seed. And a voice A-I rancher that calls you on Twilio when something needs your eyes. Open source. M-I-T licensed. Eleven-hundred tests, eighty-seven percent coverage."
 
 CUES["vo-c-vision"]="Today: software M-V-P and simulator. Six months: pilot ranches in New Mexico. One year: ten ranches with real cameras and L-O-R-A. Five years: every ranch in America has a nervous system."
 
