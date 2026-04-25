@@ -1,13 +1,13 @@
 /**
- * v2 — Variants A & B Act 2 (Demo, 90s).
+ * v2 — Variants A & B Act 2 (Demo, ~90s) — iter2 restructure.
  *
- * Five-scenario montage (~11s each = 55s) + "under the hood" mesh reveal (35s).
- * Same skeleton for both variants — no divergence.
+ * Deep coyote scenario (~25s, full VO) + silent 4-scene montage (~25s) +
+ * mesh-opus beat (~40s, names Opus 4.7 explicitly). Same skeleton for both
+ * variants.
  */
 import {
   AbsoluteFill,
   Audio,
-  Sequence,
   Series,
   Video,
   interpolate,
@@ -27,141 +27,7 @@ import {
 
 const FPS = 30;
 
-// ── Scenario beat ────────────────────────────────────────────────────────────
-type ScenarioProps = {
-  scenarioNumber: number;
-  clipName: string;
-  voFile: string | null;
-  voStartFrame: number;
-  agent: string;
-  detail: string;
-  accent: Accent;
-  anchorLabel: string;
-  anchorTopic: string;
-  anchorHash: string;
-  anchorStatus: string;
-};
-
-const ScenarioBeat = ({
-  scenarioNumber,
-  clipName,
-  voFile,
-  voStartFrame,
-  agent,
-  detail,
-  accent,
-  anchorLabel,
-  anchorTopic,
-  anchorHash,
-  anchorStatus,
-}: ScenarioProps) => {
-  const frame = useCurrentFrame();
-  const { durationInFrames } = useVideoConfig();
-
-  const fadeIn = interpolate(frame, [0, 10], [0, 1], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
-  const fadeOut = interpolate(
-    frame,
-    [durationInFrames - 14, durationInFrames],
-    [1, 0.25],
-    { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
-  );
-  const opacity = Math.min(fadeIn, fadeOut);
-
-  return (
-    <AbsoluteFill style={{ backgroundColor: "rgb(6 8 12)" }}>
-      <div style={{ width: "100%", height: "100%", opacity }}>
-        <Video
-          src={staticFile(`clips/${clipName}`)}
-          startFrom={0}
-          endAt={420}
-          muted
-          style={{
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-          }}
-        />
-      </div>
-      <AbsoluteFill
-        style={{
-          background:
-            "radial-gradient(ellipse at center, rgba(0,0,0,0) 55%, rgba(6,8,12,0.55) 100%)",
-          opacity,
-        }}
-      />
-
-      {/* Scenario badge top-left */}
-      <div
-        style={{
-          position: "absolute",
-          top: 90,
-          left: 90,
-          display: "flex",
-          alignItems: "center",
-          gap: 16,
-          opacity: fadeIn,
-        }}
-      >
-        <div
-          style={{
-            width: 56,
-            height: 56,
-            borderRadius: 28,
-            backgroundColor: ACCENT_MAP[accent],
-            color: "rgb(10 12 16)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontFamily: "Inter, sans-serif",
-            fontWeight: 800,
-            fontSize: 28,
-          }}
-        >
-          {scenarioNumber}
-        </div>
-        <div
-          style={{
-            fontFamily: "Inter, sans-serif",
-            fontSize: 16,
-            letterSpacing: "0.32em",
-            textTransform: "uppercase",
-            color: "rgb(236 239 244)",
-            fontWeight: 600,
-          }}
-        >
-          Scenario {scenarioNumber} / 5
-        </div>
-      </div>
-
-      {voFile ? (
-        <Sequence from={voStartFrame}>
-          <Audio src={staticFile(voFile)} />
-        </Sequence>
-      ) : null}
-
-      <LowerThird
-        agent={agent}
-        detail={detail}
-        accent={accent}
-        appearFrame={45}
-        durationInFrames={durationInFrames - 45}
-      />
-      <AnchorChip
-        label={anchorLabel}
-        topic={anchorTopic}
-        hash={anchorHash}
-        statusPill={anchorStatus}
-        appearFrame={Math.max(150, voStartFrame + 30)}
-        accent={accent}
-      />
-    </AbsoluteFill>
-  );
-};
-
-// ── Mesh "under the hood" reveal (35s) ───────────────────────────────────────
+// ── Mesh "under the hood" reveal (~40s, iter2) ───────────────────────────────
 //
 // Animated 5-agent node canvas with smooth camera pan. Mirrors CrossBeam's
 // Opus Orchestrator beat (the top-3-confirmed copyable moment).
@@ -200,7 +66,7 @@ const MeshBeat = () => {
 
   return (
     <AbsoluteFill style={{ backgroundColor: "rgb(8 10 14)", opacity }}>
-      <Audio src={staticFile("voiceover/vo-mesh.mp3")} />
+      <Audio src={staticFile("voiceover/vo-mesh-opus.mp3")} />
 
       {/* Title strip top-left */}
       <div
@@ -222,7 +88,7 @@ const MeshBeat = () => {
             marginBottom: 12,
           }}
         >
-          Under the hood · Managed Agents mesh
+          Under the hood · Opus 4.7 · Managed Agents mesh
         </div>
         <div
           style={{
@@ -428,37 +294,301 @@ const MeshBeat = () => {
   );
 };
 
-// ── Act 2 root ───────────────────────────────────────────────────────────────
+// ── Deep coyote beat (iter2): single scenario, full VO, ~25s ─────────────────
+//
+// This is the cinematic beat. Scripts call for: thermal pulse → FenceLineDispatcher
+// lane flash → drone telemetry → drone POV → deterrent → mock SMS bubble →
+// HashChip slide. Visually, the coyote clip carries the footage; overlays pop
+// on top at scripted beats.
+const DeepCoyoteBeat = () => {
+  const frame = useCurrentFrame();
+  const { durationInFrames } = useVideoConfig();
+
+  const fadeIn = interpolate(frame, [0, 15], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  const fadeOut = interpolate(
+    frame,
+    [durationInFrames - 20, durationInFrames],
+    [1, 0.25],
+    { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
+  );
+  const opacity = Math.min(fadeIn, fadeOut);
+
+  // SMS bubble at ~19s mark per script — shows the Wes text pattern
+  const SMS_AT = 19 * 30;
+  const smsO = interpolate(frame, [SMS_AT, SMS_AT + 20], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+
+  return (
+    <AbsoluteFill style={{ backgroundColor: "rgb(6 8 12)" }}>
+      <Audio src={staticFile("voiceover/vo-coyote-deep.mp3")} />
+      <div style={{ width: "100%", height: "100%", opacity }}>
+        <Video
+          src={staticFile("clips/coyote.mp4")}
+          startFrom={0}
+          endAt={durationInFrames + 60}
+          muted
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+          }}
+        />
+      </div>
+      <AbsoluteFill
+        style={{
+          background:
+            "radial-gradient(ellipse at center, rgba(0,0,0,0) 55%, rgba(6,8,12,0.55) 100%)",
+          opacity,
+        }}
+      />
+
+      {/* Scenario badge top-left */}
+      <div
+        style={{
+          position: "absolute",
+          top: 90,
+          left: 90,
+          display: "flex",
+          alignItems: "center",
+          gap: 16,
+          opacity: fadeIn,
+        }}
+      >
+        <div
+          style={{
+            width: 56,
+            height: 56,
+            borderRadius: 28,
+            backgroundColor: ACCENT_MAP.thermal,
+            color: "rgb(10 12 16)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontFamily: "Inter, sans-serif",
+            fontWeight: 800,
+            fontSize: 22,
+          }}
+        >
+          3:14
+        </div>
+        <div
+          style={{
+            fontFamily: "Inter, sans-serif",
+            fontSize: 14,
+            letterSpacing: "0.32em",
+            textTransform: "uppercase",
+            color: "rgb(236 239 244)",
+            fontWeight: 600,
+          }}
+        >
+          Deep scenario · Coyote at fence
+        </div>
+      </div>
+
+      <LowerThird
+        agent="FenceLineDispatcher"
+        detail="Coyote · 91% · Fence W-12 · Mavic dispatched"
+        accent="thermal"
+        appearFrame={60}
+        durationInFrames={durationInFrames - 60}
+      />
+      <AnchorChip
+        label="Attest row"
+        topic="Fence W-12 breach"
+        hash="a7c3…f91e"
+        statusPill="Signed"
+        appearFrame={22 * 30}
+        accent="thermal"
+      />
+
+      {/* Mock SMS bubble bottom-right at 19s */}
+      <div
+        style={{
+          position: "absolute",
+          bottom: 240,
+          right: 90,
+          opacity: smsO,
+          maxWidth: 420,
+          backgroundColor: "rgba(30,34,40,0.92)",
+          borderRadius: 18,
+          border: "1px solid rgba(148,176,136,0.3)",
+          padding: "14px 18px",
+          fontFamily: "Inter, sans-serif",
+          color: "rgb(236 239 244)",
+          boxShadow: "0 8px 32px rgba(0,0,0,0.55)",
+        }}
+      >
+        <div
+          style={{
+            fontSize: 11,
+            color: "rgb(148 176 136)",
+            letterSpacing: "0.28em",
+            textTransform: "uppercase",
+            fontWeight: 700,
+            marginBottom: 6,
+          }}
+        >
+          SMS · 3:14am
+        </div>
+        <div
+          style={{
+            fontSize: 16,
+            lineHeight: 1.35,
+            fontWeight: 500,
+          }}
+        >
+          Coyote on W-12. Drone scared it off. Fence intact. You&rsquo;re good.
+        </div>
+      </div>
+    </AbsoluteFill>
+  );
+};
+
+// ── Montage scene (iter2): 6s fast-cut, no VO, kinetic callout + anchor ──────
+type MontageProps = {
+  clipName: string;
+  callout: string;
+  agent: string;
+  detail: string;
+  accent: Accent;
+  anchorLabel: string;
+  anchorTopic: string;
+  anchorHash: string;
+  anchorStatus: string;
+};
+
+const MontageScene = ({
+  clipName,
+  callout,
+  agent,
+  detail,
+  accent,
+  anchorLabel,
+  anchorTopic,
+  anchorHash,
+  anchorStatus,
+}: MontageProps) => {
+  const frame = useCurrentFrame();
+  const { durationInFrames } = useVideoConfig();
+
+  const fadeIn = interpolate(frame, [0, 6], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  const fadeOut = interpolate(
+    frame,
+    [durationInFrames - 8, durationInFrames],
+    [1, 0.2],
+    { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
+  );
+  const opacity = Math.min(fadeIn, fadeOut);
+
+  // Callout pops in at ~0.5s, holds through the scene.
+  const calloutO = interpolate(frame, [15, 30], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  const calloutY = interpolate(frame, [15, 30], [20, 0], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+
+  return (
+    <AbsoluteFill style={{ backgroundColor: "rgb(6 8 12)" }}>
+      <div style={{ width: "100%", height: "100%", opacity }}>
+        <Video
+          src={staticFile(`clips/${clipName}`)}
+          startFrom={0}
+          endAt={200}
+          muted
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+          }}
+        />
+      </div>
+      <AbsoluteFill
+        style={{
+          background:
+            "radial-gradient(ellipse at center, rgba(0,0,0,0) 50%, rgba(6,8,12,0.65) 100%)",
+          opacity,
+        }}
+      />
+
+      {/* Big kinetic callout — center-top */}
+      <div
+        style={{
+          position: "absolute",
+          top: 180,
+          left: 0,
+          right: 0,
+          textAlign: "center",
+          padding: "0 8%",
+          opacity: calloutO,
+          transform: `translateY(${calloutY}px)`,
+        }}
+      >
+        <div
+          style={{
+            fontFamily: "Inter, sans-serif",
+            fontWeight: 800,
+            fontSize: 56,
+            color: ACCENT_MAP[accent],
+            letterSpacing: "-0.022em",
+            lineHeight: 1.1,
+            textShadow: "0 6px 30px rgba(0,0,0,0.75)",
+          }}
+        >
+          {callout}
+        </div>
+      </div>
+
+      <LowerThird
+        agent={agent}
+        detail={detail}
+        accent={accent}
+        appearFrame={24}
+        durationInFrames={durationInFrames - 24}
+      />
+      <AnchorChip
+        label={anchorLabel}
+        topic={anchorTopic}
+        hash={anchorHash}
+        statusPill={anchorStatus}
+        appearFrame={45}
+        accent={accent}
+      />
+    </AbsoluteFill>
+  );
+};
+
+// ── Act 2 root (iter2): deep coyote + 4-scene montage + mesh-opus ────────────
 export const ABAct2Demo = () => {
-  const SCENARIO = AB_LAYOUT.act2.scenarioSeconds * FPS; // 330
-  const MESH = AB_LAYOUT.act2.meshSeconds * FPS; // 1050
+  const DEEP = AB_LAYOUT.act2.coyoteDeepMin * FPS; // 750 (25s * 30)
+  const MONTAGE_TOTAL = AB_LAYOUT.act2.montageSeconds * FPS; // 750
+  const SCENE = Math.floor(
+    MONTAGE_TOTAL / AB_LAYOUT.act2.montageSceneCount,
+  ); // ~187 frames
+  const MESH = AB_LAYOUT.act2.meshMin * FPS; // 1200 (40s * 30)
 
   return (
     <AbsoluteFill>
       <Series>
-        <Series.Sequence durationInFrames={SCENARIO}>
-          <ScenarioBeat
-            scenarioNumber={1}
-            clipName="coyote.mp4"
-            voFile="voiceover/vo-coyote.mp3"
-            voStartFrame={120}
-            agent="FenceLineDispatcher"
-            detail="Coyote · 91% confidence · Fence W-12 · Mavic dispatched"
-            accent="thermal"
-            anchorLabel="Attest row"
-            anchorTopic="Fence W-12 breach"
-            anchorHash="a7c3…f91e"
-            anchorStatus="Signed"
-          />
+        <Series.Sequence durationInFrames={DEEP}>
+          <DeepCoyoteBeat />
         </Series.Sequence>
-        <Series.Sequence durationInFrames={SCENARIO}>
-          <ScenarioBeat
-            scenarioNumber={2}
+        <Series.Sequence durationInFrames={SCENE}>
+          <MontageScene
             clipName="sick_cow.mp4"
-            voFile="voiceover/vo-sick-cow.mp3"
-            voStartFrame={120}
+            callout="A014 — vet packet on his phone in 12 seconds"
             agent="HerdHealthWatcher"
-            detail="Cow A014 · pinkeye 83% · Vet packet generated"
+            detail="Cow A014 · pinkeye 83%"
             accent="warn"
             anchorLabel="Vet packet"
             anchorTopic="Cow A014 · pinkeye"
@@ -466,44 +596,38 @@ export const ABAct2Demo = () => {
             anchorStatus="Sent"
           />
         </Series.Sequence>
-        <Series.Sequence durationInFrames={SCENARIO}>
-          <ScenarioBeat
-            scenarioNumber={3}
+        <Series.Sequence durationInFrames={SCENE}>
+          <MontageScene
             clipName="water.mp4"
-            voFile={null}
-            voStartFrame={0}
+            callout="Tank 7 dropped to 8 PSI — drone flew it before sunrise"
             agent="GrazingOptimizer"
-            detail="Tank 7 pressure drop · IR flyover scheduled"
+            detail="Tank 7 · pressure drop"
             accent="sky"
             anchorLabel="IR flyover"
-            anchorTopic="Tank 7 · pressure drop"
+            anchorTopic="Tank 7"
             anchorHash="92e1…5a0d"
             anchorStatus="Queued"
           />
         </Series.Sequence>
-        <Series.Sequence durationInFrames={SCENARIO}>
-          <ScenarioBeat
-            scenarioNumber={4}
+        <Series.Sequence durationInFrames={SCENE}>
+          <MontageScene
             clipName="calving.mp4"
-            voFile="voiceover/vo-calving.mp3"
-            voStartFrame={120}
+            callout="117's calving — pinged at 3:14am"
             agent="CalvingWatch"
-            detail="Cow 117 · pre-labor · Rancher paged (priority)"
+            detail="Cow 117 · pre-labor · priority"
             accent="sage"
             anchorLabel="Behavior trace"
-            anchorTopic="Cow 117 · pre-labor"
+            anchorTopic="Cow 117"
             anchorHash="61bf…2c94"
             anchorStatus="Paged"
           />
         </Series.Sequence>
-        <Series.Sequence durationInFrames={SCENARIO}>
-          <ScenarioBeat
-            scenarioNumber={5}
+        <Series.Sequence durationInFrames={SCENE}>
+          <MontageScene
             clipName="storm.mp4"
-            voFile="voiceover/vo-storm.mp3"
-            voStartFrame={120}
+            callout="Hail in 45min — herd routed to Shelter 2"
             agent="Weather-Redirect"
-            detail="Hail ETA 45 min · Paddock B → Shelter 2"
+            detail="Paddock B → Shelter 2"
             accent="dust"
             anchorLabel="Redirect plan"
             anchorTopic="Paddock B → Shelter 2"

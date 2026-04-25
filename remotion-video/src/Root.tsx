@@ -16,48 +16,43 @@ loadFont("normal", {
 });
 
 // Default frame counts used before calculateMetadata measures real VO
-// durations. Per-variant — A/B share 60/90/30 = 180s; C is 20/50/55/35/20 = 180s.
+// durations. Iter2 retunes: A/B ~60/100/30, C ~20/45/55/50/20.
 const DEFAULT_AB_ACT_DURATIONS = {
   act1: 60 * FPS,
-  act2: 90 * FPS,
+  act2: 100 * FPS,
   act3: 30 * FPS,
   act4: 0,
   act5: 0,
 };
 
 const DEFAULT_C_ACT_DURATIONS = {
-  act1: 20 * FPS,
-  act2: 50 * FPS,
+  act1: 24 * FPS,
+  act2: 45 * FPS,
   act3: 55 * FPS,
-  act4: 35 * FPS,
+  act4: 50 * FPS,
   act5: 20 * FPS,
 };
 
-// Fallback VO durations (frames). Measured 2026-04-24 from Antoni renders.
+// Fallback VO durations (frames). Measured 2026-04-24 from iter2 Will/v3.
 const DEFAULT_VO_DURATIONS_FRAMES = {
-  // Shared scenario cues
-  coyote: Math.ceil(3.66 * FPS),
-  sickCow: Math.ceil(6.5 * FPS),
-  calving: Math.ceil(5.69 * FPS),
-  storm: Math.ceil(3.66 * FPS),
-  // Shared market + close
-  market: Math.ceil(21.03 * FPS),
-  mesh: Math.ceil(22.6 * FPS),
-  closeSubstance: Math.ceil(12.85 * FPS),
-  closeFinal: Math.ceil(5.85 * FPS),
+  // Shared deep scenario (A/B/C)
+  coyoteDeep: Math.ceil(28.53 * FPS),
+  // Shared (A/B)
+  market: Math.ceil(17.95 * FPS),
+  compare: Math.ceil(30.85 * FPS),
+  meshOpus: Math.ceil(30.43 * FPS),
+  closeSubstance: Math.ceil(16.93 * FPS),
+  closeFinal: Math.ceil(7.24 * FPS),
   // Variant A
-  intro: Math.ceil(14.45 * FPS),
-  bridge: Math.ceil(8.36 * FPS),
+  intro: Math.ceil(13.64 * FPS),
   // Variant B
-  introB: Math.ceil(16.25 * FPS),
-  bridgeB: Math.ceil(1.99 * FPS),
+  introB: Math.ceil(19.88 * FPS),
   // Variant C
-  hookC: Math.ceil(7.97 * FPS),
-  storyC: Math.ceil(27.66 * FPS),
-  synthesisC: Math.ceil(7.97 * FPS),
-  opusC: Math.ceil(24.06 * FPS),
-  depthC: Math.ceil(12.49 * FPS),
-  closeC: Math.ceil(6.71 * FPS),
+  hookC: Math.ceil(14.45 * FPS),
+  storyC: Math.ceil(42.68 * FPS),
+  opusC: Math.ceil(30.85 * FPS),
+  depthC: Math.ceil(17.63 * FPS),
+  closeC: Math.ceil(9.17 * FPS),
 };
 
 const sumActDurations = (a: typeof DEFAULT_AB_ACT_DURATIONS): number =>

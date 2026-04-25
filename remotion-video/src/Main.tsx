@@ -77,8 +77,9 @@ const duckingCurve = (
   return volume * envelope;
 };
 
-// Compute the duck-window list per variant. Each entry is an absolute frame
-// range when a VO file is playing — used by the BGM ducker.
+// Compute the duck-window list per variant. Iter2 restructure: deep coyote
+// scenario, silent 4-scenario montage, compare beat in Act 1 (A/B) or Act 2
+// (C), mesh-opus beat that names Opus 4.7 explicitly.
 const computeDuckWindows = (
   variant: Variant,
   vo: VoDurationsFrames,
@@ -87,70 +88,53 @@ const computeDuckWindows = (
   const windows: Array<[number, number]> = [];
 
   if (variant === "C") {
-    // Act 1: hook punch (8s no VO) then hook VO.
-    const a1Start = 0;
+    // Act 1: hook punch (8s no VO) then hookC VO.
     const a1HookPunchEnd = 8 * FPS;
-    windows.push([
-      a1Start + a1HookPunchEnd,
-      a1Start + a1HookPunchEnd + vo.hookC,
-    ]);
+    windows.push([a1HookPunchEnd, a1HookPunchEnd + vo.hookC]);
 
-    // Act 2: story VO across the entire act.
+    // Act 2: story VO (which now folds the compare beat in).
     const a2Start = actDur.act1;
     windows.push([a2Start + 30, a2Start + 30 + vo.storyC]);
 
-    // Act 3: 5 scenarios @ 8s, then synthesis.
+    // Act 3: deep coyote (VO), then silent montage, then silent synthesis.
     const a3Start = actDur.act1 + actDur.act2;
-    const SCEN = 8 * FPS;
-    [vo.coyote, vo.sickCow, 0, vo.calving, vo.storm].forEach((d, i) => {
-      if (d > 0) {
-        const start = a3Start + i * SCEN + 30;
-        windows.push([start, start + d]);
-      }
-    });
-    const synthStart = a3Start + 5 * SCEN;
-    windows.push([synthStart + 30, synthStart + 30 + vo.synthesisC]);
+    windows.push([a3Start + 60, a3Start + 60 + vo.coyoteDeep]);
 
     // Act 4: opus then depth.
     const a4Start = a3Start + actDur.act3;
+    const opusSlot = Math.max(vo.opusC + FPS, 25 * FPS);
     windows.push([a4Start + 30, a4Start + 30 + vo.opusC]);
-    const depthStart = a4Start + 20 * FPS;
+    const depthStart = a4Start + opusSlot;
     windows.push([depthStart + 30, depthStart + 30 + vo.depthC]);
 
     // Act 5: bookend close.
     const a5Start = a4Start + actDur.act4;
     windows.push([a5Start + 30, a5Start + 30 + vo.closeC]);
   } else {
-    // A & B share skeleton; only intro/bridge keys differ.
+    // A & B share skeleton; only intro key differs. Act 1 has no bridge
+    // cue in iter2 — replaced by the compare beat VO.
     const introDur = variant === "B" ? vo.introB : vo.intro;
-    const bridgeDur = variant === "B" ? vo.bridgeB : vo.bridge;
 
-    // Act 1: hook (8s no VO) → intro → market → bridge.
+    // Act 1: hook (8s no VO) → intro → market → compare.
     const HOOK = 8 * FPS;
     const introStart = HOOK;
     windows.push([introStart, introStart + introDur]);
 
-    // intro's slot is max(intro+0.5, 14) seconds
-    const introSlot =
-      Math.max(introDur / FPS + 0.5, 14) * FPS;
+    const introSlot = Math.max(introDur + 15, 14 * FPS);
     const marketStart = HOOK + introSlot;
     windows.push([marketStart, marketStart + vo.market]);
 
-    const marketSlot = 28 * FPS;
-    const bridgeStart = HOOK + introSlot + marketSlot;
-    windows.push([bridgeStart, bridgeStart + bridgeDur]);
+    const marketSlot = Math.max(vo.market + 30, 20 * FPS);
+    const compareStart = HOOK + introSlot + marketSlot;
+    windows.push([compareStart, compareStart + vo.compare]);
 
-    // Act 2: 5 scenarios @ 11s, then mesh.
+    // Act 2: deep coyote VO, then silent montage, then mesh-opus VO.
     const a2Start = actDur.act1;
-    const SCEN = 11 * FPS;
-    [vo.coyote, vo.sickCow, 0, vo.calving, vo.storm].forEach((d, i) => {
-      if (d > 0) {
-        const start = a2Start + i * SCEN + 120;
-        windows.push([start, start + d]);
-      }
-    });
-    const meshStart = a2Start + 5 * SCEN;
-    windows.push([meshStart, meshStart + vo.mesh]);
+    const deepSlot = Math.max(vo.coyoteDeep + 30, 25 * FPS);
+    const MONTAGE = 25 * FPS;
+    windows.push([a2Start + 60, a2Start + 60 + vo.coyoteDeep]);
+    const meshStart = a2Start + deepSlot + MONTAGE;
+    windows.push([meshStart + 30, meshStart + 30 + vo.meshOpus]);
 
     // Act 3: substance then final.
     const a3Start = actDur.act1 + actDur.act2;
@@ -182,31 +166,36 @@ export const Main = ({
         volume={(f) => duckingCurve(f, durationInFrames, duckWindows)}
       />
 
-      {/* Global SFX cues — only meaningful for AB layout (scenarios at 11s
-          increments inside Act 2). For C the cues are skipped — its 8s
-          scenarios don't have time for SFX layering. */}
+      {/* Global SFX cues — iter2 restructure places them during the deep
+          coyote beat and across the silent montage. Deep coyote runs ~25s
+          at the start of Act 2 (A/B) or Act 3 (C). SFX timing is relative
+          to the appropriate act start. */}
       {variant !== "C" && (
         <>
+          {/* Coyote-distant inside deep coyote beat (around tool-call flash) */}
           <Sequence
-            from={actDurations.act1 + 1 * 11 * FPS - 60}
+            from={actDurations.act1 + 3 * FPS}
             durationInFrames={120}
           >
             <Audio src={staticFile("sfx/coyote-distant.mp3")} volume={0.35} />
           </Sequence>
+          {/* Drone whir when telemetry overlay slides in */}
           <Sequence
-            from={actDurations.act1 + 0 * 11 * FPS + 240}
-            durationInFrames={120}
+            from={actDurations.act1 + 9 * FPS}
+            durationInFrames={180}
           >
-            <Audio src={staticFile("sfx/drone-whir.mp3")} volume={0.45} />
+            <Audio src={staticFile("sfx/drone-whir.mp3")} volume={0.4} />
           </Sequence>
+          {/* Paper-rustle on sick-cow vet-packet callout (montage scene 1) */}
           <Sequence
-            from={actDurations.act1 + 1 * 11 * FPS + 180}
+            from={actDurations.act1 + 26 * FPS}
             durationInFrames={90}
           >
             <Audio src={staticFile("sfx/paper-rustle.mp3")} volume={0.4} />
           </Sequence>
+          {/* Radio-static on calving priority-page (montage scene 3) */}
           <Sequence
-            from={actDurations.act1 + 2 * 11 * FPS + 60}
+            from={actDurations.act1 + 38 * FPS}
             durationInFrames={60}
           >
             <Audio src={staticFile("sfx/radio-static.mp3")} volume={0.3} />
@@ -249,97 +238,93 @@ export const Main = ({
         </Series>
       )}
 
-      {/* Phase E2 — Lottie reveals layered on top of the act sequences.
-          AB layout: scenario triggers at 11s increments inside Act 2, mesh +
-          attestation reveals at the cost-ticker beat. C layout: scenarios at
-          8s increments inside Act 3 plus a synthesis beat at the end. All
-          fail-soft via LottieReveal's null-on-404 guard. */}
+      {/* Phase E2 Lottie reveals — iter2: one deep coyote scenario (25s at
+          start of Act 2 for A/B, Act 3 for C) + 4-scenario montage (~6s each)
+          + mesh/opus beat. Fail-soft via LottieReveal's null-on-404 guard. */}
       {variant !== "C" ? (
         <>
-          {/* Map pin drops at scenario triggers (each 11s, first 5 scenarios) */}
-          {[0, 1, 2, 3, 4].map((i) => (
-            <Sequence
-              key={`pin-${i}`}
-              from={actDurations.act1 + i * 11 * FPS}
-              durationInFrames={45}
-            >
-              <LottieReveal asset="map-pin-drop.json" size={180} top={140} right={140} />
-            </Sequence>
-          ))}
-          {/* Pulse wave at sensor activity moment (during scenario 1) */}
+          {/* Deep coyote: map pin at start, pulse wave during tool-call flash,
+              hash chip on attestation at the end of the beat */}
           <Sequence
-            from={actDurations.act1 + 0 * 11 * FPS + 90}
-            durationInFrames={75}
+            from={actDurations.act1 + 1 * FPS}
+            durationInFrames={45}
+          >
+            <LottieReveal asset="map-pin-drop.json" size={200} top={140} right={140} />
+          </Sequence>
+          <Sequence
+            from={actDurations.act1 + 5 * FPS}
+            durationInFrames={90}
           >
             <LottieReveal asset="pulse-wave.json" size={220} top={780} left={140} loop />
           </Sequence>
-          {/* Hash chip slide on attestation moment (after scenarios end, mesh beat) */}
           <Sequence
-            from={actDurations.act1 + 5 * 11 * FPS + 60}
+            from={actDurations.act1 + 22 * FPS}
             durationInFrames={75}
           >
             <LottieReveal asset="hash-chip-slide.json" size={260} top={140} left={140} />
           </Sequence>
-          {/* Stat counter near the cost ticker callback (~2:25 in script) */}
+          {/* Montage: pin drop on each of the 4 fast cuts */}
+          {[0, 1, 2, 3].map((i) => (
+            <Sequence
+              key={`m-pin-${i}`}
+              from={actDurations.act1 + 25 * FPS + i * 6 * FPS}
+              durationInFrames={45}
+            >
+              <LottieReveal asset="map-pin-drop.json" size={160} top={140} right={140} />
+            </Sequence>
+          ))}
+          {/* Stat counter near the cost ticker in mesh-opus beat */}
           <Sequence
-            from={actDurations.act1 + actDurations.act2 - 4 * FPS}
+            from={actDurations.act1 + actDurations.act2 - 10 * FPS}
             durationInFrames={90}
           >
             <LottieReveal asset="stat-counter.json" size={300} bottom={220} right={140} />
           </Sequence>
-          {/* Checkmark complete at scenario resolutions (compressed series) */}
-          {[0, 2, 4].map((i) => (
-            <Sequence
-              key={`check-${i}`}
-              from={actDurations.act1 + i * 11 * FPS + 9 * FPS}
-              durationInFrames={45}
-            >
-              <LottieReveal asset="check-complete.json" size={140} top={300} right={140} />
-            </Sequence>
-          ))}
+          {/* Checkmark complete at end of montage */}
+          <Sequence
+            from={actDurations.act1 + 48 * FPS}
+            durationInFrames={45}
+          >
+            <LottieReveal asset="check-complete.json" size={140} top={300} right={140} />
+          </Sequence>
         </>
       ) : (
         <>
-          {/* C variant: scenarios are 8s. Pin drops at each. */}
-          {[0, 1, 2, 3, 4].map((i) => (
-            <Sequence
-              key={`c-pin-${i}`}
-              from={actDurations.act1 + actDurations.act2 + i * 8 * FPS}
-              durationInFrames={45}
-            >
-              <LottieReveal asset="map-pin-drop.json" size={170} top={140} right={140} />
-            </Sequence>
-          ))}
-          {/* Pulse wave + hash chip during synthesis beat at end of Act 3 */}
+          {/* C variant iter2: deep coyote at start of Act 3, then montage */}
           <Sequence
-            from={actDurations.act1 + actDurations.act2 + 5 * 8 * FPS}
-            durationInFrames={120}
+            from={actDurations.act1 + actDurations.act2 + 1 * FPS}
+            durationInFrames={45}
           >
-            <LottieReveal asset="pulse-wave.json" size={200} top={760} left={140} loop />
+            <LottieReveal asset="map-pin-drop.json" size={200} top={140} right={140} />
           </Sequence>
           <Sequence
-            from={actDurations.act1 + actDurations.act2 + 5 * 8 * FPS + 30}
-            durationInFrames={120}
+            from={actDurations.act1 + actDurations.act2 + 5 * FPS}
+            durationInFrames={90}
+          >
+            <LottieReveal asset="pulse-wave.json" size={200} top={780} left={140} loop />
+          </Sequence>
+          <Sequence
+            from={actDurations.act1 + actDurations.act2 + 22 * FPS}
+            durationInFrames={75}
           >
             <LottieReveal asset="hash-chip-slide.json" size={260} top={140} left={140} />
           </Sequence>
-          {/* Stat counter during Act 4 substance/Opus beat */}
+          {[0, 1, 2, 3].map((i) => (
+            <Sequence
+              key={`c-m-pin-${i}`}
+              from={actDurations.act1 + actDurations.act2 + 25 * FPS + i * 6 * FPS}
+              durationInFrames={45}
+            >
+              <LottieReveal asset="map-pin-drop.json" size={160} top={140} right={140} />
+            </Sequence>
+          ))}
+          {/* Stat counter during Act 4 Opus 4.7 beat */}
           <Sequence
             from={actDurations.act1 + actDurations.act2 + actDurations.act3 + 60}
             durationInFrames={120}
           >
             <LottieReveal asset="stat-counter.json" size={280} bottom={220} right={140} />
           </Sequence>
-          {/* Checkmarks: one at the end of every other scenario */}
-          {[1, 3].map((i) => (
-            <Sequence
-              key={`c-check-${i}`}
-              from={actDurations.act1 + actDurations.act2 + i * 8 * FPS + 6 * FPS}
-              durationInFrames={45}
-            >
-              <LottieReveal asset="check-complete.json" size={130} top={300} right={140} />
-            </Sequence>
-          ))}
         </>
       )}
 

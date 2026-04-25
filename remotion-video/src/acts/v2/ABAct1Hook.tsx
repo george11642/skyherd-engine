@@ -294,87 +294,223 @@ const MarketBeat = () => {
   );
 };
 
-// ── Beat 4 — Bridge to Demo (10s, plays bridge VO + wordmark fade-in) ────────
-const BridgeBeat = ({ variant }: { variant: Variant }) => {
+// ── Beat 4 — Compare (~18s, iter2): Traditional vs SkyHerd split ─────────────
+//
+// Left column: "Traditional" — desaturated pickup / horseback footage, dust
+// grade. Stat callouts fade in at the iter2 script beats.
+// Right column: "SkyHerd" — dashboard map glow, dark-mode, agent lane pulses.
+// Stat callouts name Opus 4.7 explicitly.
+const CompareBeat = () => {
   const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
-  const opacity = useFadeInOut(durationInFrames, 20, 20);
-  const voFile =
-    variant === "B"
-      ? "voiceover/vo-bridge-B.mp3"
-      : "voiceover/vo-bridge.mp3";
+  const opacity = useFadeInOut(durationInFrames, 25, 25);
+
+  const leftCallouts = [
+    { at: 30, text: "Rancher · 6 runs/day · 200 mi/week" },
+    { at: 120, text: "Between runs · blind" },
+  ];
+  const rightCallouts = [
+    { at: 270, text: "Opus 4.7 · 5 Managed Agents", color: ACCENT_MAP.sage },
+    { at: 360, text: "Every minute", color: ACCENT_MAP.sage },
+    { at: 450, text: "$4.17 / week", color: ACCENT_MAP.dust, big: true },
+  ];
 
   return (
     <AbsoluteFill style={{ backgroundColor: "rgb(10 12 16)", opacity }}>
-      <Audio src={staticFile(voFile)} />
-      <Video
-        src={staticFile("clips/ambient_establish.mp4")}
-        startFrom={150}
-        endAt={durationInFrames + 200}
-        muted
-        style={{
-          width: "100%",
-          height: "100%",
-          objectFit: "cover",
-          opacity: 0.85,
-        }}
-      />
-      <AbsoluteFill
-        style={{
-          background:
-            "linear-gradient(180deg, rgba(10,12,16,0) 45%, rgba(10,12,16,0.78) 100%)",
-        }}
-      />
+      <Audio src={staticFile("voiceover/vo-compare.mp3")} />
 
-      {/* Wordmark bottom-right */}
+      {/* Left half — "Traditional" */}
       <div
         style={{
           position: "absolute",
-          bottom: 90,
-          right: 100,
-          opacity: interpolate(frame, [30, 80], [0, 1], {
+          left: 0,
+          top: 0,
+          width: "50%",
+          height: "100%",
+          overflow: "hidden",
+        }}
+      >
+        <Video
+          src={staticFile("clips/ambient_establish.mp4")}
+          startFrom={0}
+          endAt={durationInFrames + 60}
+          muted
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            filter: "saturate(0.35) contrast(1.1) brightness(0.6) sepia(0.2)",
+          }}
+        />
+        <AbsoluteFill
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(6,8,12,0.3) 0%, rgba(6,8,12,0.8) 100%)",
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            top: 80,
+            left: 60,
+            fontFamily: "Inter, sans-serif",
+            fontSize: 13,
+            color: "rgb(168 180 198)",
+            letterSpacing: "0.42em",
+            textTransform: "uppercase",
+            fontWeight: 700,
+          }}
+        >
+          Traditional
+        </div>
+        {leftCallouts.map((c, i) => {
+          const o = interpolate(frame, [c.at, c.at + 20], [0, 1], {
+            extrapolateLeft: "clamp",
+            extrapolateRight: "clamp",
+          });
+          const y = interpolate(frame - c.at, [0, 20], [20, 0], {
+            extrapolateLeft: "clamp",
+            extrapolateRight: "clamp",
+          });
+          return (
+            <div
+              key={`lc-${i}`}
+              style={{
+                position: "absolute",
+                left: 60,
+                top: 130 + i * 70,
+                fontFamily: "Inter, sans-serif",
+                fontWeight: 600,
+                fontSize: 28,
+                color: "rgb(236 239 244)",
+                opacity: o,
+                transform: `translateY(${y}px)`,
+                letterSpacing: "-0.01em",
+                maxWidth: 700,
+                lineHeight: 1.2,
+                textShadow: "0 4px 20px rgba(0,0,0,0.65)",
+              }}
+            >
+              {c.text}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Right half — "SkyHerd" */}
+      <div
+        style={{
+          position: "absolute",
+          right: 0,
+          top: 0,
+          width: "50%",
+          height: "100%",
+          overflow: "hidden",
+          backgroundColor: "rgb(8 10 14)",
+        }}
+      >
+        <Video
+          src={staticFile("clips/ambient_establish.mp4")}
+          startFrom={120}
+          endAt={durationInFrames + 200}
+          muted
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            filter: "saturate(1.1) brightness(0.85) hue-rotate(-6deg)",
+          }}
+        />
+        <AbsoluteFill
+          style={{
+            background:
+              "radial-gradient(ellipse at 50% 30%, rgba(148,176,136,0.22) 0%, rgba(8,10,14,0.9) 80%)",
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            top: 80,
+            left: 60,
+            fontFamily: "Inter, sans-serif",
+            fontSize: 13,
+            color: ACCENT_MAP.sage,
+            letterSpacing: "0.42em",
+            textTransform: "uppercase",
+            fontWeight: 700,
+          }}
+        >
+          SkyHerd
+        </div>
+        {rightCallouts.map((c, i) => {
+          const o = interpolate(frame, [c.at, c.at + 20], [0, 1], {
+            extrapolateLeft: "clamp",
+            extrapolateRight: "clamp",
+          });
+          const y = interpolate(frame - c.at, [0, 20], [20, 0], {
+            extrapolateLeft: "clamp",
+            extrapolateRight: "clamp",
+          });
+          return (
+            <div
+              key={`rc-${i}`}
+              style={{
+                position: "absolute",
+                left: 60,
+                top: 130 + i * 80,
+                fontFamily: "Inter, sans-serif",
+                fontWeight: c.big ? 800 : 600,
+                fontSize: c.big ? 54 : 28,
+                color: c.color,
+                opacity: o,
+                transform: `translateY(${y}px)`,
+                letterSpacing: "-0.015em",
+                maxWidth: 700,
+                lineHeight: 1.15,
+                textShadow: "0 4px 20px rgba(0,0,0,0.7)",
+              }}
+            >
+              {c.text}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Centered lower-third — Ranch A slug */}
+      <div
+        style={{
+          position: "absolute",
+          bottom: 50,
+          left: 0,
+          right: 0,
+          textAlign: "center",
+          opacity: interpolate(frame, [durationInFrames - 60, durationInFrames - 30], [0, 1], {
             extrapolateLeft: "clamp",
             extrapolateRight: "clamp",
           }),
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "flex-end",
-          gap: 8,
         }}
       >
         <div
           style={{
             fontFamily: "Inter, sans-serif",
-            fontWeight: 800,
-            fontSize: 72,
-            color: "rgb(236 239 244)",
-            letterSpacing: "-0.03em",
-            lineHeight: 1,
-          }}
-        >
-          Sky<span style={{ color: ACCENT_MAP.sage }}>Herd</span>
-        </div>
-        <div
-          style={{
-            fontFamily: "Inter, sans-serif",
-            fontWeight: 500,
-            fontSize: 16,
+            fontWeight: 600,
+            fontSize: 14,
             color: "rgb(168 180 198)",
-            letterSpacing: "0.35em",
+            letterSpacing: "0.4em",
             textTransform: "uppercase",
           }}
         >
-          Ranch A · 40,000 acres
+          SkyHerd · Ranch A · 40,000 acres
         </div>
       </div>
     </AbsoluteFill>
   );
 };
 
-// ── Act 1 root (sequences the four beats) ────────────────────────────────────
+// ── Act 1 root (sequences the four beats: hook → intro → market → compare) ───
 export const ABAct1Hook = ({ variant, voDurationsFrames }: Props) => {
-  // Beat lengths in frames.
-  const HOOK = AB_LAYOUT.act1.hook * FPS; // 240
+  const HOOK = AB_LAYOUT.act1.hook * FPS;
+
   const introVoSeconds =
     variant === "B"
       ? voDurationsFrames.introB / FPS
@@ -382,13 +518,15 @@ export const ABAct1Hook = ({ variant, voDurationsFrames }: Props) => {
   const INTRO = Math.ceil(
     Math.max(introVoSeconds + 0.5, AB_LAYOUT.act1.introMin) * FPS,
   );
-  const MARKET = AB_LAYOUT.act1.marketSlot * FPS;
-  const bridgeVoSeconds =
-    variant === "B"
-      ? voDurationsFrames.bridgeB / FPS
-      : voDurationsFrames.bridge / FPS;
-  const BRIDGE = Math.ceil(
-    Math.max(bridgeVoSeconds + 0.5, AB_LAYOUT.act1.bridgeMin) * FPS,
+
+  const marketVoSeconds = voDurationsFrames.market / FPS;
+  const MARKET = Math.ceil(
+    Math.max(marketVoSeconds + 1, AB_LAYOUT.act1.marketMin) * FPS,
+  );
+
+  const compareVoSeconds = voDurationsFrames.compare / FPS;
+  const COMPARE = Math.ceil(
+    Math.max(compareVoSeconds + 1, AB_LAYOUT.act1.compareMin) * FPS,
   );
 
   return (
@@ -404,10 +542,10 @@ export const ABAct1Hook = ({ variant, voDurationsFrames }: Props) => {
       </Sequence>
       <Sequence
         from={HOOK + INTRO + MARKET}
-        durationInFrames={BRIDGE}
+        durationInFrames={COMPARE}
         layout="none"
       >
-        <BridgeBeat variant={variant} />
+        <CompareBeat />
       </Sequence>
     </AbsoluteFill>
   );

@@ -403,32 +403,33 @@ const CScenario = ({
 const CSynthesisBeat = () => {
   const frame = useCurrentFrame();
   const { durationInFrames, fps } = useVideoConfig();
-  const opacity = useFadeInOut(durationInFrames, 20, 20);
+  const opacity = useFadeInOut(durationInFrames, 15, 15);
 
+  // iter2: short 5s synthesis with three fast cards. No VO — music carries,
+  // script retired vo-synthesis-C in the humanize pass.
   const cards = [
     {
-      at: 30,
+      at: 10,
       title: "5 Managed Agents",
       body: "Idle-pause billing.",
       accent: "sage" as Accent,
     },
     {
-      at: 120,
+      at: 40,
       title: "33 Skill Files",
-      body: "Per-task domain knowledge.",
+      body: "Per-task knowledge.",
       accent: "dust" as Accent,
     },
     {
-      at: 240,
+      at: 80,
       title: "$4.17 / week",
-      body: "24/7 ranch coverage.",
+      body: "24/7 coverage.",
       accent: "sky" as Accent,
     },
   ];
 
   return (
     <AbsoluteFill style={{ backgroundColor: "rgb(8 10 14)", opacity }}>
-      <Audio src={staticFile("voiceover/vo-synthesis-C.mp3")} />
       <Video
         src={staticFile("clips/ambient_30x_synthesis.mp4")}
         startFrom={0}
@@ -512,49 +513,290 @@ const CSynthesisBeat = () => {
   );
 };
 
+// Deep coyote scenario for variant C — same visual grammar as AB deep beat
+// but uses the shared vo-coyote-deep.mp3 and keeps the dense-caption flow.
+const CDeepCoyote = () => {
+  const frame = useCurrentFrame();
+  const { durationInFrames } = useVideoConfig();
+
+  const fadeIn = interpolate(frame, [0, 12], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  const fadeOut = interpolate(
+    frame,
+    [durationInFrames - 15, durationInFrames],
+    [1, 0.25],
+    { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
+  );
+  const opacity = Math.min(fadeIn, fadeOut);
+
+  const SMS_AT = 19 * 30;
+  const smsO = interpolate(frame, [SMS_AT, SMS_AT + 20], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+
+  return (
+    <AbsoluteFill style={{ backgroundColor: "rgb(6 8 12)" }}>
+      <Audio src={staticFile("voiceover/vo-coyote-deep.mp3")} />
+      <div style={{ width: "100%", height: "100%", opacity }}>
+        <Video
+          src={staticFile("clips/coyote.mp4")}
+          startFrom={0}
+          endAt={durationInFrames + 60}
+          muted
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+          }}
+        />
+      </div>
+      <AbsoluteFill
+        style={{
+          background:
+            "radial-gradient(ellipse at center, rgba(0,0,0,0) 55%, rgba(6,8,12,0.55) 100%)",
+          opacity,
+        }}
+      />
+      <div
+        style={{
+          position: "absolute",
+          top: 80,
+          left: 80,
+          display: "flex",
+          alignItems: "center",
+          gap: 14,
+          opacity: fadeIn,
+        }}
+      >
+        <div
+          style={{
+            width: 48,
+            height: 48,
+            borderRadius: 24,
+            backgroundColor: ACCENT_MAP.thermal,
+            color: "rgb(10 12 16)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontFamily: "Inter, sans-serif",
+            fontWeight: 800,
+            fontSize: 18,
+          }}
+        >
+          3:14
+        </div>
+        <div
+          style={{
+            fontFamily: "Inter, sans-serif",
+            fontSize: 14,
+            letterSpacing: "0.32em",
+            textTransform: "uppercase",
+            color: "rgb(236 239 244)",
+            fontWeight: 600,
+          }}
+        >
+          Deep scenario · Coyote
+        </div>
+      </div>
+      <LowerThird
+        agent="FenceLineDispatcher"
+        detail="Coyote · 91% · Mavic dispatched"
+        accent="thermal"
+        appearFrame={45}
+        durationInFrames={durationInFrames - 45}
+      />
+      <AnchorChip
+        label="Attest"
+        topic="Fence W-12 breach"
+        hash="a7c3…f91e"
+        statusPill="Signed"
+        appearFrame={22 * 30}
+        accent="thermal"
+      />
+      <div
+        style={{
+          position: "absolute",
+          bottom: 220,
+          right: 80,
+          opacity: smsO,
+          maxWidth: 400,
+          backgroundColor: "rgba(30,34,40,0.92)",
+          borderRadius: 18,
+          border: "1px solid rgba(148,176,136,0.3)",
+          padding: "14px 18px",
+          fontFamily: "Inter, sans-serif",
+          color: "rgb(236 239 244)",
+          boxShadow: "0 8px 32px rgba(0,0,0,0.55)",
+        }}
+      >
+        <div
+          style={{
+            fontSize: 11,
+            color: "rgb(148 176 136)",
+            letterSpacing: "0.28em",
+            textTransform: "uppercase",
+            fontWeight: 700,
+            marginBottom: 6,
+          }}
+        >
+          SMS · 3:14am
+        </div>
+        <div style={{ fontSize: 15, lineHeight: 1.35, fontWeight: 500 }}>
+          Coyote on W-12. Drone scared it off. Fence intact. You&rsquo;re good.
+        </div>
+      </div>
+    </AbsoluteFill>
+  );
+};
+
+// Silent montage scene for C — 6-7s kinetic callout, no full VO.
+type CMontageProps = {
+  clipName: string;
+  callout: string;
+  agent: string;
+  detail: string;
+  accent: Accent;
+  anchorLabel: string;
+  anchorTopic: string;
+  anchorHash: string;
+  anchorStatus: string;
+};
+
+const CMontageScene = ({
+  clipName,
+  callout,
+  agent,
+  detail,
+  accent,
+  anchorLabel,
+  anchorTopic,
+  anchorHash,
+  anchorStatus,
+}: CMontageProps) => {
+  const frame = useCurrentFrame();
+  const { durationInFrames } = useVideoConfig();
+
+  const fadeIn = interpolate(frame, [0, 6], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  const fadeOut = interpolate(
+    frame,
+    [durationInFrames - 8, durationInFrames],
+    [1, 0.2],
+    { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
+  );
+  const opacity = Math.min(fadeIn, fadeOut);
+
+  const calloutO = interpolate(frame, [12, 28], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+
+  return (
+    <AbsoluteFill style={{ backgroundColor: "rgb(6 8 12)" }}>
+      <div style={{ width: "100%", height: "100%", opacity }}>
+        <Video
+          src={staticFile(`clips/${clipName}`)}
+          startFrom={0}
+          endAt={200}
+          muted
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+          }}
+        />
+      </div>
+      <AbsoluteFill
+        style={{
+          background:
+            "radial-gradient(ellipse at center, rgba(0,0,0,0) 50%, rgba(6,8,12,0.65) 100%)",
+          opacity,
+        }}
+      />
+      <div
+        style={{
+          position: "absolute",
+          top: 180,
+          left: 0,
+          right: 0,
+          textAlign: "center",
+          padding: "0 8%",
+          opacity: calloutO,
+        }}
+      >
+        <div
+          style={{
+            fontFamily: "Inter, sans-serif",
+            fontWeight: 800,
+            fontSize: 50,
+            color: ACCENT_MAP[accent],
+            letterSpacing: "-0.022em",
+            lineHeight: 1.1,
+            textShadow: "0 6px 30px rgba(0,0,0,0.75)",
+          }}
+        >
+          {callout}
+        </div>
+      </div>
+      <LowerThird
+        agent={agent}
+        detail={detail}
+        accent={accent}
+        appearFrame={20}
+        durationInFrames={durationInFrames - 20}
+      />
+      <AnchorChip
+        label={anchorLabel}
+        topic={anchorTopic}
+        hash={anchorHash}
+        statusPill={anchorStatus}
+        appearFrame={40}
+        accent={accent}
+      />
+    </AbsoluteFill>
+  );
+};
+
 export const CAct3Demo = () => {
-  const SCEN = C_LAYOUT.act3.scenarioSeconds * FPS; // 240
-  const SYNTH = C_LAYOUT.act3.synthesisSeconds * FPS; // 450
+  const DEEP = C_LAYOUT.act3.coyoteDeepMin * FPS; // ~750
+  const MONTAGE_TOTAL = C_LAYOUT.act3.montageSeconds * FPS; // 750
+  const SCENE = Math.floor(
+    MONTAGE_TOTAL / C_LAYOUT.act3.montageSceneCount,
+  );
+  const SYNTH = C_LAYOUT.act3.synthesisSeconds * FPS; // 150
+
+  // Keep CScenario import alive — it's used nowhere else now but we retain the
+  // export for backwards-compat with the caption track generator.
+  void CScenario;
 
   return (
     <AbsoluteFill>
       <Series>
-        <Series.Sequence durationInFrames={SCEN}>
-          <CScenario
-            scenarioNumber={1}
-            clipName="coyote.mp4"
-            voFile="voiceover/vo-coyote.mp3"
-            voStartFrame={30}
-            agent="FenceLineDispatcher"
-            detail="Coyote · 91% · Mavic dispatched"
-            accent="thermal"
-            anchorLabel="Attest"
-            anchorTopic="Fence W-12 breach"
-            anchorHash="a7c3…f91e"
-            anchorStatus="Signed"
-          />
+        <Series.Sequence durationInFrames={DEEP}>
+          <CDeepCoyote />
         </Series.Sequence>
-        <Series.Sequence durationInFrames={SCEN}>
-          <CScenario
-            scenarioNumber={2}
+        <Series.Sequence durationInFrames={SCENE}>
+          <CMontageScene
             clipName="sick_cow.mp4"
-            voFile="voiceover/vo-sick-cow.mp3"
-            voStartFrame={30}
+            callout="A014 — vet packet in 12 seconds"
             agent="HerdHealthWatcher"
             detail="Cow A014 · pinkeye 83%"
             accent="warn"
             anchorLabel="Vet"
-            anchorTopic="Cow A014 · pinkeye"
+            anchorTopic="Cow A014"
             anchorHash="4d82…b03c"
             anchorStatus="Sent"
           />
         </Series.Sequence>
-        <Series.Sequence durationInFrames={SCEN}>
-          <CScenario
-            scenarioNumber={3}
+        <Series.Sequence durationInFrames={SCENE}>
+          <CMontageScene
             clipName="water.mp4"
-            voFile={null}
-            voStartFrame={0}
+            callout="Tank 7 · 8 PSI · drone flew it"
             agent="GrazingOptimizer"
             detail="Tank 7 · pressure drop"
             accent="sky"
@@ -564,14 +806,12 @@ export const CAct3Demo = () => {
             anchorStatus="Queued"
           />
         </Series.Sequence>
-        <Series.Sequence durationInFrames={SCEN}>
-          <CScenario
-            scenarioNumber={4}
+        <Series.Sequence durationInFrames={SCENE}>
+          <CMontageScene
             clipName="calving.mp4"
-            voFile="voiceover/vo-calving.mp3"
-            voStartFrame={30}
+            callout="117's calving · 3:14am"
             agent="CalvingWatch"
-            detail="Cow 117 · pre-labor · priority"
+            detail="Cow 117 · pre-labor"
             accent="sage"
             anchorLabel="Trace"
             anchorTopic="Cow 117"
@@ -579,17 +819,15 @@ export const CAct3Demo = () => {
             anchorStatus="Paged"
           />
         </Series.Sequence>
-        <Series.Sequence durationInFrames={SCEN}>
-          <CScenario
-            scenarioNumber={5}
+        <Series.Sequence durationInFrames={SCENE}>
+          <CMontageScene
             clipName="storm.mp4"
-            voFile="voiceover/vo-storm.mp3"
-            voStartFrame={30}
+            callout="Hail 45min · herd → Shelter 2"
             agent="Weather-Redirect"
-            detail="Hail ETA 45 · Paddock B → Shelter 2"
+            detail="Paddock B → Shelter 2"
             accent="dust"
             anchorLabel="Plan"
-            anchorTopic="Paddock B → Shelter 2"
+            anchorTopic="Shelter 2"
             anchorHash="d3a9…7e11"
             anchorStatus="Active"
           />
@@ -836,8 +1074,8 @@ const CDepthBeat = () => {
 };
 
 export const CAct4Substance = () => {
-  const OPUS = C_LAYOUT.act4.opusSeconds * FPS; // 600
-  const DEPTH = C_LAYOUT.act4.depthSeconds * FPS; // 450
+  const OPUS = C_LAYOUT.act4.opusMin * FPS;
+  const DEPTH = C_LAYOUT.act4.depthMin * FPS;
 
   return (
     <AbsoluteFill>
