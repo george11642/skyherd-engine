@@ -6,8 +6,8 @@
  * top-level composition (Main_A / Main_B / Main_C) in Root.tsx so renders can
  * target a specific variant via `pnpm exec remotion render Main_A …`.
  *
- * BGM bed and ducking are handled here at the composition root so the
- * envelope can see all VO start/end frames in one pass.
+ * BGM bed and per-stem ducking are handled by <MusicBed> at the composition
+ * root so the envelope can see all VO start/end frames in one pass.
  */
 import {
   AbsoluteFill,
@@ -15,7 +15,6 @@ import {
   Sequence,
   Series,
   staticFile,
-  useVideoConfig,
 } from "remotion";
 import {
   type MainProps,
@@ -34,116 +33,81 @@ import {
 } from "./acts/v2/CActs";
 import { KineticCaptions } from "./components/KineticCaptions";
 import { LottieReveal } from "./components/LottieReveal";
+import { MusicBed } from "./components/MusicBed";
+import { type VoSegment } from "./lib/audio-ducking";
 
 const FPS = 30;
-const DUCK_BASE = 0.55;
-const DUCK_UNDER_VO = 0.22;
-const DUCK_FADE = 24;
-const DUCK_INTER_GAP = 18;
 
-const smoothstep = (edge0: number, edge1: number, x: number): number => {
-  if (edge1 === edge0) return x >= edge1 ? 1 : 0;
-  const t = Math.max(0, Math.min(1, (x - edge0) / (edge1 - edge0)));
-  return t * t * (3 - 2 * t);
-};
-
-const duckingCurve = (
-  frame: number,
-  totalFrames: number,
-  duckWindows: Array<[number, number]>,
-): number => {
-  const envelope = Math.min(
-    smoothstep(0, 150, frame),
-    smoothstep(totalFrames, totalFrames - 150, frame),
-  );
-
-  let duckAmount = 0;
-  for (const [start, end] of duckWindows) {
-    const rampIn = smoothstep(start - DUCK_FADE, start, frame);
-    const rampOut = smoothstep(end + DUCK_FADE, end, frame);
-    const inWindow = Math.min(rampIn, rampOut);
-    if (inWindow > duckAmount) duckAmount = inWindow;
-  }
-
-  for (let i = 0; i < duckWindows.length - 1; i++) {
-    const [, endA] = duckWindows[i];
-    const [startB] = duckWindows[i + 1];
-    if (startB - endA <= DUCK_INTER_GAP && frame >= endA && frame <= startB) {
-      duckAmount = Math.max(duckAmount, 1);
-    }
-  }
-
-  const volume = DUCK_BASE + (DUCK_UNDER_VO - DUCK_BASE) * duckAmount;
-  return volume * envelope;
-};
-
-// Compute the duck-window list per variant. Iter2 restructure: deep coyote
-// scenario, silent 4-scenario montage, compare beat in Act 1 (A/B) or Act 2
-// (C), mesh-opus beat that names Opus 4.7 explicitly.
-const computeDuckWindows = (
+/**
+ * Derive the list of VO windows per variant.
+ * Returns VoSegment[] (absolute composition frames) used by MusicBed for ducking.
+ */
+const computeVoSegments = (
   variant: Variant,
   vo: VoDurationsFrames,
   actDur: { act1: number; act2: number; act3: number; act4: number; act5: number },
-): Array<[number, number]> => {
-  const windows: Array<[number, number]> = [];
+): VoSegment[] => {
+  const segs: VoSegment[] = [];
+
+  const push = (start: number, dur: number) => {
+    segs.push({ startFrame: start, endFrame: start + dur });
+  };
 
   if (variant === "C") {
     // Act 1: hook punch (8s no VO) then hookC VO.
     const a1HookPunchEnd = 8 * FPS;
-    windows.push([a1HookPunchEnd, a1HookPunchEnd + vo.hookC]);
+    push(a1HookPunchEnd, vo.hookC);
 
-    // Act 2: story VO (which now folds the compare beat in).
+    // Act 2: story VO (folds compare beat in).
     const a2Start = actDur.act1;
-    windows.push([a2Start + 30, a2Start + 30 + vo.storyC]);
+    push(a2Start + 30, vo.storyC);
 
-    // Act 3: deep coyote (VO), then silent montage, then silent synthesis.
+    // Act 3: deep coyote VO.
     const a3Start = actDur.act1 + actDur.act2;
-    windows.push([a3Start + 60, a3Start + 60 + vo.coyoteDeep]);
+    push(a3Start + 60, vo.coyoteDeep);
 
     // Act 4: opus then depth.
     const a4Start = a3Start + actDur.act3;
     const opusSlot = Math.max(vo.opusC + FPS, 25 * FPS);
-    windows.push([a4Start + 30, a4Start + 30 + vo.opusC]);
+    push(a4Start + 30, vo.opusC);
     const depthStart = a4Start + opusSlot;
-    windows.push([depthStart + 30, depthStart + 30 + vo.depthC]);
+    push(depthStart + 30, vo.depthC);
 
     // Act 5: bookend close.
     const a5Start = a4Start + actDur.act4;
-    windows.push([a5Start + 30, a5Start + 30 + vo.closeC]);
+    push(a5Start + 30, vo.closeC);
   } else {
-    // A & B share skeleton; only intro key differs. Act 1 has no bridge
-    // cue in iter2 — replaced by the compare beat VO.
+    // A & B share skeleton; only intro key differs.
     const introDur = variant === "B" ? vo.introB : vo.intro;
 
     // Act 1: hook (8s no VO) → intro → market → compare.
     const HOOK = 8 * FPS;
-    const introStart = HOOK;
-    windows.push([introStart, introStart + introDur]);
+    push(HOOK, introDur);
 
     const introSlot = Math.max(introDur + 15, 14 * FPS);
     const marketStart = HOOK + introSlot;
-    windows.push([marketStart, marketStart + vo.market]);
+    push(marketStart, vo.market);
 
     const marketSlot = Math.max(vo.market + 30, 20 * FPS);
     const compareStart = HOOK + introSlot + marketSlot;
-    windows.push([compareStart, compareStart + vo.compare]);
+    push(compareStart, vo.compare);
 
-    // Act 2: deep coyote VO, then silent montage, then mesh-opus VO.
+    // Act 2: deep coyote VO, then mesh-opus VO.
     const a2Start = actDur.act1;
     const deepSlot = Math.max(vo.coyoteDeep + 30, 25 * FPS);
     const MONTAGE = 25 * FPS;
-    windows.push([a2Start + 60, a2Start + 60 + vo.coyoteDeep]);
+    push(a2Start + 60, vo.coyoteDeep);
     const meshStart = a2Start + deepSlot + MONTAGE;
-    windows.push([meshStart + 30, meshStart + 30 + vo.meshOpus]);
+    push(meshStart + 30, vo.meshOpus);
 
     // Act 3: substance then final.
     const a3Start = actDur.act1 + actDur.act2;
-    windows.push([a3Start, a3Start + vo.closeSubstance]);
+    push(a3Start, vo.closeSubstance);
     const finalStart = a3Start + 18 * FPS;
-    windows.push([finalStart, finalStart + vo.closeFinal]);
+    push(finalStart, vo.closeFinal);
   }
 
-  return windows;
+  return segs;
 };
 
 export const Main = ({
@@ -151,8 +115,7 @@ export const Main = ({
   actDurations,
   voDurationsFrames,
 }: MainProps) => {
-  const { durationInFrames } = useVideoConfig();
-  const duckWindows = computeDuckWindows(
+  const voSegments = computeVoSegments(
     variant,
     voDurationsFrames,
     actDurations,
@@ -160,11 +123,8 @@ export const Main = ({
 
   return (
     <AbsoluteFill style={{ backgroundColor: "rgb(10 12 16)" }}>
-      <Audio
-        src={staticFile("music/bgm-main.mp3")}
-        loop
-        volume={(f) => duckingCurve(f, durationInFrames, duckWindows)}
-      />
+      {/* Phase 6 S2: layered BGM stems with per-stem ducking + 6 stings */}
+      <MusicBed voSegments={voSegments} />
 
       {/* Global SFX cues — iter2 restructure places them during the deep
           coyote beat and across the silent montage. Deep coyote runs ~25s
