@@ -1,0 +1,21 @@
+{
+  "elevenlabs.will": {
+    "voice_id": "bIHbv24MWmeRgasZH58o",
+    "model": "eleven_v3",
+    "fallback_model": "eleven_turbo_v2_5",
+    "stability": 0.5,
+    "similarity_boost": 0.75,
+    "style": 0.4,
+    "use_speaker_boost": true,
+    "default": false,
+    "notes": "Will — modern conversational male. Iter2 pick: holds pauses, reads metrics with a shrug not a pitch. Known-good fallback."
+  },
+  "inworld.male19": {
+    "voice_id": "Nate",
+    "model_id": "inworld-tts-1.5-max",
+    "temperature": 0.8,
+    "speed": 1.0,
+    "default": true,
+    "notes": "Nate — 'Conversational, sociable male voice'. Picked 2026-04-24 via description-fit scoring (Jake/Avery/Nate/Tyler candidates). Nate best matches 'friend telling you about a thing he built' brief. Audition files: out/audition-inworld-{Jake,Avery,Nate,Tyler}.mp3."
+  }
+}
