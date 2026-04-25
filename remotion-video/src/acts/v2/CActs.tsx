@@ -46,9 +46,106 @@ const C_ACT5_START = 160;  // Act 5 Close starts at 160s
 
 const FPS = 30;
 
-// ── Act 1 (Hook, 20s) — metric punch + hookC VO ───────────────────────────────
+// ── Act 1 (Hook, 20s) — cold-open pain → metric punch + hookC VO ──────────────
 
+const C_HOOK_COLDOPEN = 45; // 1.5s visceral pain pre-roll before $4.17 reveal
 const C_HOOK_PUNCH = C_LAYOUT.act1.punchSeconds * FPS; // 240
+
+const CAct1HookColdOpen = () => {
+  const frame = useCurrentFrame();
+  const { durationInFrames } = useVideoConfig();
+
+  // Hard fade-out in last 6 frames so cut into the cream punch is clean.
+  const opacity = interpolate(
+    frame,
+    [0, 5, durationInFrames - 6, durationInFrames],
+    [0, 1, 1, 0],
+    { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
+  );
+  const statO = interpolate(frame, [4, 14], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  const statY = interpolate(frame, [4, 14], [16, 0], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  const zoom = interpolate(frame, [0, durationInFrames], [1.04, 1.12]);
+
+  return (
+    <AbsoluteFill style={{ backgroundColor: "rgb(6 8 12)", opacity }}>
+      <div
+        style={{
+          width: "100%",
+          height: "100%",
+          transform: `scale(${zoom})`,
+        }}
+      >
+        <Video
+          src={staticFile("broll/t1-drone-rangeland-aerial.mp4")}
+          startFrom={0}
+          endAt={durationInFrames + 30}
+          muted
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            filter: "saturate(0.8) contrast(1.08) brightness(0.7)",
+          }}
+        />
+      </div>
+      <AbsoluteFill
+        style={{
+          background:
+            "linear-gradient(180deg, rgba(6,8,12,0.55) 0%, rgba(6,8,12,0.85) 100%)",
+        }}
+      />
+      <AbsoluteFill
+        style={{
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "0 8%",
+        }}
+      >
+        <div
+          style={{
+            opacity: statO,
+            transform: `translateY(${statY}px)`,
+            fontFamily: "Inter, sans-serif",
+            textAlign: "center",
+          }}
+        >
+          <div
+            style={{
+              fontSize: 16,
+              color: ACCENT_MAP.warn,
+              letterSpacing: "0.34em",
+              textTransform: "uppercase",
+              fontWeight: 700,
+              marginBottom: 14,
+            }}
+          >
+            US ranch losses · 2024
+          </div>
+          <div
+            style={{
+              fontSize: 96,
+              fontWeight: 800,
+              color: "rgb(236 239 244)",
+              letterSpacing: "-0.028em",
+              lineHeight: 1.02,
+              textShadow: "0 6px 30px rgba(0,0,0,0.7)",
+            }}
+          >
+            Coyotes kill <span style={{ color: ACCENT_MAP.warn }}>$232M</span>
+            <br />
+            in US cattle / year.
+          </div>
+        </div>
+      </AbsoluteFill>
+    </AbsoluteFill>
+  );
+};
 
 const CAct1HookPunch = () => (
   <AbsoluteFill
@@ -180,14 +277,25 @@ export const CAct1Hook = () => {
   const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
   void frame;
-  const VO = durationInFrames - C_HOOK_PUNCH;
+  const VO = Math.max(durationInFrames - C_HOOK_PUNCH - C_HOOK_COLDOPEN, 1);
 
   return (
     <AbsoluteFill>
-      <Sequence from={0} durationInFrames={C_HOOK_PUNCH} layout="none">
+      <Sequence from={0} durationInFrames={C_HOOK_COLDOPEN} layout="none">
+        <CAct1HookColdOpen />
+      </Sequence>
+      <Sequence
+        from={C_HOOK_COLDOPEN}
+        durationInFrames={C_HOOK_PUNCH}
+        layout="none"
+      >
         <CAct1HookPunch />
       </Sequence>
-      <Sequence from={C_HOOK_PUNCH} durationInFrames={VO} layout="none">
+      <Sequence
+        from={C_HOOK_COLDOPEN + C_HOOK_PUNCH}
+        durationInFrames={VO}
+        layout="none"
+      >
         <CAct1HookVo />
       </Sequence>
     </AbsoluteFill>
