@@ -1,17 +1,27 @@
 /**
- * TraditionalWay v2 — Scene 0:18–0:35 (17s / 510 frames @ 30fps)
+ * TraditionalWay v3 — multi-method ranch + SkyHerd comparison beat.
  *
- * Real ranch-shape map with labelled paddocks and water sources.
- * Truck moves on a believable physical road loop, realistic pace.
- * 3 missed-event icons at FIXED positions (coyote south fence,
- * sick cow near pen, water tank far corner).
- * Events fire at VO words: "coyote" ~f285, "sick cow" ~f345, "tank" ~f405.
- * Time-of-day clock prominent in corner.
- * "$12K / yr in missed events" callout on the "All missed." beat.
+ * Total scene: 600 frames (20s @ 30fps).
+ *
+ * Phases:
+ *   1. Setup            f0-60     title + ranch map fade in
+ *   2. Multi-method     f60-360   helicopter, dogs, ATV, truck operating
+ *                                 simultaneously across the ranch
+ *   3. Missed events    f240-420  3 pulses (coyote/sick cow/empty tank)
+ *                                 + "$12K / yr" cost callout
+ *   4. SkyHerd overlay  f420-600  traditional methods dim, nervous-system
+ *                                 overlay sweeps in (sensors + FOV + drone),
+ *                                 ✗ flip to ✓, comparator card slides in
+ *
+ * Keeps the SVG ranch-shape skeleton from v2 (paddocks, troughs, road,
+ * pen, house, compass). Truck loop math reused at 70% size; missed-event
+ * pulse mechanism reused with new fire frames; clock simplified to a
+ * smooth 11pm→midnight ramp.
  */
 import React from "react";
 import { AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
 
+// ─── Palette ─────────────────────────────────────────────────────────────────
 const CREAM      = "rgb(245 240 230)";
 const CREAM_DARK = "rgb(228 220 205)";
 const SAGE       = "rgb(148 176 136)";
@@ -20,11 +30,23 @@ const TERRACOTTA = "rgb(188 90 60)";
 const SKY        = "rgb(120 180 220)";
 const INK        = "rgb(45 42 38)";
 const INK_LIGHT  = "rgb(90 86 80)";
+const DUST       = "rgb(178 156 122)";
+const EMERALD    = "rgb(16 185 129)";    // SkyHerd nervous-system color
+const EMERALD_DK = "rgb(5 150 105)";
 const MONO       = "ui-monospace, 'JetBrains Mono', monospace";
 const SERIF      = "Georgia, 'Times New Roman', serif";
 
-// ─── Ranch shape (irregular polygon) ────────────────────────────────────────
-// Defined as fractions of (width, height). Mimics an NM-style irregular parcel.
+// ─── Scene phase boundaries (frames) ─────────────────────────────────────────
+// Total: 600 frames (20s @ 30fps).
+//   0..60    Phase 1: title + map fade in
+//   60..360  Phase 2: multi-method active (helicopter, dogs, ATV, truck)
+//   240..420 Phase 3: missed-events pulse (overlaps phase 2 tail)
+//   420..600 Phase 4: SkyHerd comparison beat (dim → overlay → comparator)
+const MULTI_END        = 360;
+const COMPARE_START    = 420;
+const COMPARE_DIM_END  = 450;
+
+// ─── Ranch shape (irregular polygon) ─────────────────────────────────────────
 const RANCH_POLY = [
   [0.10, 0.20], // NW corner (offset west)
   [0.55, 0.15], // N-top gentle jog
@@ -40,8 +62,7 @@ function polyPoints(poly: Array<[number, number]>, w: number, h: number): string
   return poly.map(([x, y]) => `${x * w},${y * h}`).join(" ");
 }
 
-// ─── Road waypoints (fraction coords, clockwise) ────────────────────────────
-// A loop that stays ~0.1–0.15 inside the boundary, dips south, passes the pen.
+// ─── Road waypoints (fraction coords, clockwise) ─────────────────────────────
 const ROAD_WP: Array<[number, number]> = [
   [0.22, 0.28], // NW road start
   [0.50, 0.22], // N straight
@@ -74,76 +95,307 @@ function truckAngle(wp: Array<[number, number]>, t: number): number {
   return (Math.atan2(dy, dx) * 180) / Math.PI;
 }
 
-// Lap time = 18 real seconds at 30fps → 540 frames; truck completes ~0.95 lap
-const LAP_FRAMES = 540;
+// Truck completes ~1.0 lap across the multi-method window (300f).
+const LAP_FRAMES = 300;
 
-// ─── Clock that jumps to specific times ─────────────────────────────────────
-// Maps frame → displayed time so events look contextual.
-// f0→f240: 11:00 PM → 2:59 AM  (fast tick through night)
-// f285: 3:00 AM (coyote)
-// f285→f330: holds at 3:00 AM
-// f345: 12:00 PM (sick cow)
-// f405: 12:00 AM (tank)
+// ─── Clock — smooth 11:00 PM → 12:00 AM (midnight) across f0-360 ─────────────
 function clockText(frame: number): string {
-  let h: number, m: number;
-  if (frame < 280) {
-    // Ramp from 23:00 → 02:59 over first 280 frames
-    const mins = Math.floor(interpolate(frame, [0, 280], [23 * 60, 2 * 60 + 59], {
-      extrapolateLeft: "clamp", extrapolateRight: "clamp",
-    }));
-    h = Math.floor(mins / 60) % 24;
-    m = mins % 60;
-  } else if (frame < 340) {
-    h = 3; m = 0; // coyote beat
-  } else if (frame < 400) {
-    h = 12; m = 0; // sick cow
-  } else {
-    h = 0; m = 0; // midnight
-  }
-  const period = h < 12 ? "AM" : "PM";
-  const displayH = h % 12 === 0 ? 12 : h % 12;
+  // 23:00 → 24:00 over 0..360 frames
+  const totalMin = interpolate(frame, [0, MULTI_END], [23 * 60, 24 * 60], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  const mins = Math.floor(totalMin);
+  const h24 = Math.floor(mins / 60) % 24;
+  const m = mins % 60;
+  const period = h24 < 12 ? "AM" : "PM";
+  const displayH = h24 % 12 === 0 ? 12 : h24 % 12;
   const mStr = m < 10 ? `0${m}` : `${m}`;
   return `${displayH}:${mStr} ${period}`;
 }
 
-// ─── Events — FIXED positions, fire at VO words ──────────────────────────────
-const EVENTS = [
-  { label: "COYOTE",   timeTag: "3:00 AM",   fireFrame: 285, x: 0.74, y: 0.35 },
-  { label: "SICK COW", timeTag: "NOON",       fireFrame: 345, x: 0.28, y: 0.64 },
-  { label: "EMPTY TANK",timeTag: "MIDNIGHT",  fireFrame: 405, x: 0.70, y: 0.72 },
-] as const;
+// ─── Missed events — fire frames re-scoped for 600f scene ────────────────────
+type MissedEvent = {
+  label: "COYOTE" | "SICK COW" | "EMPTY TANK";
+  shortLabel: string;
+  fireFrame: number;
+  flipFrame: number;
+  x: number;
+  y: number;
+};
 
-// Frame at which "all missed" callout appears
-const ALL_MISSED_FRAME = 450;
+const EVENTS: MissedEvent[] = [
+  { label: "COYOTE",     shortLabel: "Coyote at fence",  fireFrame: 240, flipFrame: 490, x: 0.74, y: 0.35 },
+  { label: "SICK COW",   shortLabel: "Cow issue",        fireFrame: 300, flipFrame: 510, x: 0.28, y: 0.64 },
+  { label: "EMPTY TANK", shortLabel: "Water shortage",   fireFrame: 360, flipFrame: 530, x: 0.70, y: 0.72 },
+];
+
+// ─── SkyHerd nervous-system overlay anchors ──────────────────────────────────
+// 8 LoRaWAN sensor dots: 4 troughs + 2 fence corners + 2 mid-pasture
+const LORA_DOTS: Array<{ x: number; y: number; reveal: number }> = [
+  { x: 0.78, y: 0.245, reveal: 440 }, // trough 1 (NE)
+  { x: 0.71, y: 0.715, reveal: 448 }, // trough 2 (south)
+  { x: 0.32, y: 0.30,  reveal: 456 }, // mid-N pasture trough (implicit)
+  { x: 0.55, y: 0.66,  reveal: 464 }, // mid-S pasture trough
+  { x: 0.12, y: 0.20,  reveal: 472 }, // NW fence corner
+  { x: 0.88, y: 0.18,  reveal: 480 }, // NE fence corner
+  { x: 0.30, y: 0.40,  reveal: 488 }, // mid-N pasture
+  { x: 0.62, y: 0.55,  reveal: 496 }, // mid-pasture S
+];
+
+// 3 camera FOV cones (translucent emerald arcs)
+const CAMERAS: Array<{ x: number; y: number; angleDeg: number; reveal: number }> = [
+  { x: 0.78, y: 0.78, angleDeg: 200, reveal: 450 }, // SE camera, looking NW into fields
+  { x: 0.14, y: 0.22, angleDeg: 30,  reveal: 470 }, // NW camera, looking SE
+  { x: 0.50, y: 0.18, angleDeg: 110, reveal: 490 }, // N camera, looking S
+];
+
+// 1 drone path: ranch house → coyote position
+const DRONE_PATH = {
+  start:  { x: 0.17, y: 0.50 },
+  end:    { x: 0.74, y: 0.35 },
+  reveal: 470,
+};
+
+// ─── Helicopter SVG silhouette ───────────────────────────────────────────────
+type HelicopterProps = { x: number; y: number; rotation: number; rotor: number; opacity: number };
+function Helicopter({ x, y, rotation, rotor, opacity }: HelicopterProps) {
+  return (
+    <g transform={`translate(${x},${y}) rotate(${rotation})`} opacity={opacity}>
+      {/* Tail boom */}
+      <rect x={-44} y={-3} width={36} height={6} rx={2} fill={SAGE_DARK} />
+      {/* Tail rotor */}
+      <circle cx={-44} cy={0} r={4} fill={SAGE_DARK} />
+      <line x1={-44} y1={-7} x2={-44} y2={7} stroke={INK_LIGHT} strokeWidth={1.5} opacity={0.6} />
+      {/* Body */}
+      <ellipse cx={6} cy={0} rx={20} ry={10} fill={SAGE_DARK} />
+      <ellipse cx={10} cy={-1} rx={9} ry={5} fill={SKY} opacity={0.6} />
+      {/* Skid */}
+      <line x1={-8} y1={11} x2={20} y2={11} stroke={INK} strokeWidth={1.5} />
+      {/* Main rotor — 3 strokes spinning */}
+      <g transform={`rotate(${rotor})`}>
+        <line x1={-30} y1={0} x2={30} y2={0} stroke={INK} strokeWidth={2} opacity={0.55} />
+      </g>
+      <g transform={`rotate(${rotor + 60})`}>
+        <line x1={-30} y1={0} x2={30} y2={0} stroke={INK} strokeWidth={2} opacity={0.45} />
+      </g>
+      <g transform={`rotate(${rotor + 120})`}>
+        <line x1={-30} y1={0} x2={30} y2={0} stroke={INK} strokeWidth={2} opacity={0.35} />
+      </g>
+      {/* Hub */}
+      <circle cx={6} cy={0} r={3} fill={INK} />
+    </g>
+  );
+}
+
+// ─── Working dog SVG silhouette ──────────────────────────────────────────────
+type DogProps = { x: number; y: number; bounce: number; opacity: number; flip?: boolean };
+function WorkingDog({ x, y, bounce, opacity, flip }: DogProps) {
+  const sx = flip ? -1 : 1;
+  return (
+    <g transform={`translate(${x},${y - bounce}) scale(${sx},1)`} opacity={opacity}>
+      {/* Body */}
+      <ellipse cx={0} cy={0} rx={11} ry={5} fill={DUST} />
+      {/* Head */}
+      <circle cx={10} cy={-3} r={5} fill={DUST} />
+      {/* Snout */}
+      <ellipse cx={14} cy={-2} rx={3} ry={2} fill={INK_LIGHT} />
+      {/* Ear */}
+      <polygon points="8,-7 10,-10 12,-6" fill={INK_LIGHT} />
+      {/* Tail */}
+      <line x1={-10} y1={-1} x2={-15} y2={-5} stroke={DUST} strokeWidth={3} strokeLinecap="round" />
+      {/* Front legs */}
+      <line x1={6} y1={4} x2={6} y2={9} stroke={DUST} strokeWidth={2.5} strokeLinecap="round" />
+      <line x1={9} y1={4} x2={9} y2={9} stroke={DUST} strokeWidth={2.5} strokeLinecap="round" />
+      {/* Back legs */}
+      <line x1={-5} y1={4} x2={-5} y2={9} stroke={DUST} strokeWidth={2.5} strokeLinecap="round" />
+      <line x1={-8} y1={4} x2={-8} y2={9} stroke={DUST} strokeWidth={2.5} strokeLinecap="round" />
+    </g>
+  );
+}
+
+// ─── ATV SVG silhouette (side profile) ───────────────────────────────────────
+type AtvProps = { x: number; y: number; wheelSpin: number; opacity: number; flip?: boolean };
+function ATV({ x, y, wheelSpin, opacity, flip }: AtvProps) {
+  const sx = flip ? -1 : 1;
+  return (
+    <g transform={`translate(${x},${y}) scale(${sx},1)`} opacity={opacity}>
+      {/* Chassis */}
+      <rect x={-14} y={-6} width={28} height={8} rx={2} fill={TERRACOTTA} />
+      {/* Seat */}
+      <rect x={-3} y={-11} width={10} height={5} rx={1.5} fill={INK} />
+      {/* Handlebars */}
+      <line x1={11} y1={-12} x2={14} y2={-7} stroke={INK} strokeWidth={2} strokeLinecap="round" />
+      <line x1={14} y1={-13} x2={14} y2={-9} stroke={INK} strokeWidth={2} strokeLinecap="round" />
+      {/* Headlight */}
+      <circle cx={15} cy={-3} r={2} fill="rgb(255 220 120)" />
+      {/* Wheels (with rotation marks) */}
+      <g transform={`translate(-10,4)`}>
+        <circle r={6} fill={INK} />
+        <line
+          x1={0} y1={0}
+          x2={6 * Math.cos(wheelSpin)} y2={6 * Math.sin(wheelSpin)}
+          stroke={INK_LIGHT} strokeWidth={1.5}
+        />
+      </g>
+      <g transform={`translate(10,4)`}>
+        <circle r={6} fill={INK} />
+        <line
+          x1={0} y1={0}
+          x2={6 * Math.cos(wheelSpin)} y2={6 * Math.sin(wheelSpin)}
+          stroke={INK_LIGHT} strokeWidth={1.5}
+        />
+      </g>
+    </g>
+  );
+}
+
+// ─── Camera FOV cone (30deg arc) ─────────────────────────────────────────────
+type FovProps = { cx: number; cy: number; angleDeg: number; radius: number; opacity: number };
+function FovCone({ cx, cy, angleDeg, radius, opacity }: FovProps) {
+  const half = 15; // half-angle in degrees → 30deg cone
+  const a1 = ((angleDeg - half) * Math.PI) / 180;
+  const a2 = ((angleDeg + half) * Math.PI) / 180;
+  const x1 = cx + radius * Math.cos(a1);
+  const y1 = cy + radius * Math.sin(a1);
+  const x2 = cx + radius * Math.cos(a2);
+  const y2 = cy + radius * Math.sin(a2);
+  const path = `M ${cx},${cy} L ${x1},${y1} A ${radius},${radius} 0 0 1 ${x2},${y2} Z`;
+  return (
+    <g opacity={opacity}>
+      <path d={path} fill={EMERALD} fillOpacity={0.18} stroke={EMERALD} strokeWidth={1.5} />
+      <circle cx={cx} cy={cy} r={4} fill={EMERALD_DK} />
+    </g>
+  );
+}
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+function clamp01(t: number): number {
+  return Math.max(0, Math.min(1, t));
+}
 
 export const TraditionalWay: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps, width, height } = useVideoConfig();
 
-  // Fast fade-in — start at 30% opacity, reach 100% by f8 (prevents dim stall)
-  const fadeIn = interpolate(frame, [0, 8], [0.30, 1], {
+  // ── Phase 1: Title + map fade in (0..60) ───────────────────────────────────
+  const setupOp = interpolate(frame, [0, 30], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
 
-  // Truck position along road loop
-  const lapT = (frame % LAP_FRAMES) / LAP_FRAMES;
+  // ── Phase 4: Traditional methods dim during compare beat ───────────────────
+  // Fade traditional actors + missed-event icons from 1.0 → 0.25 over 420..450
+  const traditionalOp = interpolate(
+    frame,
+    [COMPARE_START, COMPARE_DIM_END],
+    [1, 0.25],
+    { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
+  );
+
+  // ── Truck — slow road loop (only animates while in the multi-method beat) ──
+  // Truck stops at MULTI_END so it doesn't overlap with the comparison beat.
+  const truckActiveFrame = Math.min(frame, MULTI_END);
+  const lapT = (truckActiveFrame % LAP_FRAMES) / LAP_FRAMES;
   const truck = lerpWp(ROAD_WP, lapT);
   const tAngle = truckAngle(ROAD_WP, lapT);
-  const clock = clockText(frame);
 
-  // "All missed" banner
-  const allMissedOp = interpolate(frame, [ALL_MISSED_FRAME, ALL_MISSED_FRAME + 18], [0, 1], {
-    extrapolateLeft: "clamp", extrapolateRight: "clamp",
+  // ── Helicopter — wide circular orbit around N pasture, ~1.5 laps in 300f ──
+  // Center: NE of north pasture. Slight tilt with motion direction.
+  const heliCenter = { x: 0.50 * width, y: 0.32 * height };
+  const heliRadiusX = 0.30 * width;
+  const heliRadiusY = 0.16 * height;
+  // Phase: 1.5 laps from f0..f300 (active multi-method window).
+  const heliPhase = (Math.min(frame, MULTI_END) / MULTI_END) * Math.PI * 3;
+  const heliX = heliCenter.x + heliRadiusX * Math.cos(heliPhase);
+  const heliY = heliCenter.y + heliRadiusY * Math.sin(heliPhase);
+  // Tangent angle for nose direction
+  const heliTangent =
+    (Math.atan2(heliRadiusY * Math.cos(heliPhase), -heliRadiusX * Math.sin(heliPhase)) * 180) /
+    Math.PI;
+  const heliTilt = Math.sin(heliPhase) * 6; // slight banking
+  // Rotor spin (degrees) — fast spin
+  const rotorAngle = (frame * 28) % 360;
+  // During the comparison beat the helicopter also slows + dims.
+  const heliCompareDrift = Math.sin(((frame - COMPARE_START) / 30) * Math.PI * 0.5) * 4;
+  const heliFinalX = frame >= COMPARE_START ? heliX + heliCompareDrift : heliX;
+
+  // ── Working dogs — bounce alongside truck on the road loop ─────────────────
+  // Two dogs offset from truck position, bouncing slightly out of phase.
+  // Dog 1 leads truck by ~4% of lap; Dog 2 trails by ~4%.
+  const dog1T = (lapT + 0.04) % 1;
+  const dog2T = (lapT - 0.04 + 1) % 1;
+  const dog1Pos = lerpWp(ROAD_WP, dog1T);
+  const dog2Pos = lerpWp(ROAD_WP, dog2T);
+  const dog1Bounce = Math.abs(Math.sin((frame * Math.PI) / 6)) * 4;
+  const dog2Bounce = Math.abs(Math.sin((frame * Math.PI) / 6 + Math.PI / 3)) * 4;
+
+  // Dog 1 sprint: at f180, dog 1 sprints toward the COYOTE marker, returns.
+  // Sprint window: f180..f240 (60f). Linear interp from dog1Pos -> coyote -> back.
+  const sprintT = clamp01((frame - 180) / 60);
+  // 0 → 0.5 outbound, 0.5 → 1.0 return.
+  const sprintPhase = sprintT < 0.5 ? sprintT * 2 : (1 - sprintT) * 2;
+  const coyoteX = EVENTS[0].x;
+  const coyoteY = EVENTS[0].y;
+  const sprintActive = frame >= 180 && frame <= 240;
+  const dog1FinalX = sprintActive
+    ? dog1Pos.x + (coyoteX - dog1Pos.x) * sprintPhase
+    : dog1Pos.x;
+  const dog1FinalY = sprintActive
+    ? dog1Pos.y + (coyoteY - dog1Pos.y) * sprintPhase
+    : dog1Pos.y;
+
+  // ── ATV — linear traverse along east fence, takes 240f to cross ────────────
+  // East fence runs from ~(0.86, 0.20) to ~(0.86, 0.80).
+  // ATV active f60..f300 (240f window).
+  const atvT = clamp01((frame - 60) / 240);
+  const atvX = 0.86;
+  const atvY = 0.20 + (0.80 - 0.20) * atvT;
+  const atvOp = interpolate(frame, [60, 75, 300, 320], [0, 1, 1, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
   });
+  // Wheel spin (radians)
+  const atvWheelSpin = (frame * 0.6) % (Math.PI * 2);
 
-  // Sub-label appears at f260
-  const subLabelOp = interpolate(frame, [260, 285], [0, 1], {
-    extrapolateLeft: "clamp", extrapolateRight: "clamp",
+  // ── Sub-label fade in at f120 ──────────────────────────────────────────────
+  const subLabelOp = interpolate(frame, [120, 150], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  // Sub-label also dims during compare beat.
+  const subLabelCompareOp = interpolate(
+    frame,
+    [COMPARE_START, COMPARE_DIM_END],
+    [1, 0.25],
+    { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
+  );
+
+  // ── Clock visible during phase 2-3, fades during compare ───────────────────
+  const clock = clockText(frame);
+  const clockOp = interpolate(
+    frame,
+    [0, 30, COMPARE_START, COMPARE_DIM_END],
+    [0, 1, 1, 0.3],
+    { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
+  );
+
+  // ── $12K cost callout: fires f330, holds through f400 ──────────────────────
+  const costOp = interpolate(
+    frame,
+    [330, 348, 400, 420],
+    [0, 1, 1, 0],
+    { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
+  );
+
+  // ── Comparator card slide-in (right edge, frames 460..500) ─────────────────
+  const comparatorBaseOp = interpolate(frame, [460, 500], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
   });
 
   return (
-    <AbsoluteFill style={{ backgroundColor: CREAM, opacity: fadeIn }}>
+    <AbsoluteFill style={{ backgroundColor: CREAM, opacity: setupOp }}>
       {/* ── Title ── */}
       <div
         style={{
@@ -162,7 +414,7 @@ export const TraditionalWay: React.FC = () => {
         How a Ranch Runs Today
       </div>
 
-      {/* ── Ranch map SVG ── */}
+      {/* ── Ranch map SVG (always at full opacity — base layer) ── */}
       <svg
         style={{ position: "absolute", inset: 0 }}
         viewBox={`0 0 ${width} ${height}`}
@@ -212,7 +464,6 @@ export const TraditionalWay: React.FC = () => {
           stroke={SAGE}
           strokeWidth={1.5}
         />
-        {/* Paddock 1 label */}
         <text
           x={width * 0.26} y={height * 0.37}
           textAnchor="middle"
@@ -297,19 +548,71 @@ export const TraditionalWay: React.FC = () => {
         <text x={width * 0.86} y={height * 0.22}
           textAnchor="middle" fontFamily={MONO} fontSize={13} fill={INK_LIGHT} opacity={0.55}
           fontWeight="700">N↑</text>
+
+        {/* ── Traditional actors layer (helicopter, dogs, ATV) ── */}
+        <g opacity={traditionalOp}>
+          {/* ATV dust trail — short trailing line behind ATV */}
+          {frame >= 60 && frame <= 320 && (
+            <line
+              x1={atvX * width - 18}
+              y1={atvY * height + 4}
+              x2={atvX * width - 4}
+              y2={atvY * height + 4}
+              stroke={DUST}
+              strokeWidth={2}
+              strokeLinecap="round"
+              opacity={0.55}
+            />
+          )}
+
+          {/* ATV */}
+          <ATV
+            x={atvX * width}
+            y={atvY * height}
+            wheelSpin={atvWheelSpin}
+            opacity={atvOp}
+          />
+
+          {/* Working dog 1 (with optional sprint to coyote) */}
+          <WorkingDog
+            x={dog1FinalX * width}
+            y={dog1FinalY * height}
+            bounce={dog1Bounce}
+            opacity={1}
+            flip={false}
+          />
+          {/* Working dog 2 (always with truck) */}
+          <WorkingDog
+            x={dog2Pos.x * width}
+            y={dog2Pos.y * height}
+            bounce={dog2Bounce}
+            opacity={1}
+            flip
+          />
+
+          {/* Helicopter — orbiting north pasture */}
+          <Helicopter
+            x={heliFinalX}
+            y={heliY}
+            rotation={heliTangent + heliTilt}
+            rotor={rotorAngle}
+            opacity={1}
+          />
+        </g>
       </svg>
 
-      {/* ── Truck emoji ── */}
+      {/* ── Truck emoji (scaled to 70% — was 30px, now 21px-equivalent via scale) ── */}
       <div
         style={{
           position: "absolute",
-          left: truck.x * width - 20,
-          top: truck.y * height - 18,
-          fontSize: 30,
+          left: truck.x * width - 14,
+          top: truck.y * height - 13,
+          fontSize: 21,
           transform: `rotate(${tAngle}deg)`,
-          filter: "drop-shadow(0 2px 6px rgba(0,0,0,0.28))",
+          filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.28))",
           lineHeight: 1,
           zIndex: 10,
+          opacity: traditionalOp,
         }}
       >
         🚛
@@ -330,9 +633,16 @@ export const TraditionalWay: React.FC = () => {
               extrapolateLeft: "clamp", extrapolateRight: "clamp",
             })
           : 0;
-        // Full-map vignette at pulse: rendered via outer component
         const iconOp = hasStarted ? 1 : 0.18;
-        const labelColor = hasStarted ? TERRACOTTA : SAGE_DARK;
+        // Has the SkyHerd nervous-system reached this event yet?
+        const flipped = frame >= ev.flipFrame;
+        // Fade red-ring color toward emerald during flip transition.
+        const flipT = clamp01((frame - ev.flipFrame) / 20);
+        const labelColor = flipped
+          ? interpolateColor(TERRACOTTA, EMERALD_DK, flipT)
+          : hasStarted
+            ? TERRACOTTA
+            : SAGE_DARK;
 
         // Spring pop-in on first appearance
         const popSp = spring({
@@ -343,6 +653,19 @@ export const TraditionalWay: React.FC = () => {
         const popScale = hasStarted ? interpolate(popSp, [0, 1], [0, 1], {
           extrapolateLeft: "clamp", extrapolateRight: "clamp",
         }) : 1;
+
+        // Ring color shifts to emerald after flip.
+        const ringColor = flipped ? EMERALD : TERRACOTTA;
+
+        // During compare beat, the icon dims along with traditional layer
+        // EXCEPT for the symbol itself — which stays at full opacity to show ✗→✓.
+        const containerDim =
+          frame >= COMPARE_START
+            ? interpolate(frame, [COMPARE_START, COMPARE_DIM_END], [1, 0.85], {
+                extrapolateLeft: "clamp",
+                extrapolateRight: "clamp",
+              })
+            : 1;
 
         return (
           <div
@@ -356,6 +679,7 @@ export const TraditionalWay: React.FC = () => {
               alignItems: "center",
               gap: 5,
               zIndex: 20,
+              opacity: containerDim,
             }}
           >
             {/* Expanding pulse ring */}
@@ -364,7 +688,7 @@ export const TraditionalWay: React.FC = () => {
               width: 72,
               height: 72,
               borderRadius: "50%",
-              border: `3px solid ${TERRACOTTA}`,
+              border: `3px solid ${ringColor}`,
               opacity: ringOp,
               transform: `scale(${pulseScale * 1.25})`,
               top: -4,
@@ -376,7 +700,7 @@ export const TraditionalWay: React.FC = () => {
               width: 72,
               height: 72,
               borderRadius: "50%",
-              border: `2px solid ${TERRACOTTA}`,
+              border: `2px solid ${ringColor}`,
               opacity: ringOp * 0.55,
               transform: `scale(${pulseScale * 1.8})`,
               top: -4,
@@ -388,13 +712,13 @@ export const TraditionalWay: React.FC = () => {
               fontSize: 32,
               opacity: iconOp,
               transform: `scale(${hasStarted ? pulseScale * popScale : 1})`,
-              filter: isRinging ? `drop-shadow(0 0 10px ${TERRACOTTA})` : "none",
+              filter: isRinging ? `drop-shadow(0 0 10px ${ringColor})` : "none",
               lineHeight: 1,
             }}>
               {ev.label === "COYOTE" ? "🐺" : ev.label === "SICK COW" ? "🐄" : "💧"}
             </div>
 
-            {/* Label */}
+            {/* Label — flips between MISSED and shortLabel */}
             <div style={{
               fontFamily: MONO,
               fontSize: 11,
@@ -405,19 +729,42 @@ export const TraditionalWay: React.FC = () => {
               whiteSpace: "nowrap",
               opacity: iconOp,
             }}>
-              {hasStarted ? "MISSED" : ev.label}
+              {flipped ? "ON IT" : hasStarted ? "MISSED" : ev.label}
             </div>
 
-            {/* Time tag (shown after fire) */}
+            {/* Sub-label (description, only after fire) */}
             {hasStarted && (
               <div style={{
                 fontFamily: MONO,
                 fontSize: 10,
-                color: TERRACOTTA,
-                opacity: 0.75,
-                letterSpacing: "0.08em",
+                color: flipped ? EMERALD_DK : TERRACOTTA,
+                opacity: 0.85,
+                letterSpacing: "0.06em",
               }}>
-                {ev.timeTag}
+                {ev.shortLabel}
+              </div>
+            )}
+
+            {/* ✗ → ✓ flip badge */}
+            {hasStarted && (
+              <div style={{
+                position: "absolute",
+                top: -16,
+                right: -22,
+                fontFamily: MONO,
+                fontSize: 22,
+                fontWeight: 900,
+                color: flipped ? EMERALD_DK : TERRACOTTA,
+                transition: "color 0.2s",
+                textShadow: `0 0 6px ${flipped ? "rgba(16,185,129,0.5)" : "rgba(188,90,60,0.5)"}`,
+                transform: `scale(${flipped
+                  ? interpolate(flipT, [0, 0.6, 1], [1.4, 0.95, 1], {
+                      extrapolateLeft: "clamp",
+                      extrapolateRight: "clamp",
+                    })
+                  : 1})`,
+              }}>
+                {flipped ? "✓" : "✗"}
               </div>
             )}
           </div>
@@ -437,12 +784,115 @@ export const TraditionalWay: React.FC = () => {
             position: "absolute",
             inset: 0,
             backgroundColor: TERRACOTTA,
-            opacity: vOp,
+            opacity: vOp * (frame < COMPARE_START ? 1 : 0),
             pointerEvents: "none",
             zIndex: 15,
           }} />
         );
       })}
+
+      {/* ── SkyHerd nervous-system overlay (frames 440..600) ── */}
+      <svg
+        style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 18 }}
+        viewBox={`0 0 ${width} ${height}`}
+        width={width}
+        height={height}
+      >
+        {/* Camera FOV cones */}
+        {CAMERAS.map((cam, i) => {
+          const op = interpolate(frame, [cam.reveal, cam.reveal + 30], [0, 0.85], {
+            extrapolateLeft: "clamp",
+            extrapolateRight: "clamp",
+          });
+          return (
+            <FovCone
+              key={`fov-${i}`}
+              cx={cam.x * width}
+              cy={cam.y * height}
+              angleDeg={cam.angleDeg}
+              radius={Math.min(width, height) * 0.18}
+              opacity={op}
+            />
+          );
+        })}
+
+        {/* Drone path: dashed arc from house → coyote */}
+        {(() => {
+          const pathOp = interpolate(
+            frame,
+            [DRONE_PATH.reveal, DRONE_PATH.reveal + 40],
+            [0, 1],
+            { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
+          );
+          const sx = DRONE_PATH.start.x * width;
+          const sy = DRONE_PATH.start.y * height;
+          const ex = DRONE_PATH.end.x * width;
+          const ey = DRONE_PATH.end.y * height;
+          // Arc control point (bowed up)
+          const cx = (sx + ex) / 2;
+          const cy = Math.min(sy, ey) - 60;
+          const arcPath = `M ${sx},${sy} Q ${cx},${cy} ${ex},${ey}`;
+          // Dash offset for "drawing" effect
+          const lineLen = Math.hypot(ex - sx, ey - sy) * 1.25;
+          const drawT = interpolate(
+            frame,
+            [DRONE_PATH.reveal, DRONE_PATH.reveal + 60],
+            [0, 1],
+            { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
+          );
+          return (
+            <g opacity={pathOp}>
+              <path
+                d={arcPath}
+                fill="none"
+                stroke={EMERALD}
+                strokeWidth={2.5}
+                strokeDasharray={`${lineLen * drawT} ${lineLen}`}
+                strokeLinecap="round"
+              />
+              {/* Drone dot at end */}
+              {drawT > 0.9 && (
+                <circle
+                  cx={ex}
+                  cy={ey}
+                  r={5}
+                  fill={EMERALD}
+                  opacity={0.9}
+                />
+              )}
+            </g>
+          );
+        })()}
+
+        {/* LoRaWAN sensor dots */}
+        {LORA_DOTS.map((dot, i) => {
+          const op = interpolate(frame, [dot.reveal, dot.reveal + 14], [0, 1], {
+            extrapolateLeft: "clamp",
+            extrapolateRight: "clamp",
+          });
+          // Pulsing inner halo
+          const pulseSize = 1 + 0.3 * Math.sin(((frame - dot.reveal) * Math.PI) / 18);
+          return (
+            <g key={`lora-${i}`} opacity={op}>
+              <circle
+                cx={dot.x * width}
+                cy={dot.y * height}
+                r={10 * pulseSize}
+                fill={EMERALD}
+                opacity={0.18}
+              />
+              <circle
+                cx={dot.x * width}
+                cy={dot.y * height}
+                r={6}
+                fill={EMERALD_DK}
+                stroke={CREAM}
+                strokeWidth={1.5}
+              />
+            </g>
+          );
+        })}
+      </svg>
 
       {/* ── Clock ── */}
       <div
@@ -458,6 +908,7 @@ export const TraditionalWay: React.FC = () => {
           alignItems: "center",
           gap: 3,
           zIndex: 30,
+          opacity: clockOp,
         }}
       >
         <div style={{
@@ -491,14 +942,14 @@ export const TraditionalWay: React.FC = () => {
           color: SAGE_DARK,
           letterSpacing: "0.14em",
           textTransform: "uppercase",
-          opacity: subLabelOp,
+          opacity: subLabelOp * subLabelCompareOp,
           zIndex: 30,
         }}
       >
-        1 rancher · 200 miles / week · events missed between runs
+        Helicopters · Dogs · ATVs · Trucks — still missing things between runs
       </div>
 
-      {/* ── "All Missed" + cost callout ── */}
+      {/* ── "$12K / yr lost" cost callout (frames 330..400) ── */}
       <div
         style={{
           position: "absolute",
@@ -509,7 +960,7 @@ export const TraditionalWay: React.FC = () => {
           justifyContent: "center",
           alignItems: "center",
           gap: 32,
-          opacity: allMissedOp,
+          opacity: costOp,
           zIndex: 30,
         }}
       >
@@ -536,6 +987,142 @@ export const TraditionalWay: React.FC = () => {
           ~$12K / yr in lost events
         </div>
       </div>
+
+      {/* ── Comparator card (right edge, frames 460..600) ── */}
+      <ComparatorCard
+        baseOp={comparatorBaseOp}
+        frame={frame}
+        height={height}
+      />
     </AbsoluteFill>
   );
 };
+
+// ─── Comparator card component ───────────────────────────────────────────────
+type ComparatorCardProps = { baseOp: number; frame: number; height: number };
+
+const COMPARATOR_LINES: Array<{
+  label: string;
+  detail: string;
+  emerald?: boolean;
+  delay: number;
+}> = [
+  { label: "Helicopter",   detail: "$1,200/hr · skies clear",       delay: 0  },
+  { label: "Working dogs", detail: "2-mi range · daylight only",    delay: 12 },
+  { label: "ATV / truck",  detail: "between runs only",             delay: 24 },
+  { label: "SkyHerd",      detail: "24/7 · 10,000 acres · $4.17/wk", emerald: true, delay: 44 },
+];
+
+function ComparatorCard({ baseOp, frame, height }: ComparatorCardProps) {
+  const slideStart = 460;
+  return (
+    <div
+      style={{
+        position: "absolute",
+        right: 60,
+        top: height * 0.30,
+        width: "36%",
+        maxWidth: 560,
+        opacity: baseOp,
+        zIndex: 40,
+        fontFamily: MONO,
+      }}
+    >
+      <div
+        style={{
+          backgroundColor: "rgba(245,240,230,0.96)",
+          border: `2px solid ${INK_LIGHT}`,
+          borderRadius: 14,
+          padding: "22px 26px",
+          boxShadow: "0 12px 28px rgba(45,42,38,0.18)",
+          display: "flex",
+          flexDirection: "column",
+          gap: 14,
+        }}
+      >
+        <div
+          style={{
+            fontFamily: SERIF,
+            fontSize: 18,
+            fontWeight: 700,
+            color: INK_LIGHT,
+            letterSpacing: "0.08em",
+            textTransform: "uppercase",
+            paddingBottom: 8,
+            borderBottom: `1px dashed ${SAGE_DARK}`,
+          }}
+        >
+          The same job, compared
+        </div>
+        {COMPARATOR_LINES.map((line, i) => {
+          const lineStart = slideStart + line.delay;
+          const lineOp = interpolate(frame, [lineStart, lineStart + 12], [0, 1], {
+            extrapolateLeft: "clamp",
+            extrapolateRight: "clamp",
+          });
+          const lineY = interpolate(frame, [lineStart, lineStart + 12], [12, 0], {
+            extrapolateLeft: "clamp",
+            extrapolateRight: "clamp",
+          });
+          const isEmerald = !!line.emerald;
+          const labelColor = isEmerald ? EMERALD_DK : DUST;
+          const detailColor = isEmerald ? EMERALD_DK : SAGE_DARK;
+          return (
+            <div
+              key={i}
+              style={{
+                opacity: lineOp,
+                transform: `translateY(${lineY}px)`,
+                display: "flex",
+                flexDirection: "column",
+                gap: 3,
+                paddingTop: i === 3 ? 10 : 0,
+                borderTop: i === 3 ? `1px dashed ${SAGE_DARK}` : "none",
+                marginTop: i === 3 ? 4 : 0,
+              }}
+            >
+              <div
+                style={{
+                  fontSize: isEmerald ? 22 : 17,
+                  fontWeight: isEmerald ? 800 : 700,
+                  color: labelColor,
+                  letterSpacing: "0.04em",
+                }}
+              >
+                {line.label}
+              </div>
+              <div
+                style={{
+                  fontSize: isEmerald ? 17 : 13,
+                  color: detailColor,
+                  letterSpacing: "0.02em",
+                  fontWeight: isEmerald ? 600 : 400,
+                }}
+              >
+                {line.detail}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ─── Color interp helper ─────────────────────────────────────────────────────
+function parseRgb(rgb: string): [number, number, number] {
+  // "rgb(188 90 60)" → [188,90,60]
+  const m = rgb.match(/rgb\((\d+)\s+(\d+)\s+(\d+)\)/);
+  if (!m) return [0, 0, 0];
+  return [Number(m[1]), Number(m[2]), Number(m[3])];
+}
+
+function interpolateColor(a: string, b: string, t: number): string {
+  const [r1, g1, b1] = parseRgb(a);
+  const [r2, g2, b2] = parseRgb(b);
+  const tt = clamp01(t);
+  const r = Math.round(r1 + (r2 - r1) * tt);
+  const g = Math.round(g1 + (g2 - g1) * tt);
+  const bb = Math.round(b1 + (b2 - b1) * tt);
+  return `rgb(${r} ${g} ${bb})`;
+}

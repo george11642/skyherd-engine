@@ -1,8 +1,8 @@
 cHook=19.152
-cTraditional=13.200
+cTraditional=19.224
 cAnswer=15.672
 cCoyote=22.440
-cGrid=18.240
+cGrid=17.832
 cMvp=17.304
 cVision=12.552
 cAibody=11.064

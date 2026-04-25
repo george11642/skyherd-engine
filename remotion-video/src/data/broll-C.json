@@ -87,14 +87,6 @@
       "transition": "cut",
       "transitionDurationFrames": 0,
       "reason": "C-ONLY: Microcircuit PiP follows circuit-board, same lower-right slot. Together they assert 'this is real hardware territory' in 15s without leaving the depth narrative."
-    },
-    {
-      "startSeconds": 160.0,
-      "endSeconds": 173.0,
-      "src": "broll/t3-night-sky-stars.mp4",
-      "transition": "cut",
-      "transitionDurationFrames": 0,
-      "reason": "C-ONLY: Night-sky-stars carries the 'Now \u2014 finally \u2014 the ranch can watch itself' bookend. Differentiates from A/B's drone-rangeland close. Stars = always-on, the metaphor lands."
     }
   ]
 }

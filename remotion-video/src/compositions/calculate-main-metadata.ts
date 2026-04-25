@@ -203,19 +203,19 @@ const AB_ACT3_SUBSTANCE_SECONDS = 15;
 const AB_ACT3_META_LOOP_SECONDS = 5;
 const AB_ACT3_FINAL_SECONDS = 10;
 
-// C v5 — 9-scene layout mapped to 5 acts (Wave 2E, total = 180s = 5400 frames)
+// C v5.1 — 9-scene layout mapped to 5 acts (polish pass, total = 170s = 5100 frames)
 //
-// act1 = coldOpen(3s) + hook(22s)             = 25s = 750 frames
-// act2 = traditional(16s) + answer(16s)       = 32s = 960 frames
-// act3 = coyote(32s) + grid(25s)              = 57s = 1710 frames
-// act4 = mvp(22s) + vision(22s)               = 44s = 1320 frames
-// act5 = aibody(18s) + wordmark(4s)           = 22s = 660 frames
-// TOTAL                                       = 180s = 5400 frames ✓
-const C_ACT1_SECONDS = 25;  // coldOpen(3) + hook(22)
-const C_ACT2_SECONDS = 32;  // traditional(16) + answer(16)
-const C_ACT3_SECONDS = 57;  // coyote(32) + grid(25)
-const C_ACT4_SECONDS = 44;  // mvp(22) + vision(22)
-const C_ACT5_SECONDS = 22;  // aibody(18) + wordmark(4)
+// act1 = coldOpen(6s) + hook(22s)             = 28s = 840 frames
+// act2 = traditional(20s) + answer(18s)       = 38s = 1140 frames
+// act3 = coyote(26s) + grid(22s)              = 48s = 1440 frames
+// act4 = mvp(20s) + vision(18s)               = 38s = 1140 frames
+// act5 = aibody(14s) + wordmark(4s)           = 18s = 540 frames
+// TOTAL                                       = 170s = 5100 frames ✓
+const C_ACT1_SECONDS = 28;  // coldOpen(6) + hook(22)
+const C_ACT2_SECONDS = 38;  // traditional(20) + answer(18)
+const C_ACT3_SECONDS = 48;  // coyote(26) + grid(22)
+const C_ACT4_SECONDS = 38;  // mvp(20) + vision(18)
+const C_ACT5_SECONDS = 18;  // aibody(14) + wordmark(4)
 
 // Re-exported for act components.
 export const AB_LAYOUT = {
@@ -240,24 +240,24 @@ export const AB_LAYOUT = {
 
 // Re-exported for act components.
 export const C_LAYOUT = {
-  // act1: coldOpen(3s) + hook(22s) = 25s  [Wave 2E: hook expanded to absorb VO overflow]
-  act1: { totalSeconds: C_ACT1_SECONDS, coldOpenSeconds: 3, hookSeconds: 22, punchSeconds: 3 },
-  // act2: traditional(16s) + answer(16s) = 32s  [Wave 2E: -1s each for budget]
-  act2: { totalSeconds: C_ACT2_SECONDS, traditionalSeconds: 16, answerSeconds: 16, storyMin: 32 },
-  // act3: coyote live demo(32s) + grid(25s) = 57s  [Wave 2E: coyote -8s, grid +7s]
+  // act1: coldOpen(6s) + hook(22s) = 28s  [v5.1 polish: cold-open extended for $1.8B plot landing]
+  act1: { totalSeconds: C_ACT1_SECONDS, coldOpenSeconds: 6, hookSeconds: 22, punchSeconds: 3 },
+  // act2: traditional(20s) + answer(18s) = 38s  [v5.1: trad +4s for SkyHerd comparison beat, ans -2s]
+  act2: { totalSeconds: C_ACT2_SECONDS, traditionalSeconds: 20, answerSeconds: 18, storyMin: 38 },
+  // act3: coyote(26s) + grid(22s) = 48s  [v5.1: faster VO — coyote -6s, grid -3s]
   act3: {
     totalSeconds: C_ACT3_SECONDS,
-    coyoteSeconds: 32,
-    gridSeconds: 25,
-    coyoteDeepMin: 32,
-    montageSeconds: 25,
+    coyoteSeconds: 26,
+    gridSeconds: 22,
+    coyoteDeepMin: 26,
+    montageSeconds: 22,
     montageSceneCount: 4,
     synthesisSeconds: 0,
   },
-  // act4: mvp(22s) + vision(22s) = 44s  [Wave 2E: mvp +2s]
-  act4: { totalSeconds: C_ACT4_SECONDS, mvpSeconds: 22, visionSeconds: 22, opusMin: 22, depthMin: 22 },
-  // act5: aibody(18s) + wordmark(4s) = 22s  [Wave 2E: aibody -5s, wordmark -1s]
-  act5: { totalSeconds: C_ACT5_SECONDS, aibodySeconds: 18, wordmarkSeconds: 4, bookendSeconds: 18 },
+  // act4: mvp(20s) + vision(18s) = 38s  [v5.1: mvp -2s, vision -4s]
+  act4: { totalSeconds: C_ACT4_SECONDS, mvpSeconds: 20, visionSeconds: 18, opusMin: 20, depthMin: 18 },
+  // act5: aibody(14s) + wordmark(4s) = 18s  [v5.1: aibody -4s]
+  act5: { totalSeconds: C_ACT5_SECONDS, aibodySeconds: 14, wordmarkSeconds: 4, bookendSeconds: 14 },
 } as const;
 
 export const calculateMainMetadata: CalculateMetadataFunction<
@@ -280,9 +280,9 @@ export const calculateMainMetadata: CalculateMetadataFunction<
   let actDurations: ActDurations;
 
   if (variant === "C") {
-    // C v5 — fixed 5-act layout (Wave 2E). Scene durations redistributed to
-    // absorb VO overflow from new Will/eleven_v3 recordings.
-    // Total = 25+32+57+44+22 = 180s = 5400 frames.
+    // C v5.1 — fixed 5-act layout (polish pass). Scene durations re-timed to
+    // fast Chatterbox-cloned-George VO take.
+    // Total = 28+38+48+38+18 = 170s = 5100 frames.
     actDurations = {
       act1: framesFromSeconds(C_ACT1_SECONDS),
       act2: framesFromSeconds(C_ACT2_SECONDS),

@@ -24,14 +24,15 @@ meta-loop beat and goes with clean, uniform rendering. Default values are
 supplied so KineticCaptions.tsx (which treats these as Required fields in
 StyledWord) continues to render without changes.
 
-Timeline offsets (absolute composition seconds, locked in plan deep-fluttering-brook.md):
-  vo-c-hook         →  3s   (cold open ends at 3s)
-  vo-c-traditional  → 18s
-  vo-c-answer       → 35s
-  vo-c-coyote       → 52s
-  vo-c-grid         → 92s
-  vo-c-mvp          → 110s
-  vo-c-vision       → 130s
+Timeline offsets (absolute composition seconds, locked in plan v5.1
+make-it-not-say-prancy-pudding.md):
+  vo-c-hook         →   6s   (cold open extended to 6s)
+  vo-c-traditional  →  28s
+  vo-c-answer       →  48s
+  vo-c-coyote       →  66s
+  vo-c-grid         →  92s
+  vo-c-mvp          → 114s
+  vo-c-vision       → 134s
   vo-c-aibody       → 152s
 
 Usage:
@@ -59,15 +60,17 @@ OUT_DEFAULT = REPO_ROOT / "remotion-video/public/captions/styled-captions-C.json
 CUES_FILE_DEFAULT = REPO_ROOT / "scripts/vo_cues.sh"
 
 # Cue keys in playback order + their absolute composition start-time (seconds).
+# Updated per plan v5.1 (make-it-not-say-prancy-pudding.md): 6s cold open,
+# 18s traditional cue (Helicopters/Working dogs/A-T-Vs + $4.17/wk tail).
 CUE_OFFSETS: dict[str, float] = {
-    "vo-c-hook":        3.0,
-    "vo-c-traditional": 18.0,
-    "vo-c-answer":      35.0,
-    "vo-c-coyote":      52.0,
-    "vo-c-grid":        92.0,
-    "vo-c-mvp":         110.0,
-    "vo-c-vision":      130.0,
-    "vo-c-aibody":      152.0,
+    "vo-c-hook":         6.0,   # was 3.0 (cold open extended to 6s)
+    "vo-c-traditional": 28.0,   # was 18.0
+    "vo-c-answer":      48.0,   # was 35.0
+    "vo-c-coyote":      66.0,   # was 52.0
+    "vo-c-grid":        92.0,   # unchanged
+    "vo-c-mvp":        114.0,   # was 110.0
+    "vo-c-vision":     134.0,   # was 130.0
+    "vo-c-aibody":     152.0,   # unchanged
 }
 
 # Default StyledWord styling (uniform; no Opus-authored per-word color).
@@ -193,6 +196,10 @@ def align_cue(
     # Use phonetic form as initial_prompt so the model recognises abbreviations
     phonetic = phonetic_text(text)
 
+    # condition_on_previous_text=False prevents Whisper repeat-attractor loops
+    # (e.g. vo-c-grid produced 277 words including 33x "A cow goes into labor
+    # before dawn." with the default True setting — pure transcription
+    # artifact, audio is fine).
     segments_iter, _info = model.transcribe(  # type: ignore[attr-defined]
         str(audio_path),
         language="en",
@@ -200,6 +207,7 @@ def align_cue(
         initial_prompt=phonetic,
         beam_size=5,
         vad_filter=False,
+        condition_on_previous_text=False,
     )
 
     words: list[dict[str, float | str]] = []

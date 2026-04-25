@@ -49,8 +49,8 @@ import brollCRaw from "../../data/broll-C.json";
 const BROLL_C: BrollCut[] = (brollCRaw as { cuts: BrollCut[] }).cuts;
 
 // Global act offsets (seconds) used by BrollTrack
-// Wave 2E: act5 starts at frame 4740 = 158s (coldOpen3+hook22+trad16+ans16+coyote32+grid25+mvp22+vision22)
-const C_ACT5_START = 158;
+// v5.1 polish: act5 starts at frame 4560 = 152s (coldOpen6+hook22+trad20+ans18+coyote26+grid22+mvp20+vision18)
+const C_ACT5_START = 152;
 
 const FPS = 30;
 
@@ -64,11 +64,16 @@ void (LowerThird as unknown);
 
 /**
  * "1 rancher · 10,000 acres · 0 sleep" slam.
- * Holds from frame 0, exits at f75→90 to avoid bleeding into hook VO.
+ * v5.1: cold open is 180f total. Slam owns the first 90f, then hands off
+ *  to ColdOpenAerial ($1.8B/yr). Fade in 0–18, hold, exit 75–95.
  */
 const ColdOpenSlam = () => {
   const frame = useCurrentFrame();
-  const opacityOut = interpolate(frame, [60, 90], [1, 0], {
+  const opacityIn = interpolate(frame, [0, 18], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  const opacityOut = interpolate(frame, [75, 95], [1, 0], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
@@ -78,7 +83,7 @@ const ColdOpenSlam = () => {
         backgroundColor: "rgb(8 10 14)",
         alignItems: "center",
         justifyContent: "center",
-        opacity: opacityOut,
+        opacity: Math.min(opacityIn, opacityOut),
       }}
     >
       <div
@@ -104,20 +109,47 @@ const ColdOpenSlam = () => {
 };
 
 /**
- * "$1.8B / yr" aerial cut — appears at f8, exits at end of cold open.
+ * "$1.8B / yr" aerial cut — v5.1 polish: extended to 180f (6s) for plot landing.
+ *  Slam owns 0–95; aerial $1.8B then takes the rest:
+ *  - 80→110  fade-in
+ *  - 110→160 long opacity plateau (the stat dwells ~1.7s so it registers)
+ *  - 160→172 fade out
+ *  - 168→180 outO crossfade tail into hook
+ *  - statScale: 0.95 → 1.0 spring on entry (frames 80–100) so it lands rather than just fades
  */
 const ColdOpenAerial = () => {
   const frame = useCurrentFrame();
-  const statO = interpolate(frame, [8, 26], [0, 1], {
+  const { fps } = useVideoConfig();
+  const statFadeIn = interpolate(frame, [80, 110], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  const statFadeOut = interpolate(frame, [160, 172], [1, 0], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  const statO = Math.min(statFadeIn, statFadeOut);
+  // Slight scale pop so the $1.8B plate "lands"
+  const scaleSp = spring({
+    frame: frame - 80,
+    fps,
+    config: { damping: 12, stiffness: 90, mass: 1 },
+  });
+  const statScale = interpolate(scaleSp, [0, 1], [0.95, 1.0], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  // 12-frame crossfade tail into hook
+  const outO = interpolate(frame, [168, 180], [1, 0], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
   return (
-    <AbsoluteFill>
+    <AbsoluteFill style={{ opacity: outO }}>
       <Video
         src={staticFile("clips/ambient_establish.mp4")}
         startFrom={0}
-        endAt={90}
+        endAt={180}
         muted
         style={{
           width: "100%",
@@ -138,6 +170,7 @@ const ColdOpenAerial = () => {
           justifyContent: "center",
           padding: "0 8%",
           opacity: statO,
+          transform: `scale(${statScale})`,
           flexDirection: "column",
           gap: 18,
         }}
@@ -275,7 +308,8 @@ const HookCallout = ({ text, subtext, appearFrame, color = ACCENT_MAP.dust, size
 const HookIntroVo = () => {
   const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
-  const opacity = useFadeInOut(durationInFrames, 18, 18);
+  // v5.1 polish: 12-frame fade-in to crossfade with ColdOpenAerial outO tail
+  const opacity = useFadeInOut(durationInFrames, 12, 18);
   const zoom = interpolate(frame, [0, durationInFrames], [1.0, 1.06]);
 
   // ID badge fades in early and stays
@@ -385,7 +419,7 @@ const HookIntroVo = () => {
 // ── Act 1 Export ──────────────────────────────────────────────────────────────
 
 export const CAct1Hook = () => {
-  const COLD = C_LAYOUT.act1.coldOpenSeconds * FPS; // 3s = 90f
+  const COLD = C_LAYOUT.act1.coldOpenSeconds * FPS; // 6s = 180f (v5.1)
   const HOOK = C_LAYOUT.act1.hookSeconds * FPS;     // 22s = 660f
 
   return (

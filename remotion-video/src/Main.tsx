@@ -54,26 +54,27 @@ const computeVoSegments = (
   };
 
   if (variant === "C") {
-    // v5 Wave 2E — 9-scene timeline (absolute frames at 30 fps):
+    // v5.1 polish pass — 9-scene timeline retimed to fast Chatterbox VO
+    // (absolute frames at 30 fps, total 5100f = 170s):
     //
-    // coldOpen: 0–90         (silent, 3s)
-    // hook:     90–750       (vo.cHook = 21.6s, window = 22s = 660f)
-    // traditional: 750–1230  (vo.cTraditional = 15.4s, window = 16s = 480f)
-    // answer:   1230–1710    (vo.cAnswer = 15.5s, window = 16s = 480f)
-    // coyote:   1710–2670    (vo.cCoyote = 25.2s + 6.8s held, window = 32s = 960f)
-    // grid:     2670–3420    (vo.cGrid = 24.3s, window = 25s = 750f)
-    // mvp:      3420–4080    (vo.cMvp = 21.6s, window = 22s = 660f)
-    // vision:   4080–4740    (vo.cVision = 12.5s + 9.5s held-final, window = 22s = 660f)
-    // aibody:   4740–5280    (vo.cAibody = 12.8s + 5.2s held, window = 18s = 540f)
-    // wordmark: 5280–5400    (silent, 4s = 120f)
-    push(90,   vo.cHook);
-    push(750,  vo.cTraditional);
-    push(1230, vo.cAnswer);
-    push(1710, vo.cCoyote);
-    push(2670, vo.cGrid);
+    // coldOpen:    0–180     (silent, 6s — extended for $1.8B plot landing)
+    // hook:        180–840   (cHook 19.152s + 26f hold, window = 22s = 660f)
+    // traditional: 840–1440  (cTraditional 13.2s + 6s comparison beat, window = 20s = 600f)
+    // answer:      1440–1980 (cAnswer 15.672s + 67f hold, window = 18s = 540f)
+    // coyote:      1980–2760 (cCoyote 22.44s + 107f hold, window = 26s = 780f)
+    // grid:        2760–3420 (cGrid 18.24s + 113f hold, window = 22s = 660f)
+    // mvp:         3420–4020 (cMvp 17.304s + 81f hold, window = 20s = 600f)
+    // vision:      4020–4560 (cVision 12.552s + 163f hold, window = 18s = 540f)
+    // aibody:      4560–4980 (cAibody 11.064s + 88f hold, window = 14s = 420f)
+    // wordmark:    4980–5100 (silent, 4s = 120f)
+    push(180,  vo.cHook);
+    push(840,  vo.cTraditional);
+    push(1440, vo.cAnswer);
+    push(1980, vo.cCoyote);
+    push(2760, vo.cGrid);
     push(3420, vo.cMvp);
-    push(4080, vo.cVision);
-    push(4740, vo.cAibody);
+    push(4020, vo.cVision);
+    push(4560, vo.cAibody);
   } else {
     // A & B share skeleton; only intro key differs.
     const introDur = variant === "B" ? vo.introB : vo.intro;

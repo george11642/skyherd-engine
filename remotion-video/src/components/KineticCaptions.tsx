@@ -226,14 +226,16 @@ const DenseRollingWindow = ({ segments, fps }: DenseProps) => {
   const window = allWords.slice(startIdx, endIdx + 1);
   if (window.length === 0) return null;
 
-  // Fade out a beat after the last word ends.
+  // Hold a beat after the last word ends, then fade fully out so the pill
+  // doesn't bleed into silent scenes.
   const lastEnd = window[window.length - 1].end;
   const opacity = interpolate(
     seconds,
-    [lastEnd, lastEnd + 0.4],
-    [1, 0.92],
+    [lastEnd, lastEnd + 0.4, lastEnd + 1.0],
+    [1, 1, 0],
     { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
   );
+  if (opacity <= 0.001) return null;
 
   return <Pill opacity={opacity}>{buildLine(window)}</Pill>;
 };
@@ -381,12 +383,15 @@ const StyledRollingWindow = ({ words, fps }: StyledRollingWindowProps) => {
   if (visible.length === 0) return null;
 
   const lastEnd = visible[visible.length - 1].end;
+  // Hold full opacity for 0.4s after last word, then fade out by 1.0s so the
+  // pill doesn't bleed into silent scenes (cold open / wordmark).
   const containerOpacity = interpolate(
     seconds,
-    [lastEnd, lastEnd + 0.4],
-    [1, 0.92],
+    [lastEnd, lastEnd + 0.4, lastEnd + 1.0],
+    [1, 1, 0],
     { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
   );
+  if (containerOpacity <= 0.001) return null;
 
   return (
     <div

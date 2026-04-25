@@ -109,13 +109,13 @@ CUES["vo-meta-B"]="And the captions you've been reading? Opus 4.7 styled every w
 
 CUES["vo-c-hook"]="I'm George, senior at UNM. I've spent a lot of nights on New Mexico ranches watching ranchers do impossible work. Right now beef prices are at record highs — but the American cow herd is at a sixty-five-year low. Labor's gone. Ranchers are aging out. Every ranch left has to do more, with fewer people watching it."
 
-CUES["vo-c-traditional"]="Here's how a ranch runs today. One person, two-hundred miles a week — checking every fence, every trough, every cow. Six runs a day, best case. A coyote at 3 A-M, a sick cow at noon, an empty water tank at midnight — all missed."
+CUES["vo-c-traditional"]="Here's how a ranch runs today. Helicopters. Working dogs. A-T-Vs. One ranch hand and two-hundred miles a week. Six runs a day, best case — and still, a coyote before dawn, a sick cow at noon, an empty water tank at midnight, all missed between runs. SkyHerd watches every acre, every minute, for four-seventeen a week."
 
 CUES["vo-c-answer"]="SkyHerd gives the ranch a nervous system. Five Claude agents, built on Opus 4.7. They're idle until a sensor wakes them — vision, motion, pressure, weather. Then they decide and act. Four dollars and seventeen cents a week of compute, total."
 
-CUES["vo-c-coyote"]="3:14 A-M. Thermal hits the south fence. The agent wakes up, looks at the frame, calls it — coyote, ninety-one percent confidence. It dispatches the drone autonomously. Drone flies the perimeter, scares the coyote off, returns home. The rancher gets a text. Nobody woke up. Nothing got eaten. The fence-line agent goes back to sleep — billing stops until the next sensor event."
+CUES["vo-c-coyote"]="Three-fourteen in the morning. Thermal hits the south fence. The agent wakes up, looks at the frame, calls it — coyote, ninety-one percent confidence. It dispatches the drone autonomously. Drone flies the perimeter, scares the coyote off, returns home. The rancher gets a text. Nobody woke up. Nothing got eaten. The fence-line agent goes back to sleep — billing stops until the next sensor event."
 
-CUES["vo-c-grid"]="And it's not just the fence. Sick cow with pinkeye? An agent flags her, drafts the vet packet, schedules the visit — all before sunrise. Trough pressure dropping overnight? A drone flies the leak. A cow goes into labor at 3 A-M — the rancher gets a priority page, not a maybe. Hailstorm forty-five minutes out? The herd auto-rotates to shelter."
+CUES["vo-c-grid"]="And it's not just the fence. Sick cow with pinkeye? An agent flags her, drafts the vet packet, schedules the visit — all before sunrise. Trough pressure dropping overnight? A drone flies the leak. A cow goes into labor before dawn — the rancher gets a priority page, not a maybe. Hailstorm forty-five minutes out? The herd auto-rotates to shelter."
 
 CUES["vo-c-mvp"]="I built the full software M-V-P solo. Web dashboard. iOS app. Android app. A deterministic simulator that replays any scenario from a seed. And a voice A-I rancher that calls you on Twilio when something needs your eyes. Open source. M-I-T licensed. Eleven-hundred tests, eighty-seven percent coverage."
 

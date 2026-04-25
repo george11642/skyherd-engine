@@ -63,10 +63,10 @@ const TILES: TileData[] = [
   },
 ];
 
-// 6s per tile × 4 = 24s total
-const FOCUS_DUR = 170;
-const STAGGER = 180;
-const TRANS = 25;
+// v5.1 polish: tightened to fit 660f (22s) — 4 tiles
+const FOCUS_DUR = 130;   // 4.33s per tile
+const STAGGER  = 145;   // ~4.83s tile-to-tile
+const TRANS   = 20;
 
 /** Mini SVG body visual for each scenario */
 function TileVisual({ tile, progress }: { tile: TileData; progress: number }) {
@@ -172,8 +172,8 @@ export const ScenarioGrid: React.FC = () => {
         const isVisible = frame >= focusStart - TRANS || i === 0;
         if (!isVisible) return null;
 
-        const activeSp = spring({ frame: frame - focusStart, fps, config: { damping: 100, stiffness: 140, mass: 0.9 } });
-        const exitSp = isPast ? spring({ frame: frame - focusEnd - TRANS, fps, config: { damping: 120, stiffness: 180 } }) : 0;
+        const activeSp = spring({ frame: frame - focusStart, fps, config: { damping: 75, stiffness: 160, mass: 0.85 } });
+        const exitSp = isPast ? spring({ frame: frame - focusEnd - TRANS, fps, config: { damping: 90, stiffness: 200 } }) : 0;
 
         const cW = isFocused ? interpolate(activeSp, [0, 1], [MINI_W, ACTIVE_W]) : MINI_W;
         const cH = isFocused ? interpolate(activeSp, [0, 1], [MINI_H, ACTIVE_H]) : MINI_H;
@@ -198,7 +198,7 @@ export const ScenarioGrid: React.FC = () => {
           : isPast ? 1 : 0;
 
         const statProg = isFocused
-          ? interpolate(frame, [focusStart + 40, focusStart + 130], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" })
+          ? interpolate(frame, [focusStart + 20, focusStart + 95], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" })
           : isPast ? 1 : 0;
 
         return (
@@ -276,7 +276,7 @@ export const ScenarioGrid: React.FC = () => {
         position: "absolute", bottom: 32, left: 48,
         fontFamily: MONO, fontSize: 13, color: INK_LIGHT, letterSpacing: "0.10em",
         textTransform: "uppercase" as const,
-        opacity: interpolate(frame, [500, 540], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }),
+        opacity: interpolate(frame, [540, 580], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }),
       }}>
         No rancher action needed
       </div>

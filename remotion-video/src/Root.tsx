@@ -25,14 +25,15 @@ const DEFAULT_AB_ACT_DURATIONS = {
   act5: 0,
 };
 
-// v5 Wave 2E: fixed 5-act grouping — 25+32+57+44+22 = 180s = 5400 frames
+// v5.1 polish pass — re-timed to fast Chatterbox VO (170s = 5100 frames @ 30fps)
 const DEFAULT_C_ACT_DURATIONS = {
-  act1: 25 * FPS,  // coldOpen(3s) + hook(22s)
-  act2: 32 * FPS,  // traditional(16s) + answer(16s)
-  act3: 57 * FPS,  // coyote(32s) + grid(25s)
-  act4: 44 * FPS,  // mvp(22s) + vision(22s)
-  act5: 22 * FPS,  // aibody(18s) + wordmark(4s)
+  act1: 28 * FPS,  //  840f: coldOpen(6s) + hook(22s)
+  act2: 38 * FPS,  // 1140f: traditional(20s) + answer(18s)
+  act3: 48 * FPS,  // 1440f: coyote(26s) + grid(22s)
+  act4: 38 * FPS,  // 1140f: mvp(20s) + vision(18s)
+  act5: 18 * FPS,  //  540f: aibody(14s) + wordmark(4s)
 };
+// Total: 170s = 5100 frames @ 30fps
 
 // Fallback VO durations (frames). Measured 2026-04-24 from Inworld/Nate render.
 const DEFAULT_VO_DURATIONS_FRAMES = {

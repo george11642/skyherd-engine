@@ -4,7 +4,8 @@
  * Mountain b-roll (t1-drone-arid-mountains.mp4) held for the full scene.
  * Faint diagram overlay: sensor-radius rings, agent-node dots, data-flow lines.
  * Kinetic captions for the VO close line (unchanged from v4).
- * Wordmark fades in over the held mountain footage — no tail cut, no cross-fade.
+ * Scene ends on the architecture diagram at full opacity — wordmark/credits
+ * end-card is owned by CCloseWordmark (next scene), not this component.
  */
 import {
   AbsoluteFill,
@@ -22,7 +23,6 @@ import {
 const CREAM   = "rgb(245 240 230)";
 const SAGE    = "rgb(148 176 136)";
 const TERRA   = "rgb(185 110 80)";
-const MONO    = "ui-monospace, 'JetBrains Mono', monospace";
 const SERIF   = "Georgia, 'Times New Roman', serif";
 
 // ---------------------------------------------------------------------------
@@ -41,9 +41,6 @@ const CAPTION_LINES = [
 // ---------------------------------------------------------------------------
 const TOTAL_FRAMES   = 690;   // 23 s
 const VO_END_FRAME   = 384;   // ~12.8 s — last caption exits here
-const DARK_FADE_START = 400;
-const DARK_FADE_END   = 480;
-const WORDMARK_START  = 440;
 
 // Slow zoom: subtle pull-back over full scene (reads "expansive")
 const ZOOM_START_SCALE = 1.10;
@@ -177,25 +174,13 @@ export const AIBodyClose: React.FC = () => {
     extrapolateRight: "clamp",
   });
 
-  // Dark overlay for wordmark section
-  const darkOverlay = interpolate(frame, [DARK_FADE_START, DARK_FADE_END], [0, 0.88], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
-
-  // Diagram overlay fades in early, fades with the dark overlay
+  // Diagram overlay fades in early and holds at full opacity through end of scene
   const diagramOpacity = interpolate(
     frame,
-    [30, 90, DARK_FADE_START, DARK_FADE_END],
-    [0, 1, 1, 0],
+    [30, 90],
+    [0, 1],
     { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
   );
-
-  // Wordmark
-  const wordmarkOpacity = interpolate(frame, [WORDMARK_START, WORDMARK_START + 40], [0, 1], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
 
   return (
     <AbsoluteFill style={{ backgroundColor: "#0a0b0c", opacity: fadeIn }}>
@@ -232,19 +217,8 @@ export const AIBodyClose: React.FC = () => {
       {/* Diagram overlay — sensor rings, agent dots, data lines */}
       <DiagramOverlay frame={frame} diagramOpacity={diagramOpacity} />
 
-      {/* Dark fade overlay (for wordmark section) */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          backgroundColor: "#0a0b0c",
-          opacity: darkOverlay,
-          pointerEvents: "none",
-        }}
-      />
-
       {/* Kinetic captions — white-with-shadow, large serif, fade-in per word */}
-      {frame < DARK_FADE_END &&
+      {frame < VO_END_FRAME &&
         CAPTION_LINES.map((line, i) => {
           const nextAppear = CAPTION_LINES[i + 1]?.appearFrame ?? VO_END_FRAME;
           const fadeOutStart = nextAppear - 15;
@@ -303,62 +277,6 @@ export const AIBodyClose: React.FC = () => {
             </div>
           );
         })}
-
-      {/* Wordmark — appears over held mountain footage */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          opacity: wordmarkOpacity,
-        }}
-      >
-        <div
-          style={{
-            fontFamily: SERIF,
-            fontWeight: 700,
-            fontSize: 88,
-            color: CREAM,
-            letterSpacing: "-0.02em",
-            lineHeight: 1,
-            textShadow: "0 4px 40px rgba(0,0,0,0.7)",
-          }}
-        >
-          SkyHerd
-        </div>
-        <div
-          style={{
-            fontFamily: MONO,
-            fontSize: 22,
-            color: SAGE,
-            letterSpacing: "0.22em",
-            textTransform: "uppercase",
-            marginTop: 18,
-          }}
-        >
-          Built with Opus 4.7
-        </div>
-        <div
-          style={{
-            fontFamily: MONO,
-            fontSize: 16,
-            color: "rgba(245,240,230,0.5)",
-            letterSpacing: "0.1em",
-            marginTop: 24,
-            opacity: interpolate(
-              frame,
-              [WORDMARK_START + 60, WORDMARK_START + 100],
-              [0, 1],
-              { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
-            ),
-          }}
-        >
-          github.com/george11642/skyherd-engine
-        </div>
-      </div>
     </AbsoluteFill>
   );
 };
