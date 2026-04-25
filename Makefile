@@ -194,11 +194,40 @@ video-record-clips:  ## Record 7+2 dashboard clips for Remotion composition (nee
 # ---------------------------------------------------------------------------
 
 video-pipeline:  ## VIDEO-FULL: end-to-end — audio → clips → composition → render → package
-	@bash scripts/render_vo_phase1.sh
+	@bash scripts/render_vo.sh
 	@$(MAKE) video-record-clips
 	@cd remotion-video && pnpm install && pnpm run render
 	@bash scripts/video_iterate.sh  # (Phase 5 loop — 6-iter cap)
 	@$(MAKE) video-render
+
+video-vo:  ## VIDEO-VO: regenerate all 21 vo-*.mp3 via active provider (default: inworld)
+	@bash scripts/render_vo.sh
+
+video-vo-elevenlabs:  ## VIDEO-VO-EL: regenerate all VO via ElevenLabs/Will (known-good fallback)
+	@SKYHERD_TTS_PROVIDER=elevenlabs bash scripts/render_vo.sh --provider elevenlabs
+
+video-vo-audition:  ## VIDEO-VO-AUD: render 4 Inworld presets + ElevenLabs Will, concat → out/vo-audition.mp3
+	@mkdir -p out
+	@INWORLD_KEY=$$(grep INWORLD_API_KEY .env.local | cut -d= -f2-) && \
+	ELEVENLABS_KEY=$$(grep ELEVENLABS_API_KEY .env.local | cut -d= -f2-) && \
+	AUDITION_TEXT="Same ranch. Five Claude Managed Agents, built on Opus 4.7. Every fence, every trough, every cow." && \
+	TMP=$$(mktemp -d) && trap "rm -rf $$TMP" EXIT && \
+	for VOICE in Jake Avery Nate Tyler; do \
+	  PAYLOAD=$$(python3 -c "import json,sys; print(json.dumps({'text':sys.argv[1],'voiceId':sys.argv[2],'modelId':'inworld-tts-1.5-max','audioConfig':{'audioEncoding':'MP3','sampleRateHertz':44100},'temperature':0.8,'applyTextNormalization':'ON'}))" "$$AUDITION_TEXT" "$$VOICE") && \
+	  RAW="$$TMP/$$VOICE.raw" && \
+	  HTTP=$$(curl -sS -w '%{http_code}' -X POST https://api.inworld.ai/tts/v1/voice \
+	    -H "Authorization: Basic $$INWORLD_KEY" -H "Content-Type: application/json" \
+	    -o "$$RAW" -d "$$PAYLOAD") && \
+	  if [ "$$HTTP" = "200" ]; then \
+	    python3 -c "import json,base64,sys; d=json.load(open(sys.argv[1],'rb')); open(sys.argv[2],'wb').write(base64.b64decode(d.get('audioContent','')))" "$$RAW" "$$TMP/$$VOICE.mp3" && \
+	    ffmpeg -y -hide_banner -loglevel error -i "$$TMP/$$VOICE.mp3" -ac 2 -ar 44100 -af "loudnorm=I=-18:TP=-1:LRA=11" -c:a libmp3lame -b:a 192k "out/audition-inworld-$$VOICE.mp3" && \
+	    echo "[audition] $$VOICE saved"; \
+	  else echo "[audition] $$VOICE FAILED HTTP=$$HTTP"; fi; \
+	done && \
+	ffmpeg -y -hide_banner -loglevel error -f lavfi -i anullsrc=r=44100:cl=stereo -t 1.0 -c:a libmp3lame -b:a 192k "$$TMP/silence.mp3" && \
+	( for V in Jake Avery Nate Tyler; do echo "file '$$(pwd)/out/audition-inworld-$$V.mp3'"; echo "file '$$TMP/silence.mp3'"; done ) > "$$TMP/concat.txt" && \
+	ffmpeg -y -hide_banner -loglevel error -f concat -safe 0 -i "$$TMP/concat.txt" -c:a libmp3lame -b:a 192k -ar 44100 -ac 2 out/vo-audition.mp3 && \
+	echo "[audition] out/vo-audition.mp3 ready — edit scripts/vo_voices.json to mark default:true on chosen preset"
 
 # TODO: scripts/video_iterate.sh produced by Phase 5 agent
 video-iterate:  ## VIDEO-ITER: dual-vision iteration loop (cap 6)
