@@ -378,7 +378,7 @@ print(d.get('input_i','?'), d.get('input_tp','?'), d.get('input_lra','?'), d.get
 	ffmpeg -y -hide_banner -loglevel warning \
 		-i "$(MP4)" \
 		-af "loudnorm=I=-16:TP=-1:LRA=11:measured_I=$${MEASURED_I}:measured_TP=$${MEASURED_TP}:measured_LRA=$${MEASURED_LRA}:measured_thresh=$${MEASURED_THRESH}:linear=true" \
-		-c:v copy -c:a aac -b:a 192k \
+		-c:v copy -c:a aac -profile:a aac_low -ar 48000 -ac 2 -b:a 192k -movflags +faststart \
 		"$${MASTERED}"; \
 	echo "[video-master] Mastered: $${MASTERED}"; \
 	ls -lh "$${MASTERED}"; \
