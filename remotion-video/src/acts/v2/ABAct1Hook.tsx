@@ -13,7 +13,6 @@
 import {
   AbsoluteFill,
   Audio,
-  OffthreadVideo,
   Sequence,
   interpolate,
   staticFile,
@@ -79,34 +78,6 @@ const HookStatOverlay = () => {
   );
 };
 
-// iter-4 A fix: 0.5s ranch-dawn b-roll plate behind a low-opacity cream wash
-// so "Everyone thinks" fades up over real ranch imagery instead of a blank
-// cream frame. Establishes the rancher domain immediately (Impact lift).
-// Wash ramps to fully opaque by frame 18 so the rest of the hook stays in
-// the existing CrossBeam-cream typography treatment.
-const HookPlate = () => {
-  const frame = useCurrentFrame();
-  const washOpacity = interpolate(frame, [12, 18], [0.55, 1.0], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
-  return (
-    <AbsoluteFill>
-      <OffthreadVideo
-        src={staticFile("broll/t1-pexels-ranch-dawn.mp4")}
-        muted
-        style={{ width: "100%", height: "100%", objectFit: "cover" }}
-      />
-      <AbsoluteFill
-        style={{
-          backgroundColor: "rgb(248 244 234)",
-          opacity: washOpacity,
-        }}
-      />
-    </AbsoluteFill>
-  );
-};
-
 const HookContrarian = () => (
   <AbsoluteFill
     style={{
@@ -115,9 +86,6 @@ const HookContrarian = () => (
       justifyContent: "center",
     }}
   >
-    <Sequence from={0} durationInFrames={18} layout="none">
-      <HookPlate />
-    </Sequence>
     <KineticPunch
       words={[
         {
