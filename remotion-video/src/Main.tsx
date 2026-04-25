@@ -129,8 +129,13 @@ export const Main = ({
 
   return (
     <AbsoluteFill style={{ backgroundColor: "rgb(10 12 16)" }}>
-      {/* Phase 6 S2: layered BGM stems with per-stem ducking + 6 stings */}
-      <MusicBed voSegments={voSegments} />
+      {/* Phase 6 S2: layered BGM stems with per-stem ducking + 6 stings.
+          Variant C uses a 9-scene structure where the default sting frames
+          (calibrated for A/B) mis-fire mid-scene — suppress all stings. */}
+      <MusicBed
+        voSegments={voSegments}
+        stingCues={variant === "C" ? [] : undefined}
+      />
 
       {/* Global SFX cues — iter2 restructure places them during the deep
           coyote beat and across the silent montage. Deep coyote runs ~25s
