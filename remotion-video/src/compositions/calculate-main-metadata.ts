@@ -166,7 +166,7 @@ async function measureVo(
 //   42–60 traditional-vs-SkyHerd compare beat (~18 s)
 const AB_ACT1_HOOK_SECONDS = 8;
 const AB_ACT1_INTRO_MIN_SECONDS = 14;
-const AB_ACT1_MARKET_MIN_SECONDS = 20;
+const AB_ACT1_MARKET_MIN_SECONDS = 17; // Phase 3: trim MarketBeat 28s→25s (−3s from prior ~20s floor)
 const AB_ACT1_COMPARE_MIN_SECONDS = 18;
 
 // A & B — Act 2 (~90s) — iter2: one deep scenario + rapid montage + mesh
@@ -178,9 +178,10 @@ const AB_ACT2_MONTAGE_SECONDS = 25;
 const AB_ACT2_MONTAGE_SCENE_COUNT = 4;
 const AB_ACT2_MESH_MIN_SECONDS = 40;
 
-// A & B — Act 3 (~30s)
-const AB_ACT3_SUBSTANCE_SECONDS = 18;
-const AB_ACT3_FINAL_SECONDS = 12;
+// A & B — Act 3 (~30s) — Phase 3 restructure: 15s + 5s meta-loop + 10s = 30s
+const AB_ACT3_SUBSTANCE_SECONDS = 15;
+const AB_ACT3_META_LOOP_SECONDS = 5;
+const AB_ACT3_FINAL_SECONDS = 10;
 
 // C — Act 1 (Hook, ~20s)
 const C_ACT1_HOOK_PUNCH_SECONDS = 8;
@@ -219,6 +220,7 @@ export const AB_LAYOUT = {
   },
   act3: {
     substanceSeconds: AB_ACT3_SUBSTANCE_SECONDS,
+    metaLoopSeconds: AB_ACT3_META_LOOP_SECONDS,
     finalSeconds: AB_ACT3_FINAL_SECONDS,
   },
 } as const;
@@ -307,7 +309,7 @@ export const calculateMainMetadata: CalculateMetadataFunction<
       Math.max(voSeconds.coyoteDeep + 1, AB_ACT2_COYOTE_DEEP_MIN_SECONDS) +
       AB_ACT2_MONTAGE_SECONDS +
       Math.max(voSeconds.meshOpus + 1, AB_ACT2_MESH_MIN_SECONDS);
-    const act3Seconds = AB_ACT3_SUBSTANCE_SECONDS + AB_ACT3_FINAL_SECONDS;
+    const act3Seconds = AB_ACT3_SUBSTANCE_SECONDS + AB_ACT3_META_LOOP_SECONDS + AB_ACT3_FINAL_SECONDS;
 
     actDurations = {
       act1: framesFromSeconds(act1Seconds),
