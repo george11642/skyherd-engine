@@ -48,9 +48,17 @@ export function ScenarioStrip({ replay: replayProp }: ScenarioStripProps = {}) {
   const [replay] = useState<SkyHerdReplay | null>(() =>
     replayProp !== undefined ? replayProp : getReplayIfActive(),
   );
-  const [overlayVisible, setOverlayVisible] = useState<boolean>(() =>
-    replay !== null && replay.isPaused(),
-  );
+  // Hide overlay on first paint when ?autostart=1 is present — the recorder
+  // relies on this so no "Start Simulation" flash ever lands in a clip frame.
+  // Without this short-circuit, the autostart useEffect below fires AFTER the
+  // first paint, leaving a 1-frame flash of the overlay in recordings.
+  const [overlayVisible, setOverlayVisible] = useState<boolean>(() => {
+    if (replay === null || !replay.isPaused()) return false;
+    if (typeof window === "undefined") return true;
+    const flag = new URLSearchParams(window.location.search).get("autostart");
+    if (flag === "1" || flag === "true") return false;
+    return true;
+  });
   const [announce, setAnnounce] = useState<string>("");
 
   const handleLog = useCallback((payload: { message?: string }) => {
