@@ -125,13 +125,13 @@ const FALLBACK_VO_SECONDS: Record<VoKey, number> = {
   metaA: 9.80,
   metaB: 8.07,
 
-  // Variant C v4 — 9-scene rewrite (Wave 2C, measured 2026-04-24 ffprobe)
-  cHook: 14.628571,
-  cTraditional: 11.728980,
-  cAnswer: 12.747755,
-  cCoyote: 16.431020,
-  cGrid: 15.934694,
-  cMvp: 18.128980,
+  // Variant C v5 — Wave 2E re-recorded VO (measured 2026-04-24 ffprobe)
+  cHook: 21.551020,
+  cTraditional: 15.386122,
+  cAnswer: 15.490612,
+  cCoyote: 25.234286,
+  cGrid: 24.346122,
+  cMvp: 21.629388,
   cVision: 12.538776,
   cAibody: 12.826122,
 };
@@ -203,19 +203,19 @@ const AB_ACT3_SUBSTANCE_SECONDS = 15;
 const AB_ACT3_META_LOOP_SECONDS = 5;
 const AB_ACT3_FINAL_SECONDS = 10;
 
-// C v4 — 9-scene layout mapped to 5 acts (Wave 2C, total = 180s = 5400 frames)
+// C v5 — 9-scene layout mapped to 5 acts (Wave 2E, total = 180s = 5400 frames)
 //
-// act1 = coldOpen(3s) + hook(15s)             = 18s = 540 frames
-// act2 = traditional(17s) + answer(17s)       = 34s = 1020 frames
-// act3 = coyote(40s) + grid(18s)              = 58s = 1740 frames
-// act4 = mvp(20s) + vision(22s)               = 42s = 1260 frames
-// act5 = aibody(23s) + wordmark(5s)           = 28s = 840 frames
+// act1 = coldOpen(3s) + hook(22s)             = 25s = 750 frames
+// act2 = traditional(16s) + answer(16s)       = 32s = 960 frames
+// act3 = coyote(32s) + grid(25s)              = 57s = 1710 frames
+// act4 = mvp(22s) + vision(22s)               = 44s = 1320 frames
+// act5 = aibody(18s) + wordmark(4s)           = 22s = 660 frames
 // TOTAL                                       = 180s = 5400 frames ✓
-const C_ACT1_SECONDS = 18;  // coldOpen + hook
-const C_ACT2_SECONDS = 34;  // traditional + answer
-const C_ACT3_SECONDS = 58;  // coyote (live demo) + grid
-const C_ACT4_SECONDS = 42;  // mvp + vision
-const C_ACT5_SECONDS = 28;  // aibody + wordmark
+const C_ACT1_SECONDS = 25;  // coldOpen(3) + hook(22)
+const C_ACT2_SECONDS = 32;  // traditional(16) + answer(16)
+const C_ACT3_SECONDS = 57;  // coyote(32) + grid(25)
+const C_ACT4_SECONDS = 44;  // mvp(22) + vision(22)
+const C_ACT5_SECONDS = 22;  // aibody(18) + wordmark(4)
 
 // Re-exported for act components.
 export const AB_LAYOUT = {
@@ -240,28 +240,24 @@ export const AB_LAYOUT = {
 
 // Re-exported for act components.
 export const C_LAYOUT = {
-  // act1: coldOpen(3s) + hook(15s) = 18s
-  // punchSeconds kept for CActs.tsx v3 compat (Wave 2B will remove it)
-  act1: { totalSeconds: C_ACT1_SECONDS, coldOpenSeconds: 3, hookSeconds: 15, punchSeconds: 3 },
-  // act2: traditional(17s) + answer(17s) = 34s
-  act2: { totalSeconds: C_ACT2_SECONDS, traditionalSeconds: 17, answerSeconds: 17, storyMin: 34 },
-  // act3: coyote live demo(40s) + grid(18s) = 58s
-  // Legacy keys kept for CActs.tsx v3 compat (Wave 2B will remove them)
+  // act1: coldOpen(3s) + hook(22s) = 25s  [Wave 2E: hook expanded to absorb VO overflow]
+  act1: { totalSeconds: C_ACT1_SECONDS, coldOpenSeconds: 3, hookSeconds: 22, punchSeconds: 3 },
+  // act2: traditional(16s) + answer(16s) = 32s  [Wave 2E: -1s each for budget]
+  act2: { totalSeconds: C_ACT2_SECONDS, traditionalSeconds: 16, answerSeconds: 16, storyMin: 32 },
+  // act3: coyote live demo(32s) + grid(25s) = 57s  [Wave 2E: coyote -8s, grid +7s]
   act3: {
     totalSeconds: C_ACT3_SECONDS,
-    coyoteSeconds: 40,
-    gridSeconds: 18,
-    coyoteDeepMin: 40,
-    montageSeconds: 18,
+    coyoteSeconds: 32,
+    gridSeconds: 25,
+    coyoteDeepMin: 32,
+    montageSeconds: 25,
     montageSceneCount: 4,
     synthesisSeconds: 0,
   },
-  // act4: mvp(20s) + vision(22s) = 42s
-  // Legacy keys kept for CActs.tsx v3 compat (Wave 2B will remove them)
-  act4: { totalSeconds: C_ACT4_SECONDS, mvpSeconds: 20, visionSeconds: 22, opusMin: 20, depthMin: 22 },
-  // act5: aibody(23s) + wordmark(5s) = 28s
-  // Legacy keys kept for CActs.tsx v3 compat (Wave 2B will remove them)
-  act5: { totalSeconds: C_ACT5_SECONDS, aibodySeconds: 23, wordmarkSeconds: 5, bookendSeconds: 23 },
+  // act4: mvp(22s) + vision(22s) = 44s  [Wave 2E: mvp +2s]
+  act4: { totalSeconds: C_ACT4_SECONDS, mvpSeconds: 22, visionSeconds: 22, opusMin: 22, depthMin: 22 },
+  // act5: aibody(18s) + wordmark(4s) = 22s  [Wave 2E: aibody -5s, wordmark -1s]
+  act5: { totalSeconds: C_ACT5_SECONDS, aibodySeconds: 18, wordmarkSeconds: 4, bookendSeconds: 18 },
 } as const;
 
 export const calculateMainMetadata: CalculateMetadataFunction<
@@ -284,9 +280,9 @@ export const calculateMainMetadata: CalculateMetadataFunction<
   let actDurations: ActDurations;
 
   if (variant === "C") {
-    // C v4 — fixed 5-act layout (Wave 2C). Scene durations are exact; no
-    // dynamic stretch needed because scenes have deliberate silent padding.
-    // Total = 18+34+58+42+28 = 180s = 5400 frames.
+    // C v5 — fixed 5-act layout (Wave 2E). Scene durations redistributed to
+    // absorb VO overflow from new Will/eleven_v3 recordings.
+    // Total = 25+32+57+44+22 = 180s = 5400 frames.
     actDurations = {
       act1: framesFromSeconds(C_ACT1_SECONDS),
       act2: framesFromSeconds(C_ACT2_SECONDS),
