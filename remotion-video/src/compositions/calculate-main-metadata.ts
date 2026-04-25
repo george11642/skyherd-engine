@@ -125,15 +125,15 @@ const FALLBACK_VO_SECONDS: Record<VoKey, number> = {
   metaA: 9.80,
   metaB: 8.07,
 
-  // Variant C v5 — Wave 2E re-recorded VO (measured 2026-04-24 ffprobe)
-  cHook: 21.551020,
-  cTraditional: 15.386122,
-  cAnswer: 15.490612,
-  cCoyote: 25.234286,
-  cGrid: 24.346122,
-  cMvp: 21.629388,
-  cVision: 12.538776,
-  cAibody: 12.826122,
+  // Variant C v5 — Chatterbox-cloned George voice (measured 2026-04-25 ffprobe)
+  cHook: 19.152,
+  cTraditional: 13.200,
+  cAnswer: 15.672,
+  cCoyote: 22.440,
+  cGrid: 18.240,
+  cMvp: 17.304,
+  cVision: 12.552,
+  cAibody: 11.064,
 };
 
 export type VoDurationsFrames = Record<VoKey, number>;
