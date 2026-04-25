@@ -257,9 +257,6 @@ export type KineticPunchProps = {
     weight?: 400 | 500 | 600 | 700 | 800;
     size?: number;
     color?: string;
-    // When set, use a linear fade over this many frames instead of the spring.
-    // Used for hook openers that need to land hard at frame 0 with no blank gap.
-    fadeFrames?: number;
   }>;
   layout?: "stack" | "wrap";
 };
@@ -283,28 +280,16 @@ export const KineticPunch = ({
       }}
     >
       {words.map((w, i) => {
-        let y: number;
-        let o: number;
-        if (w.fadeFrames !== undefined) {
-          o = interpolate(
-            frame,
-            [w.appearFrame, w.appearFrame + w.fadeFrames],
-            [0, 1],
-            { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
-          );
-          y = 0;
-        } else {
-          const p = spring({
-            frame: frame - w.appearFrame,
-            fps,
-            config: { damping: 100, stiffness: 200, mass: 0.65 },
-          });
-          y = interpolate(p, [0, 1], [40, 0]);
-          o = interpolate(p, [0, 1], [0, 1], {
-            extrapolateLeft: "clamp",
-            extrapolateRight: "clamp",
-          });
-        }
+        const p = spring({
+          frame: frame - w.appearFrame,
+          fps,
+          config: { damping: 100, stiffness: 200, mass: 0.65 },
+        });
+        const y = interpolate(p, [0, 1], [40, 0]);
+        const o = interpolate(p, [0, 1], [0, 1], {
+          extrapolateLeft: "clamp",
+          extrapolateRight: "clamp",
+        });
         return (
           <div
             key={`punch-${i}`}
