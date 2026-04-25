@@ -54,34 +54,26 @@ const computeVoSegments = (
   };
 
   if (variant === "C") {
-    // Act 1: hook punch (8s no VO) then hookC VO.
-    const a1HookPunchEnd = 8 * FPS;
-    push(a1HookPunchEnd, vo.hookC);
-
-    // Act 2: story VO (folds compare beat in).
-    const a2Start = actDur.act1;
-    push(a2Start + 30, vo.storyC);
-
-    // Act 3: deep coyote VO + montage cues that follow it.
-    const a3Start = actDur.act1 + actDur.act2;
-    push(a3Start + 60, vo.coyoteDeep);
-    // Cover the entire ~25 s montage block (sick / tank / calving / storm /
-    // bridge cues land somewhere in here — duck the whole window so VO is
-    // never drowned regardless of exact placement).
-    const cMontageStart =
-      a3Start + 60 + Math.max(vo.coyoteDeep + 30, 25 * FPS);
-    push(cMontageStart, 25 * FPS);
-
-    // Act 4: opus then depth.
-    const a4Start = a3Start + actDur.act3;
-    const opusSlot = Math.max(vo.opusC + FPS, 25 * FPS);
-    push(a4Start + 30, vo.opusC);
-    const depthStart = a4Start + opusSlot;
-    push(depthStart + 30, vo.depthC);
-
-    // Act 5: bookend close.
-    const a5Start = a4Start + actDur.act4;
-    push(a5Start + 30, vo.closeC);
+    // v4 Wave 2C — 9-scene timeline (absolute frames at 30 fps):
+    //
+    // coldOpen: 0–90         (silent, 3s)
+    // hook:     90–540       (vo.cHook = 14.6s, rest is visual padding)
+    // traditional: 540–1050  (vo.cTraditional = 11.7s)
+    // answer:   1050–1560    (vo.cAnswer = 12.7s)
+    // coyote:   1560–2760    (vo.cCoyote = 16.4s + 23.6s live-demo screen)
+    // grid:     2760–3300    (vo.cGrid = 15.9s)
+    // mvp:      3300–3900    (vo.cMvp = 18.1s)
+    // vision:   3900–4560    (vo.cVision = 12.5s)
+    // aibody:   4560–5250    (vo.cAibody = 12.8s)
+    // wordmark: 5250–5400    (silent, 5s)
+    push(90,   vo.cHook);
+    push(540,  vo.cTraditional);
+    push(1050, vo.cAnswer);
+    push(1560, vo.cCoyote);
+    push(2760, vo.cGrid);
+    push(3300, vo.cMvp);
+    push(3900, vo.cVision);
+    push(4560, vo.cAibody);
   } else {
     // A & B share skeleton; only intro key differs.
     const introDur = variant === "B" ? vo.introB : vo.intro;

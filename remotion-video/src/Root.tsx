@@ -25,12 +25,13 @@ const DEFAULT_AB_ACT_DURATIONS = {
   act5: 0,
 };
 
+// v4 Wave 2C: fixed 5-act grouping — 18+34+58+42+28 = 180s = 5400 frames
 const DEFAULT_C_ACT_DURATIONS = {
-  act1: 24 * FPS,
-  act2: 45 * FPS,
-  act3: 55 * FPS,
-  act4: 50 * FPS,
-  act5: 20 * FPS,
+  act1: 18 * FPS,  // coldOpen(3s) + hook(15s)
+  act2: 34 * FPS,  // traditional(17s) + answer(17s)
+  act3: 58 * FPS,  // coyote(40s) + grid(18s)
+  act4: 42 * FPS,  // mvp(20s) + vision(22s)
+  act5: 28 * FPS,  // aibody(23s) + wordmark(5s)
 };
 
 // Fallback VO durations (frames). Measured 2026-04-24 from Inworld/Nate render.
@@ -62,6 +63,15 @@ const DEFAULT_VO_DURATIONS_FRAMES = {
   // Meta-loop cues (Phase 3 — ABAct3Close MetaLoopBeat)
   metaA: Math.ceil(9.80 * FPS),
   metaB: Math.ceil(8.07 * FPS),
+  // Variant C v4 — 9-scene rewrite (Wave 2C, measured 2026-04-24 ffprobe)
+  cHook: Math.ceil(14.628571 * FPS),
+  cTraditional: Math.ceil(11.728980 * FPS),
+  cAnswer: Math.ceil(12.747755 * FPS),
+  cCoyote: Math.ceil(16.431020 * FPS),
+  cGrid: Math.ceil(15.934694 * FPS),
+  cMvp: Math.ceil(18.128980 * FPS),
+  cVision: Math.ceil(12.538776 * FPS),
+  cAibody: Math.ceil(12.826122 * FPS),
 };
 
 const sumActDurations = (a: typeof DEFAULT_AB_ACT_DURATIONS): number =>

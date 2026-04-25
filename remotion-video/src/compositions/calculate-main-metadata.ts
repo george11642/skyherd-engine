@@ -54,12 +54,22 @@ export const VO_FILES = {
   // Variant B — metric-first hook
   introB: "voiceover/vo-intro-B.mp3",
 
-  // Variant C — 5-act differentiated
+  // Variant C — 5-act differentiated (v3, kept for A/B compat)
   hookC: "voiceover/vo-hook-C.mp3",
   storyC: "voiceover/vo-story-C.mp3",
   opusC: "voiceover/vo-opus-C.mp3",
   depthC: "voiceover/vo-depth-C.mp3",
   closeC: "voiceover/vo-close-C.mp3",
+
+  // Variant C v4 — 9-scene rewrite (Wave 2C)
+  cHook: "voiceover/vo-c-hook.mp3",
+  cTraditional: "voiceover/vo-c-traditional.mp3",
+  cAnswer: "voiceover/vo-c-answer.mp3",
+  cCoyote: "voiceover/vo-c-coyote.mp3",
+  cGrid: "voiceover/vo-c-grid.mp3",
+  cMvp: "voiceover/vo-c-mvp.mp3",
+  cVision: "voiceover/vo-c-vision.mp3",
+  cAibody: "voiceover/vo-c-aibody.mp3",
 
   // Montage cues (Phase 2 — fills 1:25-1:50 previously-silent montage window)
   montageSick: "voiceover/vo-montage-sick.mp3",
@@ -114,6 +124,16 @@ const FALLBACK_VO_SECONDS: Record<VoKey, number> = {
   // Meta-loop cues (Phase 3)
   metaA: 9.80,
   metaB: 8.07,
+
+  // Variant C v4 — 9-scene rewrite (Wave 2C, measured 2026-04-24 ffprobe)
+  cHook: 14.628571,
+  cTraditional: 11.728980,
+  cAnswer: 12.747755,
+  cCoyote: 16.431020,
+  cGrid: 15.934694,
+  cMvp: 18.128980,
+  cVision: 12.538776,
+  cAibody: 12.826122,
 };
 
 export type VoDurationsFrames = Record<VoKey, number>;
@@ -183,26 +203,19 @@ const AB_ACT3_SUBSTANCE_SECONDS = 15;
 const AB_ACT3_META_LOOP_SECONDS = 5;
 const AB_ACT3_FINAL_SECONDS = 10;
 
-// C — Act 1 (Hook, ~20s)
-const C_ACT1_HOOK_PUNCH_SECONDS = 8;
-const C_ACT1_HOOK_VO_MIN_SECONDS = 12;
-
-// C — Act 2 (Story + compare, ~40s — compare fused into story in iter2)
-const C_ACT2_STORY_MIN_SECONDS = 38;
-
-// C — Act 3 (Demo, ~55s) — deep coyote + montage + short synthesis
-const C_ACT3_COYOTE_DEEP_MIN_SECONDS = 25;
-const C_ACT3_MONTAGE_SECONDS = 25;
-const C_ACT3_MONTAGE_SCENE_COUNT = 4;
-const C_ACT3_SYNTHESIS_SECONDS = 5;
-
-// C — Act 4 (Substance, ~45s in iter2) — Opus (~25s) + Depth (~20s)
-const C_ACT4_OPUS_MIN_SECONDS = 25;
-const C_ACT4_DEPTH_MIN_SECONDS = 20;
-
-// C — Act 5 (Close, ~20s)
-const C_ACT5_BOOKEND_SECONDS = 13;
-const C_ACT5_WORDMARK_SECONDS = 7;
+// C v4 — 9-scene layout mapped to 5 acts (Wave 2C, total = 180s = 5400 frames)
+//
+// act1 = coldOpen(3s) + hook(15s)             = 18s = 540 frames
+// act2 = traditional(17s) + answer(17s)       = 34s = 1020 frames
+// act3 = coyote(40s) + grid(18s)              = 58s = 1740 frames
+// act4 = mvp(20s) + vision(22s)               = 42s = 1260 frames
+// act5 = aibody(23s) + wordmark(5s)           = 28s = 840 frames
+// TOTAL                                       = 180s = 5400 frames ✓
+const C_ACT1_SECONDS = 18;  // coldOpen + hook
+const C_ACT2_SECONDS = 34;  // traditional + answer
+const C_ACT3_SECONDS = 58;  // coyote (live demo) + grid
+const C_ACT4_SECONDS = 42;  // mvp + vision
+const C_ACT5_SECONDS = 28;  // aibody + wordmark
 
 // Re-exported for act components.
 export const AB_LAYOUT = {
@@ -225,26 +238,30 @@ export const AB_LAYOUT = {
   },
 } as const;
 
+// Re-exported for act components.
 export const C_LAYOUT = {
-  act1: {
-    punchSeconds: C_ACT1_HOOK_PUNCH_SECONDS,
-    voMin: C_ACT1_HOOK_VO_MIN_SECONDS,
-  },
-  act2: { storyMin: C_ACT2_STORY_MIN_SECONDS },
+  // act1: coldOpen(3s) + hook(15s) = 18s
+  // punchSeconds kept for CActs.tsx v3 compat (Wave 2B will remove it)
+  act1: { totalSeconds: C_ACT1_SECONDS, coldOpenSeconds: 3, hookSeconds: 15, punchSeconds: 3 },
+  // act2: traditional(17s) + answer(17s) = 34s
+  act2: { totalSeconds: C_ACT2_SECONDS, traditionalSeconds: 17, answerSeconds: 17, storyMin: 34 },
+  // act3: coyote live demo(40s) + grid(18s) = 58s
+  // Legacy keys kept for CActs.tsx v3 compat (Wave 2B will remove them)
   act3: {
-    coyoteDeepMin: C_ACT3_COYOTE_DEEP_MIN_SECONDS,
-    montageSeconds: C_ACT3_MONTAGE_SECONDS,
-    montageSceneCount: C_ACT3_MONTAGE_SCENE_COUNT,
-    synthesisSeconds: C_ACT3_SYNTHESIS_SECONDS,
+    totalSeconds: C_ACT3_SECONDS,
+    coyoteSeconds: 40,
+    gridSeconds: 18,
+    coyoteDeepMin: 40,
+    montageSeconds: 18,
+    montageSceneCount: 4,
+    synthesisSeconds: 0,
   },
-  act4: {
-    opusMin: C_ACT4_OPUS_MIN_SECONDS,
-    depthMin: C_ACT4_DEPTH_MIN_SECONDS,
-  },
-  act5: {
-    bookendSeconds: C_ACT5_BOOKEND_SECONDS,
-    wordmarkSeconds: C_ACT5_WORDMARK_SECONDS,
-  },
+  // act4: mvp(20s) + vision(22s) = 42s
+  // Legacy keys kept for CActs.tsx v3 compat (Wave 2B will remove them)
+  act4: { totalSeconds: C_ACT4_SECONDS, mvpSeconds: 20, visionSeconds: 22, opusMin: 20, depthMin: 22 },
+  // act5: aibody(23s) + wordmark(5s) = 28s
+  // Legacy keys kept for CActs.tsx v3 compat (Wave 2B will remove them)
+  act5: { totalSeconds: C_ACT5_SECONDS, aibodySeconds: 23, wordmarkSeconds: 5, bookendSeconds: 23 },
 } as const;
 
 export const calculateMainMetadata: CalculateMetadataFunction<
@@ -267,29 +284,15 @@ export const calculateMainMetadata: CalculateMetadataFunction<
   let actDurations: ActDurations;
 
   if (variant === "C") {
-    // C — 5-act layout, iter2: Hook (~20s) / Story+compare (~45s) / Demo
-    // deep+montage+synth (~55s) / Substance Opus+Depth (~45-50s) / Close (~20s)
-    const act1Seconds = Math.max(
-      C_ACT1_HOOK_PUNCH_SECONDS +
-        Math.max(voSeconds.hookC + 0.5, C_ACT1_HOOK_VO_MIN_SECONDS),
-      20,
-    );
-    const act2Seconds = Math.max(voSeconds.storyC + 2, 40);
-    const act3Seconds =
-      Math.max(voSeconds.coyoteDeep + 1, C_ACT3_COYOTE_DEEP_MIN_SECONDS) +
-      C_ACT3_MONTAGE_SECONDS +
-      C_ACT3_SYNTHESIS_SECONDS;
-    const act4Seconds =
-      Math.max(voSeconds.opusC + 1, C_ACT4_OPUS_MIN_SECONDS) +
-      Math.max(voSeconds.depthC + 1, C_ACT4_DEPTH_MIN_SECONDS);
-    const act5Seconds = C_ACT5_BOOKEND_SECONDS + C_ACT5_WORDMARK_SECONDS;
-
+    // C v4 — fixed 5-act layout (Wave 2C). Scene durations are exact; no
+    // dynamic stretch needed because scenes have deliberate silent padding.
+    // Total = 18+34+58+42+28 = 180s = 5400 frames.
     actDurations = {
-      act1: framesFromSeconds(act1Seconds),
-      act2: framesFromSeconds(act2Seconds),
-      act3: framesFromSeconds(act3Seconds),
-      act4: framesFromSeconds(act4Seconds),
-      act5: framesFromSeconds(act5Seconds),
+      act1: framesFromSeconds(C_ACT1_SECONDS),
+      act2: framesFromSeconds(C_ACT2_SECONDS),
+      act3: framesFromSeconds(C_ACT3_SECONDS),
+      act4: framesFromSeconds(C_ACT4_SECONDS),
+      act5: framesFromSeconds(C_ACT5_SECONDS),
     };
   } else {
     // A & B — 3-act, iter2: Setup (~60-70s) / Demo deep+montage+mesh-opus
