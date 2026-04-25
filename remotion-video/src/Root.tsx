@@ -33,26 +33,35 @@ const DEFAULT_C_ACT_DURATIONS = {
   act5: 20 * FPS,
 };
 
-// Fallback VO durations (frames). Measured 2026-04-24 from iter2 Will/v3.
+// Fallback VO durations (frames). Measured 2026-04-24 from Inworld/Nate render.
 const DEFAULT_VO_DURATIONS_FRAMES = {
   // Shared deep scenario (A/B/C)
-  coyoteDeep: Math.ceil(28.53 * FPS),
+  coyoteDeep: Math.ceil(23.09 * FPS),
   // Shared (A/B)
-  market: Math.ceil(17.95 * FPS),
-  compare: Math.ceil(30.85 * FPS),
-  meshOpus: Math.ceil(30.43 * FPS),
-  closeSubstance: Math.ceil(16.93 * FPS),
-  closeFinal: Math.ceil(7.24 * FPS),
+  market: Math.ceil(15.70 * FPS),
+  compare: Math.ceil(24.82 * FPS),
+  meshOpus: Math.ceil(25.29 * FPS),
+  closeSubstance: Math.ceil(14.21 * FPS),
+  closeFinal: Math.ceil(6.03 * FPS),
   // Variant A
-  intro: Math.ceil(13.64 * FPS),
+  intro: Math.ceil(14.52 * FPS),
   // Variant B
-  introB: Math.ceil(19.88 * FPS),
+  introB: Math.ceil(18.68 * FPS),
   // Variant C
-  hookC: Math.ceil(14.45 * FPS),
-  storyC: Math.ceil(42.68 * FPS),
-  opusC: Math.ceil(30.85 * FPS),
-  depthC: Math.ceil(17.63 * FPS),
-  closeC: Math.ceil(9.17 * FPS),
+  hookC: Math.ceil(12.96 * FPS),
+  storyC: Math.ceil(31.63 * FPS),
+  opusC: Math.ceil(27.72 * FPS),
+  depthC: Math.ceil(12.28 * FPS),
+  closeC: Math.ceil(7.94 * FPS),
+  // Montage cues (Phase 2 — fills 1:25-1:50 silent window)
+  montageSick: Math.ceil(7.92 * FPS),
+  montageTank: Math.ceil(6.09 * FPS),
+  montageCalving: Math.ceil(6.27 * FPS),
+  montageStorm: Math.ceil(5.46 * FPS),
+  montageBridge: Math.ceil(5.07 * FPS),
+  // Meta-loop cues (Phase 3 — ABAct3Close MetaLoopBeat)
+  metaA: Math.ceil(9.80 * FPS),
+  metaB: Math.ceil(8.07 * FPS),
 };
 
 const sumActDurations = (a: typeof DEFAULT_AB_ACT_DURATIONS): number =>

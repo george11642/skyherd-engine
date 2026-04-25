@@ -60,6 +60,17 @@ export const VO_FILES = {
   opusC: "voiceover/vo-opus-C.mp3",
   depthC: "voiceover/vo-depth-C.mp3",
   closeC: "voiceover/vo-close-C.mp3",
+
+  // Montage cues (Phase 2 — fills 1:25-1:50 previously-silent montage window)
+  montageSick: "voiceover/vo-montage-sick.mp3",
+  montageTank: "voiceover/vo-montage-tank.mp3",
+  montageCalving: "voiceover/vo-montage-calving.mp3",
+  montageStorm: "voiceover/vo-montage-storm.mp3",
+  montageBridge: "voiceover/vo-montage-bridge.mp3",
+
+  // Meta-loop cues (Phase 3 — ABAct3Close MetaLoopBeat)
+  metaA: "voiceover/vo-meta-A.mp3",
+  metaB: "voiceover/vo-meta-B.mp3",
 } as const;
 
 export type VoKey = keyof typeof VO_FILES;
@@ -70,28 +81,39 @@ export type VoKey = keyof typeof VO_FILES;
  * at metadata-resolution time (e.g. CI without public/).
  */
 const FALLBACK_VO_SECONDS: Record<VoKey, number> = {
-  // Shared deep scenario
-  coyoteDeep: 28.53,
+  // Shared deep scenario — Inworld/Nate measured 2026-04-24
+  coyoteDeep: 23.09,
 
   // Shared (A/B)
-  market: 17.95,
-  compare: 30.85,
-  meshOpus: 30.43,
-  closeSubstance: 16.93,
-  closeFinal: 7.24,
+  market: 15.70,
+  compare: 24.82,
+  meshOpus: 25.29,
+  closeSubstance: 14.21,
+  closeFinal: 6.03,
 
   // Variant A
-  intro: 13.64,
+  intro: 14.52,
 
   // Variant B
-  introB: 19.88,
+  introB: 18.68,
 
   // Variant C
-  hookC: 14.45,
-  storyC: 42.68,
-  opusC: 30.85,
-  depthC: 17.63,
-  closeC: 9.17,
+  hookC: 12.96,
+  storyC: 31.63,
+  opusC: 27.72,
+  depthC: 12.28,
+  closeC: 7.94,
+
+  // Montage cues (Phase 2 — measured 2026-04-24 Inworld/Nate)
+  montageSick: 7.92,
+  montageTank: 6.09,
+  montageCalving: 6.27,
+  montageStorm: 5.46,
+  montageBridge: 5.07,
+
+  // Meta-loop cues (Phase 3)
+  metaA: 9.80,
+  metaB: 8.07,
 };
 
 export type VoDurationsFrames = Record<VoKey, number>;
