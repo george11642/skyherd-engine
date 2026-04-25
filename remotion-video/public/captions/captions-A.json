@@ -1,0 +1,44 @@
+{
+  "variant": "A",
+  "mode": "sparse",
+  "emphasis": [
+    {
+      "second": 1,
+      "text": "Everyone thinks"
+    },
+    {
+      "second": 2,
+      "text": "ranchers need smarter sensors."
+    },
+    {
+      "second": 4,
+      "text": "They don't."
+    },
+    {
+      "second": 6,
+      "text": "They need a nervous system."
+    },
+    {
+      "second": 24,
+      "text": "Beef \u00b7 record highs"
+    },
+    {
+      "second": 30,
+      "text": "Cow herd \u00b7 65-yr low"
+    },
+    {
+      "second": 36,
+      "text": "Labor \u00b7 gone"
+    },
+    {
+      "second": 42,
+      "text": "Eyes \u00b7 fewer per acre"
+    },
+    {
+      "second": 48,
+      "text": "The herd has a nervous system. The rancher does not."
+    }
+  ],
+  "segments": [],
+  "fingerprint": "196908ff605e61441603e26131eb4409e61abb5fc81687068e1cae18cff198e9"
+}

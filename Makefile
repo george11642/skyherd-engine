@@ -1,4 +1,4 @@
-.PHONY: setup sim demo dashboard dashboard-mock test lint format typecheck clean ci sitl-up sitl-down bus-up bus-down mosquitto-up mosquitto-down mesh-smoke one-pager hardware-demo hardware-demo-sim hardware-demo-sim-down h2-smoke h3-smoke h4-smoke h4-docs mavic-bridge f3-bridge drone-smoke sitl-smoke determinism-3x gate-check voice-demo rehearsal record-ready preflight laptop-drone-smoke edge-pi-setup edge-galileo-setup video-record-clips video-pipeline video-iterate video-render
+.PHONY: setup sim demo dashboard dashboard-mock test lint format typecheck clean ci sitl-up sitl-down bus-up bus-down mosquitto-up mosquitto-down mesh-smoke one-pager hardware-demo hardware-demo-sim hardware-demo-sim-down h2-smoke h3-smoke h4-smoke h4-docs mavic-bridge f3-bridge drone-smoke sitl-smoke determinism-3x gate-check voice-demo rehearsal record-ready preflight laptop-drone-smoke edge-pi-setup edge-galileo-setup video-record-clips video-pipeline video-iterate video-render video-captions video-captions-A video-captions-B video-captions-C
 
 SEED ?= 42
 SCENARIO ?= all
@@ -217,3 +217,22 @@ video-render:  ## VIDEO-FINAL: render 1080p60 + loudnorm to -16 LUFS
 
 laptop-drone-smoke:  ## 7.1 LDC-01/03/06: mocked MAVSDK-over-USB-C + manual-override API smoke (<10s, no drone)
 	uv run pytest tests/hardware/test_laptop_drone_control.py tests/server/test_drone_control.py -v --no-cov
+
+# ---------------------------------------------------------------------------
+# Phase E1: kinetic captions (faster-whisper transcription per variant)
+# Sparse mode (A/B) emits emphasis-only windows from the variant scripts;
+# dense mode (C) transcribes the full VO bus with word-level timestamps.
+# Idempotent — fingerprint check skips re-runs if inputs haven't changed.
+# ---------------------------------------------------------------------------
+
+video-captions:  ## E1: regenerate caption JSON for all 3 variants (idempotent)
+	uv run python scripts/generate_kinetic_captions.py --variant all
+
+video-captions-A:  ## E1: regenerate captions for variant A only (sparse)
+	uv run python scripts/generate_kinetic_captions.py --variant A
+
+video-captions-B:  ## E1: regenerate captions for variant B only (sparse)
+	uv run python scripts/generate_kinetic_captions.py --variant B
+
+video-captions-C:  ## E1: regenerate captions for variant C only (dense, ~30s)
+	uv run python scripts/generate_kinetic_captions.py --variant C

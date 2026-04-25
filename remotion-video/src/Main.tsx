@@ -32,6 +32,7 @@ import {
   CAct4Substance,
   CAct5Close,
 } from "./acts/v2/CActs";
+import { KineticCaptions } from "./components/KineticCaptions";
 
 const FPS = 30;
 const DUCK_BASE = 0.55;
@@ -246,6 +247,9 @@ export const Main = ({
           </Series.Sequence>
         </Series>
       )}
+
+      {/* Phase E1 — kinetic captions overlay (sparse for A/B, dense for C). */}
+      <KineticCaptions variant={variant} />
     </AbsoluteFill>
   );
 };

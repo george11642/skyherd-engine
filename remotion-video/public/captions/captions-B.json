@@ -1,0 +1,48 @@
+{
+  "variant": "B",
+  "mode": "sparse",
+  "emphasis": [
+    {
+      "second": 1,
+      "text": "$4.17"
+    },
+    {
+      "second": 2,
+      "text": "a week"
+    },
+    {
+      "second": 3,
+      "text": "twenty-four-seven"
+    },
+    {
+      "second": 4,
+      "text": "nervous system"
+    },
+    {
+      "second": 6,
+      "text": "ten-thousand-acre ranch"
+    },
+    {
+      "second": 24,
+      "text": "Beef \u00b7 record highs"
+    },
+    {
+      "second": 30,
+      "text": "Cow herd \u00b7 65-yr low"
+    },
+    {
+      "second": 36,
+      "text": "Labor \u00b7 gone"
+    },
+    {
+      "second": 42,
+      "text": "Eyes \u00b7 fewer per acre"
+    },
+    {
+      "second": 48,
+      "text": "The herd has a nervous system. The rancher does not."
+    }
+  ],
+  "segments": [],
+  "fingerprint": "39606304d7dfd806762ec6a08801619e6310aa86bd390c2955d3f6d215906d50"
+}

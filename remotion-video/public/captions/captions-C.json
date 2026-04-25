@@ -1,0 +1,1456 @@
+{
+  "variant": "C",
+  "mode": "dense",
+  "emphasis": [],
+  "segments": [
+    {
+      "start": 0.0,
+      "end": 7.34,
+      "text": "I'm George, UNM senior, Drone-Op. Skyherd watches one ranch. Every fence, every trough, every cow.",
+      "words": [
+        {
+          "word": "I'm",
+          "start": 0.0,
+          "end": 0.32
+        },
+        {
+          "word": "George,",
+          "start": 0.32,
+          "end": 0.64
+        },
+        {
+          "word": "UNM",
+          "start": 1.04,
+          "end": 1.6
+        },
+        {
+          "word": "senior,",
+          "start": 1.6,
+          "end": 1.92
+        },
+        {
+          "word": "Drone",
+          "start": 2.2,
+          "end": 2.52
+        },
+        {
+          "word": "-Op.",
+          "start": 2.52,
+          "end": 2.76
+        },
+        {
+          "word": "Skyherd",
+          "start": 3.0,
+          "end": 3.54
+        },
+        {
+          "word": "watches",
+          "start": 3.54,
+          "end": 3.72
+        },
+        {
+          "word": "one",
+          "start": 3.72,
+          "end": 4.06
+        },
+        {
+          "word": "ranch.",
+          "start": 4.06,
+          "end": 4.34
+        },
+        {
+          "word": "Every",
+          "start": 4.88,
+          "end": 5.12
+        },
+        {
+          "word": "fence,",
+          "start": 5.12,
+          "end": 5.4
+        },
+        {
+          "word": "every",
+          "start": 5.92,
+          "end": 6.1
+        },
+        {
+          "word": "trough,",
+          "start": 6.1,
+          "end": 6.56
+        },
+        {
+          "word": "every",
+          "start": 6.88,
+          "end": 7.08
+        },
+        {
+          "word": "cow.",
+          "start": 7.08,
+          "end": 7.34
+        }
+      ]
+    },
+    {
+      "start": 7.967,
+      "end": 9.087,
+      "text": "Beef is at record highs.",
+      "words": [
+        {
+          "word": "Beef",
+          "start": 7.967,
+          "end": 8.147
+        },
+        {
+          "word": "is",
+          "start": 8.147,
+          "end": 8.347
+        },
+        {
+          "word": "at",
+          "start": 8.347,
+          "end": 8.447
+        },
+        {
+          "word": "record",
+          "start": 8.447,
+          "end": 8.707
+        },
+        {
+          "word": "highs.",
+          "start": 8.707,
+          "end": 9.087
+        }
+      ]
+    },
+    {
+      "start": 9.807,
+      "end": 12.367,
+      "text": "The American cow herd is at a 65-year low.",
+      "words": [
+        {
+          "word": "The",
+          "start": 9.807,
+          "end": 9.927
+        },
+        {
+          "word": "American",
+          "start": 9.927,
+          "end": 10.267
+        },
+        {
+          "word": "cow",
+          "start": 10.267,
+          "end": 10.607
+        },
+        {
+          "word": "herd",
+          "start": 10.607,
+          "end": 10.847
+        },
+        {
+          "word": "is",
+          "start": 10.847,
+          "end": 11.027
+        },
+        {
+          "word": "at",
+          "start": 11.027,
+          "end": 11.147
+        },
+        {
+          "word": "a",
+          "start": 11.147,
+          "end": 11.247
+        },
+        {
+          "word": "65",
+          "start": 11.247,
+          "end": 11.627
+        },
+        {
+          "word": "-year",
+          "start": 11.627,
+          "end": 12.007
+        },
+        {
+          "word": "low.",
+          "start": 12.007,
+          "end": 12.367
+        }
+      ]
+    },
+    {
+      "start": 12.987,
+      "end": 14.507,
+      "text": "Ranchers can't hire their way out.",
+      "words": [
+        {
+          "word": "Ranchers",
+          "start": 12.987,
+          "end": 13.327
+        },
+        {
+          "word": "can't",
+          "start": 13.327,
+          "end": 13.627
+        },
+        {
+          "word": "hire",
+          "start": 13.627,
+          "end": 13.827
+        },
+        {
+          "word": "their",
+          "start": 13.827,
+          "end": 14.027
+        },
+        {
+          "word": "way",
+          "start": 14.027,
+          "end": 14.247
+        },
+        {
+          "word": "out.",
+          "start": 14.247,
+          "end": 14.507
+        }
+      ]
+    },
+    {
+      "start": 15.007,
+      "end": 15.747,
+      "text": "Labor is gone.",
+      "words": [
+        {
+          "word": "Labor",
+          "start": 15.007,
+          "end": 15.207
+        },
+        {
+          "word": "is",
+          "start": 15.207,
+          "end": 15.447
+        },
+        {
+          "word": "gone.",
+          "start": 15.447,
+          "end": 15.747
+        }
+      ]
+    },
+    {
+      "start": 16.347,
+      "end": 17.447,
+      "text": "Ranchers are aging out.",
+      "words": [
+        {
+          "word": "Ranchers",
+          "start": 16.347,
+          "end": 16.687
+        },
+        {
+          "word": "are",
+          "start": 16.687,
+          "end": 16.807
+        },
+        {
+          "word": "aging",
+          "start": 16.807,
+          "end": 17.127
+        },
+        {
+          "word": "out.",
+          "start": 17.127,
+          "end": 17.447
+        }
+      ]
+    },
+    {
+      "start": 17.927,
+      "end": 21.247,
+      "text": "Every existing ranch has to do more with fewer eyes on it.",
+      "words": [
+        {
+          "word": "Every",
+          "start": 17.927,
+          "end": 18.187
+        },
+        {
+          "word": "existing",
+          "start": 18.187,
+          "end": 18.587
+        },
+        {
+          "word": "ranch",
+          "start": 18.587,
+          "end": 18.927
+        },
+        {
+          "word": "has",
+          "start": 18.927,
+          "end": 19.187
+        },
+        {
+          "word": "to",
+          "start": 19.187,
+          "end": 19.347
+        },
+        {
+          "word": "do",
+          "start": 19.347,
+          "end": 19.507
+        },
+        {
+          "word": "more",
+          "start": 19.507,
+          "end": 19.847
+        },
+        {
+          "word": "with",
+          "start": 19.847,
+          "end": 20.087
+        },
+        {
+          "word": "fewer",
+          "start": 20.087,
+          "end": 20.387
+        },
+        {
+          "word": "eyes",
+          "start": 20.387,
+          "end": 20.807
+        },
+        {
+          "word": "on",
+          "start": 20.807,
+          "end": 21.087
+        },
+        {
+          "word": "it.",
+          "start": 21.087,
+          "end": 21.247
+        }
+      ]
+    },
+    {
+      "start": 21.767,
+      "end": 23.407,
+      "text": "Coyotes don't read business hours.",
+      "words": [
+        {
+          "word": "Coyotes",
+          "start": 21.767,
+          "end": 22.127
+        },
+        {
+          "word": "don't",
+          "start": 22.127,
+          "end": 22.487
+        },
+        {
+          "word": "read",
+          "start": 22.487,
+          "end": 22.667
+        },
+        {
+          "word": "business",
+          "start": 22.667,
+          "end": 23.007
+        },
+        {
+          "word": "hours.",
+          "start": 23.007,
+          "end": 23.407
+        }
+      ]
+    },
+    {
+      "start": 24.187,
+      "end": 26.167,
+      "text": "Hale doesn't wait for the next vet visit.",
+      "words": [
+        {
+          "word": "Hale",
+          "start": 24.187,
+          "end": 24.367
+        },
+        {
+          "word": "doesn't",
+          "start": 24.367,
+          "end": 24.807
+        },
+        {
+          "word": "wait",
+          "start": 24.807,
+          "end": 24.987
+        },
+        {
+          "word": "for",
+          "start": 24.987,
+          "end": 25.167
+        },
+        {
+          "word": "the",
+          "start": 25.167,
+          "end": 25.287
+        },
+        {
+          "word": "next",
+          "start": 25.287,
+          "end": 25.547
+        },
+        {
+          "word": "vet",
+          "start": 25.547,
+          "end": 25.807
+        },
+        {
+          "word": "visit.",
+          "start": 25.807,
+          "end": 26.167
+        }
+      ]
+    },
+    {
+      "start": 26.707,
+      "end": 30.067,
+      "text": "A cow can be dying for 72 hours before anyone sees her.",
+      "words": [
+        {
+          "word": "A",
+          "start": 26.707,
+          "end": 26.827
+        },
+        {
+          "word": "cow",
+          "start": 26.827,
+          "end": 27.027
+        },
+        {
+          "word": "can",
+          "start": 27.027,
+          "end": 27.227
+        },
+        {
+          "word": "be",
+          "start": 27.227,
+          "end": 27.347
+        },
+        {
+          "word": "dying",
+          "start": 27.347,
+          "end": 27.667
+        },
+        {
+          "word": "for",
+          "start": 27.667,
+          "end": 27.887
+        },
+        {
+          "word": "72",
+          "start": 27.887,
+          "end": 28.327
+        },
+        {
+          "word": "hours",
+          "start": 28.327,
+          "end": 28.767
+        },
+        {
+          "word": "before",
+          "start": 28.767,
+          "end": 29.087
+        },
+        {
+          "word": "anyone",
+          "start": 29.087,
+          "end": 29.527
+        },
+        {
+          "word": "sees",
+          "start": 29.527,
+          "end": 29.827
+        },
+        {
+          "word": "her.",
+          "start": 29.827,
+          "end": 30.067
+        }
+      ]
+    },
+    {
+      "start": 30.567,
+      "end": 32.227,
+      "text": "The herd already has a nervous system.",
+      "words": [
+        {
+          "word": "The",
+          "start": 30.567,
+          "end": 30.647
+        },
+        {
+          "word": "herd",
+          "start": 30.647,
+          "end": 30.827
+        },
+        {
+          "word": "already",
+          "start": 30.827,
+          "end": 31.227
+        },
+        {
+          "word": "has",
+          "start": 31.227,
+          "end": 31.467
+        },
+        {
+          "word": "a",
+          "start": 31.467,
+          "end": 31.587
+        },
+        {
+          "word": "nervous",
+          "start": 31.587,
+          "end": 31.787
+        },
+        {
+          "word": "system.",
+          "start": 31.787,
+          "end": 32.227
+        }
+      ]
+    },
+    {
+      "start": 32.667,
+      "end": 34.967,
+      "text": "The rancher does not, so we built one.",
+      "words": [
+        {
+          "word": "The",
+          "start": 32.667,
+          "end": 32.767
+        },
+        {
+          "word": "rancher",
+          "start": 32.767,
+          "end": 33.127
+        },
+        {
+          "word": "does",
+          "start": 33.127,
+          "end": 33.287
+        },
+        {
+          "word": "not,",
+          "start": 33.287,
+          "end": 33.527
+        },
+        {
+          "word": "so",
+          "start": 34.107,
+          "end": 34.307
+        },
+        {
+          "word": "we",
+          "start": 34.307,
+          "end": 34.467
+        },
+        {
+          "word": "built",
+          "start": 34.467,
+          "end": 34.707
+        },
+        {
+          "word": "one.",
+          "start": 34.707,
+          "end": 34.967
+        }
+      ]
+    },
+    {
+      "start": 35.631,
+      "end": 38.851,
+      "text": "Heads up, Coyote at the South Fence, drones en route.",
+      "words": [
+        {
+          "word": "Heads",
+          "start": 35.631,
+          "end": 35.931
+        },
+        {
+          "word": "up,",
+          "start": 35.931,
+          "end": 36.131
+        },
+        {
+          "word": "Coyote",
+          "start": 36.531,
+          "end": 36.951
+        },
+        {
+          "word": "at",
+          "start": 36.951,
+          "end": 37.131
+        },
+        {
+          "word": "the",
+          "start": 37.131,
+          "end": 37.211
+        },
+        {
+          "word": "South",
+          "start": 37.211,
+          "end": 37.411
+        },
+        {
+          "word": "Fence,",
+          "start": 37.411,
+          "end": 37.851
+        },
+        {
+          "word": "drones",
+          "start": 38.131,
+          "end": 38.371
+        },
+        {
+          "word": "en",
+          "start": 38.371,
+          "end": 38.651
+        },
+        {
+          "word": "route.",
+          "start": 38.651,
+          "end": 38.851
+        }
+      ]
+    },
+    {
+      "start": 39.288,
+      "end": 45.348,
+      "text": "Cow A014, eye irritation, 83% confidence, vet packets on your phone.",
+      "words": [
+        {
+          "word": "Cow",
+          "start": 39.288,
+          "end": 39.508
+        },
+        {
+          "word": "A014,",
+          "start": 39.508,
+          "end": 40.828
+        },
+        {
+          "word": "eye",
+          "start": 41.208,
+          "end": 41.488
+        },
+        {
+          "word": "irritation,",
+          "start": 41.488,
+          "end": 42.008
+        },
+        {
+          "word": "83",
+          "start": 42.368,
+          "end": 42.728
+        },
+        {
+          "word": "%",
+          "start": 42.728,
+          "end": 43.088
+        },
+        {
+          "word": "confidence,",
+          "start": 43.088,
+          "end": 43.588
+        },
+        {
+          "word": "vet",
+          "start": 44.068,
+          "end": 44.308
+        },
+        {
+          "word": "packets",
+          "start": 44.308,
+          "end": 44.688
+        },
+        {
+          "word": "on",
+          "start": 44.688,
+          "end": 44.948
+        },
+        {
+          "word": "your",
+          "start": 44.948,
+          "end": 45.048
+        },
+        {
+          "word": "phone.",
+          "start": 45.048,
+          "end": 45.348
+        }
+      ]
+    },
+    {
+      "start": 45.793,
+      "end": 48.093,
+      "text": "Cow 117 is going into labor.",
+      "words": [
+        {
+          "word": "Cow",
+          "start": 45.793,
+          "end": 46.053
+        },
+        {
+          "word": "117",
+          "start": 46.053,
+          "end": 46.993
+        },
+        {
+          "word": "is",
+          "start": 46.993,
+          "end": 47.293
+        },
+        {
+          "word": "going",
+          "start": 47.293,
+          "end": 47.513
+        },
+        {
+          "word": "into",
+          "start": 47.513,
+          "end": 47.773
+        },
+        {
+          "word": "labor.",
+          "start": 47.773,
+          "end": 48.093
+        }
+      ]
+    },
+    {
+      "start": 48.713,
+      "end": 50.953,
+      "text": "Pre-labor signals flagged priority.",
+      "words": [
+        {
+          "word": "Pre",
+          "start": 48.713,
+          "end": 48.893
+        },
+        {
+          "word": "-labor",
+          "start": 48.893,
+          "end": 49.173
+        },
+        {
+          "word": "signals",
+          "start": 49.173,
+          "end": 49.573
+        },
+        {
+          "word": "flagged",
+          "start": 49.573,
+          "end": 50.513
+        },
+        {
+          "word": "priority.",
+          "start": 50.513,
+          "end": 50.953
+        }
+      ]
+    },
+    {
+      "start": 51.487,
+      "end": 54.727,
+      "text": "Hail in 45 minutes, moving the herd to Shelter 2.",
+      "words": [
+        {
+          "word": "Hail",
+          "start": 51.487,
+          "end": 51.727
+        },
+        {
+          "word": "in",
+          "start": 51.727,
+          "end": 51.907
+        },
+        {
+          "word": "45",
+          "start": 51.907,
+          "end": 52.267
+        },
+        {
+          "word": "minutes,",
+          "start": 52.267,
+          "end": 52.727
+        },
+        {
+          "word": "moving",
+          "start": 53.267,
+          "end": 53.567
+        },
+        {
+          "word": "the",
+          "start": 53.567,
+          "end": 53.767
+        },
+        {
+          "word": "herd",
+          "start": 53.767,
+          "end": 53.967
+        },
+        {
+          "word": "to",
+          "start": 53.967,
+          "end": 54.127
+        },
+        {
+          "word": "Shelter",
+          "start": 54.127,
+          "end": 54.467
+        },
+        {
+          "word": "2.",
+          "start": 54.467,
+          "end": 54.727
+        }
+      ]
+    },
+    {
+      "start": 55.144,
+      "end": 61.784,
+      "text": "Five agents, idle until a sensor wakes them, skills loaded per task, cost ticker freezes",
+      "words": [
+        {
+          "word": "Five",
+          "start": 55.144,
+          "end": 55.424
+        },
+        {
+          "word": "agents,",
+          "start": 55.424,
+          "end": 55.984
+        },
+        {
+          "word": "idle",
+          "start": 56.544,
+          "end": 56.844
+        },
+        {
+          "word": "until",
+          "start": 56.844,
+          "end": 57.164
+        },
+        {
+          "word": "a",
+          "start": 57.164,
+          "end": 57.344
+        },
+        {
+          "word": "sensor",
+          "start": 57.344,
+          "end": 57.624
+        },
+        {
+          "word": "wakes",
+          "start": 57.624,
+          "end": 57.964
+        },
+        {
+          "word": "them,",
+          "start": 57.964,
+          "end": 58.264
+        },
+        {
+          "word": "skills",
+          "start": 58.644,
+          "end": 58.924
+        },
+        {
+          "word": "loaded",
+          "start": 58.924,
+          "end": 59.344
+        },
+        {
+          "word": "per",
+          "start": 59.344,
+          "end": 59.624
+        },
+        {
+          "word": "task,",
+          "start": 59.624,
+          "end": 60.164
+        },
+        {
+          "word": "cost",
+          "start": 60.604,
+          "end": 60.964
+        },
+        {
+          "word": "ticker",
+          "start": 60.964,
+          "end": 61.344
+        },
+        {
+          "word": "freezes",
+          "start": 61.344,
+          "end": 61.784
+        }
+      ]
+    },
+    {
+      "start": 61.784,
+      "end": 62.604,
+      "text": "between events.",
+      "words": [
+        {
+          "word": "between",
+          "start": 61.784,
+          "end": 62.064
+        },
+        {
+          "word": "events.",
+          "start": 62.064,
+          "end": 62.604
+        }
+      ]
+    },
+    {
+      "start": 63.112,
+      "end": 66.092,
+      "text": "Each agent runs on its own managed agent session.",
+      "words": [
+        {
+          "word": "Each",
+          "start": 63.112,
+          "end": 63.472
+        },
+        {
+          "word": "agent",
+          "start": 63.472,
+          "end": 63.832
+        },
+        {
+          "word": "runs",
+          "start": 63.832,
+          "end": 64.112
+        },
+        {
+          "word": "on",
+          "start": 64.112,
+          "end": 64.372
+        },
+        {
+          "word": "its",
+          "start": 64.372,
+          "end": 64.532
+        },
+        {
+          "word": "own",
+          "start": 64.532,
+          "end": 64.752
+        },
+        {
+          "word": "managed",
+          "start": 64.752,
+          "end": 65.192
+        },
+        {
+          "word": "agent",
+          "start": 65.192,
+          "end": 65.652
+        },
+        {
+          "word": "session.",
+          "start": 65.652,
+          "end": 66.092
+        }
+      ]
+    },
+    {
+      "start": 66.712,
+      "end": 70.692,
+      "text": "Clawed beta header, prompt cached system plus skills prefix.",
+      "words": [
+        {
+          "word": "Clawed",
+          "start": 66.712,
+          "end": 67.032
+        },
+        {
+          "word": "beta",
+          "start": 67.032,
+          "end": 67.192
+        },
+        {
+          "word": "header,",
+          "start": 67.192,
+          "end": 67.532
+        },
+        {
+          "word": "prompt",
+          "start": 67.972,
+          "end": 68.232
+        },
+        {
+          "word": "cached",
+          "start": 68.232,
+          "end": 68.752
+        },
+        {
+          "word": "system",
+          "start": 68.752,
+          "end": 69.252
+        },
+        {
+          "word": "plus",
+          "start": 69.252,
+          "end": 69.592
+        },
+        {
+          "word": "skills",
+          "start": 69.592,
+          "end": 70.132
+        },
+        {
+          "word": "prefix.",
+          "start": 70.132,
+          "end": 70.692
+        }
+      ]
+    },
+    {
+      "start": 71.712,
+      "end": 75.052,
+      "text": "Idle pause billing means a sleeping agent costs nothing.",
+      "words": [
+        {
+          "word": "Idle",
+          "start": 71.712,
+          "end": 72.172
+        },
+        {
+          "word": "pause",
+          "start": 72.172,
+          "end": 72.472
+        },
+        {
+          "word": "billing",
+          "start": 72.472,
+          "end": 72.872
+        },
+        {
+          "word": "means",
+          "start": 72.872,
+          "end": 73.272
+        },
+        {
+          "word": "a",
+          "start": 73.272,
+          "end": 73.452
+        },
+        {
+          "word": "sleeping",
+          "start": 73.452,
+          "end": 73.712
+        },
+        {
+          "word": "agent",
+          "start": 73.712,
+          "end": 74.132
+        },
+        {
+          "word": "costs",
+          "start": 74.132,
+          "end": 74.572
+        },
+        {
+          "word": "nothing.",
+          "start": 74.572,
+          "end": 75.052
+        }
+      ]
+    },
+    {
+      "start": 75.952,
+      "end": 81.052,
+      "text": "We also let opus 4.7 author the on-screen captions you're reading right now.",
+      "words": [
+        {
+          "word": "We",
+          "start": 75.952,
+          "end": 76.152
+        },
+        {
+          "word": "also",
+          "start": 76.152,
+          "end": 76.452
+        },
+        {
+          "word": "let",
+          "start": 76.452,
+          "end": 76.792
+        },
+        {
+          "word": "opus",
+          "start": 76.792,
+          "end": 77.232
+        },
+        {
+          "word": "4",
+          "start": 77.232,
+          "end": 77.472
+        },
+        {
+          "word": ".7",
+          "start": 77.472,
+          "end": 78.112
+        },
+        {
+          "word": "author",
+          "start": 78.112,
+          "end": 78.492
+        },
+        {
+          "word": "the",
+          "start": 78.492,
+          "end": 78.712
+        },
+        {
+          "word": "on",
+          "start": 78.712,
+          "end": 78.992
+        },
+        {
+          "word": "-screen",
+          "start": 78.992,
+          "end": 79.212
+        },
+        {
+          "word": "captions",
+          "start": 79.212,
+          "end": 79.712
+        },
+        {
+          "word": "you're",
+          "start": 79.712,
+          "end": 80.132
+        },
+        {
+          "word": "reading",
+          "start": 80.132,
+          "end": 80.312
+        },
+        {
+          "word": "right",
+          "start": 80.312,
+          "end": 80.592
+        },
+        {
+          "word": "now.",
+          "start": 80.592,
+          "end": 81.052
+        }
+      ]
+    },
+    {
+      "start": 81.612,
+      "end": 86.552,
+      "text": "Per word, semantic styling generated as JSON, committed to the repo.",
+      "words": [
+        {
+          "word": "Per",
+          "start": 81.612,
+          "end": 81.912
+        },
+        {
+          "word": "word,",
+          "start": 81.912,
+          "end": 82.292
+        },
+        {
+          "word": "semantic",
+          "start": 82.432,
+          "end": 82.792
+        },
+        {
+          "word": "styling",
+          "start": 82.792,
+          "end": 83.412
+        },
+        {
+          "word": "generated",
+          "start": 83.412,
+          "end": 84.052
+        },
+        {
+          "word": "as",
+          "start": 84.052,
+          "end": 84.532
+        },
+        {
+          "word": "JSON,",
+          "start": 84.532,
+          "end": 84.992
+        },
+        {
+          "word": "committed",
+          "start": 85.612,
+          "end": 85.932
+        },
+        {
+          "word": "to",
+          "start": 85.932,
+          "end": 86.172
+        },
+        {
+          "word": "the",
+          "start": 86.172,
+          "end": 86.272
+        },
+        {
+          "word": "repo.",
+          "start": 86.272,
+          "end": 86.552
+        }
+      ]
+    },
+    {
+      "start": 87.171,
+      "end": 91.711,
+      "text": "1106 tests, 87% coverage, every tool call signed,",
+      "words": [
+        {
+          "word": "1106",
+          "start": 87.171,
+          "end": 87.891
+        },
+        {
+          "word": "tests,",
+          "start": 87.891,
+          "end": 88.451
+        },
+        {
+          "word": "87",
+          "start": 88.771,
+          "end": 89.191
+        },
+        {
+          "word": "%",
+          "start": 89.191,
+          "end": 89.551
+        },
+        {
+          "word": "coverage,",
+          "start": 89.551,
+          "end": 90.031
+        },
+        {
+          "word": "every",
+          "start": 90.411,
+          "end": 90.651
+        },
+        {
+          "word": "tool",
+          "start": 90.651,
+          "end": 90.911
+        },
+        {
+          "word": "call",
+          "start": 90.911,
+          "end": 91.231
+        },
+        {
+          "word": "signed,",
+          "start": 91.231,
+          "end": 91.711
+        }
+      ]
+    },
+    {
+      "start": 92.731,
+      "end": 95.891,
+      "text": "ED25519 Merkle chain, replay from a seed,",
+      "words": [
+        {
+          "word": "ED25519",
+          "start": 92.731,
+          "end": 93.471
+        },
+        {
+          "word": "Merkle",
+          "start": 93.471,
+          "end": 93.991
+        },
+        {
+          "word": "chain,",
+          "start": 93.991,
+          "end": 94.371
+        },
+        {
+          "word": "replay",
+          "start": 94.771,
+          "end": 95.071
+        },
+        {
+          "word": "from",
+          "start": 95.071,
+          "end": 95.391
+        },
+        {
+          "word": "a",
+          "start": 95.391,
+          "end": 95.551
+        },
+        {
+          "word": "seed,",
+          "start": 95.551,
+          "end": 95.891
+        }
+      ]
+    },
+    {
+      "start": 96.311,
+      "end": 99.111,
+      "text": "same input, same bytes, every time.",
+      "words": [
+        {
+          "word": "same",
+          "start": 96.311,
+          "end": 96.571
+        },
+        {
+          "word": "input,",
+          "start": 96.571,
+          "end": 96.971
+        },
+        {
+          "word": "same",
+          "start": 97.331,
+          "end": 97.471
+        },
+        {
+          "word": "bytes,",
+          "start": 97.471,
+          "end": 97.891
+        },
+        {
+          "word": "every",
+          "start": 98.251,
+          "end": 98.591
+        },
+        {
+          "word": "time.",
+          "start": 98.591,
+          "end": 99.111
+        }
+      ]
+    },
+    {
+      "start": 99.657,
+      "end": 103.137,
+      "text": "Beef at record highs, cow herd at a 65-year low.",
+      "words": [
+        {
+          "word": "Beef",
+          "start": 99.657,
+          "end": 99.877
+        },
+        {
+          "word": "at",
+          "start": 99.877,
+          "end": 100.077
+        },
+        {
+          "word": "record",
+          "start": 100.077,
+          "end": 100.337
+        },
+        {
+          "word": "highs,",
+          "start": 100.337,
+          "end": 100.697
+        },
+        {
+          "word": "cow",
+          "start": 101.097,
+          "end": 101.377
+        },
+        {
+          "word": "herd",
+          "start": 101.377,
+          "end": 101.717
+        },
+        {
+          "word": "at",
+          "start": 101.717,
+          "end": 101.917
+        },
+        {
+          "word": "a",
+          "start": 101.917,
+          "end": 102.017
+        },
+        {
+          "word": "65",
+          "start": 102.017,
+          "end": 102.457
+        },
+        {
+          "word": "-year",
+          "start": 102.457,
+          "end": 102.817
+        },
+        {
+          "word": "low.",
+          "start": 102.817,
+          "end": 103.137
+        }
+      ]
+    },
+    {
+      "start": 103.577,
+      "end": 105.917,
+      "text": "Now, finally, the ranch can watch itself.",
+      "words": [
+        {
+          "word": "Now,",
+          "start": 103.577,
+          "end": 103.777
+        },
+        {
+          "word": "finally,",
+          "start": 104.117,
+          "end": 104.397
+        },
+        {
+          "word": "the",
+          "start": 104.857,
+          "end": 104.897
+        },
+        {
+          "word": "ranch",
+          "start": 104.897,
+          "end": 105.097
+        },
+        {
+          "word": "can",
+          "start": 105.097,
+          "end": 105.337
+        },
+        {
+          "word": "watch",
+          "start": 105.337,
+          "end": 105.577
+        },
+        {
+          "word": "itself.",
+          "start": 105.577,
+          "end": 105.917
+        }
+      ]
+    }
+  ],
+  "fingerprint": "083029c84be6f6fdea4ae6bd57bed20523a4fb022241928324e938731530d7ee"
+}
