@@ -1,11 +1,12 @@
 /**
- * v4 — Variant C 9-scene layout (3:00 / 180s / 5400 frames @ 30fps).
+ * v5 — Variant C 9-scene layout (3:00 / 180s / 5400 frames @ 30fps).
+ * Wave 2E: scene durations redistributed to absorb VO overflow.
  *
- * Act 1 Hook  (18s / 540f)  : cold-open slam (3s) + hook VO (15s)
- * Act 2 Story (34s / 1020f) : TraditionalWay (17s) + NervousSystemStack (17s)
- * Act 3 Demo  (58s / 1740f) : live coyote dashboard (40s) + ScenarioGrid (18s)
- * Act 4 Sub   (42s / 1260f) : SoftwareMVPBlocks (20s) + VisionTimeline (22s)
- * Act 5 Close (28s / 840f)  : AIBodyClose (23s) + wordmark tail (5s)
+ * Act 1 Hook  (25s / 750f)  : cold-open slam (3s) + hook VO (22s)
+ * Act 2 Story (32s / 960f)  : TraditionalWay (16s) + NervousSystemStack (16s)
+ * Act 3 Demo  (57s / 1710f) : live coyote dashboard (32s) + ScenarioGrid (25s)
+ * Act 4 Sub   (44s / 1320f) : SoftwareMVPBlocks (22s) + VisionTimeline (22s)
+ * Act 5 Close (22s / 660f)  : AIBodyClose (18s) + wordmark tail (4s)
  *
  * Each scene's animations are relative to its Series.Sequence mount frame.
  * VO Audio tags fire at scene-relative frame 0.
@@ -34,7 +35,6 @@ import {
   ACCENT_MAP,
   type Accent,
   AnchorChip,
-  KineticPunch,
   LowerThird,
   useFadeInOut,
 } from "./shared";
@@ -49,7 +49,8 @@ import brollCRaw from "../../data/broll-C.json";
 const BROLL_C: BrollCut[] = (brollCRaw as { cuts: BrollCut[] }).cuts;
 
 // Global act offsets (seconds) used by BrollTrack
-const C_ACT5_START = 160;
+// Wave 2E: act5 starts at frame 4740 = 158s (coldOpen3+hook22+trad16+ans16+coyote32+grid25+mvp22+vision22)
+const C_ACT5_START = 158;
 
 const FPS = 30;
 
@@ -185,24 +186,131 @@ const ColdOpenAerial = () => {
   );
 };
 
-// ── Scene 2: Hook + Intro VO (15s / 450 frames) ───────────────────────────────
+// ── Scene 2: Hook VO (22s / 660 frames) ──────────────────────────────────────
+//
+// VO text: "I'm George, senior at UNM. I've spent a lot of nights on New Mexico
+// ranches watching ranchers do impossible work. Right now beef prices are at
+// record highs — but the American cow herd is at a sixty-five-year low. Labor's
+// gone. Ranchers are aging out. Every ranch left has to do more, with fewer
+// people watching it."
+//
+// Key callout moments (approximate VO timestamps → frames):
+//   "beef prices"        ~7s  → frame 210
+//   "record highs"       ~8s  → frame 240
+//   "sixty-five-year low"~11s → frame 330
+//   "aging out"          ~15s → frame 450
+//   "fewer people"       ~18s → frame 540
+
+// Pulse callout: a number/phrase that scales in and holds for ~2s
+type CalloutProps = {
+  text: string;
+  subtext?: string;
+  appearFrame: number;
+  color?: string;
+  size?: number;
+};
+
+const HookCallout = ({ text, subtext, appearFrame, color = ACCENT_MAP.dust, size = 96 }: CalloutProps) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const p = spring({
+    frame: frame - appearFrame,
+    fps,
+    config: { damping: 80, stiffness: 280, mass: 0.5 },
+  });
+  const scale = interpolate(p, [0, 1], [0.7, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const opacity = interpolate(p, [0, 1], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  // Hold then fade out after 2.5s
+  const exitO = interpolate(frame, [appearFrame + 75, appearFrame + 90], [1, 0], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  const finalO = Math.min(opacity, exitO);
+
+  return (
+    <div
+      style={{
+        position: "absolute",
+        top: "50%",
+        left: "50%",
+        transform: `translate(-50%, -50%) scale(${scale})`,
+        opacity: finalO,
+        textAlign: "center",
+        pointerEvents: "none",
+      }}
+    >
+      <div
+        style={{
+          fontFamily: "Inter, sans-serif",
+          fontWeight: 800,
+          fontSize: size,
+          color,
+          letterSpacing: "-0.03em",
+          lineHeight: 1.0,
+          textShadow: "0 6px 40px rgba(0,0,0,0.8)",
+        }}
+      >
+        {text}
+      </div>
+      {subtext && (
+        <div
+          style={{
+            fontFamily: "Inter, sans-serif",
+            fontWeight: 600,
+            fontSize: size * 0.28,
+            color: "rgb(200 210 220)",
+            letterSpacing: "0.1em",
+            textTransform: "uppercase",
+            marginTop: 10,
+            textShadow: "0 3px 18px rgba(0,0,0,0.7)",
+          }}
+        >
+          {subtext}
+        </div>
+      )}
+    </div>
+  );
+};
 
 const HookIntroVo = () => {
   const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
   const opacity = useFadeInOut(durationInFrames, 18, 18);
-  const zoom = interpolate(frame, [0, durationInFrames], [1.0, 1.08]);
+  const zoom = interpolate(frame, [0, durationInFrames], [1.0, 1.06]);
+
+  // ID badge fades in early and stays
+  const badgeO = interpolate(frame, [20, 48], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+
+  // "beef prices / record highs" callout at ~7s
+  const BEEF_F = 210;
+  // "65-year low" callout at ~11s
+  const LOW_F = 330;
+  // "aging out" callout at ~15s
+  const AGING_F = 450;
+  // "fewer people" callout at ~18s
+  const FEWER_F = 540;
+
+  // Active callout: only one is visible at a time — track which window we're in
+  const showBeef  = frame >= BEEF_F  && frame < BEEF_F  + 90;
+  const showLow   = frame >= LOW_F   && frame < LOW_F   + 90;
+  const showAging = frame >= AGING_F && frame < AGING_F + 90;
+  const showFewer = frame >= FEWER_F && frame < FEWER_F + 90;
+  const anyCallout = showBeef || showLow || showAging || showFewer;
+
+  // Bottom tagline: visible when no callout is active and after frame 48
+  const taglineO = interpolate(frame, [48, 70], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  }) * (anyCallout ? 0 : 1);
 
   return (
     <AbsoluteFill style={{ backgroundColor: "rgb(8 10 14)", opacity }}>
       <Audio src={staticFile("voiceover/vo-c-hook.mp3")} />
-      <div
-        style={{
-          width: "100%",
-          height: "100%",
-          transform: `scale(${zoom})`,
-        }}
-      >
+      {/* Slow Ken-Burns aerial */}
+      <div style={{ width: "100%", height: "100%", transform: `scale(${zoom})`, overflow: "hidden" }}>
         <Video
           src={staticFile("clips/ambient_establish.mp4")}
           startFrom={0}
@@ -212,90 +320,59 @@ const HookIntroVo = () => {
             width: "100%",
             height: "100%",
             objectFit: "cover",
-            filter: "saturate(0.92) contrast(1.04)",
+            filter: "saturate(0.88) contrast(1.06) brightness(0.52)",
           }}
         />
       </div>
+      {/* Bottom gradient vignette */}
       <AbsoluteFill
         style={{
           background:
-            "linear-gradient(180deg, rgba(10,12,16,0) 50%, rgba(10,12,16,0.85) 100%)",
+            "linear-gradient(180deg, rgba(6,8,12,0.35) 0%, rgba(6,8,12,0) 35%, rgba(6,8,12,0) 55%, rgba(6,8,12,0.88) 100%)",
         }}
       />
-      {/* Kinetic typography: key phrases appear over the VO */}
-      <KineticPunch
-        words={[
-          {
-            text: "$4.17",
-            appearFrame: 30,
-            fastFade: 6,
-            scaleFrom: 1.4,
-            weight: 800,
-            size: 200,
-            color: ACCENT_MAP.dust,
-          },
-          {
-            text: "/ week",
-            appearFrame: 60,
-            weight: 500,
-            size: 48,
-            color: "rgb(60 72 56)",
-          },
-          {
-            text: "24 / 7",
-            appearFrame: 120,
-            weight: 800,
-            size: 88,
-            color: ACCENT_MAP.sage,
-          },
-          {
-            text: "nervous system",
-            appearFrame: 160,
-            weight: 800,
-            size: 60,
-            color: ACCENT_MAP.sage,
-          },
-          {
-            text: "10,000-acre ranch",
-            appearFrame: 200,
-            weight: 600,
-            size: 42,
-            color: "rgb(60 72 56)",
-          },
-        ]}
-      />
+
+      {/* Callout pulses — one at a time, centered */}
+      {showBeef  && <HookCallout text="Record Highs"   subtext="Beef prices · 2026" appearFrame={BEEF_F}  color={ACCENT_MAP.dust} size={110} />}
+      {showLow   && <HookCallout text="65-Year Low"    subtext="US cow herd"        appearFrame={LOW_F}   color={ACCENT_MAP.warn} size={120} />}
+      {showAging && <HookCallout text="Aging Out"      subtext="Ranch labor"        appearFrame={AGING_F} color={ACCENT_MAP.thermal} size={100} />}
+      {showFewer && <HookCallout text="Fewer People"   subtext="More acres to cover" appearFrame={FEWER_F} color={ACCENT_MAP.sage} size={100} />}
+
+      {/* Bottom ID + tagline — hidden while callout is active */}
       <div
         style={{
           position: "absolute",
-          bottom: 110,
+          bottom: 100,
           left: 90,
+          right: 90,
           fontFamily: "Inter, sans-serif",
           color: "rgb(236 239 244)",
-          opacity: interpolate(frame, [25, 55], [0, 1], {
-            extrapolateLeft: "clamp",
-            extrapolateRight: "clamp",
-          }),
+          opacity: Math.min(badgeO, taglineO > 0 ? 1 : badgeO),
         }}
       >
         <div
           style={{
-            fontSize: 14,
+            fontSize: 13,
             color: ACCENT_MAP.sage,
-            letterSpacing: "0.34em",
+            letterSpacing: "0.36em",
             textTransform: "uppercase",
-            fontWeight: 600,
-            marginBottom: 10,
+            fontWeight: 700,
+            marginBottom: 12,
+            opacity: badgeO,
           }}
         >
-          George Teifel · UNM · Part 107
+          George Teifel · UNM · Part 107 Certified
         </div>
         <div
           style={{
-            fontSize: 38,
-            fontWeight: 700,
-            letterSpacing: "-0.012em",
-            maxWidth: 1200,
-            lineHeight: 1.1,
+            fontSize: 44,
+            fontWeight: 800,
+            letterSpacing: "-0.018em",
+            maxWidth: 1100,
+            lineHeight: 1.08,
+            color: "rgb(236 239 244)",
+            textShadow: "0 4px 28px rgba(0,0,0,0.7)",
+            opacity: taglineO,
           }}
         >
           Every fence. Every trough. Every cow.
@@ -309,7 +386,7 @@ const HookIntroVo = () => {
 
 export const CAct1Hook = () => {
   const COLD = C_LAYOUT.act1.coldOpenSeconds * FPS; // 3s = 90f
-  const HOOK = C_LAYOUT.act1.hookSeconds * FPS;     // 15s = 450f
+  const HOOK = C_LAYOUT.act1.hookSeconds * FPS;     // 22s = 660f
 
   return (
     <AbsoluteFill>
@@ -331,8 +408,8 @@ export const CAct1Hook = () => {
 // ── Act 2 Export ──────────────────────────────────────────────────────────────
 
 export const CAct2Story = () => {
-  const TRAD = C_LAYOUT.act2.traditionalSeconds * FPS; // 17s = 510f
-  const ANS  = C_LAYOUT.act2.answerSeconds * FPS;      // 17s = 510f
+  const TRAD = C_LAYOUT.act2.traditionalSeconds * FPS; // 16s = 480f
+  const ANS  = C_LAYOUT.act2.answerSeconds * FPS;      // 16s = 480f
 
   return (
     <AbsoluteFill>
@@ -506,8 +583,8 @@ const CoyoteDashboard = () => {
 // ── Act 3 Export ──────────────────────────────────────────────────────────────
 
 export const CAct3Demo = () => {
-  const COYOTE = C_LAYOUT.act3.coyoteSeconds * FPS; // 40s = 1200f
-  const GRID   = C_LAYOUT.act3.gridSeconds * FPS;   // 18s = 540f
+  const COYOTE = C_LAYOUT.act3.coyoteSeconds * FPS; // 32s = 960f
+  const GRID   = C_LAYOUT.act3.gridSeconds * FPS;   // 25s = 750f
 
   return (
     <AbsoluteFill>
@@ -529,7 +606,7 @@ export const CAct3Demo = () => {
 // ── Act 4 Export ──────────────────────────────────────────────────────────────
 
 export const CAct4Substance = () => {
-  const MVP    = C_LAYOUT.act4.mvpSeconds * FPS;    // 20s = 600f
+  const MVP    = C_LAYOUT.act4.mvpSeconds * FPS;    // 22s = 660f
   const VISION = C_LAYOUT.act4.visionSeconds * FPS; // 22s = 660f
 
   return (
@@ -667,8 +744,8 @@ const CCloseWordmark = () => {
 // ── Act 5 Export ──────────────────────────────────────────────────────────────
 
 export const CAct5Close = () => {
-  const AIBODY   = C_LAYOUT.act5.aibodySeconds * FPS;   // 23s = 690f
-  const WORDMARK = C_LAYOUT.act5.wordmarkSeconds * FPS; // 5s = 150f
+  const AIBODY   = C_LAYOUT.act5.aibodySeconds * FPS;   // 18s = 540f
+  const WORDMARK = C_LAYOUT.act5.wordmarkSeconds * FPS; // 4s = 120f
 
   return (
     <AbsoluteFill>
