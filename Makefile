@@ -1,4 +1,4 @@
-.PHONY: setup sim demo dashboard dashboard-mock test lint format typecheck clean ci sitl-up sitl-down bus-up bus-down mosquitto-up mosquitto-down mesh-smoke one-pager hardware-demo hardware-demo-sim hardware-demo-sim-down h2-smoke h3-smoke h4-smoke h4-docs mavic-bridge f3-bridge drone-smoke sitl-smoke determinism-3x gate-check voice-demo rehearsal record-ready preflight laptop-drone-smoke edge-pi-setup edge-galileo-setup video-record-clips video-pipeline video-iterate video-iterate-A video-iterate-B video-iterate-C video-iterate-all video-loop video-render video-captions video-captions-A video-captions-B video-captions-C video-style-captions video-style-captions-A video-style-captions-B video-style-captions-C video-broll-sync
+.PHONY: setup sim demo dashboard dashboard-mock test lint format typecheck clean ci sitl-up sitl-down bus-up bus-down mosquitto-up mosquitto-down mesh-smoke one-pager hardware-demo hardware-demo-sim hardware-demo-sim-down h2-smoke h3-smoke h4-smoke h4-docs mavic-bridge f3-bridge drone-smoke sitl-smoke determinism-3x gate-check voice-demo rehearsal record-ready preflight laptop-drone-smoke edge-pi-setup edge-galileo-setup video-record-clips video-pipeline video-iterate video-iterate-A video-iterate-B video-iterate-C video-iterate-all video-loop video-render video-captions video-captions-A video-captions-B video-captions-C video-style-captions video-style-captions-A video-style-captions-B video-style-captions-C video-broll-sync video-master
 
 SEED ?= 42
 SCENARIO ?= all
@@ -336,3 +336,51 @@ video-broll-sync:  ## Phase1: regenerate remotion-video/src/data/broll-{A,B,C}.j
 		remotion-video/src/data/broll-C.json \
 		--emit-broll-track
 	@echo "video-broll-sync: broll-A/B/C.json regenerated from cinematic EDLs"
+
+# ---------------------------------------------------------------------------
+# Phase 6 S3: post-render two-pass loudnorm mastering + ducking verification.
+# Usage: make video-master MP4=out/iter-3/A-iter3.mp4
+#   Produces: out/iter-3/A-iter3.mastered.mp4  (loudnorm'd, -16 LUFS, AAC 192k)
+#             out/iter-3/A-iter3.mastered.mp4.loudnorm.json  (ffmpeg pass-1 stats)
+#             out/iter-3/A-iter3.mastered.vo-segments.json   (VO window sidecar)
+# ---------------------------------------------------------------------------
+
+MP4 ?= out/skyherd-demo.mp4
+
+video-master:  ## VIDEO-MASTER: two-pass loudnorm + ducking verify on a rendered MP4
+	@if [ -z "$(MP4)" ] || [ ! -f "$(MP4)" ]; then \
+		echo "ERROR: MP4=$(MP4) not found. Usage: make video-master MP4=out/iter-N/X-iterN.mp4"; \
+		exit 1; \
+	fi
+	@OUTBASE="$$(echo "$(MP4)" | sed 's/\.mp4$$//')"; \
+	MASTERED="$${OUTBASE}.mastered.mp4"; \
+	STATS_RAW="$${OUTBASE}.loudnorm-pass1.txt"; \
+	STATS_JSON="$${OUTBASE}.loudnorm-pass1.json"; \
+	echo "[video-master] Pass 1: measuring loudness of $(MP4)..."; \
+	ffmpeg -y -hide_banner \
+		-i "$(MP4)" \
+		-af "loudnorm=I=-16:TP=-1:LRA=11:print_format=json" \
+		-f null - 2>"$${STATS_RAW}"; \
+	python3 -c "\
+import sys, re, json; \
+raw = open(sys.argv[1]).read(); \
+m = re.search(r'\{[^}]+\}', raw, re.DOTALL); \
+d = json.loads(m.group(0)) if m else {}; \
+json.dump(d, open(sys.argv[2], 'w'), indent=2); \
+print(d.get('input_i','?'), d.get('input_tp','?'), d.get('input_lra','?'), d.get('input_thresh','?'))\
+" "$${STATS_RAW}" "$${STATS_JSON}"; \
+	MEASURED_I=$$(python3 -c "import json; d=json.load(open('$${STATS_JSON}')); print(d['input_i'])"); \
+	MEASURED_TP=$$(python3 -c "import json; d=json.load(open('$${STATS_JSON}')); print(d['input_tp'])"); \
+	MEASURED_LRA=$$(python3 -c "import json; d=json.load(open('$${STATS_JSON}')); print(d['input_lra'])"); \
+	MEASURED_THRESH=$$(python3 -c "import json; d=json.load(open('$${STATS_JSON}')); print(d['input_thresh'])"); \
+	echo "[video-master] Measured: I=$${MEASURED_I} TP=$${MEASURED_TP} LRA=$${MEASURED_LRA} thresh=$${MEASURED_THRESH}"; \
+	echo "[video-master] Pass 2: applying two-pass loudnorm..."; \
+	ffmpeg -y -hide_banner -loglevel warning \
+		-i "$(MP4)" \
+		-af "loudnorm=I=-16:TP=-1:LRA=11:measured_I=$${MEASURED_I}:measured_TP=$${MEASURED_TP}:measured_LRA=$${MEASURED_LRA}:measured_thresh=$${MEASURED_THRESH}:linear=true" \
+		-c:v copy -c:a aac -b:a 192k \
+		"$${MASTERED}"; \
+	echo "[video-master] Mastered: $${MASTERED}"; \
+	ls -lh "$${MASTERED}"; \
+	echo "[video-master] Running ducking verification..."; \
+	bash scripts/verify_ducking.sh "$${MASTERED}"
