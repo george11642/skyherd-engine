@@ -1,14 +1,51 @@
-# SkyHerd — Demo Video Script (Sim-First, 3:00 Total)
+# SkyHerd — Demo Video Script (Reproducible Scenario Harness, 3:00 Total)
 
-**Version:** Phase 9 sim-first edit · 2026-04-24
-**Sibling doc:** `docs/VIDEO_SCRIPT.md` — the full hybrid (field + sim) cut.
-**This doc:** the **sim-first fallback** that records end-to-end from a laptop,
-deterministically, with zero hardware risk. Use this if weather grounds the
-Mavic, or as the guaranteed-safe take to cut against the hero footage.
+> ## v2 status (2026-04-24)
+>
+> **This file is the v1 fallback script.** Wes cowboy persona, 3-act 25/115/40s
+> layout. Preserved for the v1 fallback render at
+> `docs/demo-assets/video/skyherd-demo-v1-sim-first.mp4`.
+>
+> **The v2 submission script lives across three variant files** — the dual-vision
+> iteration loop (Phase H of `/home/george/.claude/plans/smooth-leaping-popcorn.md`)
+> picks the winner:
+>
+> - **Variant A — Winner-pattern** · `docs/scripts/skyherd-script-A-winner-pattern.md`
+>   3-act Setup/Demo/Close (60/90/30s). Identity/contrarian hook. Emphasis-only captions.
+> - **Variant B — Hybrid** · `docs/scripts/skyherd-script-B-hybrid.md`
+>   3-act same skeleton. Metric-first hook ("$4.17/week"). Emphasis-only captions.
+> - **Variant C — Differentiated** · `docs/scripts/skyherd-script-C-differentiated.md`
+>   5-act Hook/Story/Demo/Substance/Close (20/50/55/35/20s). Metric hook.
+>   Word-level kinetic captions throughout.
+>
+> All three v2 variants share: neutral 19yo male voice (**Antoni — ElevenLabs
+> voice ID `ErXwobaYiN019PkySvjV`**), no Wes cowboy-isms, same B-roll inventory,
+> same dashboard MP4s, same hackathon-criteria coverage signals. Filenames migrate
+> `wes-*.mp3` → `vo-*.mp3` for v2 render paths.
+>
+> Reasoning for the voice pick: per `/home/george/.claude/plans/smooth-leaping-popcorn.md`
+> Phase C audition cues, Antoni's tone reads as "neutral 19yo guy who built this
+> in his dorm" — the brief for v2. Arnold-young (`VR6AewLTigWG4xSOukaG`) trends
+> heavier/older; Bill-Liam (`pqHfZKP75CvOlQylNhV4`) trends middle-aged narrator.
+> Antoni clocks ~3.6s on the test cue (good cadence) and matches the
+> college-student-engineer brand we want post-Wes.
+>
+> Detailed rationale for the 3-variant track is in plan §"3-variant render track"
+> and Phase A's `.planning/research/winner-top3-analysis.md`.
 
-Every beat below is keyed to a pause-point in `make demo SEED=42 SCENARIO=all`.
-That command is byte-stable across replays (per `tests/test_determinism_e2e.py`),
-so you can scrub to any timestamp and get the same pixels.
+---
+
+**Version:** Phase 9 canonical cut · 2026-04-24 (hardware deferred to Year-2) — **superseded by v2 variant scripts above**
+**This doc:** the **v1 fallback submission script**, recording end-to-end from a
+laptop against a deterministic scenario harness. Every beat is keyed to a
+pause-point in `make demo SEED=42 SCENARIO=all` — byte-stable across replays
+(per `tests/test_determinism_e2e.py`), so any judge can clone the repo, run the
+command, and scrub to the same pixels shown in the video. Reproducibility is a
+feature, not a fallback: the entire submission is designed so a reviewer can
+verify every claim themselves.
+
+> `docs/VIDEO_SCRIPT.md` (the hybrid field+sim cut) is retained as a Year-2
+> reference but is **not** the submission cut.
 
 **Deadline:** Sun 2026-04-26 20:00 EST (target submit 18:00 EST).
 **Format:** 3:00 total, 1080p60 H.264, ≤500 MB, YouTube unlisted.
@@ -19,7 +56,7 @@ so you can scrub to any timestamp and get the same pixels.
 
 ---
 
-## Three-act layout (sim-first)
+## Three-act layout
 
 ```
 ┌──────── ACT 1 — Hook ──────────────────┐ 0:00 – 0:25  (25 s)
@@ -141,7 +178,7 @@ Pan the dashboard top-to-bottom on OBS (slow vertical pan, 4 s):
 | 1:07 | Tank 7 glyph turns red | `lora.water_tank(tank_7, pressure=0.08)` |
 | 1:10 | GrazingOptimizer lane wakes | `evaluate_water_access(tank_7)` |
 | 1:13 | Drone flyover mission spawns | `launch_drone(TANK_7, inspect)` |
-| 1:17 | Infrared still from simulated drone cam | `drone.snapshot(tank_7)` |
+| 1:17 | Infrared still from ArduPilot-SITL drone cam | `drone.snapshot(tank_7)` |
 | 1:19 | AttestationPanel: 3 new signed events | chain grows |
 
 **Scrub anchor:** `scenario/water/ir_still` — pause on drone IR frame.
@@ -156,7 +193,7 @@ Pan the dashboard top-to-bottom on OBS (slow vertical pan, 4 s):
 | 1:25 | Behavior trace: isolation + pawing + tail raise | `behavior_series(cow_117)` |
 | 1:28 | Priority urgency on rancher page | `page_rancher(urgency=priority)` |
 | 1:31 | Wes voice: *"Boss. 117 is fixin' to calve. You'll want to see this one."* | `page_rancher` |
-| 1:33 | PWA phone mock rings (visual only in sim) | — |
+| 1:33 | PWA phone mock rings (visual-only cue for the edit) | — |
 
 **Scrub anchor:** `scenario/calving/behavior_trace` — behavior series chart.
 
@@ -166,7 +203,7 @@ Pan the dashboard top-to-bottom on OBS (slow vertical pan, 4 s):
 
 | Beat | Visual | Dashboard trigger |
 |------|--------|-------------------|
-| 1:35 | Weather API overlay on map (sim data) | `weather_forecast(hail, eta=45min)` |
+| 1:35 | Weather API overlay on map (scenario harness data) | `weather_forecast(hail, eta=45min)` |
 | 1:39 | GrazingOptimizer proposes paddock redirect | `propose_redirect(paddock_3→6)` |
 | 1:42 | Acoustic nudge icon pulses at 3 speakers | `acoustic_nudge(cattle_move)` |
 | 1:46 | Cows animate moving on the map | `herd.relocate(paddock_6)` |
@@ -181,7 +218,7 @@ lanes idle again. Overlay three annotations in sequence (8–10 s each):
 
 1. **Managed Agents callout** — *"5 Managed Agents · 1 platform session each · idle-pause billing. $4.17/week."*
 2. **Keep Thinking callout** — *"33 skill files · Domain knowledge loaded per-task. CrossBeam pattern. Sessions persisted 241 → 5."*
-3. **Creative callout** — *"Ranch + Mavic + Wes voice. Physical loop, sim-first."*
+3. **Creative callout** — *"Ranch + Mavic + Wes voice. End-to-end reproducible loop."*
 
 **Voiceover (25 s budget):**
 > "Each agent runs on its own Managed Agents session and only wakes when the sensors call it. The skills library loads just what the task needs. Sessions persist so the predator learner actually learns. And the cost ticker freezes in between — this whole ranch runs at four dollars a week."
@@ -315,4 +352,4 @@ For pre-rendering with ElevenLabs (`bash docs/demo-assets/audio/render.sh`):
 
 ---
 
-*End of sim-first script. See `docs/VIDEO_SCRIPT.md` for the full hybrid (hero-field) cut — use whichever matches Friday weather.*
+*End of canonical script. `docs/VIDEO_SCRIPT.md` (hybrid field+sim cut) retained as Year-2 reference only.*
