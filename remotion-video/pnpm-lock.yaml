@@ -17,6 +17,9 @@ importers:
       '@remotion/google-fonts':
         specifier: ^4.0.451
         version: 4.0.451(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      '@remotion/lottie':
+        specifier: ^4.0.451
+        version: 4.0.451(lottie-web@5.13.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       '@remotion/media-utils':
         specifier: ^4.0.451
         version: 4.0.451(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -430,6 +433,13 @@ packages:
 
   '@remotion/licensing@4.0.451':
     resolution: {integrity: sha512-LQKL1gKZEWY71ueW+cSTFP3pR/kbNfzoOgu+pplYMPXLf/jtNrlkDW5cr6Bnl5xtSUQczrP3L8J18gwCi2kH7Q==}
+
+  '@remotion/lottie@4.0.451':
+    resolution: {integrity: sha512-69I6SXB047glrS+Sk3I3mPyMCSE/UlHyri/kLsAyOQZVK2bHDe8mlmhpKlCGdkCLyW1vEsz5AUPhbrRylv5oLg==}
+    peerDependencies:
+      lottie-web: ^5
+      react: '>=16.8.0'
+      react-dom: '>=16.8.0'
 
   '@remotion/media-parser@4.0.451':
     resolution: {integrity: sha512-GeGHDxV2ljUNZc+TAFjBGYM8tLFKToln34Xn9ymu7R25lO79DKATqSwu4nnLlKx3qsWvQ2Yy2lVj7x9pXIShQg==}
@@ -1297,6 +1307,9 @@ packages:
   lodash.sortby@4.7.0:
     resolution: {integrity: sha512-HDWXG8isMntAyRF5vZ7xKuEvOhT4AhlRt/3czTSjvGUxjYCBVRQY48ViDHyfYz9VIoBkW4TMGQNapx+l3RUwdA==}
 
+  lottie-web@5.13.0:
+    resolution: {integrity: sha512-+gfBXl6sxXMPe8tKQm7qzLnUy5DUPJPKIyRHwtpCpyUEYjHYRJC/5gjUvdkuO2c3JllrPtHXH5UJJK8LRYl5yQ==}
+
   lru-cache@6.0.0:
     resolution: {integrity: sha512-Jo6dJ04CmSjuznwJSS3pUeWmd/H0ffTlkXXgwZi+eq1UCmqQwCh+eLsYOYCwY991i2Fah4h1BEMCx4qThGbsiA==}
     engines: {node: '>=10'}
@@ -2045,6 +2058,13 @@ snapshots:
       - react-dom
 
   '@remotion/licensing@4.0.451': {}
+
+  '@remotion/lottie@4.0.451(lottie-web@5.13.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)':
+    dependencies:
+      lottie-web: 5.13.0
+      react: 19.2.3
+      react-dom: 19.2.3(react@19.2.3)
+      remotion: 4.0.451(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
 
   '@remotion/media-parser@4.0.451': {}
 
@@ -2978,6 +2998,8 @@ snapshots:
   lodash.merge@4.6.2: {}
 
   lodash.sortby@4.7.0: {}
+
+  lottie-web@5.13.0: {}
 
   lru-cache@6.0.0:
     dependencies:

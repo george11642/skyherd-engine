@@ -33,6 +33,7 @@ import {
   CAct5Close,
 } from "./acts/v2/CActs";
 import { KineticCaptions } from "./components/KineticCaptions";
+import { LottieReveal } from "./components/LottieReveal";
 
 const FPS = 30;
 const DUCK_BASE = 0.55;
@@ -246,6 +247,100 @@ export const Main = ({
             <ABAct3Close />
           </Series.Sequence>
         </Series>
+      )}
+
+      {/* Phase E2 — Lottie reveals layered on top of the act sequences.
+          AB layout: scenario triggers at 11s increments inside Act 2, mesh +
+          attestation reveals at the cost-ticker beat. C layout: scenarios at
+          8s increments inside Act 3 plus a synthesis beat at the end. All
+          fail-soft via LottieReveal's null-on-404 guard. */}
+      {variant !== "C" ? (
+        <>
+          {/* Map pin drops at scenario triggers (each 11s, first 5 scenarios) */}
+          {[0, 1, 2, 3, 4].map((i) => (
+            <Sequence
+              key={`pin-${i}`}
+              from={actDurations.act1 + i * 11 * FPS}
+              durationInFrames={45}
+            >
+              <LottieReveal asset="map-pin-drop.json" size={180} top={140} right={140} />
+            </Sequence>
+          ))}
+          {/* Pulse wave at sensor activity moment (during scenario 1) */}
+          <Sequence
+            from={actDurations.act1 + 0 * 11 * FPS + 90}
+            durationInFrames={75}
+          >
+            <LottieReveal asset="pulse-wave.json" size={220} top={780} left={140} loop />
+          </Sequence>
+          {/* Hash chip slide on attestation moment (after scenarios end, mesh beat) */}
+          <Sequence
+            from={actDurations.act1 + 5 * 11 * FPS + 60}
+            durationInFrames={75}
+          >
+            <LottieReveal asset="hash-chip-slide.json" size={260} top={140} left={140} />
+          </Sequence>
+          {/* Stat counter near the cost ticker callback (~2:25 in script) */}
+          <Sequence
+            from={actDurations.act1 + actDurations.act2 - 4 * FPS}
+            durationInFrames={90}
+          >
+            <LottieReveal asset="stat-counter.json" size={300} bottom={220} right={140} />
+          </Sequence>
+          {/* Checkmark complete at scenario resolutions (compressed series) */}
+          {[0, 2, 4].map((i) => (
+            <Sequence
+              key={`check-${i}`}
+              from={actDurations.act1 + i * 11 * FPS + 9 * FPS}
+              durationInFrames={45}
+            >
+              <LottieReveal asset="check-complete.json" size={140} top={300} right={140} />
+            </Sequence>
+          ))}
+        </>
+      ) : (
+        <>
+          {/* C variant: scenarios are 8s. Pin drops at each. */}
+          {[0, 1, 2, 3, 4].map((i) => (
+            <Sequence
+              key={`c-pin-${i}`}
+              from={actDurations.act1 + actDurations.act2 + i * 8 * FPS}
+              durationInFrames={45}
+            >
+              <LottieReveal asset="map-pin-drop.json" size={170} top={140} right={140} />
+            </Sequence>
+          ))}
+          {/* Pulse wave + hash chip during synthesis beat at end of Act 3 */}
+          <Sequence
+            from={actDurations.act1 + actDurations.act2 + 5 * 8 * FPS}
+            durationInFrames={120}
+          >
+            <LottieReveal asset="pulse-wave.json" size={200} top={760} left={140} loop />
+          </Sequence>
+          <Sequence
+            from={actDurations.act1 + actDurations.act2 + 5 * 8 * FPS + 30}
+            durationInFrames={120}
+          >
+            <LottieReveal asset="hash-chip-slide.json" size={260} top={140} left={140} />
+          </Sequence>
+          {/* Stat counter during Act 4 substance/Opus beat */}
+          <Sequence
+            from={actDurations.act1 + actDurations.act2 + actDurations.act3 + 60}
+            durationInFrames={120}
+          >
+            <LottieReveal asset="stat-counter.json" size={280} bottom={220} right={140} />
+          </Sequence>
+          {/* Checkmarks: one at the end of every other scenario */}
+          {[1, 3].map((i) => (
+            <Sequence
+              key={`c-check-${i}`}
+              from={actDurations.act1 + actDurations.act2 + i * 8 * FPS + 6 * FPS}
+              durationInFrames={45}
+            >
+              <LottieReveal asset="check-complete.json" size={130} top={300} right={140} />
+            </Sequence>
+          ))}
+        </>
       )}
 
       {/* Phase E1 — kinetic captions overlay (sparse for A/B, dense for C). */}
