@@ -52,28 +52,28 @@ const HookContrarian = () => (
       words={[
         {
           text: "Everyone thinks",
-          appearFrame: 15,
+          appearFrame: 0,
           weight: 500,
           size: 56,
           color: "rgb(60 72 56)",
         },
         {
           text: "ranchers need smarter sensors.",
-          appearFrame: 45,
+          appearFrame: 30,
           weight: 500,
           size: 56,
           color: "rgb(60 72 56)",
         },
         {
           text: "They don't.",
-          appearFrame: 105,
+          appearFrame: 90,
           weight: 800,
           size: 86,
           color: ACCENT_MAP.sage,
         },
         {
           text: "They need a nervous system.",
-          appearFrame: 165,
+          appearFrame: 150,
           weight: 800,
           size: 86,
           color: ACCENT_MAP.dust,
