@@ -292,12 +292,15 @@ export const KineticPunch = ({
           fps,
           config: { damping: 100, stiffness: 200, mass: 0.65 },
         });
-        const fastO = interpolate(
-          frame,
-          [w.appearFrame, w.appearFrame + (w.fastFade ?? 0)],
-          [0, 1],
-          { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
-        );
+        const fastFadeDuration = useFast ? (w.fastFade as number) : 1;
+        const fastO = useFast
+          ? interpolate(
+              frame,
+              [w.appearFrame, w.appearFrame + fastFadeDuration],
+              [0, 1],
+              { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
+            )
+          : 0;
         const y = useFast ? 0 : interpolate(p, [0, 1], [40, 0]);
         const o = useFast
           ? fastO
