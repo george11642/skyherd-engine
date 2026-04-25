@@ -1,0 +1,8 @@
+cHook=21.551020
+cTraditional=15.386122
+cAnswer=15.490612
+cCoyote=25.234286
+cGrid=24.346122
+cMvp=21.629388
+cVision=12.538776
+cAibody=12.826122
