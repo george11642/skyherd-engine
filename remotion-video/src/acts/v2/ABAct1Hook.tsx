@@ -40,6 +40,44 @@ type Props = {
 const FPS = 30;
 
 // ── Beat 1A — Variant A cold open: contrarian punch (8s, no VO) ──────────────
+//
+// iter-3 A fix: replace the redundant lower karaoke caption echo with a single
+// quantified stat overlay anchored at the bottom — adds information density
+// (Demo + Impact scoring) without word-for-word duplication of the kinetic
+// punch text above.
+const HookStatOverlay = () => {
+  const frame = useCurrentFrame();
+  const opacity = interpolate(frame, [200, 220, 235, 240], [0, 1, 1, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  const y = interpolate(frame, [200, 220], [12, 0], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  return (
+    <div
+      style={{
+        position: "absolute",
+        bottom: 90,
+        left: 0,
+        right: 0,
+        textAlign: "center",
+        opacity,
+        transform: `translateY(${y}px)`,
+        fontFamily: "Inter, sans-serif",
+        fontWeight: 700,
+        fontSize: 22,
+        color: "rgb(60 72 56)",
+        letterSpacing: "0.18em",
+        textTransform: "uppercase",
+      }}
+    >
+      $2.4B / yr · lost to undetected herd events
+    </div>
+  );
+};
+
 const HookContrarian = () => (
   <AbsoluteFill
     style={{
@@ -51,8 +89,10 @@ const HookContrarian = () => (
     <KineticPunch
       words={[
         {
+          // Pre-roll spring by 10 frames so the word is already ~80% opacity at
+          // video frame 0 — eliminates the blank opening frame (iter-3 fix).
           text: "Everyone thinks",
-          appearFrame: 0,
+          appearFrame: -10,
           weight: 500,
           size: 56,
           color: "rgb(60 72 56)",
@@ -80,6 +120,7 @@ const HookContrarian = () => (
         },
       ]}
     />
+    <HookStatOverlay />
   </AbsoluteFill>
 );
 
