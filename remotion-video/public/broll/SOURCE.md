@@ -29,6 +29,34 @@ Playwright dashboard recorder format used elsewhere in `remotion-video/public/`.
 | t3-night-sky-stars.mp4                  | Mixkit | https://mixkit.co/free-stock-video/milky-way-seen-at-night-4148/                                          | Mixkit License                | 2026-04-24 |
 | t3-meadow-landscape.mp4                 | Mixkit | https://mixkit.co/free-stock-video/meadow-landscape-15981/                                                | Mixkit License                | 2026-04-24 |
 | t3-cattle-windy-paddock.mp4             | Mixkit | https://mixkit.co/free-stock-video/cows-grazing-in-a-paddock-on-a-windy-day-44958/                        | Mixkit License                | 2026-04-24 |
+| t1-pexels-coyote-night.mp4              | Pexels | https://www.pexels.com/video/silhouettes-in-moonlit-forest-video-34660193/                                | Pexels License                | 2026-04-24 |
+| t1-pexels-fence-wire.mp4                | Pexels | https://www.pexels.com/video/a-metal-wire-mesh-fence-4650102/                                             | Pexels License                | 2026-04-24 |
+| t2-pexels-hand-phone.mp4                | Pexels | https://www.pexels.com/video/close-up-view-of-person-calling-emergency-sos-6831196/                       | Pexels License                | 2026-04-24 |
+| t2-pexels-water-tank.mp4                | Pexels | https://www.pexels.com/video/aerial-drone-footage-of-abandoned-desert-ranch-35529631/                     | Pexels License                | 2026-04-24 |
+| t3-pexels-calf.mp4                      | Pexels | https://www.pexels.com/video/tender-moment-between-cow-and-newborn-calf-in-forest-35854640/               | Pexels License                | 2026-04-24 |
+| t3-pexels-vet-mobile.mp4                | Pexels | https://www.pexels.com/video/vet-examining-little-dog-s-face-6235179/                                     | Pexels License                | 2026-04-24 |
+| t1-pexels-drone-thermal.mp4             | Pexels | https://www.pexels.com/video/aerial-view-of-tractor-in-australian-countryside-31711788/                   | Pexels License                | 2026-04-24 |
+| t1-pexels-ranch-dawn.mp4                | Pexels | https://www.pexels.com/video/rural-scenery-at-dawn-10585381/                                              | Pexels License                | 2026-04-24 |
+
+### Phase H iter2 — Pexels gap fills (acquired 2026-04-24)
+
+The iter1 inventory left 6 Phase-A shots un-covered on Mixkit/Coverr. With a
+Pexels API key in hand, the `scripts/fetch_pexels.sh` pipeline searched for
+each gap (plus a few variants like `drone aerial farm` and `ranch dawn`) and
+picked the best 1080p result per search. All 8 clips are under the Pexels
+License (commercial use allowed, no attribution required — attribution
+recorded above as a courtesy).
+
+| File | Contributor | Notes |
+|---|---|---|
+| `t1-pexels-coyote-night.mp4` | Burak Bahadır Büyükkılınç | silhouettes in moonlit forest — fills "coyote at fence" night ambience |
+| `t1-pexels-fence-wire.mp4` | Pavel Danilyuk | metal wire-mesh fence close-up |
+| `t2-pexels-hand-phone.mp4` | Tima Miroshnichenko | close-up hand placing an emergency SOS call — the Twilio/Wes voice-call beat |
+| `t2-pexels-water-tank.mp4` | Strange Happenings | aerial over an abandoned desert ranch with a water-tank silhouette |
+| `t3-pexels-calf.mp4` | Gizem Gökce | tender moment between a cow and a newborn calf (portrait framing, letterboxed in normalize) |
+| `t3-pexels-vet-mobile.mp4` | Tima Miroshnichenko | vet examining an animal with a mobile/clinical framing — stands in for the vet-intake mock |
+| `t1-pexels-drone-thermal.mp4` | Macourt Media | aerial drone view of a tractor on rural Australian farmland (establishing drone flyover; not literally thermal) |
+| `t1-pexels-ranch-dawn.mp4` | Ruslan Sikunov | rural dawn scenery — the opening Act 1 establishing shot |
 
 ## Shot-list mapping (Phase A reference)
 
@@ -38,26 +66,27 @@ clips give variant coverage for the same Phase A bullet.
 
 | Phase A shot | Mapped clip(s) | Tier |
 |---|---|---|
-| 1. Dawn over the corral / sunrise on rangeland | `t1-dawn-corral-golden.mp4`, `t2-sunrise-clouds.mp4` | T1 |
+| 1. Dawn over the corral / sunrise on rangeland | `t1-dawn-corral-golden.mp4`, `t2-sunrise-clouds.mp4`, `t1-pexels-ranch-dawn.mp4` | T1 |
 | 2. Cattle herd grazing wide shot | `t1-cattle-grazing-wide.mp4`, `t1-cattle-herd-countryside.mp4`, `t3-cattle-windy-paddock.mp4` | T1 |
-| 3. Drone aerial over rangeland | `t1-drone-rangeland-aerial.mp4`, `t1-drone-arid-mountains.mp4` | T1 |
-| 4. Coyote silhouette / eyes at night | **GAP** — no permissive coyote night silhouette located on Mixkit/Coverr (Pexels/Pixabay reachable only via authed browser). Compensate with `t3-night-sky-stars.mp4` ambience + voiceover-driven framing. | T1 |
-| 5. Fence wire close-up at night | **GAP** — no permissive fence-wire night clip located. Use existing `clips/coyote.mp4` dashboard recording for fence-line dispatcher narrative; ambient cover from `t1-lightning-night.mp4`. | T1 |
+| 3. Drone aerial over rangeland | `t1-drone-rangeland-aerial.mp4`, `t1-drone-arid-mountains.mp4`, `t1-pexels-drone-thermal.mp4` | T1 |
+| 4. Coyote silhouette / eyes at night | `t1-pexels-coyote-night.mp4` (silhouettes in moonlit forest — iter2 Pexels fill) | T1 |
+| 5. Fence wire close-up at night | `t1-pexels-fence-wire.mp4` (metal wire-mesh fence close-up — iter2 Pexels fill) | T1 |
 | 6. Lightning / storm cell on horizon | `t1-storm-cell-horizon.mp4`, `t1-lightning-night.mp4` | T1 |
-| 7. Gloved hand on phone or radio | **GAP** — no permissive close-up hand-on-phone clip. Compensate with `t2-rancher-horse-walk.mp4` (rancher establishing) and on-screen Twilio SMS recording from `clips/`. | T2 |
+| 7. Gloved hand on phone or radio | `t2-pexels-hand-phone.mp4` (close-up hand placing an emergency SOS call — iter2 Pexels fill) | T2 |
 | 8. Rancher's boot kicking dust / walking through gate | `t2-rancher-horse-walk.mp4`, `t2-cowboy-sunset.mp4`, `t2-rancher-sunset-couple.mp4` | T2 |
-| 9. Water tank from below with sky | **GAP** — no permissive water-tank-from-below clip. Compensate with existing `clips/water.mp4` dashboard scenario recording. | T2 |
+| 9. Water tank from below with sky | `t2-pexels-water-tank.mp4` (aerial over abandoned desert ranch with water-tank — iter2 Pexels fill) | T2 |
 | 10. Pi / Galileo board close-up with LEDs | `t2-hardware-circuit-board.mp4`, `t2-hardware-microcircuit.mp4` | T2 |
 | 11. Cattle stampede / movement | `t3-cattle-windy-paddock.mp4` | T3 |
 | 12. Empty pasture / lonely landscape | `t3-meadow-landscape.mp4` | T3 |
-| 13. Calf close-up / newborn cow | **GAP** — no permissive newborn-calf clip located. Compensate with existing `clips/calving.mp4`. | T3 |
+| 13. Calf close-up / newborn cow | `t3-pexels-calf.mp4` (tender moment: cow and newborn calf — iter2 Pexels fill) | T3 |
 | 14. Sky / clouds time-lapse | `t2-sunrise-clouds.mp4`, `t3-night-sky-stars.mp4` | T3 |
+| 15. Vet mobile / clinical hand-off | `t3-pexels-vet-mobile.mp4` (iter2 Pexels fill — stands in for the vet-intake mock) | T3 |
 
-**13 of 19 Phase A shots covered by stock B-roll. The 6 gaps (coyote, fence
-wire, hand-on-phone, water-tank, calf newborn — and per the "drop from prior
-list" note, generic-cow which is intentionally dropped) are absorbed by
-existing SkyHerd-internal clips already recorded in `remotion-video/public/clips/`
-or by ambience/narration in the variant scripts.**
+**Phase H iter2 update: all 6 Phase A gaps (coyote, fence wire, hand-on-phone,
+water-tank, calf newborn, vet-mobile) are now filled by Pexels B-roll. Total
+stock-B-roll clip count: 16 Mixkit + 8 Pexels = 24 clips. The SkyHerd-internal
+dashboard recordings in `remotion-video/public/clips/` remain available as
+supplementary cutaways but are no longer required to paper over shot gaps.**
 
 ## Per-source license notes
 

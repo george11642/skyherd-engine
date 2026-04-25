@@ -55,12 +55,58 @@ declare -A SOURCES=(
     ["t3-cattle-windy-paddock"]="https://mixkit.co/free-stock-video/cows-grazing-in-a-paddock-on-a-windy-day-44958/"
 )
 
+# Phase H iter2 — Pexels gap-fill clips.
+# Each value is the direct `video_files[].link` URL from the Pexels API response
+# (Pexels License, commercial use OK, no attribution required — attribution is
+# recorded in SOURCE.md as a courtesy). These are direct-CDN URLs so a plain
+# curl is sufficient; no yt-dlp / API key required at reproduce-time.
+declare -A PEXELS_SOURCES=(
+    ["t1-pexels-coyote-night"]="https://videos.pexels.com/video-files/34660193/14691738_1920_1080_60fps.mp4"
+    ["t1-pexels-fence-wire"]="https://videos.pexels.com/video-files/4650102/4650102-hd_1920_1080_30fps.mp4"
+    ["t2-pexels-hand-phone"]="https://videos.pexels.com/video-files/6831196/6831196-hd_1920_1080_25fps.mp4"
+    ["t2-pexels-water-tank"]="https://videos.pexels.com/video-files/35529631/15052265_1920_1080_60fps.mp4"
+    ["t3-pexels-calf"]="https://videos.pexels.com/video-files/35854640/15204675_1080_1920_30fps.mp4"
+    ["t3-pexels-vet-mobile"]="https://videos.pexels.com/video-files/6235179/6235179-uhd_1440_2560_25fps.mp4"
+    ["t1-pexels-drone-thermal"]="https://videos.pexels.com/video-files/31711788/13511800_1920_1080_30fps.mp4"
+    ["t1-pexels-ranch-dawn"]="https://videos.pexels.com/video-files/10585381/10585381-hd_1920_1080_30fps.mp4"
+)
+
 mkdir -p "$BROLL_DIR"
+
+normalize_raw() {
+    # Normalize a raw download into our canonical 1920x1080 30fps H.264 + AAC
+    # stereo format, 8s cap, +faststart. Some sources (notably Pexels) have no
+    # audio track, so we overlay silent audio when the source has none.
+    local raw="$1"
+    local final_path="$2"
+
+    # Try with silent-audio overlay first (works for any source, with or without audio)
+    ffmpeg -y -i "$raw" -f lavfi -i anullsrc=channel_layout=stereo:sample_rate=44100 \
+        -t 8 \
+        -vf "scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2:black,fps=30" \
+        -map 0:v:0 -map 1:a:0 -shortest \
+        -c:v libx264 -pix_fmt yuv420p -preset medium -crf 22 \
+        -c:a aac -ac 2 -ar 44100 \
+        -movflags +faststart \
+        "$final_path" >/dev/null 2>&1 && return 0
+
+    # Fallback: use the source's own audio track if present
+    ffmpeg -y -i "$raw" \
+        -t 8 \
+        -vf "scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2:black,fps=30" \
+        -c:v libx264 -pix_fmt yuv420p -preset medium -crf 22 \
+        -c:a aac -ac 2 -ar 44100 \
+        -movflags +faststart \
+        "$final_path" >/dev/null 2>&1 && return 0
+
+    return 1
+}
 
 fetch_one() {
     local slug="$1"
     local page_url="${SOURCES[$slug]:-}"
-    if [[ -z "$page_url" ]]; then
+    local pexels_url="${PEXELS_SOURCES[$slug]:-}"
+    if [[ -z "$page_url" && -z "$pexels_url" ]]; then
         echo "ERROR: unknown slug: $slug" >&2
         return 1
     fi
@@ -74,33 +120,34 @@ fetch_one() {
         return 0
     fi
 
-    echo "FETCH  $slug from $page_url"
     local raw="$TMP_DIR/$slug-raw.mp4"
-    # Mixkit pages embed an MP4 download URL; yt-dlp's generic extractor finds it.
-    if ! command -v yt-dlp >/dev/null 2>&1; then
-        echo "ERROR: yt-dlp not installed (try: uvx yt-dlp@latest)" >&2
-        return 1
+
+    if [[ -n "$pexels_url" ]]; then
+        # Pexels clip — direct CDN URL, just curl.
+        echo "FETCH  $slug from $pexels_url"
+        curl -sSL -A "Mozilla/5.0" -o "$raw" "$pexels_url"
+    else
+        # Mixkit clip — yt-dlp's generic extractor scrapes the embedded MP4.
+        echo "FETCH  $slug from $page_url"
+        if ! command -v yt-dlp >/dev/null 2>&1; then
+            echo "ERROR: yt-dlp not installed (try: uvx yt-dlp@latest)" >&2
+            return 1
+        fi
+        yt-dlp --quiet --no-warnings --no-progress \
+            -f "best[ext=mp4]/best" \
+            -o "$raw" \
+            "$page_url"
     fi
-    yt-dlp --quiet --no-warnings --no-progress \
-        -f "best[ext=mp4]/best" \
-        -o "$raw" \
-        "$page_url"
-    if [[ ! -f "$raw" ]]; then
+
+    if [[ ! -s "$raw" ]]; then
         echo "ERROR: download failed for $slug" >&2
         return 1
     fi
 
-    # Normalize: 1920x1080, 30fps, H.264 yuv420p, AAC stereo, 8s cap, +faststart
-    ffmpeg -y -i "$raw" \
-        -t 8 \
-        -vf "scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2:black,fps=30" \
-        -c:v libx264 -pix_fmt yuv420p -preset medium -crf 22 \
-        -c:a aac -ac 2 -ar 44100 \
-        -movflags +faststart \
-        "$final_path" >/dev/null 2>&1 || {
-            echo "ERROR: ffmpeg normalize failed for $slug" >&2
-            return 1
-        }
+    if ! normalize_raw "$raw" "$final_path"; then
+        echo "ERROR: ffmpeg normalize failed for $slug" >&2
+        return 1
+    fi
 
     local size; size=$(du -h "$final_path" | cut -f1)
     echo "DONE   $slug.mp4 ($size)"
@@ -112,7 +159,15 @@ if [[ -n "$SINGLE_SLUG" ]]; then
 fi
 
 failures=0
+total_count=0
 for slug in "${!SOURCES[@]}"; do
+    total_count=$((total_count + 1))
+    if ! fetch_one "$slug"; then
+        failures=$((failures + 1))
+    fi
+done
+for slug in "${!PEXELS_SOURCES[@]}"; do
+    total_count=$((total_count + 1))
     if ! fetch_one "$slug"; then
         failures=$((failures + 1))
     fi
@@ -120,9 +175,9 @@ done
 
 if [[ "$failures" -gt 0 ]]; then
     echo
-    echo "FAILED $failures/$(echo "${!SOURCES[@]}" | wc -w) clips"
+    echo "FAILED $failures/$total_count clips"
     exit 1
 fi
 
 echo
-echo "All ${#SOURCES[@]} clips present in $BROLL_DIR"
+echo "All $total_count clips present in $BROLL_DIR"
