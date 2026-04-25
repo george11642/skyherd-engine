@@ -3,87 +3,8 @@
   "mode": "styled",
   "model": "claude-opus-4-7",
   "fingerprint": "953decf876fed4169837c3695e4f1786f8f4ac5c4db1b038a94f6415e9e14290",
+  "_gate_note": "iter-3 B fix: segments 0-4 (t=1.0-7.0s) removed because they echoed the silent hook's hero kinetic typography ($4.17 / a week / 24-7 nervous system / 10,000-acre ranch), producing a duplicate caption box at the bottom of frame. Karaoke captions are now narration-only and start at the market beat (t=24.0s).",
   "words": [
-    {
-      "word": "$4.17",
-      "start": 1.0,
-      "end": 2.0,
-      "segment_id": 0,
-      "color": "#C04B2D",
-      "weight": "black",
-      "animation": "pop",
-      "emphasis_level": 3
-    },
-    {
-      "word": "a",
-      "start": 2.0,
-      "end": 2.5,
-      "segment_id": 1,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 0
-    },
-    {
-      "word": "week",
-      "start": 2.5,
-      "end": 3.0,
-      "segment_id": 1,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "twenty-four-seven",
-      "start": 3.0,
-      "end": 4.0,
-      "segment_id": 2,
-      "color": "#3D5A3D",
-      "weight": "bold",
-      "animation": "pulse",
-      "emphasis_level": 3
-    },
-    {
-      "word": "nervous",
-      "start": 4.0,
-      "end": 4.5,
-      "segment_id": 3,
-      "color": "#3D5A3D",
-      "weight": "bold",
-      "animation": "fade",
-      "emphasis_level": 2
-    },
-    {
-      "word": "system",
-      "start": 4.5,
-      "end": 5.0,
-      "segment_id": 3,
-      "color": "#3D5A3D",
-      "weight": "bold",
-      "animation": "pulse",
-      "emphasis_level": 3
-    },
-    {
-      "word": "ten-thousand-acre",
-      "start": 6.0,
-      "end": 6.5,
-      "segment_id": 4,
-      "color": "#A36B3A",
-      "weight": "bold",
-      "animation": "pop",
-      "emphasis_level": 2
-    },
-    {
-      "word": "ranch",
-      "start": 6.5,
-      "end": 7.0,
-      "segment_id": 4,
-      "color": "#A36B3A",
-      "weight": "bold",
-      "animation": "fade",
-      "emphasis_level": 3
-    },
     {
       "word": "Beef",
       "start": 24.0,
@@ -95,7 +16,7 @@
       "emphasis_level": 2
     },
     {
-      "word": "\u00b7",
+      "word": "·",
       "start": 24.25,
       "end": 24.5,
       "segment_id": 5,
@@ -145,7 +66,7 @@
       "emphasis_level": 2
     },
     {
-      "word": "\u00b7",
+      "word": "·",
       "start": 30.4,
       "end": 30.6,
       "segment_id": 6,
@@ -185,7 +106,7 @@
       "emphasis_level": 2
     },
     {
-      "word": "\u00b7",
+      "word": "·",
       "start": 36.333,
       "end": 36.666,
       "segment_id": 7,
@@ -215,7 +136,7 @@
       "emphasis_level": 2
     },
     {
-      "word": "\u00b7",
+      "word": "·",
       "start": 42.2,
       "end": 42.4,
       "segment_id": 8,

@@ -135,6 +135,13 @@ const HookContrarian = () => (
 // from frame 0, then crossfades into the price reveal at ~0.5s. Now f0001 is
 // information-rich, AND the contrast between cost-of-loss and cost-of-SkyHerd
 // gives the price reveal more punch.
+//
+// iter-3 B fix (f0006): KineticCaptions (mounted at composition root in
+// Main.tsx) was rendering a duplicate "$4.17 a week 24-7 nervous system" pill
+// at the bottom of frame, echoing the hero kinetic typography below. Gated by
+// removing segments 0-4 (t=1.0-7.0s) from styled-captions-B.json so the bottom-
+// third caption lockup carries narration only — the silent hook beat now shows
+// hero typography alone with no karaoke duplicate.
 const HookPainPreroll = () => {
   const frame = useCurrentFrame();
   const opacity = interpolate(frame, [0, 12, 18], [1, 1, 0], {
