@@ -91,13 +91,17 @@ if [[ "${NO_RENDER}" -eq 0 ]]; then
   (
     cd "${REMOTION_DIR}"
     pnpm exec remotion render \
-      --composition="${COMP_ID}" \
-      --output="${RENDER_MP4}" \
+      "${COMP_ID}" \
+      "${RENDER_MP4}" \
       --concurrency=4 \
       --codec=h264 \
-      2>&1 | tail -20
+      2>&1 | tail -30
   )
-  echo "    Render complete: ${RENDER_MP4}"
+  if [[ ! -s "${RENDER_MP4}" ]]; then
+    echo "ERROR: render produced no output at ${RENDER_MP4}"
+    exit 1
+  fi
+  echo "    Render complete: ${RENDER_MP4} ($(stat -c%s "${RENDER_MP4}") bytes)"
 else
   # No-render: find most recent MP4 for this variant
   RENDER_MP4=$(find "${OUT_BASE}" -name "${VARIANT}-iter*.mp4" | sort -V | tail -1)
