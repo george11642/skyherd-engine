@@ -50,6 +50,49 @@ const FPS = 30;
 
 const C_HOOK_PUNCH = C_LAYOUT.act1.punchSeconds * FPS; // 240
 
+// iter-3 C fix: even with the iter-2 cold-open, f0001 still looked empty —
+// HookColdOpen renders a darkened b-roll (brightness 0.55 + heavy dark gradient)
+// and the stat text didn't fade in until f8. Add a 1.5s opening stat slam
+// ("1 rancher · 10,000 acres · 0 sleep") that holds full opacity from frame 0
+// over a solid dark backdrop, then crossfades out at f33→f48 so the existing
+// $1.8B / yr cold-open continues into the "$4.17" reveal at f90.
+const HookOpeningSlam = () => {
+  const frame = useCurrentFrame();
+  const opacity = interpolate(frame, [0, 33, 48], [1, 1, 0], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  return (
+    <AbsoluteFill
+      style={{
+        backgroundColor: "rgb(8 10 14)",
+        alignItems: "center",
+        justifyContent: "center",
+        opacity,
+      }}
+    >
+      <div
+        style={{
+          fontFamily: "Inter, sans-serif",
+          fontWeight: 800,
+          fontSize: 96,
+          color: "rgb(236 239 244)",
+          letterSpacing: "-0.025em",
+          textAlign: "center",
+          lineHeight: 1.06,
+          textShadow: "0 6px 28px rgba(0,0,0,0.7)",
+        }}
+      >
+        1 rancher
+        <br />
+        10,000 acres
+        <br />
+        <span style={{ color: ACCENT_MAP.warn }}>0 sleep</span>
+      </div>
+    </AbsoluteFill>
+  );
+};
+
 // iter-2 C fix: f0001 was blank — KineticPunch's first word "$4.17" appeared at
 // frame 15 with no fastFade, so opacity at frame 0 was 0. Replace the blank
 // opener with a 3s visceral cold-open: aerial drone b-roll of the ranch under
@@ -154,6 +197,7 @@ const CAct1HookPunch = () => (
     }}
   >
     <HookColdOpen />
+    <HookOpeningSlam />
     <KineticPunch
       words={[
         {
