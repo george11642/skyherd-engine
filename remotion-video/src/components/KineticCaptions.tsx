@@ -121,10 +121,7 @@ const Pill = ({ children, opacity }: PillProps) => (
       left: "50%",
       transform: "translateX(-50%)",
       maxWidth: "82%",
-      padding: "22px 38px",
-      backgroundColor: "rgba(10,12,16,0.6)",
-      borderRadius: 14,
-      backdropFilter: "blur(10px)",
+      padding: "0 12px",
       fontFamily: "Inter, sans-serif",
       fontWeight: 600,
       fontSize: 56,
@@ -132,7 +129,8 @@ const Pill = ({ children, opacity }: PillProps) => (
       letterSpacing: "-0.005em",
       color: "rgb(255,255,255)",
       textAlign: "center",
-      textShadow: "0 4px 16px rgba(0,0,0,0.5)",
+      textShadow:
+        "0 2px 6px rgba(0,0,0,0.95), 0 0 12px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,1)",
       opacity,
       pointerEvents: "none",
     }}
@@ -401,12 +399,11 @@ const StyledRollingWindow = ({ words, fps }: StyledRollingWindowProps) => {
         left: "50%",
         transform: "translateX(-50%)",
         maxWidth: "82%",
-        padding: "22px 38px",
-        backgroundColor: "rgba(10,12,16,0.6)",
-        borderRadius: 14,
-        backdropFilter: "blur(10px)",
+        padding: "0 12px",
         fontFamily: "Inter, sans-serif",
         textAlign: "center",
+        textShadow:
+          "0 2px 6px rgba(0,0,0,0.95), 0 0 12px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,1)",
         opacity: containerOpacity,
         pointerEvents: "none",
       }}

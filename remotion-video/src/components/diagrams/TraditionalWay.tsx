@@ -1,15 +1,15 @@
 /**
- * TraditionalWay v3 — multi-method ranch + SkyHerd comparison beat.
+ * TraditionalWay v4 — multi-method ranch + SkyHerd comparison beat (24s window).
  *
- * Total scene: 600 frames (20s @ 30fps).
+ * Total scene: 720 frames (24s @ 30fps).
  *
  * Phases:
- *   1. Setup            f0-60     title + ranch map fade in
- *   2. Multi-method     f60-360   helicopter, dogs, ATV, truck operating
+ *   1. Setup            f0-80     title + ranch map fade in
+ *   2. Multi-method     f80-480   helicopter, dogs, ATV, truck operating
  *                                 simultaneously across the ranch
- *   3. Missed events    f240-420  3 pulses (coyote/sick cow/empty tank)
+ *   3. Missed events    f320-540  3 pulses (coyote/sick cow/empty tank)
  *                                 + "$12K / yr" cost callout
- *   4. SkyHerd overlay  f420-600  traditional methods dim, nervous-system
+ *   4. SkyHerd overlay  f540-720  traditional methods dim, nervous-system
  *                                 overlay sweeps in (sensors + FOV + drone),
  *                                 ✗ flip to ✓, comparator card slides in
  *
@@ -37,14 +37,14 @@ const MONO       = "ui-monospace, 'JetBrains Mono', monospace";
 const SERIF      = "Georgia, 'Times New Roman', serif";
 
 // ─── Scene phase boundaries (frames) ─────────────────────────────────────────
-// Total: 600 frames (20s @ 30fps).
-//   0..60    Phase 1: title + map fade in
-//   60..360  Phase 2: multi-method active (helicopter, dogs, ATV, truck)
-//   240..420 Phase 3: missed-events pulse (overlaps phase 2 tail)
-//   420..600 Phase 4: SkyHerd comparison beat (dim → overlay → comparator)
-const MULTI_END        = 360;
-const COMPARE_START    = 420;
-const COMPARE_DIM_END  = 450;
+// Total: 720 frames (24s @ 30fps).
+//   0..80    Phase 1: title + map fade in
+//   80..480  Phase 2: multi-method active (helicopter, dogs, ATV, truck)
+//   320..540 Phase 3: missed-events pulse (overlaps phase 2 tail)
+//   540..720 Phase 4: SkyHerd comparison beat (dim → overlay → comparator)
+const MULTI_END        = 480;
+const COMPARE_START    = 540;
+const COMPARE_DIM_END  = 570;
 
 // ─── Ranch shape (irregular polygon) ─────────────────────────────────────────
 const RANCH_POLY = [
@@ -95,12 +95,12 @@ function truckAngle(wp: Array<[number, number]>, t: number): number {
   return (Math.atan2(dy, dx) * 180) / Math.PI;
 }
 
-// Truck completes ~1.0 lap across the multi-method window (300f).
-const LAP_FRAMES = 300;
+// Truck completes ~1.0 lap across the multi-method window (400f).
+const LAP_FRAMES = 400;
 
-// ─── Clock — smooth 11:00 PM → 12:00 AM (midnight) across f0-360 ─────────────
+// ─── Clock — smooth 11:00 PM → 12:00 AM (midnight) across f0-480 ─────────────
 function clockText(frame: number): string {
-  // 23:00 → 24:00 over 0..360 frames
+  // 23:00 → 24:00 over 0..480 frames
   const totalMin = interpolate(frame, [0, MULTI_END], [23 * 60, 24 * 60], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
@@ -114,7 +114,7 @@ function clockText(frame: number): string {
   return `${displayH}:${mStr} ${period}`;
 }
 
-// ─── Missed events — fire frames re-scoped for 600f scene ────────────────────
+// ─── Missed events — fire frames re-scoped for 720f scene ────────────────────
 type MissedEvent = {
   label: "COYOTE" | "SICK COW" | "EMPTY TANK";
   shortLabel: string;
@@ -125,36 +125,36 @@ type MissedEvent = {
 };
 
 const EVENTS: MissedEvent[] = [
-  { label: "COYOTE",     shortLabel: "Coyote at fence",  fireFrame: 240, flipFrame: 490, x: 0.74, y: 0.35 },
-  { label: "SICK COW",   shortLabel: "Cow issue",        fireFrame: 300, flipFrame: 510, x: 0.28, y: 0.64 },
-  { label: "EMPTY TANK", shortLabel: "Water shortage",   fireFrame: 360, flipFrame: 530, x: 0.70, y: 0.72 },
+  { label: "COYOTE",     shortLabel: "Coyote at fence",  fireFrame: 320, flipFrame: 610, x: 0.74, y: 0.35 },
+  { label: "SICK COW",   shortLabel: "Cow issue",        fireFrame: 400, flipFrame: 630, x: 0.28, y: 0.64 },
+  { label: "EMPTY TANK", shortLabel: "Water shortage",   fireFrame: 480, flipFrame: 650, x: 0.70, y: 0.72 },
 ];
 
 // ─── SkyHerd nervous-system overlay anchors ──────────────────────────────────
 // 8 LoRaWAN sensor dots: 4 troughs + 2 fence corners + 2 mid-pasture
 const LORA_DOTS: Array<{ x: number; y: number; reveal: number }> = [
-  { x: 0.78, y: 0.245, reveal: 440 }, // trough 1 (NE)
-  { x: 0.71, y: 0.715, reveal: 448 }, // trough 2 (south)
-  { x: 0.32, y: 0.30,  reveal: 456 }, // mid-N pasture trough (implicit)
-  { x: 0.55, y: 0.66,  reveal: 464 }, // mid-S pasture trough
-  { x: 0.12, y: 0.20,  reveal: 472 }, // NW fence corner
-  { x: 0.88, y: 0.18,  reveal: 480 }, // NE fence corner
-  { x: 0.30, y: 0.40,  reveal: 488 }, // mid-N pasture
-  { x: 0.62, y: 0.55,  reveal: 496 }, // mid-pasture S
+  { x: 0.78, y: 0.245, reveal: 560 }, // trough 1 (NE)
+  { x: 0.71, y: 0.715, reveal: 568 }, // trough 2 (south)
+  { x: 0.32, y: 0.30,  reveal: 576 }, // mid-N pasture trough (implicit)
+  { x: 0.55, y: 0.66,  reveal: 584 }, // mid-S pasture trough
+  { x: 0.12, y: 0.20,  reveal: 592 }, // NW fence corner
+  { x: 0.88, y: 0.18,  reveal: 600 }, // NE fence corner
+  { x: 0.30, y: 0.40,  reveal: 608 }, // mid-N pasture
+  { x: 0.62, y: 0.55,  reveal: 616 }, // mid-pasture S
 ];
 
 // 3 camera FOV cones (translucent emerald arcs)
 const CAMERAS: Array<{ x: number; y: number; angleDeg: number; reveal: number }> = [
-  { x: 0.78, y: 0.78, angleDeg: 200, reveal: 450 }, // SE camera, looking NW into fields
-  { x: 0.14, y: 0.22, angleDeg: 30,  reveal: 470 }, // NW camera, looking SE
-  { x: 0.50, y: 0.18, angleDeg: 110, reveal: 490 }, // N camera, looking S
+  { x: 0.78, y: 0.78, angleDeg: 200, reveal: 570 }, // SE camera, looking NW into fields
+  { x: 0.14, y: 0.22, angleDeg: 30,  reveal: 590 }, // NW camera, looking SE
+  { x: 0.50, y: 0.18, angleDeg: 110, reveal: 610 }, // N camera, looking S
 ];
 
 // 1 drone path: ranch house → coyote position
 const DRONE_PATH = {
   start:  { x: 0.17, y: 0.50 },
   end:    { x: 0.74, y: 0.35 },
-  reveal: 470,
+  reveal: 590,
 };
 
 // ─── Helicopter SVG silhouette ───────────────────────────────────────────────
@@ -278,14 +278,14 @@ export const TraditionalWay: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps, width, height } = useVideoConfig();
 
-  // ── Phase 1: Title + map fade in (0..60) ───────────────────────────────────
-  const setupOp = interpolate(frame, [0, 30], [0, 1], {
+  // ── Phase 1: Title + map fade in (0..80) ───────────────────────────────────
+  const setupOp = interpolate(frame, [0, 40], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
 
   // ── Phase 4: Traditional methods dim during compare beat ───────────────────
-  // Fade traditional actors + missed-event icons from 1.0 → 0.25 over 420..450
+  // Fade traditional actors + missed-event icons from 1.0 → 0.25 over 540..570
   const traditionalOp = interpolate(
     frame,
     [COMPARE_START, COMPARE_DIM_END],
@@ -300,12 +300,12 @@ export const TraditionalWay: React.FC = () => {
   const truck = lerpWp(ROAD_WP, lapT);
   const tAngle = truckAngle(ROAD_WP, lapT);
 
-  // ── Helicopter — wide circular orbit around N pasture, ~1.5 laps in 300f ──
+  // ── Helicopter — wide circular orbit around N pasture, ~1.5 laps in 480f ──
   // Center: NE of north pasture. Slight tilt with motion direction.
   const heliCenter = { x: 0.50 * width, y: 0.32 * height };
   const heliRadiusX = 0.30 * width;
   const heliRadiusY = 0.16 * height;
-  // Phase: 1.5 laps from f0..f300 (active multi-method window).
+  // Phase: 1.5 laps from f0..f480 (active multi-method window).
   const heliPhase = (Math.min(frame, MULTI_END) / MULTI_END) * Math.PI * 3;
   const heliX = heliCenter.x + heliRadiusX * Math.cos(heliPhase);
   const heliY = heliCenter.y + heliRadiusY * Math.sin(heliPhase);
@@ -330,14 +330,14 @@ export const TraditionalWay: React.FC = () => {
   const dog1Bounce = Math.abs(Math.sin((frame * Math.PI) / 6)) * 4;
   const dog2Bounce = Math.abs(Math.sin((frame * Math.PI) / 6 + Math.PI / 3)) * 4;
 
-  // Dog 1 sprint: at f180, dog 1 sprints toward the COYOTE marker, returns.
-  // Sprint window: f180..f240 (60f). Linear interp from dog1Pos -> coyote -> back.
-  const sprintT = clamp01((frame - 180) / 60);
+  // Dog 1 sprint: at f240, dog 1 sprints toward the COYOTE marker, returns.
+  // Sprint window: f240..f320 (80f). Linear interp from dog1Pos -> coyote -> back.
+  const sprintT = clamp01((frame - 240) / 80);
   // 0 → 0.5 outbound, 0.5 → 1.0 return.
   const sprintPhase = sprintT < 0.5 ? sprintT * 2 : (1 - sprintT) * 2;
   const coyoteX = EVENTS[0].x;
   const coyoteY = EVENTS[0].y;
-  const sprintActive = frame >= 180 && frame <= 240;
+  const sprintActive = frame >= 240 && frame <= 320;
   const dog1FinalX = sprintActive
     ? dog1Pos.x + (coyoteX - dog1Pos.x) * sprintPhase
     : dog1Pos.x;
@@ -345,21 +345,21 @@ export const TraditionalWay: React.FC = () => {
     ? dog1Pos.y + (coyoteY - dog1Pos.y) * sprintPhase
     : dog1Pos.y;
 
-  // ── ATV — linear traverse along east fence, takes 240f to cross ────────────
+  // ── ATV — linear traverse along east fence, takes 320f to cross ────────────
   // East fence runs from ~(0.86, 0.20) to ~(0.86, 0.80).
-  // ATV active f60..f300 (240f window).
-  const atvT = clamp01((frame - 60) / 240);
+  // ATV active f80..f400 (320f window).
+  const atvT = clamp01((frame - 80) / 320);
   const atvX = 0.86;
   const atvY = 0.20 + (0.80 - 0.20) * atvT;
-  const atvOp = interpolate(frame, [60, 75, 300, 320], [0, 1, 1, 1], {
+  const atvOp = interpolate(frame, [80, 100, 400, 420], [0, 1, 1, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
   // Wheel spin (radians)
   const atvWheelSpin = (frame * 0.6) % (Math.PI * 2);
 
-  // ── Sub-label fade in at f120 ──────────────────────────────────────────────
-  const subLabelOp = interpolate(frame, [120, 150], [0, 1], {
+  // ── Sub-label fade in at f160 ──────────────────────────────────────────────
+  const subLabelOp = interpolate(frame, [160, 200], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
@@ -375,21 +375,21 @@ export const TraditionalWay: React.FC = () => {
   const clock = clockText(frame);
   const clockOp = interpolate(
     frame,
-    [0, 30, COMPARE_START, COMPARE_DIM_END],
+    [0, 40, COMPARE_START, COMPARE_DIM_END],
     [0, 1, 1, 0.3],
     { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
   );
 
-  // ── $12K cost callout: fires f330, holds through f400 ──────────────────────
+  // ── $12K cost callout: fires f490 (aligned with EMPTY TANK pulse) ──────────
   const costOp = interpolate(
     frame,
-    [330, 348, 400, 420],
+    [490, 508, 540, 560],
     [0, 1, 1, 0],
     { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
   );
 
-  // ── Comparator card slide-in (right edge, frames 460..500) ─────────────────
-  const comparatorBaseOp = interpolate(frame, [460, 500], [0, 1], {
+  // ── Comparator card slide-in (right edge, frames 600..640) ─────────────────
+  const comparatorBaseOp = interpolate(frame, [600, 640], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
@@ -552,7 +552,7 @@ export const TraditionalWay: React.FC = () => {
         {/* ── Traditional actors layer (helicopter, dogs, ATV) ── */}
         <g opacity={traditionalOp}>
           {/* ATV dust trail — short trailing line behind ATV */}
-          {frame >= 60 && frame <= 320 && (
+          {frame >= 80 && frame <= 420 && (
             <line
               x1={atvX * width - 18}
               y1={atvY * height + 4}
@@ -791,7 +791,7 @@ export const TraditionalWay: React.FC = () => {
         );
       })}
 
-      {/* ── SkyHerd nervous-system overlay (frames 440..600) ── */}
+      {/* ── SkyHerd nervous-system overlay (frames 560..720) ── */}
       <svg
         style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 18 }}
         viewBox={`0 0 ${width} ${height}`}
@@ -988,7 +988,7 @@ export const TraditionalWay: React.FC = () => {
         </div>
       </div>
 
-      {/* ── Comparator card (right edge, frames 460..600) ── */}
+      {/* ── Comparator card (right edge, frames 600..720) ── */}
       <ComparatorCard
         baseOp={comparatorBaseOp}
         frame={frame}
@@ -1001,28 +1001,35 @@ export const TraditionalWay: React.FC = () => {
 // ─── Comparator card component ───────────────────────────────────────────────
 type ComparatorCardProps = { baseOp: number; frame: number; height: number };
 
-const COMPARATOR_LINES: Array<{
+type ComparatorKind = "traditional" | "skyherd" | "savings";
+
+type ComparatorLine = {
+  kind: ComparatorKind;
   label: string;
+  price: string;
   detail: string;
-  emerald?: boolean;
   delay: number;
-}> = [
-  { label: "Helicopter",   detail: "$1,200/hr · skies clear",       delay: 0  },
-  { label: "Working dogs", detail: "2-mi range · daylight only",    delay: 12 },
-  { label: "ATV / truck",  detail: "between runs only",             delay: 24 },
-  { label: "SkyHerd",      detail: "24/7 · 10,000 acres · $4.17/wk", emerald: true, delay: 44 },
+};
+
+const COMPARATOR_LINES: Array<ComparatorLine> = [
+  { kind: "traditional", label: "Helicopter",   price: "~$40,000 / yr",  detail: "skies clear",          delay: 0  },
+  { kind: "traditional", label: "Working dogs", price: "~$6,000 / yr",   detail: "daylight only",        delay: 10 },
+  { kind: "traditional", label: "ATV / truck",  price: "~$18,000 / yr",  detail: "between runs only",    delay: 20 },
+  { kind: "traditional", label: "Lost events",  price: "~$12,000 / yr",  detail: "missed between runs",  delay: 30 },
+  { kind: "skyherd",     label: "SkyHerd",      price: "$2,500 / month", detail: "24/7 · 10,000 acres · 500 head", delay: 50 },
+  { kind: "savings",     label: "~$45,000 / yr saved", price: "",        detail: "",                     delay: 70 },
 ];
 
 function ComparatorCard({ baseOp, frame, height }: ComparatorCardProps) {
-  const slideStart = 460;
+  const slideStart = 600;
   return (
     <div
       style={{
         position: "absolute",
         right: 60,
-        top: height * 0.30,
-        width: "36%",
-        maxWidth: 560,
+        top: height * 0.22,
+        width: "38%",
+        maxWidth: 600,
         opacity: baseOp,
         zIndex: 40,
         fontFamily: MONO,
@@ -1037,7 +1044,7 @@ function ComparatorCard({ baseOp, frame, height }: ComparatorCardProps) {
           boxShadow: "0 12px 28px rgba(45,42,38,0.18)",
           display: "flex",
           flexDirection: "column",
-          gap: 14,
+          gap: 12,
         }}
       >
         <div
@@ -1064,8 +1071,39 @@ function ComparatorCard({ baseOp, frame, height }: ComparatorCardProps) {
             extrapolateLeft: "clamp",
             extrapolateRight: "clamp",
           });
-          const isEmerald = !!line.emerald;
+          // Dashed dividers ABOVE the SkyHerd row (i=4) and ABOVE the savings row (i=5).
+          const showTopDivider = line.kind === "skyherd" || line.kind === "savings";
+
+          if (line.kind === "savings") {
+            return (
+              <div
+                key={i}
+                style={{
+                  opacity: lineOp,
+                  transform: `translateY(${lineY}px)`,
+                  paddingTop: 12,
+                  marginTop: 4,
+                  borderTop: `1px dashed ${SAGE_DARK}`,
+                  textAlign: "left",
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: 26,
+                    fontWeight: 800,
+                    color: EMERALD_DK,
+                    letterSpacing: "0.03em",
+                  }}
+                >
+                  {line.label}
+                </div>
+              </div>
+            );
+          }
+
+          const isEmerald = line.kind === "skyherd";
           const labelColor = isEmerald ? EMERALD_DK : DUST;
+          const priceColor = isEmerald ? EMERALD_DK : INK_LIGHT;
           const detailColor = isEmerald ? EMERALD_DK : SAGE_DARK;
           return (
             <div
@@ -1074,32 +1112,50 @@ function ComparatorCard({ baseOp, frame, height }: ComparatorCardProps) {
                 opacity: lineOp,
                 transform: `translateY(${lineY}px)`,
                 display: "flex",
-                flexDirection: "column",
-                gap: 3,
-                paddingTop: i === 3 ? 10 : 0,
-                borderTop: i === 3 ? `1px dashed ${SAGE_DARK}` : "none",
-                marginTop: i === 3 ? 4 : 0,
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "baseline",
+                gap: 12,
+                paddingTop: showTopDivider ? 10 : 0,
+                borderTop: showTopDivider ? `1px dashed ${SAGE_DARK}` : "none",
+                marginTop: showTopDivider ? 4 : 0,
               }}
             >
-              <div
-                style={{
-                  fontSize: isEmerald ? 22 : 17,
-                  fontWeight: isEmerald ? 800 : 700,
-                  color: labelColor,
-                  letterSpacing: "0.04em",
-                }}
-              >
-                {line.label}
+              {/* Left col: label + detail */}
+              <div style={{ display: "flex", flexDirection: "column", gap: 2, flex: "1 1 auto" }}>
+                <div
+                  style={{
+                    fontSize: isEmerald ? 21 : 16,
+                    fontWeight: isEmerald ? 800 : 700,
+                    color: labelColor,
+                    letterSpacing: "0.04em",
+                  }}
+                >
+                  {line.label}
+                </div>
+                <div
+                  style={{
+                    fontSize: isEmerald ? 13 : 12,
+                    color: detailColor,
+                    letterSpacing: "0.02em",
+                    fontWeight: isEmerald ? 600 : 400,
+                  }}
+                >
+                  {line.detail}
+                </div>
               </div>
+              {/* Right col: price */}
               <div
                 style={{
-                  fontSize: isEmerald ? 17 : 13,
-                  color: detailColor,
+                  fontSize: isEmerald ? 18 : 14,
+                  fontWeight: isEmerald ? 800 : 700,
+                  color: priceColor,
                   letterSpacing: "0.02em",
-                  fontWeight: isEmerald ? 600 : 400,
+                  whiteSpace: "nowrap",
+                  textAlign: "right",
                 }}
               >
-                {line.detail}
+                {line.price}
               </div>
             </div>
           );

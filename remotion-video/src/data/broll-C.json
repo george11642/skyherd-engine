@@ -63,30 +63,6 @@
       "transition": "cut",
       "transitionDurationFrames": 0,
       "reason": "Synthesis beat: 30\u00d7 ambient dashboard with three callout cards stacking right. vo-synthesis-C: 'Five agents. Idle until a sensor wakes them. Skills loaded per-task. Cost ticker freezes between events.' Tight 15s \u2014 Elisa stats-barrage backing."
-    },
-    {
-      "startSeconds": 145.0,
-      "endSeconds": 160.0,
-      "src": "clips/attest_verify.mp4",
-      "transition": "cut",
-      "transitionDurationFrames": 0,
-      "reason": "Hard cut to terminal: skyherd-attest verify scrolling 360 entries, Ed25519 sigs blink green. vo-depth-C: tests/coverage/seed/bytes counter. Replaces A/B's 14s substance VO with a richer, terminal-led 15s."
-    },
-    {
-      "startSeconds": 145.0,
-      "endSeconds": 152.0,
-      "src": "broll/t2-hardware-circuit-board.mp4",
-      "transition": "cut",
-      "transitionDurationFrames": 0,
-      "reason": "C-ONLY b-roll inset: hardware circuit-board on a small picture-in-picture in lower-right during depth narration \u2014 ties Year-2 hardware fleet visually without forcing it into the main shot. Layer: overlay (PiP)."
-    },
-    {
-      "startSeconds": 152.0,
-      "endSeconds": 160.0,
-      "src": "broll/t2-hardware-microcircuit.mp4",
-      "transition": "cut",
-      "transitionDurationFrames": 0,
-      "reason": "C-ONLY: Microcircuit PiP follows circuit-board, same lower-right slot. Together they assert 'this is real hardware territory' in 15s without leaving the depth narrative."
     }
   ]
 }

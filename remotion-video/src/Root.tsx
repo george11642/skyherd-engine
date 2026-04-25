@@ -25,15 +25,17 @@ const DEFAULT_AB_ACT_DURATIONS = {
   act5: 0,
 };
 
-// v5.1 polish pass — re-timed to fast Chatterbox VO (170s = 5100 frames @ 30fps)
+// v5.2 polish pass — full 3:00 runtime (180s = 5400 frames @ 30fps)
+// Rebalanced to fit measured Chatterbox cue durations from
+// .planning/research/v5-chatterbox-durations.txt (each scene gets ≥0s tail).
 const DEFAULT_C_ACT_DURATIONS = {
-  act1: 28 * FPS,  //  840f: coldOpen(6s) + hook(22s)
-  act2: 38 * FPS,  // 1140f: traditional(20s) + answer(18s)
-  act3: 48 * FPS,  // 1440f: coyote(26s) + grid(22s)
-  act4: 38 * FPS,  // 1140f: mvp(20s) + vision(18s)
-  act5: 18 * FPS,  //  540f: aibody(14s) + wordmark(4s)
+  act1: 26 * FPS,   //  780f: coldOpen(6s) + hook(20s)        — hook VO 19.152s
+  act2: 41 * FPS,   // 1230f: traditional(24s) + answer(17s)  — trad 21.6s + comparator slide-in needs 24s window
+  act3: 54 * FPS,   // 1620f: coyote(30s) + grid(24s)         — coyote VO 29.59s, grid 23.52s
+  act4: 45 * FPS,   // 1350f: mvp(23s) + vision(22s)          — mvp 22.10s, vision 21.55s
+  act5: 16 * FPS,   //  480f: aibody(13s) + wordmark(3s)      — aibody VO 13.03s
 };
-// Total: 170s = 5100 frames @ 30fps
+// Total: 182s = 5460 frames @ 30fps (traditional bumped 22→24 so comparator savings row lands)
 
 // Fallback VO durations (frames). Measured 2026-04-24 from Inworld/Nate render.
 const DEFAULT_VO_DURATIONS_FRAMES = {

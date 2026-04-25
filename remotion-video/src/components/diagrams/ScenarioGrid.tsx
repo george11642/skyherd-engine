@@ -1,8 +1,8 @@
 /**
- * ScenarioGrid — Scene 6 (v5 Wave 2B rewrite)
+ * ScenarioGrid — Scene 6 (v5.2 retiming)
  *
  * 4 scenario tiles, sequential focus (one fills ~45% viewport at a time).
- * Total runtime ~24s (720 frames). Fixes: cream bg frame-0, rich bodies, bigger stats.
+ * Total runtime 24s (720 frames). Fixes: cream bg frame-0, rich bodies, bigger stats.
  */
 import { AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
 
@@ -63,9 +63,10 @@ const TILES: TileData[] = [
   },
 ];
 
-// v5.1 polish: tightened to fit 660f (22s) — 4 tiles
+// v5.2 retime: fits 720f (24s) — 4 tiles
+// 4×STAGGER + FOCUS_DUR = 4×150 + 130 = 730f ≈ 24.3s
 const FOCUS_DUR = 130;   // 4.33s per tile
-const STAGGER  = 145;   // ~4.83s tile-to-tile
+const STAGGER  = 150;   // 5.00s tile-to-tile
 const TRANS   = 20;
 
 /** Mini SVG body visual for each scenario */
@@ -271,12 +272,12 @@ export const ScenarioGrid: React.FC = () => {
         Powered by Opus 4.7 · 5-agent mesh
       </div>
 
-      {/* Sub-label */}
+      {/* Sub-label — appears once all 4 tiles have run their focus */}
       <div style={{
         position: "absolute", bottom: 32, left: 48,
         fontFamily: MONO, fontSize: 13, color: INK_LIGHT, letterSpacing: "0.10em",
         textTransform: "uppercase" as const,
-        opacity: interpolate(frame, [540, 580], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }),
+        opacity: interpolate(frame, [620, 660], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }),
       }}>
         No rancher action needed
       </div>

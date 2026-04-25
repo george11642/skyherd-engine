@@ -1,12 +1,11 @@
 /**
- * v5 — Variant C 9-scene layout (3:00 / 180s / 5400 frames @ 30fps).
- * Wave 2E: scene durations redistributed to absorb VO overflow.
+ * v5.2 — Variant C 9-scene layout (3:00 / 180s / 5400 frames @ 30fps).
  *
- * Act 1 Hook  (25s / 750f)  : cold-open slam (3s) + hook VO (22s)
- * Act 2 Story (32s / 960f)  : TraditionalWay (16s) + NervousSystemStack (16s)
- * Act 3 Demo  (57s / 1710f) : live coyote dashboard (32s) + ScenarioGrid (25s)
- * Act 4 Sub   (44s / 1320f) : SoftwareMVPBlocks (22s) + VisionTimeline (22s)
- * Act 5 Close (22s / 660f)  : AIBodyClose (18s) + wordmark tail (4s)
+ * Act 1 Hook  (28s /  840f) : cold-open slam (6s) + hook VO (22s)
+ * Act 2 Story (42s / 1260f) : TraditionalWay (24s) + NervousSystemStack (18s)
+ * Act 3 Demo  (52s / 1560f) : live coyote dashboard (28s) + ScenarioGrid (24s)
+ * Act 4 Sub   (42s / 1260f) : SoftwareMVPBlocks (21s) + VisionTimeline (21s)
+ * Act 5 Close (16s /  480f) : AIBodyClose (12s) + wordmark tail (4s)
  *
  * Each scene's animations are relative to its Series.Sequence mount frame.
  * VO Audio tags fire at scene-relative frame 0.
@@ -49,8 +48,8 @@ import brollCRaw from "../../data/broll-C.json";
 const BROLL_C: BrollCut[] = (brollCRaw as { cuts: BrollCut[] }).cuts;
 
 // Global act offsets (seconds) used by BrollTrack
-// v5.1 polish: act5 starts at frame 4560 = 152s (coldOpen6+hook22+trad20+ans18+coyote26+grid22+mvp20+vision18)
-const C_ACT5_START = 152;
+// v5.2 rebalanced: act5 starts at frame 4980 = 166s (act1+act2+act3+act4 = 26+41+54+45)
+const C_ACT5_START = 166;
 
 const FPS = 30;
 
@@ -419,7 +418,7 @@ const HookIntroVo = () => {
 // ── Act 1 Export ──────────────────────────────────────────────────────────────
 
 export const CAct1Hook = () => {
-  const COLD = C_LAYOUT.act1.coldOpenSeconds * FPS; // 6s = 180f (v5.1)
+  const COLD = C_LAYOUT.act1.coldOpenSeconds * FPS; // 6s = 180f
   const HOOK = C_LAYOUT.act1.hookSeconds * FPS;     // 22s = 660f
 
   return (
@@ -442,8 +441,8 @@ export const CAct1Hook = () => {
 // ── Act 2 Export ──────────────────────────────────────────────────────────────
 
 export const CAct2Story = () => {
-  const TRAD = C_LAYOUT.act2.traditionalSeconds * FPS; // 16s = 480f
-  const ANS  = C_LAYOUT.act2.answerSeconds * FPS;      // 16s = 480f
+  const TRAD = C_LAYOUT.act2.traditionalSeconds * FPS; // 24s = 720f
+  const ANS  = C_LAYOUT.act2.answerSeconds * FPS;      // 18s = 540f
 
   return (
     <AbsoluteFill>
@@ -465,11 +464,11 @@ export const CAct2Story = () => {
   );
 };
 
-// ── Scene: Live Coyote Dashboard (40s / 1200 frames) ─────────────────────────
+// ── Scene: Live Coyote Dashboard (28s / 840 frames) ──────────────────────────
 
 /**
  * Jargon-free live coyote FenceLineDispatcher dashboard.
- * VO is vo-c-coyote.mp3 (~16.4s); the remaining ~24s is the live dashboard
+ * VO is vo-c-coyote.mp3 (~22.4s); the remaining ~5.6s is the live dashboard
  * continuing to play through the scenario.
  */
 const CoyoteDashboard = () => {
@@ -617,8 +616,8 @@ const CoyoteDashboard = () => {
 // ── Act 3 Export ──────────────────────────────────────────────────────────────
 
 export const CAct3Demo = () => {
-  const COYOTE = C_LAYOUT.act3.coyoteSeconds * FPS; // 32s = 960f
-  const GRID   = C_LAYOUT.act3.gridSeconds * FPS;   // 25s = 750f
+  const COYOTE = C_LAYOUT.act3.coyoteSeconds * FPS; // 28s = 840f
+  const GRID   = C_LAYOUT.act3.gridSeconds * FPS;   // 24s = 720f
 
   return (
     <AbsoluteFill>
@@ -640,8 +639,8 @@ export const CAct3Demo = () => {
 // ── Act 4 Export ──────────────────────────────────────────────────────────────
 
 export const CAct4Substance = () => {
-  const MVP    = C_LAYOUT.act4.mvpSeconds * FPS;    // 22s = 660f
-  const VISION = C_LAYOUT.act4.visionSeconds * FPS; // 22s = 660f
+  const MVP    = C_LAYOUT.act4.mvpSeconds * FPS;    // 21s = 630f
+  const VISION = C_LAYOUT.act4.visionSeconds * FPS; // 21s = 630f
 
   return (
     <AbsoluteFill>
@@ -663,7 +662,7 @@ export const CAct4Substance = () => {
   );
 };
 
-// ── Wordmark tail (5s / 150 frames, silent) ───────────────────────────────────
+// ── Wordmark tail (4s / 120 frames, silent) ───────────────────────────────────
 
 const CCloseWordmark = () => {
   const frame = useCurrentFrame();
@@ -778,7 +777,7 @@ const CCloseWordmark = () => {
 // ── Act 5 Export ──────────────────────────────────────────────────────────────
 
 export const CAct5Close = () => {
-  const AIBODY   = C_LAYOUT.act5.aibodySeconds * FPS;   // 18s = 540f
+  const AIBODY   = C_LAYOUT.act5.aibodySeconds * FPS;   // 12s = 360f
   const WORDMARK = C_LAYOUT.act5.wordmarkSeconds * FPS; // 4s = 120f
 
   return (

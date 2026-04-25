@@ -1,8 +1,8 @@
 cHook=19.152
-cTraditional=19.224
-cAnswer=15.672
-cCoyote=22.440
-cGrid=17.832
-cMvp=17.304
-cVision=12.552
-cAibody=11.064
+cTraditional=21.600
+cAnswer=16.992
+cCoyote=29.592
+cGrid=23.520
+cMvp=22.104
+cVision=21.552
+cAibody=13.032

@@ -107,21 +107,21 @@ CUES["vo-meta-B"]="And the captions you've been reading? Opus 4.7 styled every w
 #   vo-c-vision      → 130s
 #   vo-c-aibody      → 152s
 
-CUES["vo-c-hook"]="I'm George, senior at UNM. I've spent a lot of nights on New Mexico ranches watching ranchers do impossible work. Right now beef prices are at record highs — but the American cow herd is at a sixty-five-year low. Labor's gone. Ranchers are aging out. Every ranch left has to do more, with fewer people watching it."
+CUES["vo-c-hook"]="I'm George, senior at UNM. I've spent a lot of nights on New Mexico ranches watching ranchers do impossible work. Right now beef prices are at record highs — but the American cow herd is at a sixty-five-year low. Labor's gone. Ranchers are aging out. Every ranch left has to do more, with fewer people watching it. And right now nobody is."
 
-CUES["vo-c-traditional"]="Here's how a ranch runs today. Helicopters. Working dogs. A-T-Vs. One ranch hand and two-hundred miles a week. Six runs a day, best case — and still, a coyote before dawn, a sick cow at noon, an empty water tank at midnight, all missed between runs. SkyHerd watches every acre, every minute, for four-seventeen a week."
+CUES["vo-c-traditional"]="Here's how a ranch runs today. Helicopters. Working dogs. A-T-Vs. One ranch hand and two-hundred miles a week. Six runs a day, best case — and still, a coyote before dawn, a sick cow at noon, an empty water tank at midnight, all missed between runs. SkyHerd replaces all of it for twenty-five hundred a month — and saves the average ranch forty-five thousand dollars a year."
 
-CUES["vo-c-answer"]="SkyHerd gives the ranch a nervous system. Five Claude agents, built on Opus 4.7. They're idle until a sensor wakes them — vision, motion, pressure, weather. Then they decide and act. Four dollars and seventeen cents a week of compute, total."
+CUES["vo-c-answer"]="SkyHerd gives the ranch a nervous system. Five Claude agents, built on Opus 4.7. They're idle until a sensor wakes them — vision, motion, pressure, weather. Then they decide and act. Twenty-five hundred a month, per ranch. Less than the cost of one ranch hand, watching every acre."
 
-CUES["vo-c-coyote"]="Three-fourteen in the morning. Thermal hits the south fence. The agent wakes up, looks at the frame, calls it — coyote, ninety-one percent confidence. It dispatches the drone autonomously. Drone flies the perimeter, scares the coyote off, returns home. The rancher gets a text. Nobody woke up. Nothing got eaten. The fence-line agent goes back to sleep — billing stops until the next sensor event."
+CUES["vo-c-coyote"]="Three-fourteen in the morning. Thermal hits the south fence. The agent wakes up, looks at the frame, calls it — coyote, ninety-one percent confidence. It dispatches the drone autonomously. Drone flies the perimeter, scares the coyote off, returns home. The rancher gets a text. Nobody woke up. Nothing got eaten. The fence-line agent goes back to sleep — billing stops until the next sensor event. Total compute for that whole alert: about forty cents."
 
-CUES["vo-c-grid"]="And it's not just the fence. Sick cow with pinkeye? An agent flags her, drafts the vet packet, schedules the visit — all before sunrise. Trough pressure dropping overnight? A drone flies the leak. A cow goes into labor before dawn — the rancher gets a priority page, not a maybe. Hailstorm forty-five minutes out? The herd auto-rotates to shelter."
+CUES["vo-c-grid"]="And it's not just the fence. Sick cow with pinkeye? An agent flags her, drafts the vet packet, schedules the visit — all before sunrise. Trough pressure dropping overnight? A drone inspects the leak. A cow goes into labor before dawn — the rancher gets a priority page, not a maybe. Hailstorm forty-five minutes out? The herd auto-rotates to shelter. All five agents, all running on Opus 4.7, all idle until a sensor wakes them."
 
-CUES["vo-c-mvp"]="I built the full software M-V-P solo. Web dashboard. iOS app. Android app. A deterministic simulator that replays any scenario from a seed. And a voice A-I rancher that calls you on Twilio when something needs your eyes. Open source. M-I-T licensed. Eleven-hundred tests, eighty-seven percent coverage."
+CUES["vo-c-mvp"]="I built the full software M-V-P solo. Web dashboard. iOS app. Android app. A deterministic simulator that replays any scenario from a seed. And a voice A-I rancher that calls you on Twilio when something needs your eyes. Open source. M-I-T licensed. Eleven-hundred tests, eighty-seven percent coverage. Anyone can clone the repo and run the demo today."
 
-CUES["vo-c-vision"]="Today: software M-V-P and simulator. Six months: pilot ranches in New Mexico. One year: ten ranches with real cameras and L-O-R-A. Five years: every ranch in America has a nervous system."
+CUES["vo-c-vision"]="Today, the M-V-P runs on a Raspberry Pi and a simulator. Six months: pilot ranches in New Mexico. One year: ten ranches with cameras, L-O-R-A collars on every animal, and a drone fleet that watches the perimeter and herds the cattle home. Five years: every ranch in America has a nervous system. And insurance companies pay for the data the ranch already produces."
 
-CUES["vo-c-aibody"]="And the future of A-I? It's not just chat windows. It's A-I that can see, that can act, that has a body in the world — watching the things people can't. SkyHerd is what that looks like for the ranch."
+CUES["vo-c-aibody"]="And the future of A-I? It's not just chat windows. It's A-I that can see, that can act, that has a body in the world — watching the things people can't. SkyHerd is what that looks like for the ranch. Today."
 
 # ─── Inworld prosody overrides ───────────────────────────────────────────────
 # Only populated where natural punctuation alone isn't enough for the

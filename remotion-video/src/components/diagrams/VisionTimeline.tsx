@@ -1,13 +1,13 @@
 /**
- * VisionTimeline v2 — Scene 8, 22s / 660 frames @ 30fps
+ * VisionTimeline v2 — Scene 8, 21s / 630 frames @ 30fps (v5.2)
  *
  * Animation:
  *  0–90f    : fade-in + L→R line draws
  *  0f       : TODAY reveals   (frame 0)
- *  150f     : 6 MONTHS reveals
- *  330f     : 1 YEAR reveals
- *  510f     : 5 YEARS reveals
- *  570–660f : hold-final (completely still)
+ *  143f     : 6 MONTHS reveals
+ *  315f     : 1 YEAR reveals  (collars + drone-fleet + acoustic-pulse fade in)
+ *  486f     : 5 YEARS reveals
+ *  540–630f : hold-final (completely still)
  *  ongoing  : TODAY dot pulse, 5-YEAR grid pulse
  */
 import { AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
@@ -15,6 +15,7 @@ import { AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig } fr
 const CREAM      = "rgb(245 240 230)";
 const CREAM_DARK = "rgb(210 200 185)";
 const SAGE       = "rgb(148 176 136)";
+const DUST       = "rgb(196 178 148)";
 const TERRACOTTA = "rgb(188 90 60)";
 const INK        = "rgb(45 42 38)";
 const INK_LIGHT  = "rgb(110 105 96)";
@@ -22,8 +23,8 @@ const MONO       = "ui-monospace, 'JetBrains Mono', monospace";
 const SERIF      = "Georgia, 'Times New Roman', serif";
 
 const LINE_REVEAL_END  = 90;                   // 3s — line draws L→R
-const REVEAL_FRAMES    = [0, 150, 330, 510] as const;
-const HOLD_FINAL_START = 570;                  // 19s — freeze everything
+const REVEAL_FRAMES    = [0, 143, 315, 486] as const; // scaled 660→630f for v5.2
+const HOLD_FINAL_START = 540;                  // 18s — freeze everything (v5.2)
 
 // ── SVG illustrations (each 120×80 viewBox) ──────────────────────────────────
 
@@ -57,9 +58,52 @@ const US_PATH = "M8,24 L20,18 L38,16 L55,14 L70,16 L88,18 L100,24 L108,28 L112,3
 const US_DOTS_10 = [{x:22,y:46},{x:30,y:42},{x:18,y:36},{x:28,y:32},{x:40,y:38},{x:48,y:30},{x:60,y:44},{x:70,y:36},{x:82,y:40},{x:56,y:54}];
 const ANTENNA_PTS = [{x:25,y:27},{x:72,y:28}];
 
+// Collar icon: rounded-rectangle GPS-collar silhouette with small puck
+const CollarIcon: React.FC<{cx: number; cy: number}> = ({ cx, cy }) => (
+  <g transform={`translate(${cx - 3} ${cy - 1.5})`}>
+    <rect x={0} y={0} width={6} height={3} rx={1.4} ry={1.4}
+      fill={DUST} stroke="rgb(140 120 90)" strokeWidth={0.4} />
+    <rect x={2.2} y={-0.6} width={1.6} height={1.2} rx={0.3}
+      fill="rgb(140 120 90)" />
+  </g>
+);
+
+// Drone-fleet chevron: 3 small triangles in formation, sage
+const DroneFleet: React.FC<{cx: number; cy: number}> = ({ cx, cy }) => (
+  <g>
+    {[
+      { dx:  0,   dy: 0   },
+      { dx: -3.2, dy: 2.4 },
+      { dx:  3.2, dy: 2.4 },
+    ].map((p, i) => (
+      <polygon key={i}
+        points={`${cx + p.dx},${cy + p.dy - 1.2} ${cx + p.dx - 1.4},${cy + p.dy + 1} ${cx + p.dx + 1.4},${cy + p.dy + 1}`}
+        fill={SAGE} opacity={0.85}
+        stroke="rgb(100 130 90)" strokeWidth={0.3} />
+    ))}
+  </g>
+);
+
+// Collar positions — scattered near a few cattle dots
+const COLLAR_PTS = [
+  { x: US_DOTS_10[0].x, y: US_DOTS_10[0].y - 5 },
+  { x: US_DOTS_10[4].x + 4, y: US_DOTS_10[4].y - 5 },
+  { x: US_DOTS_10[7].x, y: US_DOTS_10[7].y - 5 },
+];
+// Drone-fleet position — above one ranch cluster
+const DRONE_PT = { x: US_DOTS_10[3].x, y: US_DOTS_10[3].y - 8 };
+// Acoustic pulse anchor — around a cattle cluster
+const PULSE_PT = { x: US_DOTS_10[2].x, y: US_DOTS_10[2].y };
+
 const US10SVG = () => (
   <svg viewBox="0 0 120 80" width={120} height={80}>
     <path d={US_PATH} fill="rgb(55 80 50)" stroke={SAGE} strokeWidth={1.5} strokeLinejoin="round" />
+    {/* Acoustic pulse glyph: faint concentric arcs around a cattle cluster */}
+    <g opacity={0.35}>
+      <circle cx={PULSE_PT.x} cy={PULSE_PT.y} r={5}  fill="none" stroke={SAGE} strokeWidth={0.8} />
+      <circle cx={PULSE_PT.x} cy={PULSE_PT.y} r={7.5} fill="none" stroke={SAGE} strokeWidth={0.6} />
+      <circle cx={PULSE_PT.x} cy={PULSE_PT.y} r={10}  fill="none" stroke={SAGE} strokeWidth={0.5} />
+    </g>
     {US_DOTS_10.map((d, i) => (
       <g key={i}>
         <circle cx={d.x} cy={d.y} r={3.5} fill={SAGE} />
@@ -73,6 +117,12 @@ const US10SVG = () => (
         <line x1={p.x+4} y1={p.y+3} x2={p.x} y2={p.y-2} stroke="rgb(100 130 90)" strokeWidth={1} strokeLinecap="round" />
       </g>
     ))}
+    {/* Collar icons hovering near scattered ranches */}
+    {COLLAR_PTS.map((p, i) => (
+      <CollarIcon key={`collar-${i}`} cx={p.x} cy={p.y} />
+    ))}
+    {/* Drone-fleet chevron above a ranch cluster */}
+    <DroneFleet cx={DRONE_PT.x} cy={DRONE_PT.y} />
   </svg>
 );
 
@@ -102,9 +152,9 @@ const US5YearSVG: React.FC<{pulse: number}> = ({ pulse }) => (
 interface Milestone { label: string; sub: string; isNow: boolean; xFrac: number }
 
 const MILESTONES: Milestone[] = [
-  { label: "TODAY",    sub: "Software MVP · Simulator",      isNow: true,  xFrac: 0.07 },
+  { label: "TODAY",    sub: "Raspberry Pi MVP · Simulator",   isNow: true,  xFrac: 0.07 },
   { label: "6 MONTHS", sub: "Pilot ranches · NM",            isNow: false, xFrac: 0.36 },
-  { label: "1 YEAR",   sub: "10 ranches · Pi cameras · LoRa",isNow: false, xFrac: 0.65 },
+  { label: "1 YEAR",   sub: "10 ranches · cameras · LoRa collars · drone fleet", isNow: false, xFrac: 0.65 },
   { label: "5 YEARS",  sub: "Every ranch in America",         isNow: false, xFrac: 0.93 },
 ];
 
