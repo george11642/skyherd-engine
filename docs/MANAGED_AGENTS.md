@@ -117,3 +117,24 @@ The attestation panel in the dashboard shows the live chain during a demo run. `
 ---
 
 Cost-ticker is live in the dashboard at `/`. The attestation panel shows the live chain. `make mesh-smoke` replays five wake events end-to-end.
+
+---
+
+## Opus 4.7 outside the mesh — caption editorial
+
+The 5-agent mesh above uses the Managed Agents API (`client.beta.sessions.*`,
+beta header `managed-agents-2026-04-01`). Phase G adds a separate, one-shot
+use of Opus 4.7 outside the mesh: the demo video's caption styling.
+
+`scripts/generate_kinetic_captions.py style` calls
+`client.messages.create(model="claude-opus-4-7", ...)` with a cached system
+prompt and skills prefix, asking Opus to emit per-word visual styling
+(color / weight / animation / emphasis level) for the transcribed voice-over.
+Output lives at `remotion-video/public/captions/styled-captions-{A,B,C}.json`
+and is rendered by `KineticCaptions.tsx`.
+
+This is not a session and does not run inside the mesh — it's a single
+batched generation, deliberately cached so re-runs across the three video
+variants share a ~6.7K-token prefix. We mention it here so judges see that
+Opus 4.7 makes editorial decisions across the full submission surface, not
+only inside the agent loop.

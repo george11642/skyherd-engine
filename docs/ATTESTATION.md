@@ -233,3 +233,20 @@ selection, and audio bus structure; it did not produce any code, asset, or
 data that is signed into the Ed25519 ledger. See `docs/SUBMISSION.md`
 "External tools used" and `docs/OPENMONTAGE_INTEGRATION.md` for the full
 operating model and license-containment grep gate.
+
+### Phase G — Opus 4.7 caption-styling artifacts
+
+`make video-style-captions` calls Claude Opus 4.7 to emit per-word visual
+styling for the demo video's captions. The output lives at
+`remotion-video/public/captions/styled-captions-{A,B,C}.json` and is
+considered part of the demo's artifact provenance: each file records the
+exact model ID (`claude-opus-4-7`), an `input_fingerprint` SHA-256 over the
+captions JSON + script + system prompt + skills prefix, and the per-call
+Anthropic usage object (including `cache_read_input_tokens`).
+
+These styled-caption JSONs are **not** signed into the Ed25519 ledger — they
+are pre-rendered editorial decisions, not runtime tool calls — but their
+fingerprints make the styling step independently reproducible: re-running
+`style` on the same inputs produces a byte-identical file (the only
+non-deterministic component is Opus's response, which the fingerprint
+serves to detect).

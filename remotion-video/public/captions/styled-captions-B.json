@@ -1,0 +1,365 @@
+{
+  "variant": "B",
+  "mode": "styled",
+  "model": "claude-opus-4-7",
+  "fingerprint": "953decf876fed4169837c3695e4f1786f8f4ac5c4db1b038a94f6415e9e14290",
+  "words": [
+    {
+      "word": "$4.17",
+      "start": 1.0,
+      "end": 2.0,
+      "segment_id": 0,
+      "color": "#C04B2D",
+      "weight": "black",
+      "animation": "pop",
+      "emphasis_level": 3
+    },
+    {
+      "word": "a",
+      "start": 2.0,
+      "end": 2.5,
+      "segment_id": 1,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "week",
+      "start": 2.5,
+      "end": 3.0,
+      "segment_id": 1,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "twenty-four-seven",
+      "start": 3.0,
+      "end": 4.0,
+      "segment_id": 2,
+      "color": "#3D5A3D",
+      "weight": "bold",
+      "animation": "pulse",
+      "emphasis_level": 3
+    },
+    {
+      "word": "nervous",
+      "start": 4.0,
+      "end": 4.5,
+      "segment_id": 3,
+      "color": "#3D5A3D",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "system",
+      "start": 4.5,
+      "end": 5.0,
+      "segment_id": 3,
+      "color": "#3D5A3D",
+      "weight": "bold",
+      "animation": "pulse",
+      "emphasis_level": 3
+    },
+    {
+      "word": "ten-thousand-acre",
+      "start": 6.0,
+      "end": 6.5,
+      "segment_id": 4,
+      "color": "#A36B3A",
+      "weight": "bold",
+      "animation": "pop",
+      "emphasis_level": 2
+    },
+    {
+      "word": "ranch",
+      "start": 6.5,
+      "end": 7.0,
+      "segment_id": 4,
+      "color": "#A36B3A",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 3
+    },
+    {
+      "word": "Beef",
+      "start": 24.0,
+      "end": 24.25,
+      "segment_id": 5,
+      "color": "#A36B3A",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "\u00b7",
+      "start": 24.25,
+      "end": 24.5,
+      "segment_id": 5,
+      "color": "#5A3A22",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "record",
+      "start": 24.5,
+      "end": 24.75,
+      "segment_id": 5,
+      "color": "#F5D49C",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "highs",
+      "start": 24.75,
+      "end": 25.0,
+      "segment_id": 5,
+      "color": "#C04B2D",
+      "weight": "black",
+      "animation": "pop",
+      "emphasis_level": 3
+    },
+    {
+      "word": "Cow",
+      "start": 30.0,
+      "end": 30.2,
+      "segment_id": 6,
+      "color": "#A36B3A",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "herd",
+      "start": 30.2,
+      "end": 30.4,
+      "segment_id": 6,
+      "color": "#A36B3A",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "\u00b7",
+      "start": 30.4,
+      "end": 30.6,
+      "segment_id": 6,
+      "color": "#5A3A22",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "65-yr",
+      "start": 30.6,
+      "end": 30.8,
+      "segment_id": 6,
+      "color": "#C04B2D",
+      "weight": "black",
+      "animation": "pop",
+      "emphasis_level": 3
+    },
+    {
+      "word": "low",
+      "start": 30.8,
+      "end": 31.0,
+      "segment_id": 6,
+      "color": "#5A3A22",
+      "weight": "bold",
+      "animation": "glow",
+      "emphasis_level": 2
+    },
+    {
+      "word": "Labor",
+      "start": 36.0,
+      "end": 36.333,
+      "segment_id": 7,
+      "color": "#A36B3A",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "\u00b7",
+      "start": 36.333,
+      "end": 36.666,
+      "segment_id": 7,
+      "color": "#5A3A22",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "gone",
+      "start": 36.667,
+      "end": 37.0,
+      "segment_id": 7,
+      "color": "#C04B2D",
+      "weight": "black",
+      "animation": "glow",
+      "emphasis_level": 3
+    },
+    {
+      "word": "Eyes",
+      "start": 42.0,
+      "end": 42.2,
+      "segment_id": 8,
+      "color": "#A36B3A",
+      "weight": "bold",
+      "animation": "pulse",
+      "emphasis_level": 2
+    },
+    {
+      "word": "\u00b7",
+      "start": 42.2,
+      "end": 42.4,
+      "segment_id": 8,
+      "color": "#5A3A22",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "fewer",
+      "start": 42.4,
+      "end": 42.6,
+      "segment_id": 8,
+      "color": "#C04B2D",
+      "weight": "black",
+      "animation": "glow",
+      "emphasis_level": 3
+    },
+    {
+      "word": "per",
+      "start": 42.6,
+      "end": 42.8,
+      "segment_id": 8,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "acre",
+      "start": 42.8,
+      "end": 43.0,
+      "segment_id": 8,
+      "color": "#A36B3A",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "The",
+      "start": 48.0,
+      "end": 48.1,
+      "segment_id": 9,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "herd",
+      "start": 48.1,
+      "end": 48.2,
+      "segment_id": 9,
+      "color": "#A36B3A",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "has",
+      "start": 48.2,
+      "end": 48.3,
+      "segment_id": 9,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "a",
+      "start": 48.3,
+      "end": 48.4,
+      "segment_id": 9,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "nervous",
+      "start": 48.4,
+      "end": 48.5,
+      "segment_id": 9,
+      "color": "#3D5A3D",
+      "weight": "bold",
+      "animation": "pulse",
+      "emphasis_level": 2
+    },
+    {
+      "word": "system.",
+      "start": 48.5,
+      "end": 48.6,
+      "segment_id": 9,
+      "color": "#3D5A3D",
+      "weight": "bold",
+      "animation": "pulse",
+      "emphasis_level": 2
+    },
+    {
+      "word": "The",
+      "start": 48.6,
+      "end": 48.7,
+      "segment_id": 9,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "rancher",
+      "start": 48.7,
+      "end": 48.8,
+      "segment_id": 9,
+      "color": "#A36B3A",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "does",
+      "start": 48.8,
+      "end": 48.9,
+      "segment_id": 9,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "not.",
+      "start": 48.9,
+      "end": 49.0,
+      "segment_id": 9,
+      "color": "#C04B2D",
+      "weight": "black",
+      "animation": "glow",
+      "emphasis_level": 3
+    }
+  ],
+  "input_fingerprint": "5832cbf49463b15ed4c8d67e70319a6366dbfac267a788a87c21ef49912baf30",
+  "usage": {
+    "input_tokens": 7259,
+    "output_tokens": 2263,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 6669
+  }
+}

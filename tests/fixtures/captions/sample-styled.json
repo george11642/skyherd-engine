@@ -1,0 +1,68 @@
+{
+  "variant": "A",
+  "mode": "styled",
+  "model": "claude-opus-4-7",
+  "fingerprint": "sample-fixture-not-a-real-sha",
+  "words": [
+    {
+      "word": "Everyone",
+      "start": 0.12,
+      "end": 0.45,
+      "segment_id": 0,
+      "color": "#F5D49C",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "thinks",
+      "start": 0.45,
+      "end": 0.78,
+      "segment_id": 0,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "ranchers",
+      "start": 0.78,
+      "end": 1.20,
+      "segment_id": 0,
+      "color": "#A36B3A",
+      "weight": "bold",
+      "animation": "scale",
+      "emphasis_level": 2
+    },
+    {
+      "word": "blind.",
+      "start": 4.10,
+      "end": 4.55,
+      "segment_id": 1,
+      "color": "#C04B2D",
+      "weight": "black",
+      "animation": "glow",
+      "emphasis_level": 3
+    },
+    {
+      "word": "$4.17",
+      "start": 24.00,
+      "end": 24.45,
+      "segment_id": 2,
+      "color": "#C04B2D",
+      "weight": "black",
+      "animation": "pop",
+      "emphasis_level": 3
+    },
+    {
+      "word": "watch",
+      "start": 30.10,
+      "end": 30.42,
+      "segment_id": 3,
+      "color": "#3D5A3D",
+      "weight": "bold",
+      "animation": "pulse",
+      "emphasis_level": 2
+    }
+  ]
+}

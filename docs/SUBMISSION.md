@@ -85,6 +85,45 @@ pymavlink, MegaDetector V6. 1,100+ tests. 87% coverage. MIT.
 - Idle-pause billing ties agent scheduling to real-world sensor cadence (seconds, hours, days).
 - Attestation chain → insurance underwriting is a novel commercial hook for agentic systems.
 - Sim-first architecture means the demo runs on any laptop, with hardware as a bonus path.
+- **Opus 4.7 directed our caption editorial** — see below.
+
+#### Opus 4.7 directed our caption editorial
+
+faster-whisper transcribes the voice-over for each variant. We then send the
+word-level transcript and the variant script to **Claude Opus 4.7** with a
+33-file skills library prefix, and Opus emits per-word styling JSON: a
+warm-earth-tone color, a font weight, an animation (`fade` / `pop` / `pulse`
+/ `scale` / `glow`), and an emphasis level (0–3) reserved for the single most
+important word in each segment.
+
+The model isn't just narrating the demo — it's making editorial decisions
+about how its own narration is rendered on screen. Examples Opus chose:
+
+- `$4.17 → pop + brick (#C04B2D) + emphasis 3`
+- `gone → glow + brick + emphasis 3`
+- `Skyherd → pop + brick + emphasis 3`
+- `eyes → glow + emphasis 3`
+- `wakes → pulse + sage`
+- `65-year low → pop / glow + brick`
+
+The styled JSON is committed evidence at:
+
+- `remotion-video/public/captions/styled-captions-A.json` (40 words)
+- `remotion-video/public/captions/styled-captions-B.json` (35 words)
+- `remotion-video/public/captions/styled-captions-C.json` (249 words)
+
+Each file records the model ID (`claude-opus-4-7`), the input fingerprint
+(SHA-256 over captions + script + system prompt), and Anthropic's per-call
+usage including `cache_read_input_tokens` so the prompt-caching effect is
+auditable. We use `cache_control: ephemeral` on the system prompt and skills
+prefix per CLAUDE.md, so variants B and C hit the cache (~6.7K tokens read
+per call after the first variant warms it).
+
+The Remotion `KineticCaptions` component reads the styled JSON
+preferentially, falling back to the plain Phase E1 captions if the styled
+file is missing or malformed (graceful degrade per the plan's risk register).
+
+Pipeline entry point: `make video-style-captions`.
 
 ---
 

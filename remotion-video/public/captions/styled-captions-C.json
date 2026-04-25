@@ -1,0 +1,2505 @@
+{
+  "variant": "C",
+  "mode": "styled",
+  "model": "claude-opus-4-7",
+  "fingerprint": "9cffe567fc022f4ae09367a84669b6985318e0a7f7324e17976fc767825f4d08",
+  "words": [
+    {
+      "word": "I'm",
+      "start": 0.0,
+      "end": 0.32,
+      "segment_id": 0,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "George,",
+      "start": 0.32,
+      "end": 0.64,
+      "segment_id": 0,
+      "color": "#F5D49C",
+      "weight": "bold",
+      "animation": "pop",
+      "emphasis_level": 2
+    },
+    {
+      "word": "UNM",
+      "start": 1.04,
+      "end": 1.6,
+      "segment_id": 0,
+      "color": "#A36B3A",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "senior,",
+      "start": 1.6,
+      "end": 1.92,
+      "segment_id": 0,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "Drone",
+      "start": 2.2,
+      "end": 2.52,
+      "segment_id": 0,
+      "color": "#A36B3A",
+      "weight": "bold",
+      "animation": "scale",
+      "emphasis_level": 2
+    },
+    {
+      "word": "-Op.",
+      "start": 2.52,
+      "end": 2.76,
+      "segment_id": 0,
+      "color": "#A36B3A",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "Skyherd",
+      "start": 3.0,
+      "end": 3.54,
+      "segment_id": 0,
+      "color": "#C04B2D",
+      "weight": "black",
+      "animation": "pop",
+      "emphasis_level": 3
+    },
+    {
+      "word": "watches",
+      "start": 3.54,
+      "end": 3.72,
+      "segment_id": 0,
+      "color": "#3D5A3D",
+      "weight": "bold",
+      "animation": "pulse",
+      "emphasis_level": 2
+    },
+    {
+      "word": "one",
+      "start": 3.72,
+      "end": 4.06,
+      "segment_id": 0,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "ranch.",
+      "start": 4.06,
+      "end": 4.34,
+      "segment_id": 0,
+      "color": "#A36B3A",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "Every",
+      "start": 4.88,
+      "end": 5.12,
+      "segment_id": 0,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "fence,",
+      "start": 5.12,
+      "end": 5.4,
+      "segment_id": 0,
+      "color": "#A36B3A",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "every",
+      "start": 5.92,
+      "end": 6.1,
+      "segment_id": 0,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "trough,",
+      "start": 6.1,
+      "end": 6.56,
+      "segment_id": 0,
+      "color": "#A36B3A",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "every",
+      "start": 6.88,
+      "end": 7.08,
+      "segment_id": 0,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "cow.",
+      "start": 7.08,
+      "end": 7.34,
+      "segment_id": 0,
+      "color": "#A36B3A",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "Beef",
+      "start": 7.967,
+      "end": 8.147,
+      "segment_id": 1,
+      "color": "#A36B3A",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "is",
+      "start": 8.147,
+      "end": 8.347,
+      "segment_id": 1,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "at",
+      "start": 8.347,
+      "end": 8.447,
+      "segment_id": 1,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "record",
+      "start": 8.447,
+      "end": 8.707,
+      "segment_id": 1,
+      "color": "#F5D49C",
+      "weight": "bold",
+      "animation": "pop",
+      "emphasis_level": 2
+    },
+    {
+      "word": "highs.",
+      "start": 8.707,
+      "end": 9.087,
+      "segment_id": 1,
+      "color": "#C04B2D",
+      "weight": "black",
+      "animation": "pop",
+      "emphasis_level": 3
+    },
+    {
+      "word": "The",
+      "start": 9.807,
+      "end": 9.927,
+      "segment_id": 2,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "American",
+      "start": 9.927,
+      "end": 10.267,
+      "segment_id": 2,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "cow",
+      "start": 10.267,
+      "end": 10.607,
+      "segment_id": 2,
+      "color": "#A36B3A",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "herd",
+      "start": 10.607,
+      "end": 10.847,
+      "segment_id": 2,
+      "color": "#A36B3A",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "is",
+      "start": 10.847,
+      "end": 11.027,
+      "segment_id": 2,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "at",
+      "start": 11.027,
+      "end": 11.147,
+      "segment_id": 2,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "a",
+      "start": 11.147,
+      "end": 11.247,
+      "segment_id": 2,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "65",
+      "start": 11.247,
+      "end": 11.627,
+      "segment_id": 2,
+      "color": "#C04B2D",
+      "weight": "black",
+      "animation": "pop",
+      "emphasis_level": 3
+    },
+    {
+      "word": "-year",
+      "start": 11.627,
+      "end": 12.007,
+      "segment_id": 2,
+      "color": "#C04B2D",
+      "weight": "black",
+      "animation": "pop",
+      "emphasis_level": 3
+    },
+    {
+      "word": "low.",
+      "start": 12.007,
+      "end": 12.367,
+      "segment_id": 2,
+      "color": "#C04B2D",
+      "weight": "black",
+      "animation": "glow",
+      "emphasis_level": 3
+    },
+    {
+      "word": "Ranchers",
+      "start": 12.987,
+      "end": 13.327,
+      "segment_id": 3,
+      "color": "#A36B3A",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "can't",
+      "start": 13.327,
+      "end": 13.627,
+      "segment_id": 3,
+      "color": "#F5D49C",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "hire",
+      "start": 13.627,
+      "end": 13.827,
+      "segment_id": 3,
+      "color": "#3D5A3D",
+      "weight": "bold",
+      "animation": "pulse",
+      "emphasis_level": 2
+    },
+    {
+      "word": "their",
+      "start": 13.827,
+      "end": 14.027,
+      "segment_id": 3,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "way",
+      "start": 14.027,
+      "end": 14.247,
+      "segment_id": 3,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "out.",
+      "start": 14.247,
+      "end": 14.507,
+      "segment_id": 3,
+      "color": "#F5D49C",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "Labor",
+      "start": 15.007,
+      "end": 15.207,
+      "segment_id": 4,
+      "color": "#A36B3A",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "is",
+      "start": 15.207,
+      "end": 15.447,
+      "segment_id": 4,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "gone.",
+      "start": 15.447,
+      "end": 15.747,
+      "segment_id": 4,
+      "color": "#C04B2D",
+      "weight": "black",
+      "animation": "glow",
+      "emphasis_level": 3
+    },
+    {
+      "word": "Ranchers",
+      "start": 16.347,
+      "end": 16.687,
+      "segment_id": 5,
+      "color": "#A36B3A",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "are",
+      "start": 16.687,
+      "end": 16.807,
+      "segment_id": 5,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "aging",
+      "start": 16.807,
+      "end": 17.127,
+      "segment_id": 5,
+      "color": "#5A3A22",
+      "weight": "bold",
+      "animation": "glow",
+      "emphasis_level": 3
+    },
+    {
+      "word": "out.",
+      "start": 17.127,
+      "end": 17.447,
+      "segment_id": 5,
+      "color": "#5A3A22",
+      "weight": "bold",
+      "animation": "glow",
+      "emphasis_level": 2
+    },
+    {
+      "word": "Every",
+      "start": 17.927,
+      "end": 18.187,
+      "segment_id": 6,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "existing",
+      "start": 18.187,
+      "end": 18.587,
+      "segment_id": 6,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "ranch",
+      "start": 18.587,
+      "end": 18.927,
+      "segment_id": 6,
+      "color": "#A36B3A",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "has",
+      "start": 18.927,
+      "end": 19.187,
+      "segment_id": 6,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "to",
+      "start": 19.187,
+      "end": 19.347,
+      "segment_id": 6,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "do",
+      "start": 19.347,
+      "end": 19.507,
+      "segment_id": 6,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "more",
+      "start": 19.507,
+      "end": 19.847,
+      "segment_id": 6,
+      "color": "#F5D49C",
+      "weight": "bold",
+      "animation": "pop",
+      "emphasis_level": 2
+    },
+    {
+      "word": "with",
+      "start": 19.847,
+      "end": 20.087,
+      "segment_id": 6,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "fewer",
+      "start": 20.087,
+      "end": 20.387,
+      "segment_id": 6,
+      "color": "#F5D49C",
+      "weight": "bold",
+      "animation": "pop",
+      "emphasis_level": 2
+    },
+    {
+      "word": "eyes",
+      "start": 20.387,
+      "end": 20.807,
+      "segment_id": 6,
+      "color": "#C04B2D",
+      "weight": "black",
+      "animation": "glow",
+      "emphasis_level": 3
+    },
+    {
+      "word": "on",
+      "start": 20.807,
+      "end": 21.087,
+      "segment_id": 6,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "it.",
+      "start": 21.087,
+      "end": 21.247,
+      "segment_id": 6,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "Coyotes",
+      "start": 21.767,
+      "end": 22.127,
+      "segment_id": 7,
+      "color": "#A36B3A",
+      "weight": "black",
+      "animation": "pop",
+      "emphasis_level": 3
+    },
+    {
+      "word": "don't",
+      "start": 22.127,
+      "end": 22.487,
+      "segment_id": 7,
+      "color": "#F5D49C",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "read",
+      "start": 22.487,
+      "end": 22.667,
+      "segment_id": 7,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "business",
+      "start": 22.667,
+      "end": 23.007,
+      "segment_id": 7,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "hours.",
+      "start": 23.007,
+      "end": 23.407,
+      "segment_id": 7,
+      "color": "#F5D49C",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "Hale",
+      "start": 24.187,
+      "end": 24.367,
+      "segment_id": 8,
+      "color": "#A36B3A",
+      "weight": "black",
+      "animation": "pop",
+      "emphasis_level": 3
+    },
+    {
+      "word": "doesn't",
+      "start": 24.367,
+      "end": 24.807,
+      "segment_id": 8,
+      "color": "#F5D49C",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "wait",
+      "start": 24.807,
+      "end": 24.987,
+      "segment_id": 8,
+      "color": "#3D5A3D",
+      "weight": "bold",
+      "animation": "pulse",
+      "emphasis_level": 2
+    },
+    {
+      "word": "for",
+      "start": 24.987,
+      "end": 25.167,
+      "segment_id": 8,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "the",
+      "start": 25.167,
+      "end": 25.287,
+      "segment_id": 8,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "next",
+      "start": 25.287,
+      "end": 25.547,
+      "segment_id": 8,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "vet",
+      "start": 25.547,
+      "end": 25.807,
+      "segment_id": 8,
+      "color": "#A36B3A",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "visit.",
+      "start": 25.807,
+      "end": 26.167,
+      "segment_id": 8,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "A",
+      "start": 26.707,
+      "end": 26.827,
+      "segment_id": 9,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "cow",
+      "start": 26.827,
+      "end": 27.027,
+      "segment_id": 9,
+      "color": "#A36B3A",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "can",
+      "start": 27.027,
+      "end": 27.227,
+      "segment_id": 9,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "be",
+      "start": 27.227,
+      "end": 27.347,
+      "segment_id": 9,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "dying",
+      "start": 27.347,
+      "end": 27.667,
+      "segment_id": 9,
+      "color": "#5A3A22",
+      "weight": "bold",
+      "animation": "glow",
+      "emphasis_level": 2
+    },
+    {
+      "word": "for",
+      "start": 27.667,
+      "end": 27.887,
+      "segment_id": 9,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "72",
+      "start": 27.887,
+      "end": 28.327,
+      "segment_id": 9,
+      "color": "#C04B2D",
+      "weight": "black",
+      "animation": "pop",
+      "emphasis_level": 3
+    },
+    {
+      "word": "hours",
+      "start": 28.327,
+      "end": 28.767,
+      "segment_id": 9,
+      "color": "#C04B2D",
+      "weight": "black",
+      "animation": "pop",
+      "emphasis_level": 3
+    },
+    {
+      "word": "before",
+      "start": 28.767,
+      "end": 29.087,
+      "segment_id": 9,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "anyone",
+      "start": 29.087,
+      "end": 29.527,
+      "segment_id": 9,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "sees",
+      "start": 29.527,
+      "end": 29.827,
+      "segment_id": 9,
+      "color": "#3D5A3D",
+      "weight": "bold",
+      "animation": "pulse",
+      "emphasis_level": 2
+    },
+    {
+      "word": "her.",
+      "start": 29.827,
+      "end": 30.067,
+      "segment_id": 9,
+      "color": "#5A3A22",
+      "weight": "bold",
+      "animation": "glow",
+      "emphasis_level": 2
+    },
+    {
+      "word": "The",
+      "start": 30.567,
+      "end": 30.647,
+      "segment_id": 10,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "herd",
+      "start": 30.647,
+      "end": 30.827,
+      "segment_id": 10,
+      "color": "#A36B3A",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "already",
+      "start": 30.827,
+      "end": 31.227,
+      "segment_id": 10,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "has",
+      "start": 31.227,
+      "end": 31.467,
+      "segment_id": 10,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "a",
+      "start": 31.467,
+      "end": 31.587,
+      "segment_id": 10,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "nervous",
+      "start": 31.587,
+      "end": 31.787,
+      "segment_id": 10,
+      "color": "#F5D49C",
+      "weight": "bold",
+      "animation": "pop",
+      "emphasis_level": 2
+    },
+    {
+      "word": "system.",
+      "start": 31.787,
+      "end": 32.227,
+      "segment_id": 10,
+      "color": "#C04B2D",
+      "weight": "black",
+      "animation": "pop",
+      "emphasis_level": 3
+    },
+    {
+      "word": "The",
+      "start": 32.667,
+      "end": 32.767,
+      "segment_id": 11,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "rancher",
+      "start": 32.767,
+      "end": 33.127,
+      "segment_id": 11,
+      "color": "#A36B3A",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "does",
+      "start": 33.127,
+      "end": 33.287,
+      "segment_id": 11,
+      "color": "#F5D49C",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "not,",
+      "start": 33.287,
+      "end": 33.527,
+      "segment_id": 11,
+      "color": "#5A3A22",
+      "weight": "black",
+      "animation": "glow",
+      "emphasis_level": 3
+    },
+    {
+      "word": "so",
+      "start": 34.107,
+      "end": 34.307,
+      "segment_id": 11,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "we",
+      "start": 34.307,
+      "end": 34.467,
+      "segment_id": 11,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "built",
+      "start": 34.467,
+      "end": 34.707,
+      "segment_id": 11,
+      "color": "#3D5A3D",
+      "weight": "bold",
+      "animation": "scale",
+      "emphasis_level": 2
+    },
+    {
+      "word": "one.",
+      "start": 34.707,
+      "end": 34.967,
+      "segment_id": 11,
+      "color": "#3D5A3D",
+      "weight": "black",
+      "animation": "pop",
+      "emphasis_level": 2
+    },
+    {
+      "word": "Heads",
+      "start": 35.631,
+      "end": 35.931,
+      "segment_id": 12,
+      "color": "#F5D49C",
+      "weight": "bold",
+      "animation": "pulse",
+      "emphasis_level": 2
+    },
+    {
+      "word": "up,",
+      "start": 35.931,
+      "end": 36.131,
+      "segment_id": 12,
+      "color": "#F5D49C",
+      "weight": "bold",
+      "animation": "pulse",
+      "emphasis_level": 2
+    },
+    {
+      "word": "Coyote",
+      "start": 36.531,
+      "end": 36.951,
+      "segment_id": 12,
+      "color": "#C04B2D",
+      "weight": "black",
+      "animation": "pop",
+      "emphasis_level": 3
+    },
+    {
+      "word": "at",
+      "start": 36.951,
+      "end": 37.131,
+      "segment_id": 12,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "the",
+      "start": 37.131,
+      "end": 37.211,
+      "segment_id": 12,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "South",
+      "start": 37.211,
+      "end": 37.411,
+      "segment_id": 12,
+      "color": "#A36B3A",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "Fence,",
+      "start": 37.411,
+      "end": 37.851,
+      "segment_id": 12,
+      "color": "#A36B3A",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "drones",
+      "start": 38.131,
+      "end": 38.371,
+      "segment_id": 12,
+      "color": "#A36B3A",
+      "weight": "bold",
+      "animation": "scale",
+      "emphasis_level": 2
+    },
+    {
+      "word": "en",
+      "start": 38.371,
+      "end": 38.651,
+      "segment_id": 12,
+      "color": "#3D5A3D",
+      "weight": "normal",
+      "animation": "scale",
+      "emphasis_level": 1
+    },
+    {
+      "word": "route.",
+      "start": 38.651,
+      "end": 38.851,
+      "segment_id": 12,
+      "color": "#3D5A3D",
+      "weight": "bold",
+      "animation": "scale",
+      "emphasis_level": 2
+    },
+    {
+      "word": "Cow",
+      "start": 39.288,
+      "end": 39.508,
+      "segment_id": 13,
+      "color": "#A36B3A",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "A014,",
+      "start": 39.508,
+      "end": 40.828,
+      "segment_id": 13,
+      "color": "#F5D49C",
+      "weight": "bold",
+      "animation": "pop",
+      "emphasis_level": 2
+    },
+    {
+      "word": "eye",
+      "start": 41.208,
+      "end": 41.488,
+      "segment_id": 13,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "irritation,",
+      "start": 41.488,
+      "end": 42.008,
+      "segment_id": 13,
+      "color": "#C04B2D",
+      "weight": "black",
+      "animation": "glow",
+      "emphasis_level": 3
+    },
+    {
+      "word": "83",
+      "start": 42.368,
+      "end": 42.728,
+      "segment_id": 13,
+      "color": "#F5D49C",
+      "weight": "bold",
+      "animation": "pop",
+      "emphasis_level": 2
+    },
+    {
+      "word": "%",
+      "start": 42.728,
+      "end": 43.088,
+      "segment_id": 13,
+      "color": "#F5D49C",
+      "weight": "bold",
+      "animation": "pop",
+      "emphasis_level": 2
+    },
+    {
+      "word": "confidence,",
+      "start": 43.088,
+      "end": 43.588,
+      "segment_id": 13,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "vet",
+      "start": 44.068,
+      "end": 44.308,
+      "segment_id": 13,
+      "color": "#A36B3A",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "packets",
+      "start": 44.308,
+      "end": 44.688,
+      "segment_id": 13,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "on",
+      "start": 44.688,
+      "end": 44.948,
+      "segment_id": 13,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "your",
+      "start": 44.948,
+      "end": 45.048,
+      "segment_id": 13,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "phone.",
+      "start": 45.048,
+      "end": 45.348,
+      "segment_id": 13,
+      "color": "#F5D49C",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "Cow",
+      "start": 45.793,
+      "end": 46.053,
+      "segment_id": 14,
+      "color": "#A36B3A",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "117",
+      "start": 46.053,
+      "end": 46.993,
+      "segment_id": 14,
+      "color": "#F5D49C",
+      "weight": "bold",
+      "animation": "pop",
+      "emphasis_level": 2
+    },
+    {
+      "word": "is",
+      "start": 46.993,
+      "end": 47.293,
+      "segment_id": 14,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "going",
+      "start": 47.293,
+      "end": 47.513,
+      "segment_id": 14,
+      "color": "#3D5A3D",
+      "weight": "bold",
+      "animation": "scale",
+      "emphasis_level": 2
+    },
+    {
+      "word": "into",
+      "start": 47.513,
+      "end": 47.773,
+      "segment_id": 14,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "labor.",
+      "start": 47.773,
+      "end": 48.093,
+      "segment_id": 14,
+      "color": "#C04B2D",
+      "weight": "black",
+      "animation": "pop",
+      "emphasis_level": 3
+    },
+    {
+      "word": "Pre",
+      "start": 48.713,
+      "end": 48.893,
+      "segment_id": 15,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "-labor",
+      "start": 48.893,
+      "end": 49.173,
+      "segment_id": 15,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "signals",
+      "start": 49.173,
+      "end": 49.573,
+      "segment_id": 15,
+      "color": "#F5D49C",
+      "weight": "bold",
+      "animation": "pulse",
+      "emphasis_level": 2
+    },
+    {
+      "word": "flagged",
+      "start": 49.573,
+      "end": 50.513,
+      "segment_id": 15,
+      "color": "#3D5A3D",
+      "weight": "bold",
+      "animation": "pulse",
+      "emphasis_level": 2
+    },
+    {
+      "word": "priority.",
+      "start": 50.513,
+      "end": 50.953,
+      "segment_id": 15,
+      "color": "#C04B2D",
+      "weight": "black",
+      "animation": "pop",
+      "emphasis_level": 3
+    },
+    {
+      "word": "Hail",
+      "start": 51.487,
+      "end": 51.727,
+      "segment_id": 16,
+      "color": "#A36B3A",
+      "weight": "black",
+      "animation": "pop",
+      "emphasis_level": 3
+    },
+    {
+      "word": "in",
+      "start": 51.727,
+      "end": 51.907,
+      "segment_id": 16,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "45",
+      "start": 51.907,
+      "end": 52.267,
+      "segment_id": 16,
+      "color": "#F5D49C",
+      "weight": "bold",
+      "animation": "pop",
+      "emphasis_level": 2
+    },
+    {
+      "word": "minutes,",
+      "start": 52.267,
+      "end": 52.727,
+      "segment_id": 16,
+      "color": "#F5D49C",
+      "weight": "bold",
+      "animation": "pop",
+      "emphasis_level": 2
+    },
+    {
+      "word": "moving",
+      "start": 53.267,
+      "end": 53.567,
+      "segment_id": 16,
+      "color": "#3D5A3D",
+      "weight": "bold",
+      "animation": "scale",
+      "emphasis_level": 2
+    },
+    {
+      "word": "the",
+      "start": 53.567,
+      "end": 53.767,
+      "segment_id": 16,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "herd",
+      "start": 53.767,
+      "end": 53.967,
+      "segment_id": 16,
+      "color": "#A36B3A",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "to",
+      "start": 53.967,
+      "end": 54.127,
+      "segment_id": 16,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "Shelter",
+      "start": 54.127,
+      "end": 54.467,
+      "segment_id": 16,
+      "color": "#A36B3A",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "2.",
+      "start": 54.467,
+      "end": 54.727,
+      "segment_id": 16,
+      "color": "#A36B3A",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "Five",
+      "start": 55.144,
+      "end": 55.424,
+      "segment_id": 17,
+      "color": "#F5D49C",
+      "weight": "bold",
+      "animation": "pop",
+      "emphasis_level": 2
+    },
+    {
+      "word": "agents,",
+      "start": 55.424,
+      "end": 55.984,
+      "segment_id": 17,
+      "color": "#A36B3A",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "idle",
+      "start": 56.544,
+      "end": 56.844,
+      "segment_id": 17,
+      "color": "#5A3A22",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "until",
+      "start": 56.844,
+      "end": 57.164,
+      "segment_id": 17,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "a",
+      "start": 57.164,
+      "end": 57.344,
+      "segment_id": 17,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "sensor",
+      "start": 57.344,
+      "end": 57.624,
+      "segment_id": 17,
+      "color": "#A36B3A",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "wakes",
+      "start": 57.624,
+      "end": 57.964,
+      "segment_id": 17,
+      "color": "#3D5A3D",
+      "weight": "bold",
+      "animation": "pulse",
+      "emphasis_level": 3
+    },
+    {
+      "word": "them,",
+      "start": 57.964,
+      "end": 58.264,
+      "segment_id": 17,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "skills",
+      "start": 58.644,
+      "end": 58.924,
+      "segment_id": 17,
+      "color": "#F5D49C",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "loaded",
+      "start": 58.924,
+      "end": 59.344,
+      "segment_id": 17,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "per",
+      "start": 59.344,
+      "end": 59.624,
+      "segment_id": 17,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "task,",
+      "start": 59.624,
+      "end": 60.164,
+      "segment_id": 17,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "cost",
+      "start": 60.604,
+      "end": 60.964,
+      "segment_id": 17,
+      "color": "#F5D49C",
+      "weight": "bold",
+      "animation": "pop",
+      "emphasis_level": 2
+    },
+    {
+      "word": "ticker",
+      "start": 60.964,
+      "end": 61.344,
+      "segment_id": 17,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "freezes",
+      "start": 61.344,
+      "end": 61.784,
+      "segment_id": 17,
+      "color": "#F5D49C",
+      "weight": "bold",
+      "animation": "pop",
+      "emphasis_level": 2
+    },
+    {
+      "word": "between",
+      "start": 61.784,
+      "end": 62.064,
+      "segment_id": 18,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "events.",
+      "start": 62.064,
+      "end": 62.604,
+      "segment_id": 18,
+      "color": "#F5D49C",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "Each",
+      "start": 63.112,
+      "end": 63.472,
+      "segment_id": 19,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "agent",
+      "start": 63.472,
+      "end": 63.832,
+      "segment_id": 19,
+      "color": "#A36B3A",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "runs",
+      "start": 63.832,
+      "end": 64.112,
+      "segment_id": 19,
+      "color": "#3D5A3D",
+      "weight": "bold",
+      "animation": "scale",
+      "emphasis_level": 2
+    },
+    {
+      "word": "on",
+      "start": 64.112,
+      "end": 64.372,
+      "segment_id": 19,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "its",
+      "start": 64.372,
+      "end": 64.532,
+      "segment_id": 19,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "own",
+      "start": 64.532,
+      "end": 64.752,
+      "segment_id": 19,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "managed",
+      "start": 64.752,
+      "end": 65.192,
+      "segment_id": 19,
+      "color": "#F5D49C",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "agent",
+      "start": 65.192,
+      "end": 65.652,
+      "segment_id": 19,
+      "color": "#A36B3A",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "session.",
+      "start": 65.652,
+      "end": 66.092,
+      "segment_id": 19,
+      "color": "#C04B2D",
+      "weight": "black",
+      "animation": "pop",
+      "emphasis_level": 3
+    },
+    {
+      "word": "Clawed",
+      "start": 66.712,
+      "end": 67.032,
+      "segment_id": 20,
+      "color": "#F5D49C",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "beta",
+      "start": 67.032,
+      "end": 67.192,
+      "segment_id": 20,
+      "color": "#F5D49C",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "header,",
+      "start": 67.192,
+      "end": 67.532,
+      "segment_id": 20,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "prompt",
+      "start": 67.972,
+      "end": 68.232,
+      "segment_id": 20,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "cached",
+      "start": 68.232,
+      "end": 68.752,
+      "segment_id": 20,
+      "color": "#3D5A3D",
+      "weight": "bold",
+      "animation": "pulse",
+      "emphasis_level": 2
+    },
+    {
+      "word": "system",
+      "start": 68.752,
+      "end": 69.252,
+      "segment_id": 20,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "plus",
+      "start": 69.252,
+      "end": 69.592,
+      "segment_id": 20,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "skills",
+      "start": 69.592,
+      "end": 70.132,
+      "segment_id": 20,
+      "color": "#F5D49C",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "prefix.",
+      "start": 70.132,
+      "end": 70.692,
+      "segment_id": 20,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "Idle",
+      "start": 71.712,
+      "end": 72.172,
+      "segment_id": 21,
+      "color": "#5A3A22",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "pause",
+      "start": 72.172,
+      "end": 72.472,
+      "segment_id": 21,
+      "color": "#5A3A22",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "billing",
+      "start": 72.472,
+      "end": 72.872,
+      "segment_id": 21,
+      "color": "#F5D49C",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "means",
+      "start": 72.872,
+      "end": 73.272,
+      "segment_id": 21,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "a",
+      "start": 73.272,
+      "end": 73.452,
+      "segment_id": 21,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "sleeping",
+      "start": 73.452,
+      "end": 73.712,
+      "segment_id": 21,
+      "color": "#5A3A22",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "agent",
+      "start": 73.712,
+      "end": 74.132,
+      "segment_id": 21,
+      "color": "#A36B3A",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "costs",
+      "start": 74.132,
+      "end": 74.572,
+      "segment_id": 21,
+      "color": "#F5D49C",
+      "weight": "bold",
+      "animation": "pop",
+      "emphasis_level": 2
+    },
+    {
+      "word": "nothing.",
+      "start": 74.572,
+      "end": 75.052,
+      "segment_id": 21,
+      "color": "#C04B2D",
+      "weight": "black",
+      "animation": "pop",
+      "emphasis_level": 3
+    },
+    {
+      "word": "We",
+      "start": 75.952,
+      "end": 76.152,
+      "segment_id": 22,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "also",
+      "start": 76.152,
+      "end": 76.452,
+      "segment_id": 22,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "let",
+      "start": 76.452,
+      "end": 76.792,
+      "segment_id": 22,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "opus",
+      "start": 76.792,
+      "end": 77.232,
+      "segment_id": 22,
+      "color": "#C04B2D",
+      "weight": "black",
+      "animation": "pop",
+      "emphasis_level": 3
+    },
+    {
+      "word": "4",
+      "start": 77.232,
+      "end": 77.472,
+      "segment_id": 22,
+      "color": "#C04B2D",
+      "weight": "black",
+      "animation": "pop",
+      "emphasis_level": 3
+    },
+    {
+      "word": ".7",
+      "start": 77.472,
+      "end": 78.112,
+      "segment_id": 22,
+      "color": "#C04B2D",
+      "weight": "black",
+      "animation": "pop",
+      "emphasis_level": 3
+    },
+    {
+      "word": "author",
+      "start": 78.112,
+      "end": 78.492,
+      "segment_id": 22,
+      "color": "#3D5A3D",
+      "weight": "bold",
+      "animation": "scale",
+      "emphasis_level": 2
+    },
+    {
+      "word": "the",
+      "start": 78.492,
+      "end": 78.712,
+      "segment_id": 22,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "on",
+      "start": 78.712,
+      "end": 78.992,
+      "segment_id": 22,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "-screen",
+      "start": 78.992,
+      "end": 79.212,
+      "segment_id": 22,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "captions",
+      "start": 79.212,
+      "end": 79.712,
+      "segment_id": 22,
+      "color": "#F5D49C",
+      "weight": "bold",
+      "animation": "pop",
+      "emphasis_level": 2
+    },
+    {
+      "word": "you're",
+      "start": 79.712,
+      "end": 80.132,
+      "segment_id": 22,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "reading",
+      "start": 80.132,
+      "end": 80.312,
+      "segment_id": 22,
+      "color": "#3D5A3D",
+      "weight": "bold",
+      "animation": "pulse",
+      "emphasis_level": 2
+    },
+    {
+      "word": "right",
+      "start": 80.312,
+      "end": 80.592,
+      "segment_id": 22,
+      "color": "#F5D49C",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "now.",
+      "start": 80.592,
+      "end": 81.052,
+      "segment_id": 22,
+      "color": "#F5D49C",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "Per",
+      "start": 81.612,
+      "end": 81.912,
+      "segment_id": 23,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "word,",
+      "start": 81.912,
+      "end": 82.292,
+      "segment_id": 23,
+      "color": "#F5D49C",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "semantic",
+      "start": 82.432,
+      "end": 82.792,
+      "segment_id": 23,
+      "color": "#F5D49C",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "styling",
+      "start": 82.792,
+      "end": 83.412,
+      "segment_id": 23,
+      "color": "#F5D49C",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "generated",
+      "start": 83.412,
+      "end": 84.052,
+      "segment_id": 23,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "as",
+      "start": 84.052,
+      "end": 84.532,
+      "segment_id": 23,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "JSON,",
+      "start": 84.532,
+      "end": 84.992,
+      "segment_id": 23,
+      "color": "#C04B2D",
+      "weight": "black",
+      "animation": "pop",
+      "emphasis_level": 3
+    },
+    {
+      "word": "committed",
+      "start": 85.612,
+      "end": 85.932,
+      "segment_id": 23,
+      "color": "#F5D49C",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "to",
+      "start": 85.932,
+      "end": 86.172,
+      "segment_id": 23,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "the",
+      "start": 86.172,
+      "end": 86.272,
+      "segment_id": 23,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "repo.",
+      "start": 86.272,
+      "end": 86.552,
+      "segment_id": 23,
+      "color": "#F5D49C",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "1106",
+      "start": 87.171,
+      "end": 87.891,
+      "segment_id": 24,
+      "color": "#C04B2D",
+      "weight": "black",
+      "animation": "pop",
+      "emphasis_level": 3
+    },
+    {
+      "word": "tests,",
+      "start": 87.891,
+      "end": 88.451,
+      "segment_id": 24,
+      "color": "#F5D49C",
+      "weight": "bold",
+      "animation": "pop",
+      "emphasis_level": 2
+    },
+    {
+      "word": "87",
+      "start": 88.771,
+      "end": 89.191,
+      "segment_id": 24,
+      "color": "#F5D49C",
+      "weight": "bold",
+      "animation": "pop",
+      "emphasis_level": 2
+    },
+    {
+      "word": "%",
+      "start": 89.191,
+      "end": 89.551,
+      "segment_id": 24,
+      "color": "#F5D49C",
+      "weight": "bold",
+      "animation": "pop",
+      "emphasis_level": 2
+    },
+    {
+      "word": "coverage,",
+      "start": 89.551,
+      "end": 90.031,
+      "segment_id": 24,
+      "color": "#F5D49C",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "every",
+      "start": 90.411,
+      "end": 90.651,
+      "segment_id": 24,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "tool",
+      "start": 90.651,
+      "end": 90.911,
+      "segment_id": 24,
+      "color": "#F5D49C",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "call",
+      "start": 90.911,
+      "end": 91.231,
+      "segment_id": 24,
+      "color": "#F5D49C",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "signed,",
+      "start": 91.231,
+      "end": 91.711,
+      "segment_id": 24,
+      "color": "#3D5A3D",
+      "weight": "bold",
+      "animation": "pulse",
+      "emphasis_level": 2
+    },
+    {
+      "word": "ED25519",
+      "start": 92.731,
+      "end": 93.471,
+      "segment_id": 25,
+      "color": "#C04B2D",
+      "weight": "black",
+      "animation": "pop",
+      "emphasis_level": 3
+    },
+    {
+      "word": "Merkle",
+      "start": 93.471,
+      "end": 93.991,
+      "segment_id": 25,
+      "color": "#F5D49C",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "chain,",
+      "start": 93.991,
+      "end": 94.371,
+      "segment_id": 25,
+      "color": "#F5D49C",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "replay",
+      "start": 94.771,
+      "end": 95.071,
+      "segment_id": 25,
+      "color": "#3D5A3D",
+      "weight": "bold",
+      "animation": "scale",
+      "emphasis_level": 2
+    },
+    {
+      "word": "from",
+      "start": 95.071,
+      "end": 95.391,
+      "segment_id": 25,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "a",
+      "start": 95.391,
+      "end": 95.551,
+      "segment_id": 25,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "seed,",
+      "start": 95.551,
+      "end": 95.891,
+      "segment_id": 25,
+      "color": "#F5D49C",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "same",
+      "start": 96.311,
+      "end": 96.571,
+      "segment_id": 26,
+      "color": "#F5D49C",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "input,",
+      "start": 96.571,
+      "end": 96.971,
+      "segment_id": 26,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "same",
+      "start": 97.331,
+      "end": 97.471,
+      "segment_id": 26,
+      "color": "#F5D49C",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "bytes,",
+      "start": 97.471,
+      "end": 97.891,
+      "segment_id": 26,
+      "color": "#F5D49C",
+      "weight": "bold",
+      "animation": "pop",
+      "emphasis_level": 2
+    },
+    {
+      "word": "every",
+      "start": 98.251,
+      "end": 98.591,
+      "segment_id": 26,
+      "color": "#F5D49C",
+      "weight": "bold",
+      "animation": "pop",
+      "emphasis_level": 2
+    },
+    {
+      "word": "time.",
+      "start": 98.591,
+      "end": 99.111,
+      "segment_id": 26,
+      "color": "#C04B2D",
+      "weight": "black",
+      "animation": "pop",
+      "emphasis_level": 3
+    },
+    {
+      "word": "Beef",
+      "start": 99.657,
+      "end": 99.877,
+      "segment_id": 27,
+      "color": "#A36B3A",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "at",
+      "start": 99.877,
+      "end": 100.077,
+      "segment_id": 27,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "record",
+      "start": 100.077,
+      "end": 100.337,
+      "segment_id": 27,
+      "color": "#F5D49C",
+      "weight": "bold",
+      "animation": "pop",
+      "emphasis_level": 2
+    },
+    {
+      "word": "highs,",
+      "start": 100.337,
+      "end": 100.697,
+      "segment_id": 27,
+      "color": "#F5D49C",
+      "weight": "bold",
+      "animation": "pop",
+      "emphasis_level": 2
+    },
+    {
+      "word": "cow",
+      "start": 101.097,
+      "end": 101.377,
+      "segment_id": 27,
+      "color": "#A36B3A",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "herd",
+      "start": 101.377,
+      "end": 101.717,
+      "segment_id": 27,
+      "color": "#A36B3A",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "at",
+      "start": 101.717,
+      "end": 101.917,
+      "segment_id": 27,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "a",
+      "start": 101.917,
+      "end": 102.017,
+      "segment_id": 27,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "65",
+      "start": 102.017,
+      "end": 102.457,
+      "segment_id": 27,
+      "color": "#C04B2D",
+      "weight": "black",
+      "animation": "pop",
+      "emphasis_level": 3
+    },
+    {
+      "word": "-year",
+      "start": 102.457,
+      "end": 102.817,
+      "segment_id": 27,
+      "color": "#C04B2D",
+      "weight": "black",
+      "animation": "pop",
+      "emphasis_level": 3
+    },
+    {
+      "word": "low.",
+      "start": 102.817,
+      "end": 103.137,
+      "segment_id": 27,
+      "color": "#C04B2D",
+      "weight": "black",
+      "animation": "glow",
+      "emphasis_level": 3
+    },
+    {
+      "word": "Now,",
+      "start": 103.577,
+      "end": 103.777,
+      "segment_id": 28,
+      "color": "#F5D49C",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "finally,",
+      "start": 104.117,
+      "end": 104.397,
+      "segment_id": 28,
+      "color": "#F5D49C",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "the",
+      "start": 104.857,
+      "end": 104.897,
+      "segment_id": 28,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "ranch",
+      "start": 104.897,
+      "end": 105.097,
+      "segment_id": 28,
+      "color": "#A36B3A",
+      "weight": "bold",
+      "animation": "fade",
+      "emphasis_level": 2
+    },
+    {
+      "word": "can",
+      "start": 105.097,
+      "end": 105.337,
+      "segment_id": 28,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 0
+    },
+    {
+      "word": "watch",
+      "start": 105.337,
+      "end": 105.577,
+      "segment_id": 28,
+      "color": "#3D5A3D",
+      "weight": "bold",
+      "animation": "pulse",
+      "emphasis_level": 2
+    },
+    {
+      "word": "itself.",
+      "start": 105.577,
+      "end": 105.917,
+      "segment_id": 28,
+      "color": "#C04B2D",
+      "weight": "black",
+      "animation": "pop",
+      "emphasis_level": 3
+    }
+  ],
+  "input_fingerprint": "b184ec34534ad07ea853de0cec939e23694e2bee3ca87630cf949496ee6bfb62",
+  "usage": {
+    "input_tokens": 18905,
+    "output_tokens": 15947,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 6669
+  }
+}

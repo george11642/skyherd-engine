@@ -1,4 +1,4 @@
-.PHONY: setup sim demo dashboard dashboard-mock test lint format typecheck clean ci sitl-up sitl-down bus-up bus-down mosquitto-up mosquitto-down mesh-smoke one-pager hardware-demo hardware-demo-sim hardware-demo-sim-down h2-smoke h3-smoke h4-smoke h4-docs mavic-bridge f3-bridge drone-smoke sitl-smoke determinism-3x gate-check voice-demo rehearsal record-ready preflight laptop-drone-smoke edge-pi-setup edge-galileo-setup video-record-clips video-pipeline video-iterate video-render video-captions video-captions-A video-captions-B video-captions-C
+.PHONY: setup sim demo dashboard dashboard-mock test lint format typecheck clean ci sitl-up sitl-down bus-up bus-down mosquitto-up mosquitto-down mesh-smoke one-pager hardware-demo hardware-demo-sim hardware-demo-sim-down h2-smoke h3-smoke h4-smoke h4-docs mavic-bridge f3-bridge drone-smoke sitl-smoke determinism-3x gate-check voice-demo rehearsal record-ready preflight laptop-drone-smoke edge-pi-setup edge-galileo-setup video-record-clips video-pipeline video-iterate video-render video-captions video-captions-A video-captions-B video-captions-C video-style-captions video-style-captions-A video-style-captions-B video-style-captions-C
 
 SEED ?= 42
 SCENARIO ?= all
@@ -236,3 +236,23 @@ video-captions-B:  ## E1: regenerate captions for variant B only (sparse)
 
 video-captions-C:  ## E1: regenerate captions for variant C only (dense, ~30s)
 	uv run python scripts/generate_kinetic_captions.py --variant C
+
+# ---------------------------------------------------------------------------
+# Phase G: Opus 4.7 AI-directed caption styling.
+# Reads captions-{A,B,C}.json, asks Claude Opus 4.7 to emit per-word color/
+# weight/animation/emphasis_level, writes styled-captions-{A,B,C}.json.
+# Prompt-cached system + skills prefix; idempotent fingerprint cache.
+# Requires ANTHROPIC_API_KEY (no silent fallback).
+# ---------------------------------------------------------------------------
+
+video-style-captions:  ## G: Opus 4.7 styling for all 3 variants (idempotent)
+	uv run python scripts/generate_kinetic_captions.py style --variant all
+
+video-style-captions-A:  ## G: Opus 4.7 styling for variant A only
+	uv run python scripts/generate_kinetic_captions.py style --variant A
+
+video-style-captions-B:  ## G: Opus 4.7 styling for variant B only
+	uv run python scripts/generate_kinetic_captions.py style --variant B
+
+video-style-captions-C:  ## G: Opus 4.7 styling for variant C only
+	uv run python scripts/generate_kinetic_captions.py style --variant C
