@@ -50,6 +50,101 @@ const FPS = 30;
 
 const C_HOOK_PUNCH = C_LAYOUT.act1.punchSeconds * FPS; // 240
 
+// iter-2 C fix: f0001 was blank — KineticPunch's first word "$4.17" appeared at
+// frame 15 with no fastFade, so opacity at frame 0 was 0. Replace the blank
+// opener with a 3s visceral cold-open: aerial drone b-roll of the ranch under
+// a "$1.8B / yr · predators & strays" pain stat, fading 75→105f. The kinetic
+// "$4.17" reveal now lands at frame 90 (after the cold open exits) so the
+// quantified pain anchors the Impact rubric before the relief number arrives.
+const HookColdOpen = () => {
+  const frame = useCurrentFrame();
+  const opacity = interpolate(frame, [0, 75, 105], [1, 1, 0], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  const statO = interpolate(frame, [8, 26], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  const statY = interpolate(frame, [8, 26], [18, 0], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  return (
+    <AbsoluteFill style={{ opacity }}>
+      <Video
+        src={staticFile("clips/ambient_establish.mp4")}
+        startFrom={0}
+        endAt={120}
+        muted
+        style={{
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          filter: "saturate(0.85) contrast(1.05) brightness(0.55)",
+        }}
+      />
+      <AbsoluteFill
+        style={{
+          background:
+            "linear-gradient(180deg, rgba(6,8,12,0.45) 0%, rgba(6,8,12,0.78) 100%)",
+        }}
+      />
+      <AbsoluteFill
+        style={{
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "0 8%",
+          opacity: statO,
+          transform: `translateY(${statY}px)`,
+          flexDirection: "column",
+          gap: 18,
+        }}
+      >
+        <div
+          style={{
+            fontFamily: "Inter, sans-serif",
+            fontWeight: 600,
+            fontSize: 22,
+            color: ACCENT_MAP.sage,
+            letterSpacing: "0.32em",
+            textTransform: "uppercase",
+          }}
+        >
+          US ranchers · annual loss
+        </div>
+        <div
+          style={{
+            fontFamily: "Inter, sans-serif",
+            fontWeight: 800,
+            fontSize: 160,
+            color: ACCENT_MAP.dust,
+            letterSpacing: "-0.03em",
+            lineHeight: 1.0,
+            textAlign: "center",
+            textShadow: "0 8px 36px rgba(0,0,0,0.7)",
+          }}
+        >
+          $1.8B / yr
+        </div>
+        <div
+          style={{
+            fontFamily: "Inter, sans-serif",
+            fontWeight: 700,
+            fontSize: 32,
+            color: "rgb(236 239 244)",
+            letterSpacing: "0.04em",
+            textAlign: "center",
+            textShadow: "0 4px 22px rgba(0,0,0,0.7)",
+          }}
+        >
+          predators &amp; strays
+        </div>
+      </AbsoluteFill>
+    </AbsoluteFill>
+  );
+};
+
 const CAct1HookPunch = () => (
   <AbsoluteFill
     style={{
@@ -58,39 +153,45 @@ const CAct1HookPunch = () => (
       justifyContent: "center",
     }}
   >
+    <HookColdOpen />
     <KineticPunch
       words={[
         {
+          // iter-2 C fix: shifted appearFrame 15 → 90 so the price reveal lands
+          // after HookColdOpen fades (75→105f). All subsequent words shifted by
+          // +75 to preserve the original stagger spacing.
           text: "$4.17",
-          appearFrame: 15,
+          appearFrame: 90,
+          fastFade: 6,
+          scaleFrom: 1.4,
           weight: 800,
           size: 240,
           color: ACCENT_MAP.dust,
         },
         {
           text: "/ week",
-          appearFrame: 45,
+          appearFrame: 120,
           weight: 500,
           size: 52,
           color: "rgb(60 72 56)",
         },
         {
           text: "24 / 7",
-          appearFrame: 90,
+          appearFrame: 165,
           weight: 800,
           size: 96,
           color: ACCENT_MAP.sage,
         },
         {
           text: "nervous system",
-          appearFrame: 120,
+          appearFrame: 195,
           weight: 800,
           size: 64,
           color: ACCENT_MAP.sage,
         },
         {
           text: "10,000-acre ranch",
-          appearFrame: 165,
+          appearFrame: 225,
           weight: 600,
           size: 44,
           color: "rgb(60 72 56)",
