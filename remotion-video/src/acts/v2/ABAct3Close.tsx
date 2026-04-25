@@ -1,11 +1,15 @@
 /**
  * v2 — Variants A & B Act 3 (Close, 30s).
  *
- * Substance VO + signals (18s) → wordmark + final VO (12s).
+ * Phase 3 restructure: SubstanceBeat (15s) → MetaLoopBeat (5s) → FinalBeat (10s).
+ *
+ * - SubstanceBeat (was 18s → now 15s): dropped Fresh-clone block; tests + Ed25519 remain.
+ * - MetaLoopBeat (NEW 5s): StyledCaptionsRevealer + vo-meta-{variant}.mp3.
+ * - FinalBeat (was 12s → now 10s): wordmark reads in 8s; fadeout window 25→15 frames.
  *
  * B-roll is composited at z=1 by BrollTrack. SubstanceBeat uses the
  * drone-rangeland-aerial cut (150–168s in the EDL) via the shared track.
- * Act 3 starts at global second 150 for A/B.
+ * Act 3 starts at global second ~150 for A/B (actual offset depends on act1+act2 durations).
  */
 import {
   AbsoluteFill,
@@ -17,8 +21,8 @@ import {
   useCurrentFrame,
   useVideoConfig,
 } from "remotion";
-import { AB_LAYOUT } from "../../compositions/calculate-main-metadata";
 import { BrollTrack, type BrollCut } from "../../components/BrollTrack";
+import { StyledCaptionsRevealer } from "../../components/StyledCaptionsRevealer";
 import { ACCENT_MAP, useFadeInOut } from "./shared";
 import brollARaw from "../../data/broll-A.json";
 import brollBRaw from "../../data/broll-B.json";
@@ -27,21 +31,26 @@ const BROLL_A: BrollCut[] = (brollARaw as { cuts: BrollCut[] }).cuts;
 const BROLL_B: BrollCut[] = (brollBRaw as { cuts: BrollCut[] }).cuts;
 
 // Act 3 global start in the A/B composition (seconds).
-// Act1=60s + Act2=90s = 150s offset.
+// Act1≈60s + Act2≈90s ≈ 150s offset.
 const ACT3_START_SECONDS = 150;
 
 const FPS = 30;
 
-// ── Substance beat (18s) ─────────────────────────────────────────────────────
+// Phase 3 beat durations (seconds):
+const SUBSTANCE_S = 15;  // was 18; dropped Fresh-clone block
+const META_LOOP_S = 5;   // NEW — Opus meta-loop reveal
+const FINAL_S = 10;      // was 12; tighter fadeout window
+
+// ── Substance beat (15s) ─────────────────────────────────────────────────────
 const SubstanceBeat = () => {
   const frame = useCurrentFrame();
   const { durationInFrames, fps } = useVideoConfig();
-  const opacity = useFadeInOut(durationInFrames, 30, 25);
+  const opacity = useFadeInOut(durationInFrames, 22, 22);
 
+  // Dropped "Fresh-clone reproducible" block (now in C's story arc).
   const blocks = [
     { at: 30, text: "1,106 tests · 87% coverage" },
     { at: 150, text: "Ed25519 attestation chain · 360 events" },
-    { at: 270, text: "Fresh-clone reproducible · < 3 minutes" },
   ];
 
   return (
@@ -112,25 +121,38 @@ const SubstanceBeat = () => {
   );
 };
 
-// ── Final wordmark beat (12s) ────────────────────────────────────────────────
+// ── Meta-loop beat (5s, NEW) ─────────────────────────────────────────────────
+type MetaLoopBeatProps = { variant: "A" | "B" };
+
+const MetaLoopBeat = ({ variant }: MetaLoopBeatProps) => {
+  return (
+    <AbsoluteFill>
+      <Audio src={staticFile(`voiceover/vo-meta-${variant}.mp3`)} />
+      <StyledCaptionsRevealer variant={variant} appearFrame={0} />
+    </AbsoluteFill>
+  );
+};
+
+// ── Final wordmark beat (10s) ─────────────────────────────────────────────────
 const FinalBeat = () => {
   const frame = useCurrentFrame();
   const { fps, durationInFrames } = useVideoConfig();
 
-  const fadeIn = interpolate(frame, [0, 25], [0, 1], {
+  const fadeIn = interpolate(frame, [0, 20], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
+  // Tightened: was 25 frames → 15 frames
   const fadeOut = interpolate(
     frame,
-    [durationInFrames - 25, durationInFrames],
+    [durationInFrames - 15, durationInFrames],
     [1, 0],
     { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
   );
   const opacity = Math.min(fadeIn, fadeOut);
 
   const wordmarkP = spring({
-    frame: frame - 10,
+    frame: frame - 8,
     fps,
     config: { damping: 120, stiffness: 150, mass: 0.8 },
   });
@@ -139,7 +161,8 @@ const FinalBeat = () => {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
-  const linesOpacity = interpolate(frame, [60, 110], [0, 1], {
+  // Lines still fade in at frame 50 but wordmark reads in 8s
+  const linesOpacity = interpolate(frame, [50, 90], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
@@ -236,8 +259,9 @@ const FinalBeat = () => {
 type Act3Props = { variant?: "A" | "B" };
 
 export const ABAct3Close = ({ variant = "A" }: Act3Props) => {
-  const SUBSTANCE = AB_LAYOUT.act3.substanceSeconds * FPS; // 540
-  const FINAL = AB_LAYOUT.act3.finalSeconds * FPS; // 360
+  const SUBSTANCE = SUBSTANCE_S * FPS; // 450 frames
+  const META_LOOP = META_LOOP_S * FPS; // 150 frames
+  const FINAL = FINAL_S * FPS;         // 300 frames
   const brollTrack = variant === "B" ? BROLL_B : BROLL_A;
 
   return (
@@ -247,6 +271,9 @@ export const ABAct3Close = ({ variant = "A" }: Act3Props) => {
       <Series>
         <Series.Sequence durationInFrames={SUBSTANCE}>
           <SubstanceBeat />
+        </Series.Sequence>
+        <Series.Sequence durationInFrames={META_LOOP}>
+          <MetaLoopBeat variant={variant} />
         </Series.Sequence>
         <Series.Sequence durationInFrames={FINAL}>
           <FinalBeat />
