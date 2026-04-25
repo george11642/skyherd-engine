@@ -1,4 +1,4 @@
-.PHONY: setup sim demo dashboard dashboard-mock test lint format typecheck clean ci sitl-up sitl-down bus-up bus-down mosquitto-up mosquitto-down mesh-smoke one-pager hardware-demo hardware-demo-sim hardware-demo-sim-down h2-smoke h3-smoke h4-smoke h4-docs mavic-bridge f3-bridge drone-smoke sitl-smoke determinism-3x gate-check voice-demo rehearsal record-ready preflight laptop-drone-smoke edge-pi-setup edge-galileo-setup video-record-clips video-pipeline video-iterate video-render video-captions video-captions-A video-captions-B video-captions-C video-style-captions video-style-captions-A video-style-captions-B video-style-captions-C
+.PHONY: setup sim demo dashboard dashboard-mock test lint format typecheck clean ci sitl-up sitl-down bus-up bus-down mosquitto-up mosquitto-down mesh-smoke one-pager hardware-demo hardware-demo-sim hardware-demo-sim-down h2-smoke h3-smoke h4-smoke h4-docs mavic-bridge f3-bridge drone-smoke sitl-smoke determinism-3x gate-check voice-demo rehearsal record-ready preflight laptop-drone-smoke edge-pi-setup edge-galileo-setup video-record-clips video-pipeline video-iterate video-render video-captions video-captions-A video-captions-B video-captions-C video-style-captions video-style-captions-A video-style-captions-B video-style-captions-C video-broll-sync
 
 SEED ?= 42
 SCENARIO ?= all
@@ -256,3 +256,24 @@ video-style-captions-B:  ## G: Opus 4.7 styling for variant B only
 
 video-style-captions-C:  ## G: Opus 4.7 styling for variant C only
 	uv run python scripts/generate_kinetic_captions.py style --variant C
+
+# ---------------------------------------------------------------------------
+# Phase 1 (v3): B-roll track sync — regenerate broll-{A,B,C}.json from EDLs.
+# Run before each iter render to keep committed JSON in sync with EDL edits.
+# fps is always pinned to 30 (Remotion comp rate) regardless of EDL source fps.
+# ---------------------------------------------------------------------------
+
+video-broll-sync:  ## Phase1: regenerate remotion-video/src/data/broll-{A,B,C}.json from cinematic EDLs
+	uv run python scripts/openmontage_to_remotion.py \
+		docs/edl/openmontage-cuts-A-cinematic.json \
+		remotion-video/src/data/broll-A.json \
+		--emit-broll-track
+	uv run python scripts/openmontage_to_remotion.py \
+		docs/edl/openmontage-cuts-B-cinematic.json \
+		remotion-video/src/data/broll-B.json \
+		--emit-broll-track
+	uv run python scripts/openmontage_to_remotion.py \
+		docs/edl/openmontage-cuts-C-cinematic.json \
+		remotion-video/src/data/broll-C.json \
+		--emit-broll-track
+	@echo "video-broll-sync: broll-A/B/C.json regenerated from cinematic EDLs"

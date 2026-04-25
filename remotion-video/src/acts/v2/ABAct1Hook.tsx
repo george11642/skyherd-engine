@@ -6,12 +6,14 @@
  *
  * The only divergence is the hook (kinetic typography) and the intro/bridge
  * VO files. Variant prop selects.
+ *
+ * B-roll is composited at z=1 by BrollTrack, driven by broll-{A,B}.json
+ * generated from the OpenMontage cinematic EDLs.
  */
 import {
   AbsoluteFill,
   Audio,
   Sequence,
-  Video,
   interpolate,
   staticFile,
   useCurrentFrame,
@@ -22,7 +24,13 @@ import {
   type Variant,
   type VoDurationsFrames,
 } from "../../compositions/calculate-main-metadata";
+import { BrollTrack, type BrollCut } from "../../components/BrollTrack";
 import { ACCENT_MAP, KineticPunch, useFadeInOut } from "./shared";
+import brollARaw from "../../data/broll-A.json";
+import brollBRaw from "../../data/broll-B.json";
+
+const BROLL_A: BrollCut[] = (brollARaw as { cuts: BrollCut[] }).cuts;
+const BROLL_B: BrollCut[] = (brollBRaw as { cuts: BrollCut[] }).cuts;
 
 type Props = {
   variant: Variant;
@@ -129,33 +137,21 @@ const IntroBeat = ({ variant }: { variant: Variant }) => {
       ? "voiceover/vo-intro-B.mp3"
       : "voiceover/vo-intro.mp3";
 
-  // Slow zoom on dawn-corral B-roll (placeholder — Phase D fetches actual MP4).
-  // Until then we degrade gracefully to ambient_establish.mp4 — the v1 clip.
+  // Slow zoom applied to the background layer only; BrollTrack composites on top.
   const zoom = interpolate(frame, [0, durationInFrames], [1.0, 1.12]);
 
   return (
     <AbsoluteFill style={{ backgroundColor: "rgb(8 10 14)", opacity }}>
       <Audio src={staticFile(voFile)} />
+      {/* Dark fallback behind BrollTrack */}
       <div
         style={{
           width: "100%",
           height: "100%",
           transform: `scale(${zoom})`,
+          backgroundColor: "rgb(8 10 14)",
         }}
-      >
-        <Video
-          src={staticFile("clips/ambient_establish.mp4")}
-          startFrom={0}
-          endAt={durationInFrames + 60}
-          muted
-          style={{
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-            filter: "saturate(0.92) contrast(1.04)",
-          }}
-        />
-      </div>
+      />
       <AbsoluteFill
         style={{
           background:
@@ -230,18 +226,8 @@ const MarketBeat = () => {
   return (
     <AbsoluteFill style={{ backgroundColor: "rgb(8 10 14)", opacity }}>
       <Audio src={staticFile("voiceover/vo-market.mp3")} />
-      <Video
-        src={staticFile("clips/ambient_establish.mp4")}
-        startFrom={0}
-        endAt={durationInFrames + 60}
-        muted
-        style={{
-          width: "100%",
-          height: "100%",
-          objectFit: "cover",
-          filter: "saturate(0.85) contrast(1.05) brightness(0.65)",
-        }}
-      />
+      {/* Dark fallback behind BrollTrack cinematic cuts */}
+      <AbsoluteFill style={{ backgroundColor: "rgb(6 8 12)" }} />
       <AbsoluteFill
         style={{
           background:
@@ -330,15 +316,10 @@ const CompareBeat = () => {
           overflow: "hidden",
         }}
       >
-        <Video
-          src={staticFile("clips/ambient_establish.mp4")}
-          startFrom={0}
-          endAt={durationInFrames + 60}
-          muted
+        {/* Dark fallback — BrollTrack composites b-roll on top */}
+        <AbsoluteFill
           style={{
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
+            backgroundColor: "rgb(6 8 12)",
             filter: "saturate(0.35) contrast(1.1) brightness(0.6) sepia(0.2)",
           }}
         />
@@ -409,18 +390,8 @@ const CompareBeat = () => {
           backgroundColor: "rgb(8 10 14)",
         }}
       >
-        <Video
-          src={staticFile("clips/ambient_establish.mp4")}
-          startFrom={120}
-          endAt={durationInFrames + 200}
-          muted
-          style={{
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-            filter: "saturate(1.1) brightness(0.85) hue-rotate(-6deg)",
-          }}
-        />
+        {/* Dark fallback — BrollTrack composites b-roll on top */}
+        <AbsoluteFill style={{ backgroundColor: "rgb(8 10 14)" }} />
         <AbsoluteFill
           style={{
             background:
@@ -529,8 +500,12 @@ export const ABAct1Hook = ({ variant, voDurationsFrames }: Props) => {
     Math.max(compareVoSeconds + 1, AB_LAYOUT.act1.compareMin) * FPS,
   );
 
+  const brollTrack = variant === "B" ? BROLL_B : BROLL_A;
+
   return (
     <AbsoluteFill>
+      {/* z=1 b-roll track behind all text overlays — driven by OpenMontage EDL */}
+      <BrollTrack track={brollTrack} compositionStartSeconds={0} />
       <Sequence from={0} durationInFrames={HOOK} layout="none">
         {variant === "A" ? <HookContrarian /> : <HookMetric />}
       </Sequence>

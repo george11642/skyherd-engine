@@ -2,12 +2,15 @@
  * v2 — Variants A & B Act 3 (Close, 30s).
  *
  * Substance VO + signals (18s) → wordmark + final VO (12s).
+ *
+ * B-roll is composited at z=1 by BrollTrack. SubstanceBeat uses the
+ * drone-rangeland-aerial cut (150–168s in the EDL) via the shared track.
+ * Act 3 starts at global second 150 for A/B.
  */
 import {
   AbsoluteFill,
   Audio,
   Series,
-  Video,
   interpolate,
   spring,
   staticFile,
@@ -15,7 +18,17 @@ import {
   useVideoConfig,
 } from "remotion";
 import { AB_LAYOUT } from "../../compositions/calculate-main-metadata";
+import { BrollTrack, type BrollCut } from "../../components/BrollTrack";
 import { ACCENT_MAP, useFadeInOut } from "./shared";
+import brollARaw from "../../data/broll-A.json";
+import brollBRaw from "../../data/broll-B.json";
+
+const BROLL_A: BrollCut[] = (brollARaw as { cuts: BrollCut[] }).cuts;
+const BROLL_B: BrollCut[] = (brollBRaw as { cuts: BrollCut[] }).cuts;
+
+// Act 3 global start in the A/B composition (seconds).
+// Act1=60s + Act2=90s = 150s offset.
+const ACT3_START_SECONDS = 150;
 
 const FPS = 30;
 
@@ -34,19 +47,8 @@ const SubstanceBeat = () => {
   return (
     <AbsoluteFill style={{ backgroundColor: "rgb(8 10 14)", opacity }}>
       <Audio src={staticFile("voiceover/vo-close-substance.mp3")} />
-      {/* Drone-rangeland B-roll placeholder — falls back to ambient_30x */}
-      <Video
-        src={staticFile("clips/ambient_30x_synthesis.mp4")}
-        startFrom={0}
-        endAt={durationInFrames + 60}
-        muted
-        style={{
-          width: "100%",
-          height: "100%",
-          objectFit: "cover",
-          filter: "saturate(0.85) brightness(0.75)",
-        }}
-      />
+      {/* Dark base — BrollTrack composites drone-rangeland-aerial at z=1 */}
+      <AbsoluteFill style={{ backgroundColor: "rgb(6 8 12)" }} />
       <AbsoluteFill
         style={{
           background:
@@ -230,12 +232,18 @@ const FinalBeat = () => {
 };
 
 // ── Act 3 root ───────────────────────────────────────────────────────────────
-export const ABAct3Close = () => {
+
+type Act3Props = { variant?: "A" | "B" };
+
+export const ABAct3Close = ({ variant = "A" }: Act3Props) => {
   const SUBSTANCE = AB_LAYOUT.act3.substanceSeconds * FPS; // 540
   const FINAL = AB_LAYOUT.act3.finalSeconds * FPS; // 360
+  const brollTrack = variant === "B" ? BROLL_B : BROLL_A;
 
   return (
     <AbsoluteFill>
+      {/* z=1 b-roll — drone-rangeland-aerial covers the SubstanceBeat (150–168s) */}
+      <BrollTrack track={brollTrack} compositionStartSeconds={ACT3_START_SECONDS} />
       <Series>
         <Series.Sequence durationInFrames={SUBSTANCE}>
           <SubstanceBeat />

@@ -8,6 +8,10 @@
  * Word-level kinetic captions throughout — placeholder kinetic-typography
  * hero overlays for now; Phase E1 wires faster-whisper word-timestamps via
  * <KineticCaptions> component (not in Phase C scope).
+ *
+ * B-roll composited at z=1 by BrollTrack in CAct2Story (4 cuts, 20–70s)
+ * and CAct5Close (bookend night-sky-stars at 160–173s).
+ * Global offsets: Act1=0s, Act2=20s, Act3=70s, Act4=125s, Act5=160s.
  */
 import {
   AbsoluteFill,
@@ -22,6 +26,7 @@ import {
   useVideoConfig,
 } from "remotion";
 import { C_LAYOUT } from "../../compositions/calculate-main-metadata";
+import { BrollTrack, type BrollCut } from "../../components/BrollTrack";
 import {
   ACCENT_MAP,
   type Accent,
@@ -30,6 +35,13 @@ import {
   LowerThird,
   useFadeInOut,
 } from "./shared";
+import brollCRaw from "../../data/broll-C.json";
+
+const BROLL_C: BrollCut[] = (brollCRaw as { cuts: BrollCut[] }).cuts;
+
+// Global act offsets in variant C (seconds)
+const C_ACT2_START = 20;   // Act 2 Story starts at 20s
+const C_ACT5_START = 160;  // Act 5 Close starts at 160s
 
 const FPS = 30;
 
@@ -206,18 +218,10 @@ export const CAct2Story = () => {
   return (
     <AbsoluteFill style={{ backgroundColor: "rgb(8 10 14)", opacity }}>
       <Audio src={staticFile("voiceover/vo-story-C.mp3")} />
-      <Video
-        src={staticFile("clips/ambient_establish.mp4")}
-        startFrom={0}
-        endAt={durationInFrames + 60}
-        muted
-        style={{
-          width: "100%",
-          height: "100%",
-          objectFit: "cover",
-          filter: "saturate(0.85) contrast(1.05) brightness(0.6)",
-        }}
-      />
+      {/* z=1 b-roll: 4 cinematic cuts per EDL (cattle, paddock, meadow, lightning, drone) */}
+      <BrollTrack track={BROLL_C} compositionStartSeconds={C_ACT2_START} />
+      {/* Dark base behind b-roll */}
+      <AbsoluteFill style={{ backgroundColor: "rgb(6 8 12)" }} />
       <AbsoluteFill
         style={{
           background:
@@ -1112,18 +1116,8 @@ const CCloseBookend = () => {
   return (
     <AbsoluteFill style={{ backgroundColor: "rgb(8 10 14)", opacity }}>
       <Audio src={staticFile("voiceover/vo-close-C.mp3")} />
-      <Video
-        src={staticFile("clips/ambient_30x_synthesis.mp4")}
-        startFrom={0}
-        endAt={durationInFrames + 60}
-        muted
-        style={{
-          width: "100%",
-          height: "100%",
-          objectFit: "cover",
-          filter: "saturate(0.85) brightness(0.55)",
-        }}
-      />
+      {/* Dark base — BrollTrack composites night-sky-stars at z=1 */}
+      <AbsoluteFill style={{ backgroundColor: "rgb(6 8 12)" }} />
       <AbsoluteFill
         style={{
           background:
@@ -1290,6 +1284,8 @@ export const CAct5Close = () => {
 
   return (
     <AbsoluteFill>
+      {/* z=1 b-roll — night-sky-stars bookend at 160–173s per EDL */}
+      <BrollTrack track={BROLL_C} compositionStartSeconds={C_ACT5_START} />
       <Series>
         <Series.Sequence durationInFrames={BOOK}>
           <CCloseBookend />
