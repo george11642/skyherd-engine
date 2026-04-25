@@ -87,7 +87,7 @@ RENDER_MP4="${ITER_DIR}/${VARIANT}-iter${ITER}.mp4"
 
 if [[ "${NO_RENDER}" -eq 0 ]]; then
   echo "==> [1/7] Render: ${VARIANT} iter-${ITER}"
-  COMP_ID="SkyHerd${VARIANT}"
+  COMP_ID="Main-${VARIANT}"
   (
     cd "${REMOTION_DIR}"
     pnpm exec remotion render \
