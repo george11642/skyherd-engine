@@ -1,0 +1,364 @@
+{
+  "version": "1.0",
+  "render_runtime": "remotion",
+  "renderer_family": "cinematic-trailer",
+  "metadata": {
+    "skyherd_variant": "C",
+    "skyherd_pipeline": "cinematic",
+    "skyherd_acts_covered": ["act1-hook", "act2-story", "act3-synthesis", "act4-substance", "act5-close"],
+    "directorial_intent": "5-act layout with word-level kinetic captions throughout VO. Longer market-arc (vo-story-C @ 46s), dedicated 35s Substance act with split-screen mesh + terminal, emotional 'finally' bookend. Highest-variance variant — bets on differentiation over winner-pattern.",
+    "openmontage_pipeline_version": "cinematic@2.0",
+    "openmontage_version": "host-agent-2026-04",
+    "edit_director_skill": "skills/pipelines/cinematic/edit-director.md",
+    "captions_policy": "Word-level kinetic captions ENABLED for all VO beats per styled-captions-C.json. The captions ARE part of the Opus 4.7 demo — meta-loop self-reference at 2:05-2:25.",
+    "variant_risk_note": "Zero of three top-3 winners used 5-act + word-level captions. C deliberately violates that pattern — iteration loop decides if differentiation pays off."
+  },
+  "cuts": [
+    {
+      "id": "c1-cold-open-black-metric",
+      "source": "",
+      "in_seconds": 0.0,
+      "out_seconds": 8.0,
+      "transition_in": "cut",
+      "reason": "Same metric punch as B's cold open. No VO, no captions — pure typography."
+    },
+    {
+      "id": "c1-dawn-corral-hook-tail",
+      "source": "remotion-video/public/broll/t1-dawn-corral-golden.mp4",
+      "in_seconds": 8.0,
+      "out_seconds": 20.0,
+      "transition_in": "fade",
+      "transition_duration": 1.0,
+      "reason": "Dawn-corral under vo-hook-C (compressed 12s intro). Word-level captions begin here — every word renders via <KineticCaptions>."
+    },
+    {
+      "id": "c2-story-cattle-grazing",
+      "source": "remotion-video/public/broll/t1-cattle-grazing-wide.mp4",
+      "in_seconds": 20.0,
+      "out_seconds": 28.0,
+      "transition_in": "cut",
+      "reason": "Story arc opens on cattle-grazing-wide. 'Beef is at record highs.' Word-level captions active."
+    },
+    {
+      "id": "c2-story-cattle-windy-paddock",
+      "source": "remotion-video/public/broll/t3-cattle-windy-paddock.mp4",
+      "in_seconds": 28.0,
+      "out_seconds": 36.0,
+      "transition_in": "cut",
+      "reason": "C-only b-roll: windy-paddock under '65-yr cow herd low'. Wind = volatility = market context. Differentiates from A/B's static fence/storm cuts."
+    },
+    {
+      "id": "c2-story-meadow-empty",
+      "source": "remotion-video/public/broll/t3-meadow-landscape.mp4",
+      "in_seconds": 36.0,
+      "out_seconds": 44.0,
+      "transition_in": "cut",
+      "reason": "'Labor · gone. Ranchers · aging out.' Empty meadow holds the absence beat. Same asset as A — variant b-roll budget reused efficiently."
+    },
+    {
+      "id": "c2-story-lightning-silhouette",
+      "source": "remotion-video/public/broll/t1-lightning-night.mp4",
+      "in_seconds": 44.0,
+      "out_seconds": 52.0,
+      "transition_in": "cut",
+      "reason": "C-ONLY: Lightning-silhouette under 'Hail doesn't wait for the next vet visit.' Adds the dramatic stake top-3 list slot #10 called for. Word-level captions get to render in dramatic light."
+    },
+    {
+      "id": "c2-story-drone-rangeland",
+      "source": "remotion-video/public/broll/t1-drone-rangeland-aerial.mp4",
+      "in_seconds": 52.0,
+      "out_seconds": 60.0,
+      "transition_in": "cut",
+      "reason": "Drone aerial under '72 hours blind' line. Scale + isolation = the actual editorial hook of variant C."
+    },
+    {
+      "id": "c2-story-close-rancher-does-not",
+      "source": "remotion-video/public/broll/t1-cattle-grazing-wide.mp4",
+      "in_seconds": 60.0,
+      "out_seconds": 70.0,
+      "transition_in": "cut",
+      "reason": "Hold the 'rancher does not. So we built one.' beat over a return-to-cattle shot. Bookends the story act. Hard cut into demo at 1:10.",
+      "transform": {
+        "animation": "slow-zoom-in"
+      }
+    },
+    {
+      "id": "c3-synthesis-30x",
+      "source": "remotion-video/public/clips/ambient_30x_synthesis.mp4",
+      "in_seconds": 110.0,
+      "out_seconds": 125.0,
+      "transition_in": "cut",
+      "reason": "Synthesis beat: 30× ambient dashboard with three callout cards stacking right. vo-synthesis-C: 'Five agents. Idle until a sensor wakes them. Skills loaded per-task. Cost ticker freezes between events.' Tight 15s — Elisa stats-barrage backing."
+    },
+    {
+      "id": "c4-opus-mesh-terminal-split",
+      "source": "",
+      "in_seconds": 125.0,
+      "out_seconds": 145.0,
+      "transition_in": "cut",
+      "reason": "DEDICATED Opus 4.7 act — the variant's structural advantage. Split-screen: left = animated 5-agent mesh (CrossBeam pattern), right = terminal stream with cache_control:ephemeral highlighted. vo-opus-C: meta-loop reference to the captions you're reading right now (the word-level captions are themselves the Opus demo).",
+      "transform": {
+        "animation": "static-split-screen-50-50"
+      }
+    },
+    {
+      "id": "c4-depth-attest-verify",
+      "source": "remotion-video/public/clips/attest_verify.mp4",
+      "in_seconds": 145.0,
+      "out_seconds": 160.0,
+      "transition_in": "cut",
+      "reason": "Hard cut to terminal: skyherd-attest verify scrolling 360 entries, Ed25519 sigs blink green. vo-depth-C: tests/coverage/seed/bytes counter. Replaces A/B's 14s substance VO with a richer, terminal-led 15s."
+    },
+    {
+      "id": "c4-depth-hardware-circuit",
+      "source": "remotion-video/public/broll/t2-hardware-circuit-board.mp4",
+      "in_seconds": 145.0,
+      "out_seconds": 152.0,
+      "transition_in": "cut",
+      "reason": "C-ONLY b-roll inset: hardware circuit-board on a small picture-in-picture in lower-right during depth narration — ties Year-2 hardware fleet visually without forcing it into the main shot. Layer: overlay (PiP).",
+      "layer": "overlay",
+      "transform": {
+        "scale": 0.25,
+        "position": "bottom-right",
+        "crop": {"x": 0, "y": 0, "width": 480, "height": 270}
+      }
+    },
+    {
+      "id": "c4-depth-hardware-microcircuit",
+      "source": "remotion-video/public/broll/t2-hardware-microcircuit.mp4",
+      "in_seconds": 152.0,
+      "out_seconds": 160.0,
+      "transition_in": "cut",
+      "reason": "C-ONLY: Microcircuit PiP follows circuit-board, same lower-right slot. Together they assert 'this is real hardware territory' in 15s without leaving the depth narrative.",
+      "layer": "overlay",
+      "transform": {
+        "scale": 0.25,
+        "position": "bottom-right",
+        "crop": {"x": 0, "y": 0, "width": 480, "height": 270}
+      }
+    },
+    {
+      "id": "c5-close-night-sky-stars",
+      "source": "remotion-video/public/broll/t3-night-sky-stars.mp4",
+      "in_seconds": 160.0,
+      "out_seconds": 173.0,
+      "transition_in": "cut",
+      "reason": "C-ONLY: Night-sky-stars carries the 'Now — finally — the ranch can watch itself' bookend. Differentiates from A/B's drone-rangeland close. Stars = always-on, the metaphor lands."
+    },
+    {
+      "id": "c5-wordmark-isometric",
+      "source": "",
+      "in_seconds": 173.0,
+      "out_seconds": 180.0,
+      "transition_in": "cut",
+      "reason": "Hard cut to isometric brand animation. Wordmark scales up at 2:54. Silent VO — wordmark holds."
+    }
+  ],
+  "overlays": [
+    {
+      "asset_id": "punch-417",
+      "start_seconds": 1.0,
+      "end_seconds": 3.0,
+      "position": {"x": 960, "y": 480, "width": 800, "height": 240},
+      "animation": "huge-serif-dust",
+      "opacity": 1.0
+    },
+    {
+      "asset_id": "punch-a-week",
+      "start_seconds": 2.0,
+      "end_seconds": 3.5,
+      "position": {"x": 1320, "y": 580, "width": 280, "height": 60},
+      "animation": "small-cream-trail",
+      "opacity": 0.9
+    },
+    {
+      "asset_id": "punch-247",
+      "start_seconds": 3.0,
+      "end_seconds": 5.0,
+      "position": {"x": 960, "y": 540, "width": 1100, "height": 140},
+      "animation": "bold-sage-pop",
+      "opacity": 1.0
+    },
+    {
+      "asset_id": "punch-nervous-system",
+      "start_seconds": 4.0,
+      "end_seconds": 6.0,
+      "position": {"x": 960, "y": 540, "width": 1300, "height": 140},
+      "animation": "bold-sage-pop",
+      "opacity": 1.0
+    },
+    {
+      "asset_id": "punch-10k-acre",
+      "start_seconds": 6.0,
+      "end_seconds": 7.5,
+      "position": {"x": 960, "y": 620, "width": 1100, "height": 100},
+      "animation": "medium-dust-fade",
+      "opacity": 0.95
+    },
+    {
+      "asset_id": "lower3-george-credentials",
+      "start_seconds": 9.0,
+      "end_seconds": 19.0,
+      "position": {"x": 120, "y": 950, "width": 720, "height": 90},
+      "animation": "slide-in-bottom",
+      "opacity": 1.0
+    },
+    {
+      "asset_id": "kinetic-beef-record-highs-large",
+      "start_seconds": 24.0,
+      "end_seconds": 30.0,
+      "position": {"x": 960, "y": 380, "width": 1300, "height": 200},
+      "animation": "kinetic-large-dust-on-warm",
+      "opacity": 1.0
+    },
+    {
+      "asset_id": "kinetic-cow-herd-65-large",
+      "start_seconds": 30.0,
+      "end_seconds": 36.0,
+      "position": {"x": 960, "y": 380, "width": 1300, "height": 200},
+      "animation": "kinetic-large-dust-on-warm",
+      "opacity": 1.0
+    },
+    {
+      "asset_id": "kinetic-labor-gone-medium",
+      "start_seconds": 36.0,
+      "end_seconds": 42.0,
+      "position": {"x": 960, "y": 400, "width": 1100, "height": 160},
+      "animation": "kinetic-medium-sage",
+      "opacity": 1.0
+    },
+    {
+      "asset_id": "kinetic-ranchers-aging-out",
+      "start_seconds": 42.0,
+      "end_seconds": 48.0,
+      "position": {"x": 960, "y": 400, "width": 1100, "height": 160},
+      "animation": "kinetic-medium-sage",
+      "opacity": 1.0
+    },
+    {
+      "asset_id": "kinetic-72-hours-blind",
+      "start_seconds": 50.0,
+      "end_seconds": 58.0,
+      "position": {"x": 960, "y": 400, "width": 1300, "height": 220},
+      "animation": "kinetic-large-warn-orange",
+      "opacity": 1.0
+    },
+    {
+      "asset_id": "kinetic-rancher-does-not-huge",
+      "start_seconds": 58.0,
+      "end_seconds": 66.0,
+      "position": {"x": 960, "y": 540, "width": 1500, "height": 240},
+      "animation": "kinetic-huge-bold-dust",
+      "opacity": 1.0
+    },
+    {
+      "asset_id": "kinetic-so-we-built-one",
+      "start_seconds": 66.0,
+      "end_seconds": 70.0,
+      "position": {"x": 960, "y": 540, "width": 1100, "height": 160},
+      "animation": "kinetic-medium-sage-fade-out",
+      "opacity": 1.0
+    },
+    {
+      "asset_id": "synthesis-callout-managed-agents",
+      "start_seconds": 110.0,
+      "end_seconds": 125.0,
+      "position": {"x": 1400, "y": 320, "width": 480, "height": 100},
+      "animation": "stack-fade-in-1",
+      "opacity": 1.0
+    },
+    {
+      "asset_id": "synthesis-callout-skills-files",
+      "start_seconds": 114.0,
+      "end_seconds": 125.0,
+      "position": {"x": 1400, "y": 440, "width": 480, "height": 100},
+      "animation": "stack-fade-in-2",
+      "opacity": 1.0
+    },
+    {
+      "asset_id": "synthesis-callout-cost-417",
+      "start_seconds": 118.0,
+      "end_seconds": 125.0,
+      "position": {"x": 1400, "y": 560, "width": 480, "height": 100},
+      "animation": "stack-fade-in-3",
+      "opacity": 1.0
+    },
+    {
+      "asset_id": "opus-terminal-stream",
+      "start_seconds": 125.0,
+      "end_seconds": 145.0,
+      "position": {"x": 1440, "y": 540, "width": 880, "height": 800},
+      "animation": "terminal-typewriter",
+      "opacity": 1.0
+    },
+    {
+      "asset_id": "opus-mesh-canvas-left",
+      "start_seconds": 125.0,
+      "end_seconds": 145.0,
+      "position": {"x": 480, "y": 540, "width": 880, "height": 800},
+      "animation": "mesh-pulse-static",
+      "opacity": 1.0
+    },
+    {
+      "asset_id": "depth-counter-tests-coverage",
+      "start_seconds": 146.0,
+      "end_seconds": 160.0,
+      "position": {"x": 960, "y": 1000, "width": 1400, "height": 60},
+      "animation": "counter-monospace-bottom",
+      "opacity": 1.0
+    },
+    {
+      "asset_id": "depth-emphasis-every-time",
+      "start_seconds": 156.0,
+      "end_seconds": 160.0,
+      "position": {"x": 960, "y": 540, "width": 1100, "height": 140},
+      "animation": "fade-in-emphasis-warn",
+      "opacity": 1.0
+    },
+    {
+      "asset_id": "wordmark-skyherd-c",
+      "start_seconds": 174.0,
+      "end_seconds": 180.0,
+      "position": {"x": 960, "y": 460, "width": 800, "height": 200},
+      "animation": "scale-up-center",
+      "opacity": 1.0
+    },
+    {
+      "asset_id": "signoff-block-C",
+      "start_seconds": 175.5,
+      "end_seconds": 180.0,
+      "position": {"x": 960, "y": 720, "width": 1100, "height": 240},
+      "animation": "fade-in-stack",
+      "opacity": 0.95
+    }
+  ],
+  "audio": {
+    "narration": [
+      {"asset_id": "remotion-video/public/voiceover/vo-hook-C.mp3", "start_seconds": 8.0, "end_seconds": 20.0},
+      {"asset_id": "remotion-video/public/voiceover/vo-story-C.mp3", "start_seconds": 20.0, "end_seconds": 66.0},
+      {"asset_id": "remotion-video/public/voiceover/vo-synthesis-C.mp3", "start_seconds": 110.0, "end_seconds": 123.0},
+      {"asset_id": "remotion-video/public/voiceover/vo-opus-C.mp3", "start_seconds": 125.0, "end_seconds": 145.0},
+      {"asset_id": "remotion-video/public/voiceover/vo-depth-C.mp3", "start_seconds": 145.0, "end_seconds": 159.0},
+      {"asset_id": "remotion-video/public/voiceover/vo-close-C.mp3", "start_seconds": 160.0, "end_seconds": 172.0}
+    ],
+    "music": {
+      "asset_id": "remotion-video/public/music/bgm-main.mp3",
+      "volume": 0.42,
+      "fade_in_seconds": 8.0,
+      "fade_out_seconds": 5.0,
+      "ducking": "binary"
+    },
+    "sfx": [
+      {"asset_id": "metric-pop-417", "start_seconds": 1.0, "volume": 0.4},
+      {"asset_id": "ui-tick-synthesis", "start_seconds": 110.0, "volume": 0.35},
+      {"asset_id": "terminal-prompt-tick", "start_seconds": 125.0, "volume": 0.3},
+      {"asset_id": "depth-chain-pulse", "start_seconds": 145.0, "volume": 0.4},
+      {"asset_id": "wordmark-chime", "start_seconds": 174.0, "volume": 0.4}
+    ]
+  },
+  "caption_emphasis": {
+    "variant_source": "remotion-video/public/captions/captions-C.json",
+    "mode": "word-level-kinetic",
+    "policy": "Every spoken word renders via <KineticCaptions> with per-word styling from styled-captions-C.json. ≤7 words simultaneous, line-break on commas/periods. The captions are themselves a demo of Opus 4.7 (meta-loop callout in vo-opus-C)."
+  }
+}

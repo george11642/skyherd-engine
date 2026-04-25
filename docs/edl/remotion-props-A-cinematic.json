@@ -1,0 +1,467 @@
+{
+  "fps": 60,
+  "durationInFrames": 10800,
+  "sequences": [
+    {
+      "id": "a1-cold-open-black",
+      "fromFrame": 0,
+      "durationInFrames": 360,
+      "asset": {
+        "kind": "scene-component"
+      },
+      "transition": "cut",
+      "transitionDurationFrames": 0,
+      "metadata": {
+        "reason": "Black card with kinetic punch \u2014 'Everyone thinks ranchers need smarter sensors. They don't. They need a nervous system.' The black ground gives the typography weight. Silent."
+      }
+    },
+    {
+      "id": "a1-dawn-corral-bleed",
+      "fromFrame": 360,
+      "durationInFrames": 960,
+      "asset": {
+        "kind": "asset",
+        "path": "remotion-video/public/broll/t1-dawn-corral-golden.mp4"
+      },
+      "transition": "fade",
+      "transitionDurationFrames": 0,
+      "metadata": {
+        "transition_duration": 1.5,
+        "reason": "Dawn-corral fades in under the final punch line at 0:06, slow zoom holds through vo-intro. Warm 5500K grade per production note. PostVisit hospital-exterior bookend pattern."
+      }
+    },
+    {
+      "id": "a1-market-cattle-grazing",
+      "fromFrame": 1320,
+      "durationInFrames": 480,
+      "asset": {
+        "kind": "asset",
+        "path": "remotion-video/public/broll/t1-cattle-grazing-wide.mp4"
+      },
+      "transition": "cut",
+      "transitionDurationFrames": 0,
+      "metadata": {
+        "reason": "Market context cut 1: 'Beef \u00b7 record highs'. Wide grazing read as 'business as usual', undermined by overlay claim. Hard cut into next."
+      }
+    },
+    {
+      "id": "a1-market-fence-dusk",
+      "fromFrame": 1800,
+      "durationInFrames": 360,
+      "asset": {
+        "kind": "asset",
+        "path": "remotion-video/public/broll/t1-lightning-night.mp4"
+      },
+      "transition": "cut",
+      "transitionDurationFrames": 0,
+      "metadata": {
+        "reason": "Stand-in for fence-line-dusk (SOURCE.md gap #5). Lightning-night gives ominous low-key cover for 'Cow herd \u00b7 65-yr low'."
+      }
+    },
+    {
+      "id": "a1-market-empty-pasture",
+      "fromFrame": 2160,
+      "durationInFrames": 360,
+      "asset": {
+        "kind": "asset",
+        "path": "remotion-video/public/broll/t3-meadow-landscape.mp4"
+      },
+      "transition": "cut",
+      "transitionDurationFrames": 0,
+      "metadata": {
+        "reason": "Empty meadow under 'Labor \u00b7 gone'. Quiet landscape that reads as absence, not abundance."
+      }
+    },
+    {
+      "id": "a1-market-nm-desert",
+      "fromFrame": 2520,
+      "durationInFrames": 480,
+      "asset": {
+        "kind": "asset",
+        "path": "remotion-video/public/broll/t1-drone-arid-mountains.mp4"
+      },
+      "transition": "cut",
+      "transitionDurationFrames": 0,
+      "metadata": {
+        "reason": "NM high-desert flyover under 'Eyes \u00b7 fewer per acre'. Scale = vastness = the impossibility of human coverage."
+      }
+    },
+    {
+      "id": "a1-bookend-cattle-herd",
+      "fromFrame": 3000,
+      "durationInFrames": 300,
+      "asset": {
+        "kind": "asset",
+        "path": "remotion-video/public/broll/t1-cattle-herd-countryside.mp4"
+      },
+      "transition": "cut",
+      "transitionDurationFrames": 0,
+      "metadata": {
+        "reason": "Hold the 'rancher does not' line over a herd-countryside shot. Forces the contrast \u2014 the herd is the thing that's connected; the rancher isn't."
+      }
+    },
+    {
+      "id": "a1-bridge-ambient-establish",
+      "fromFrame": 3300,
+      "durationInFrames": 300,
+      "asset": {
+        "kind": "asset",
+        "path": "remotion-video/public/clips/ambient_establish.mp4"
+      },
+      "transition": "cut",
+      "transitionDurationFrames": 0,
+      "metadata": {
+        "reason": "Dashboard establish under vo-bridge \u2014 'So we built one'. Slow vertical pan, wordmark fade-in. Bridges narrative into demo without hard cut."
+      }
+    },
+    {
+      "id": "a2-mesh-reveal",
+      "fromFrame": 6900,
+      "durationInFrames": 2100,
+      "asset": {
+        "kind": "scene-component"
+      },
+      "transition": "cut",
+      "transitionDurationFrames": 0,
+      "metadata": {
+        "reason": "CrossBeam node-diagram steal \u2014 synthetic Remotion canvas, smooth pan. Sage center node fans to 5 agents, tool nodes spawn, attest.append + Merkle chain pulse. The ONE non-hard-cut beat in the variant. Cost ticker $4.17/week lands at 2:25.",
+        "transform": {
+          "animation": "smooth-pan-right"
+        }
+      }
+    },
+    {
+      "id": "a3-close-drone-rangeland",
+      "fromFrame": 9000,
+      "durationInFrames": 1080,
+      "asset": {
+        "kind": "asset",
+        "path": "remotion-video/public/broll/t1-drone-rangeland-aerial.mp4"
+      },
+      "transition": "cut",
+      "transitionDurationFrames": 0,
+      "metadata": {
+        "reason": "Substance act over warm dust-graded drone aerial. Three text blocks fade in over: 1106 tests, Ed25519 chain, fresh-clone < 3 min. CrossBeam suburban-drone close pattern."
+      }
+    },
+    {
+      "id": "a3-wordmark-isometric",
+      "fromFrame": 10080,
+      "durationInFrames": 720,
+      "asset": {
+        "kind": "scene-component"
+      },
+      "transition": "cut",
+      "transitionDurationFrames": 0,
+      "metadata": {
+        "reason": "Isometric brand animation \u2014 Remotion-built. Tan/sage corral on saturated sunrise-orange. CrossBeam pink-on-green bookend pattern. vo-close-final lands the hook echo."
+      }
+    }
+  ],
+  "overlays": [
+    {
+      "asset_id": "punch-everyone-thinks",
+      "start_seconds": 1.0,
+      "end_seconds": 2.5,
+      "position": {
+        "x": 960,
+        "y": 540,
+        "width": 1200,
+        "height": 120
+      },
+      "animation": "fade-in-light",
+      "opacity": 0.92
+    },
+    {
+      "asset_id": "punch-they-dont",
+      "start_seconds": 4.0,
+      "end_seconds": 6.0,
+      "position": {
+        "x": 960,
+        "y": 540,
+        "width": 1200,
+        "height": 160
+      },
+      "animation": "pop-bold-sage",
+      "opacity": 1.0
+    },
+    {
+      "asset_id": "punch-nervous-system",
+      "start_seconds": 6.0,
+      "end_seconds": 8.0,
+      "position": {
+        "x": 960,
+        "y": 540,
+        "width": 1400,
+        "height": 160
+      },
+      "animation": "pop-bold-dust",
+      "opacity": 1.0
+    },
+    {
+      "asset_id": "lower3-george-credentials",
+      "start_seconds": 9.0,
+      "end_seconds": 19.0,
+      "position": {
+        "x": 120,
+        "y": 950,
+        "width": 720,
+        "height": 90
+      },
+      "animation": "slide-in-bottom",
+      "opacity": 1.0
+    },
+    {
+      "asset_id": "emphasis-ranch-checked-itself",
+      "start_seconds": 20.0,
+      "end_seconds": 22.0,
+      "position": {
+        "x": 960,
+        "y": 540,
+        "width": 1400,
+        "height": 120
+      },
+      "animation": "fade-in-emphasis",
+      "opacity": 1.0
+    },
+    {
+      "asset_id": "kinetic-beef-record-highs",
+      "start_seconds": 24.0,
+      "end_seconds": 30.0,
+      "position": {
+        "x": 960,
+        "y": 460,
+        "width": 1200,
+        "height": 180
+      },
+      "animation": "kinetic-large-sage-on-dust",
+      "opacity": 1.0
+    },
+    {
+      "asset_id": "kinetic-cow-herd-65",
+      "start_seconds": 30.0,
+      "end_seconds": 36.0,
+      "position": {
+        "x": 960,
+        "y": 460,
+        "width": 1200,
+        "height": 180
+      },
+      "animation": "kinetic-large-sage-on-dust",
+      "opacity": 1.0
+    },
+    {
+      "asset_id": "kinetic-labor-gone",
+      "start_seconds": 36.0,
+      "end_seconds": 42.0,
+      "position": {
+        "x": 960,
+        "y": 460,
+        "width": 1200,
+        "height": 180
+      },
+      "animation": "kinetic-large-sage-on-dust",
+      "opacity": 1.0
+    },
+    {
+      "asset_id": "kinetic-eyes-fewer",
+      "start_seconds": 42.0,
+      "end_seconds": 48.0,
+      "position": {
+        "x": 960,
+        "y": 460,
+        "width": 1200,
+        "height": 180
+      },
+      "animation": "kinetic-large-sage-on-dust",
+      "opacity": 1.0
+    },
+    {
+      "asset_id": "kinetic-rancher-does-not",
+      "start_seconds": 48.0,
+      "end_seconds": 55.0,
+      "position": {
+        "x": 960,
+        "y": 540,
+        "width": 1500,
+        "height": 220
+      },
+      "animation": "kinetic-huge-bold-emphasis",
+      "opacity": 1.0
+    },
+    {
+      "asset_id": "lower3-skyherd-ranch-a",
+      "start_seconds": 55.0,
+      "end_seconds": 60.0,
+      "position": {
+        "x": 1300,
+        "y": 950,
+        "width": 540,
+        "height": 80
+      },
+      "animation": "fade-in-right",
+      "opacity": 0.95
+    },
+    {
+      "asset_id": "mesh-cost-ticker-417",
+      "start_seconds": 145.0,
+      "end_seconds": 150.0,
+      "position": {
+        "x": 1700,
+        "y": 1000,
+        "width": 200,
+        "height": 60
+      },
+      "animation": "ticker-bottom-right-dust",
+      "opacity": 1.0
+    },
+    {
+      "asset_id": "emphasis-same-seed-same-bytes",
+      "start_seconds": 144.0,
+      "end_seconds": 150.0,
+      "position": {
+        "x": 960,
+        "y": 600,
+        "width": 1300,
+        "height": 120
+      },
+      "animation": "fade-in-emphasis",
+      "opacity": 1.0
+    },
+    {
+      "asset_id": "substance-tests-coverage",
+      "start_seconds": 151.0,
+      "end_seconds": 168.0,
+      "position": {
+        "x": 200,
+        "y": 320,
+        "width": 720,
+        "height": 80
+      },
+      "animation": "fade-stack-1",
+      "opacity": 1.0
+    },
+    {
+      "asset_id": "substance-ed25519-chain",
+      "start_seconds": 155.0,
+      "end_seconds": 168.0,
+      "position": {
+        "x": 200,
+        "y": 420,
+        "width": 720,
+        "height": 80
+      },
+      "animation": "fade-stack-2",
+      "opacity": 1.0
+    },
+    {
+      "asset_id": "substance-fresh-clone",
+      "start_seconds": 159.0,
+      "end_seconds": 168.0,
+      "position": {
+        "x": 200,
+        "y": 520,
+        "width": 720,
+        "height": 80
+      },
+      "animation": "fade-stack-3",
+      "opacity": 1.0
+    },
+    {
+      "asset_id": "wordmark-skyherd",
+      "start_seconds": 170.0,
+      "end_seconds": 180.0,
+      "position": {
+        "x": 960,
+        "y": 460,
+        "width": 800,
+        "height": 200
+      },
+      "animation": "scale-up-center",
+      "opacity": 1.0
+    },
+    {
+      "asset_id": "signoff-block-A",
+      "start_seconds": 172.0,
+      "end_seconds": 180.0,
+      "position": {
+        "x": 960,
+        "y": 720,
+        "width": 1100,
+        "height": 240
+      },
+      "animation": "fade-in-stack",
+      "opacity": 0.95
+    }
+  ],
+  "transitions": [],
+  "audio": {
+    "narrationSegments": [
+      {
+        "asset_id": "remotion-video/public/voiceover/vo-intro.mp3",
+        "start_seconds": 8.0,
+        "end_seconds": 22.0
+      },
+      {
+        "asset_id": "remotion-video/public/voiceover/vo-market.mp3",
+        "start_seconds": 22.0,
+        "end_seconds": 50.0
+      },
+      {
+        "asset_id": "remotion-video/public/voiceover/vo-bridge.mp3",
+        "start_seconds": 50.0,
+        "end_seconds": 60.0
+      },
+      {
+        "asset_id": "remotion-video/public/voiceover/vo-mesh.mp3",
+        "start_seconds": 115.0,
+        "end_seconds": 148.0
+      },
+      {
+        "asset_id": "remotion-video/public/voiceover/vo-close-substance.mp3",
+        "start_seconds": 150.0,
+        "end_seconds": 166.0
+      },
+      {
+        "asset_id": "remotion-video/public/voiceover/vo-close-final.mp3",
+        "start_seconds": 168.0,
+        "end_seconds": 178.0
+      }
+    ],
+    "music": {
+      "asset_id": "remotion-video/public/music/bgm-main.mp3",
+      "volume": 0.45,
+      "fade_in_seconds": 5.0,
+      "fade_out_seconds": 4.0,
+      "ducking": "binary"
+    },
+    "sfx": [
+      {
+        "asset_id": "ui-tick-bridge",
+        "start_seconds": 55.5,
+        "volume": 0.35
+      },
+      {
+        "asset_id": "mesh-pulse-merkle",
+        "start_seconds": 135.0,
+        "volume": 0.5
+      },
+      {
+        "asset_id": "wordmark-chime",
+        "start_seconds": 170.0,
+        "volume": 0.4
+      }
+    ]
+  },
+  "captionEmphasis": {
+    "variant_source": "remotion-video/public/captions/captions-A.json",
+    "mode": "sparse-emphasis-only",
+    "policy": "No word-by-word captions on full VO. Three deliberate emphasis fades only: ranch-checked-itself (0:20), rancher-does-not (0:48), same-seed-same-bytes (2:24)."
+  },
+  "metadata": {
+    "sourceTool": "openmontage",
+    "sourceVersion": "host-agent-2026-04",
+    "rendererFamily": "cinematic-trailer",
+    "ingestedAt": "2026-04-25T00:57:34.376359+00:00"
+  }
+}

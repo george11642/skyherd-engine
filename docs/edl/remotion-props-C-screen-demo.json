@@ -1,0 +1,278 @@
+{
+  "fps": 60,
+  "durationInFrames": 6600,
+  "sequences": [
+    {
+      "id": "demo-coyote",
+      "fromFrame": 4200,
+      "durationInFrames": 480,
+      "asset": {
+        "kind": "asset",
+        "path": "remotion-video/public/clips/coyote.mp4"
+      },
+      "transition": "cut",
+      "transitionDurationFrames": 0,
+      "metadata": {
+        "reason": "Scenario 1 compressed to 8s \u2014 trimmed to land vo-coyote at 1:11 (1s after cut), thermal glyph + dispatcher flash in single frame burst."
+      }
+    },
+    {
+      "id": "demo-sick-cow",
+      "fromFrame": 4680,
+      "durationInFrames": 480,
+      "asset": {
+        "kind": "asset",
+        "path": "remotion-video/public/clips/sick_cow.mp4"
+      },
+      "transition": "cut",
+      "transitionDurationFrames": 0,
+      "metadata": {
+        "reason": "Scenario 2 \u2014 8s. vo-sick-cow lands at 1:18, A014 highlight overlapping VetIntakePanel slide-in to maximize info density per second."
+      }
+    },
+    {
+      "id": "demo-water-tank",
+      "fromFrame": 5160,
+      "durationInFrames": 480,
+      "asset": {
+        "kind": "asset",
+        "path": "remotion-video/public/clips/water.mp4"
+      },
+      "transition": "cut",
+      "transitionDurationFrames": 0,
+      "metadata": {
+        "reason": "Scenario 3 silent center \u2014 same as A/B. Music carries. Captions go silent for 8s \u2014 gives viewer's eyes a rest from the kinetic word stream. Architectural choice, not accident."
+      }
+    },
+    {
+      "id": "demo-calving",
+      "fromFrame": 5640,
+      "durationInFrames": 480,
+      "asset": {
+        "kind": "asset",
+        "path": "remotion-video/public/clips/calving.mp4"
+      },
+      "transition": "cut",
+      "transitionDurationFrames": 0,
+      "metadata": {
+        "reason": "Scenario 4 \u2014 8s. Cow 117 pre-labor priority page. Word-level captions resume."
+      }
+    },
+    {
+      "id": "demo-storm",
+      "fromFrame": 6120,
+      "durationInFrames": 480,
+      "asset": {
+        "kind": "asset",
+        "path": "remotion-video/public/clips/storm.mp4"
+      },
+      "transition": "cut",
+      "transitionDurationFrames": 0,
+      "metadata": {
+        "reason": "Scenario 5 \u2014 8s. Hail/redirect closes demo. Hard-cut into synthesis act at 1:50."
+      }
+    }
+  ],
+  "overlays": [
+    {
+      "asset_id": "lower3-fenceline-coyote-c",
+      "start_seconds": 70.5,
+      "end_seconds": 77.5,
+      "position": {
+        "x": 120,
+        "y": 860,
+        "width": 980,
+        "height": 80
+      },
+      "animation": "slide-in-bottom-thermal-shifted",
+      "opacity": 1.0
+    },
+    {
+      "asset_id": "anchor-chip-fence-w12-c",
+      "start_seconds": 75.0,
+      "end_seconds": 78.0,
+      "position": {
+        "x": 1500,
+        "y": 80,
+        "width": 380,
+        "height": 120
+      },
+      "animation": "fade-in-top-right",
+      "opacity": 0.95
+    },
+    {
+      "asset_id": "lower3-herdhealth-a014-c",
+      "start_seconds": 78.5,
+      "end_seconds": 85.5,
+      "position": {
+        "x": 120,
+        "y": 860,
+        "width": 980,
+        "height": 80
+      },
+      "animation": "slide-in-bottom-warn-shifted",
+      "opacity": 1.0
+    },
+    {
+      "asset_id": "anchor-chip-vet-a014-c",
+      "start_seconds": 83.0,
+      "end_seconds": 86.0,
+      "position": {
+        "x": 1500,
+        "y": 80,
+        "width": 380,
+        "height": 120
+      },
+      "animation": "fade-in-top-right",
+      "opacity": 0.95
+    },
+    {
+      "asset_id": "lower3-grazing-tank7-c",
+      "start_seconds": 86.5,
+      "end_seconds": 93.5,
+      "position": {
+        "x": 120,
+        "y": 860,
+        "width": 980,
+        "height": 80
+      },
+      "animation": "slide-in-bottom-sky-shifted",
+      "opacity": 1.0
+    },
+    {
+      "asset_id": "anchor-chip-tank7-ir-c",
+      "start_seconds": 91.0,
+      "end_seconds": 94.0,
+      "position": {
+        "x": 1500,
+        "y": 80,
+        "width": 380,
+        "height": 120
+      },
+      "animation": "fade-in-top-right",
+      "opacity": 0.95
+    },
+    {
+      "asset_id": "lower3-calving-117-c",
+      "start_seconds": 94.5,
+      "end_seconds": 101.5,
+      "position": {
+        "x": 120,
+        "y": 860,
+        "width": 980,
+        "height": 80
+      },
+      "animation": "slide-in-bottom-sage-shifted",
+      "opacity": 1.0
+    },
+    {
+      "asset_id": "anchor-chip-calving-117-c",
+      "start_seconds": 99.0,
+      "end_seconds": 102.0,
+      "position": {
+        "x": 1500,
+        "y": 80,
+        "width": 380,
+        "height": 120
+      },
+      "animation": "fade-in-top-right",
+      "opacity": 0.95
+    },
+    {
+      "asset_id": "lower3-weather-redirect-c",
+      "start_seconds": 102.5,
+      "end_seconds": 109.5,
+      "position": {
+        "x": 120,
+        "y": 860,
+        "width": 980,
+        "height": 80
+      },
+      "animation": "slide-in-bottom-dust-shifted",
+      "opacity": 1.0
+    },
+    {
+      "asset_id": "anchor-chip-redirect-active-c",
+      "start_seconds": 107.0,
+      "end_seconds": 110.0,
+      "position": {
+        "x": 1500,
+        "y": 80,
+        "width": 380,
+        "height": 120
+      },
+      "animation": "fade-in-top-right",
+      "opacity": 0.95
+    }
+  ],
+  "transitions": [],
+  "audio": {
+    "narrationSegments": [
+      {
+        "asset_id": "remotion-video/public/voiceover/vo-coyote.mp3",
+        "start_seconds": 71.0,
+        "end_seconds": 75.5
+      },
+      {
+        "asset_id": "remotion-video/public/voiceover/vo-sick-cow.mp3",
+        "start_seconds": 78.5,
+        "end_seconds": 84.5
+      },
+      {
+        "asset_id": "remotion-video/public/voiceover/vo-calving.mp3",
+        "start_seconds": 94.5,
+        "end_seconds": 99.5
+      },
+      {
+        "asset_id": "remotion-video/public/voiceover/vo-storm.mp3",
+        "start_seconds": 103.0,
+        "end_seconds": 107.0
+      }
+    ],
+    "music": {
+      "asset_id": "remotion-video/public/music/bgm-main.mp3",
+      "volume": 0.42,
+      "fade_in_seconds": 0.0,
+      "fade_out_seconds": 0.0,
+      "ducking": "binary"
+    },
+    "sfx": [
+      {
+        "asset_id": "scenario-resolve-chime-1",
+        "start_seconds": 75.5,
+        "volume": 0.35
+      },
+      {
+        "asset_id": "scenario-resolve-chime-2",
+        "start_seconds": 84.5,
+        "volume": 0.35
+      },
+      {
+        "asset_id": "scenario-resolve-chime-3",
+        "start_seconds": 92.5,
+        "volume": 0.35
+      },
+      {
+        "asset_id": "scenario-resolve-chime-4",
+        "start_seconds": 99.5,
+        "volume": 0.35
+      },
+      {
+        "asset_id": "scenario-resolve-chime-5",
+        "start_seconds": 108.0,
+        "volume": 0.35
+      }
+    ]
+  },
+  "captionEmphasis": {
+    "variant_source": "remotion-video/public/captions/captions-C.json",
+    "mode": "word-level-kinetic",
+    "policy": "Word-level captions render at y=900 (above lower-third). Captions go silent during scenario 3 (silent water tank) for visual breath room \u2014 explicit architectural choice, not omission."
+  },
+  "metadata": {
+    "sourceTool": "openmontage",
+    "sourceVersion": "host-agent-2026-04",
+    "rendererFamily": "screen-demo",
+    "ingestedAt": "2026-04-25T00:57:34.964358+00:00"
+  }
+}

@@ -132,6 +132,32 @@ file: `LICENSE`.
 
 ---
 
+## External tools used
+
+### OpenMontage (AGPLv3, external editorial director)
+
+We used OpenMontage (github.com/calesthio/OpenMontage, AGPLv3) as an external
+agentic edit director, with explicit clearance from hackathon moderators.
+OpenMontage's source lives at `~/tools/openmontage/` — outside our MIT repo —
+and we never imported its code. Our `scripts/openmontage_to_remotion.py`
+adapter ingests its `edit_decisions.json` outputs (committed at
+`docs/edl/openmontage-cuts-*.json`) and translates them to Remotion props.
+The adapter and tests are MIT-original code.
+
+Two pipelines were applied per variant: `cinematic` (Acts 1, 2, 5 — B-roll-led
+story arc, mesh-reveal, substance close) and `screen-demo` (Act 3 — dashboard
+scenario montage). The resulting 6 EDLs are committed at
+`docs/edl/openmontage-cuts-{A,B,C}-{cinematic,screen-demo}.json` as evidence
+of the editorial decisions, alongside their adapter-translated Remotion props
+at `docs/edl/remotion-props-{A,B,C}-{cinematic,screen-demo}.json`.
+
+A repo-wide containment grep (`docs/OPENMONTAGE_INTEGRATION.md` §"Containment
+grep") enforces that no AGPL OpenMontage source ever lands in this MIT tree;
+the only allowlisted touchpoints are the adapter, its test, fixtures, the
+EDL artifact directory, and markdown disclosures.
+
+---
+
 ## Team
 
 - **George Teifel** — sole registered entrant. UNM. Part 107 licensed drone operator.

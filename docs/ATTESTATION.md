@@ -206,3 +206,30 @@ previous `event_hash`.
 - `src/skyherd/server/app.py` — `/api/attest/*` HTTP surface.
 - `web/src/components/AttestChainViewer.tsx` — the `/attest/:hash` SPA page.
 - `tests/attest/` — 95+ tests covering signer, ledger, CLI, rotation, pairing.
+
+---
+
+## 9. External tools used in the demo video pipeline
+
+The 3-minute submission video was edited with the assistance of OpenMontage
+(github.com/calesthio/OpenMontage, AGPLv3) acting as an external **agentic
+edit director**, with explicit hackathon-moderator clearance. OpenMontage
+itself never touches the attestation chain or any SkyHerd runtime — it lives
+entirely outside this MIT repo at `~/tools/openmontage/` and never has its
+source vendored, copied, or imported.
+
+What lives in this repo as evidence of OpenMontage's editorial decisions are
+six `edit_decisions.json` artifacts at `docs/edl/openmontage-cuts-{A,B,C}-{cinematic,screen-demo}.json`.
+These are JSON files we authored as the host AI agent OpenMontage's pipeline
+definitions describe, applying the `cinematic` and `screen-demo` pipeline
+director skills to our three video variant scripts. Our MIT-original adapter
+`scripts/openmontage_to_remotion.py` translates them into Remotion props that
+our deterministic composition consumes — so the rendered video itself is our
+composition, driven by the OpenMontage pipeline's editorial decisions.
+
+The composition, render path, deterministic seed, and attestation chain are
+unchanged. OpenMontage influenced cut order, overlay timing, B-roll
+selection, and audio bus structure; it did not produce any code, asset, or
+data that is signed into the Ed25519 ledger. See `docs/SUBMISSION.md`
+"External tools used" and `docs/OPENMONTAGE_INTEGRATION.md` for the full
+operating model and license-containment grep gate.

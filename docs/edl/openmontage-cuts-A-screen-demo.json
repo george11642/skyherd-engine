@@ -1,0 +1,167 @@
+{
+  "version": "1.0",
+  "render_runtime": "remotion",
+  "renderer_family": "screen-demo",
+  "metadata": {
+    "skyherd_variant": "A",
+    "skyherd_pipeline": "screen-demo",
+    "skyherd_acts_covered": ["act2-scenario-montage"],
+    "directorial_intent": "Smallest clear edit per screen-demo edit-director rules: trim dead time, keep result moments at normal speed, AnchorChip + lower-third every cut. ~1s overlap between scenarios so N+1 establishes under N's tail.",
+    "openmontage_pipeline_version": "screen-demo@2.0",
+    "openmontage_version": "host-agent-2026-04",
+    "edit_director_skill": "skills/pipelines/screen-demo/edit-director.md",
+    "speed_plan": "All five scenarios at normal (1.0x) speed. The dashboard recordings are already deterministic + tight — no installs/typing to accelerate.",
+    "audio_notes": "Primary speech = Antoni VO. Music ducks under each VO cue, holds steady during silent water-tank scenario."
+  },
+  "cuts": [
+    {
+      "id": "demo-coyote",
+      "source": "remotion-video/public/clips/coyote.mp4",
+      "in_seconds": 60.0,
+      "out_seconds": 71.0,
+      "transition_in": "cut",
+      "reason": "Scenario 1 lead — predator drama is the most legible scenario for a cold viewer. Map zooms SW, thermal glyph at 1:01, FenceLineDispatcher lane flashes, drone telemetry, AnchorChip lands at 1:08."
+    },
+    {
+      "id": "demo-sick-cow",
+      "source": "remotion-video/public/clips/sick_cow.mp4",
+      "in_seconds": 71.0,
+      "out_seconds": 82.0,
+      "transition_in": "cut",
+      "reason": "Scenario 2: HerdHealthWatcher, A014 highlighted, VetIntakePanel. Higher cognitive load (per-animal anomaly) — runs second when viewer is warmed up but still primed."
+    },
+    {
+      "id": "demo-water-tank",
+      "source": "remotion-video/public/clips/water.mp4",
+      "in_seconds": 82.0,
+      "out_seconds": 93.0,
+      "transition_in": "cut",
+      "reason": "Scenario 3: Tank 7 pressure drop. SILENT VO — music carries, lower-third + AnchorChip do the talking. Center-of-cut breath room — gives the viewer a beat to absorb the rhythm."
+    },
+    {
+      "id": "demo-calving",
+      "source": "remotion-video/public/clips/calving.mp4",
+      "in_seconds": 93.0,
+      "out_seconds": 104.0,
+      "transition_in": "cut",
+      "reason": "Scenario 4: Cow 117 pre-labor. Behavior-trace draws, priority page on phone mock. Emotional pivot back up after the silent middle."
+    },
+    {
+      "id": "demo-storm",
+      "source": "remotion-video/public/clips/storm.mp4",
+      "in_seconds": 104.0,
+      "out_seconds": 115.0,
+      "transition_in": "cut",
+      "reason": "Scenario 5: Hail in 45min, paddock redirect. Closes the demo on action verbs (move, redirect, nudge) — leaves momentum for the mesh-reveal cinematic hand-off."
+    }
+  ],
+  "overlays": [
+    {
+      "asset_id": "lower3-fenceline-coyote",
+      "start_seconds": 60.5,
+      "end_seconds": 70.5,
+      "position": {"x": 120, "y": 950, "width": 980, "height": 90},
+      "animation": "slide-in-bottom-thermal",
+      "opacity": 1.0
+    },
+    {
+      "asset_id": "anchor-chip-fence-w12",
+      "start_seconds": 68.0,
+      "end_seconds": 71.0,
+      "position": {"x": 1500, "y": 80, "width": 380, "height": 120},
+      "animation": "fade-in-top-right",
+      "opacity": 0.95
+    },
+    {
+      "asset_id": "lower3-herdhealth-a014",
+      "start_seconds": 71.5,
+      "end_seconds": 81.5,
+      "position": {"x": 120, "y": 950, "width": 980, "height": 90},
+      "animation": "slide-in-bottom-warn",
+      "opacity": 1.0
+    },
+    {
+      "asset_id": "anchor-chip-vet-a014",
+      "start_seconds": 79.0,
+      "end_seconds": 82.0,
+      "position": {"x": 1500, "y": 80, "width": 380, "height": 120},
+      "animation": "fade-in-top-right",
+      "opacity": 0.95
+    },
+    {
+      "asset_id": "lower3-grazing-tank7",
+      "start_seconds": 82.5,
+      "end_seconds": 92.5,
+      "position": {"x": 120, "y": 950, "width": 980, "height": 90},
+      "animation": "slide-in-bottom-sky",
+      "opacity": 1.0
+    },
+    {
+      "asset_id": "anchor-chip-tank7-ir",
+      "start_seconds": 90.0,
+      "end_seconds": 93.0,
+      "position": {"x": 1500, "y": 80, "width": 380, "height": 120},
+      "animation": "fade-in-top-right",
+      "opacity": 0.95
+    },
+    {
+      "asset_id": "lower3-calving-117",
+      "start_seconds": 93.5,
+      "end_seconds": 103.5,
+      "position": {"x": 120, "y": 950, "width": 980, "height": 90},
+      "animation": "slide-in-bottom-sage",
+      "opacity": 1.0
+    },
+    {
+      "asset_id": "anchor-chip-calving-117",
+      "start_seconds": 101.0,
+      "end_seconds": 104.0,
+      "position": {"x": 1500, "y": 80, "width": 380, "height": 120},
+      "animation": "fade-in-top-right",
+      "opacity": 0.95
+    },
+    {
+      "asset_id": "lower3-weather-redirect",
+      "start_seconds": 104.5,
+      "end_seconds": 114.5,
+      "position": {"x": 120, "y": 950, "width": 980, "height": 90},
+      "animation": "slide-in-bottom-dust",
+      "opacity": 1.0
+    },
+    {
+      "asset_id": "anchor-chip-redirect-active",
+      "start_seconds": 112.0,
+      "end_seconds": 115.0,
+      "position": {"x": 1500, "y": 80, "width": 380, "height": 120},
+      "animation": "fade-in-top-right",
+      "opacity": 0.95
+    }
+  ],
+  "audio": {
+    "narration": [
+      {"asset_id": "remotion-video/public/voiceover/vo-coyote.mp3", "start_seconds": 64.0, "end_seconds": 68.5},
+      {"asset_id": "remotion-video/public/voiceover/vo-sick-cow.mp3", "start_seconds": 74.0, "end_seconds": 80.5},
+      {"asset_id": "remotion-video/public/voiceover/vo-calving.mp3", "start_seconds": 96.0, "end_seconds": 101.5},
+      {"asset_id": "remotion-video/public/voiceover/vo-storm.mp3", "start_seconds": 108.0, "end_seconds": 112.5}
+    ],
+    "music": {
+      "asset_id": "remotion-video/public/music/bgm-main.mp3",
+      "volume": 0.45,
+      "fade_in_seconds": 0.0,
+      "fade_out_seconds": 0.0,
+      "ducking": "binary"
+    },
+    "sfx": [
+      {"asset_id": "scenario-resolve-chime-1", "start_seconds": 68.5, "volume": 0.35},
+      {"asset_id": "scenario-resolve-chime-2", "start_seconds": 80.5, "volume": 0.35},
+      {"asset_id": "scenario-resolve-chime-3", "start_seconds": 91.5, "volume": 0.35},
+      {"asset_id": "scenario-resolve-chime-4", "start_seconds": 101.5, "volume": 0.35},
+      {"asset_id": "scenario-resolve-chime-5", "start_seconds": 113.0, "volume": 0.35}
+    ]
+  },
+  "caption_emphasis": {
+    "variant_source": "remotion-video/public/captions/captions-A.json",
+    "mode": "no-captions-on-demo",
+    "policy": "Emphasis-only variant — demo carries via lower-thirds + AnchorChips, not captions. Word-by-word captions reserved for variant C."
+  }
+}
