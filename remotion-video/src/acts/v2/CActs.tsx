@@ -656,7 +656,7 @@ const CDeepCoyote = () => {
   );
 };
 
-// Silent montage scene for C — 6-7s kinetic callout, no full VO.
+// Montage scene for C — 6-7s kinetic callout + optional VO.
 type CMontageProps = {
   clipName: string;
   callout: string;
@@ -667,6 +667,8 @@ type CMontageProps = {
   anchorTopic: string;
   anchorHash: string;
   anchorStatus: string;
+  /** Optional VO file path relative to public/. Plays from frame 0. */
+  voFile?: string;
 };
 
 const CMontageScene = ({
@@ -679,6 +681,7 @@ const CMontageScene = ({
   anchorTopic,
   anchorHash,
   anchorStatus,
+  voFile,
 }: CMontageProps) => {
   const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
@@ -702,6 +705,7 @@ const CMontageScene = ({
 
   return (
     <AbsoluteFill style={{ backgroundColor: "rgb(6 8 12)" }}>
+      {voFile ? <Audio src={staticFile(voFile)} /> : null}
       <div style={{ width: "100%", height: "100%", opacity }}>
         <Video
           src={staticFile(`clips/${clipName}`)}
@@ -795,6 +799,7 @@ export const CAct3Demo = () => {
             anchorTopic="Cow A014"
             anchorHash="4d82…b03c"
             anchorStatus="Sent"
+            voFile="voiceover/vo-montage-sick.mp3"
           />
         </Series.Sequence>
         <Series.Sequence durationInFrames={SCENE}>
@@ -808,6 +813,7 @@ export const CAct3Demo = () => {
             anchorTopic="Tank 7"
             anchorHash="92e1…5a0d"
             anchorStatus="Queued"
+            voFile="voiceover/vo-montage-tank.mp3"
           />
         </Series.Sequence>
         <Series.Sequence durationInFrames={SCENE}>
@@ -821,6 +827,7 @@ export const CAct3Demo = () => {
             anchorTopic="Cow 117"
             anchorHash="61bf…2c94"
             anchorStatus="Paged"
+            voFile="voiceover/vo-montage-calving.mp3"
           />
         </Series.Sequence>
         <Series.Sequence durationInFrames={SCENE}>
@@ -834,6 +841,7 @@ export const CAct3Demo = () => {
             anchorTopic="Shelter 2"
             anchorHash="d3a9…7e11"
             anchorStatus="Active"
+            voFile="voiceover/vo-montage-storm.mp3"
           />
         </Series.Sequence>
         <Series.Sequence durationInFrames={SYNTH}>

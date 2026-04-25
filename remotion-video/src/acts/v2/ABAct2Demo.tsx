@@ -66,7 +66,10 @@ const MeshBeat = () => {
 
   return (
     <AbsoluteFill style={{ backgroundColor: "rgb(8 10 14)", opacity }}>
-      <Audio src={staticFile("voiceover/vo-mesh-opus.mp3")} />
+      {/* Bridge cue plays at frame 0 — "Five scenarios. One ranch. Zero humans." */}
+      <Audio src={staticFile("voiceover/vo-montage-bridge.mp3")} />
+      {/* Main mesh VO starts after bridge (~5s offset) */}
+      <Audio src={staticFile("voiceover/vo-mesh-opus.mp3")} startFrom={Math.round(5.07 * FPS)} />
 
       {/* Title strip top-left */}
       <div
@@ -449,7 +452,7 @@ const DeepCoyoteBeat = () => {
   );
 };
 
-// ── Montage scene (iter2): 6s fast-cut, no VO, kinetic callout + anchor ──────
+// ── Montage scene (iter2): 6s fast-cut, kinetic callout + anchor + optional VO
 type MontageProps = {
   clipName: string;
   callout: string;
@@ -460,6 +463,8 @@ type MontageProps = {
   anchorTopic: string;
   anchorHash: string;
   anchorStatus: string;
+  /** Optional VO file path relative to public/. Plays from frame 0. */
+  voFile?: string;
 };
 
 const MontageScene = ({
@@ -472,6 +477,7 @@ const MontageScene = ({
   anchorTopic,
   anchorHash,
   anchorStatus,
+  voFile,
 }: MontageProps) => {
   const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
@@ -500,6 +506,7 @@ const MontageScene = ({
 
   return (
     <AbsoluteFill style={{ backgroundColor: "rgb(6 8 12)" }}>
+      {voFile ? <Audio src={staticFile(voFile)} /> : null}
       <div style={{ width: "100%", height: "100%", opacity }}>
         <Video
           src={staticFile(`clips/${clipName}`)}
@@ -594,6 +601,7 @@ export const ABAct2Demo = () => {
             anchorTopic="Cow A014 · pinkeye"
             anchorHash="4d82…b03c"
             anchorStatus="Sent"
+            voFile="voiceover/vo-montage-sick.mp3"
           />
         </Series.Sequence>
         <Series.Sequence durationInFrames={SCENE}>
@@ -607,6 +615,7 @@ export const ABAct2Demo = () => {
             anchorTopic="Tank 7"
             anchorHash="92e1…5a0d"
             anchorStatus="Queued"
+            voFile="voiceover/vo-montage-tank.mp3"
           />
         </Series.Sequence>
         <Series.Sequence durationInFrames={SCENE}>
@@ -620,6 +629,7 @@ export const ABAct2Demo = () => {
             anchorTopic="Cow 117"
             anchorHash="61bf…2c94"
             anchorStatus="Paged"
+            voFile="voiceover/vo-montage-calving.mp3"
           />
         </Series.Sequence>
         <Series.Sequence durationInFrames={SCENE}>
@@ -633,6 +643,7 @@ export const ABAct2Demo = () => {
             anchorTopic="Paddock B → Shelter 2"
             anchorHash="d3a9…7e11"
             anchorStatus="Active"
+            voFile="voiceover/vo-montage-storm.mp3"
           />
         </Series.Sequence>
         <Series.Sequence durationInFrames={MESH}>
