@@ -27,6 +27,7 @@ import {
 } from "remotion";
 import { C_LAYOUT } from "../../compositions/calculate-main-metadata";
 import { BrollTrack, type BrollCut } from "../../components/BrollTrack";
+import { StyledCaptionsRevealer } from "../../components/StyledCaptionsRevealer";
 import {
   ACCENT_MAP,
   type Accent,
@@ -938,7 +939,7 @@ const COpusBeat = () => {
         </div>
       </div>
 
-      {/* Right half: terminal stream */}
+      {/* Right half: terminal stream — hidden after frame 18s when StyledCaptionsRevealer takes over */}
       <div
         style={{
           position: "absolute",
@@ -954,6 +955,10 @@ const COpusBeat = () => {
           color: "rgb(180 200 188)",
           lineHeight: 1.7,
           boxShadow: "0 12px 40px rgba(0,0,0,0.55)",
+          opacity: interpolate(frame, [18 * 30 - 15, 18 * 30], [1, 0], {
+            extrapolateLeft: "clamp",
+            extrapolateRight: "clamp",
+          }),
         }}
       >
         <div
@@ -980,6 +985,11 @@ const COpusBeat = () => {
           );
         })}
       </div>
+
+      {/* StyledCaptionsRevealer — appears at frame 18s, replaces terminal list for last 6s */}
+      <Sequence from={18 * 30} layout="none">
+        <StyledCaptionsRevealer variant="C" appearFrame={0} />
+      </Sequence>
     </AbsoluteFill>
   );
 };
