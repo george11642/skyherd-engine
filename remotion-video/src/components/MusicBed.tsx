@@ -72,23 +72,26 @@ const DEFAULT_STING_CUES: StingCue[] = [
 ];
 
 // ---------------------------------------------------------------------------
-// Per-stem ducking configs
-// Bass stays prominent under VO (duckedGain 0.40), lead drops most (0.10).
+// Per-stem ducking configs.
+// Source asset levels: BGM raw -17 dB mean, VO raw -23 dB mean (VO is 6 dB
+// quieter than BGM at source). To put VO clearly above BGM during ducking we
+// need ~12 dB attenuation on stems → sum_ducked ≈ 0.18 → ~ -15 dB total.
+// Sum_normal ≈ 0.55 (~ -5 dB) keeps music-only sections lively without clipping.
 // ---------------------------------------------------------------------------
 
 const BASS_CONFIG = {
-  normalGain: 0.55,
-  duckedGain: 0.40,
+  normalGain: 0.20,
+  duckedGain: 0.07,
 } as const;
 
 const PERC_CONFIG = {
-  normalGain: 0.50,
-  duckedGain: 0.30,
+  normalGain: 0.18,
+  duckedGain: 0.05,
 } as const;
 
 const LEAD_CONFIG = {
-  normalGain: 0.55,
-  duckedGain: 0.10,
+  normalGain: 0.20,
+  duckedGain: 0.06,
 } as const;
 
 const STING_DURATION_FRAMES = 90; // 3 s at 30 fps — covers all sting assets

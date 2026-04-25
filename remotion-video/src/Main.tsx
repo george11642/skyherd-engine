@@ -62,9 +62,15 @@ const computeVoSegments = (
     const a2Start = actDur.act1;
     push(a2Start + 30, vo.storyC);
 
-    // Act 3: deep coyote VO.
+    // Act 3: deep coyote VO + montage cues that follow it.
     const a3Start = actDur.act1 + actDur.act2;
     push(a3Start + 60, vo.coyoteDeep);
+    // Cover the entire ~25 s montage block (sick / tank / calving / storm /
+    // bridge cues land somewhere in here — duck the whole window so VO is
+    // never drowned regardless of exact placement).
+    const cMontageStart =
+      a3Start + 60 + Math.max(vo.coyoteDeep + 30, 25 * FPS);
+    push(cMontageStart, 25 * FPS);
 
     // Act 4: opus then depth.
     const a4Start = a3Start + actDur.act3;
@@ -92,17 +98,25 @@ const computeVoSegments = (
     const compareStart = HOOK + introSlot + marketSlot;
     push(compareStart, vo.compare);
 
-    // Act 2: deep coyote VO, then mesh-opus VO.
+    // Act 2: deep coyote VO, montage block, then mesh-opus VO.
     const a2Start = actDur.act1;
     const deepSlot = Math.max(vo.coyoteDeep + 30, 25 * FPS);
     const MONTAGE = 25 * FPS;
     push(a2Start + 60, vo.coyoteDeep);
+    // Cover the entire montage block — 5 cues (sick / tank / calving / storm /
+    // bridge) land somewhere in this window. Duck across the full block so VO
+    // remains audible regardless of exact landing positions.
+    push(a2Start + deepSlot, MONTAGE);
     const meshStart = a2Start + deepSlot + MONTAGE;
     push(meshStart + 30, vo.meshOpus);
 
-    // Act 3: substance then final.
+    // Act 3: substance → meta-loop (Phase 3) → final.
     const a3Start = actDur.act1 + actDur.act2;
     push(a3Start, vo.closeSubstance);
+    // MetaLoopBeat (5 s) holds vo-meta-{A|B}.mp3 — Phase 3.
+    const metaStart = a3Start + 15 * FPS;
+    const metaDur = variant === "B" ? vo.metaB : vo.metaA;
+    push(metaStart, metaDur);
     const finalStart = a3Start + 18 * FPS;
     push(finalStart, vo.closeFinal);
   }
