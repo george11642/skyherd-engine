@@ -54,26 +54,26 @@ const computeVoSegments = (
   };
 
   if (variant === "C") {
-    // v4 Wave 2C — 9-scene timeline (absolute frames at 30 fps):
+    // v5 Wave 2E — 9-scene timeline (absolute frames at 30 fps):
     //
     // coldOpen: 0–90         (silent, 3s)
-    // hook:     90–540       (vo.cHook = 14.6s, rest is visual padding)
-    // traditional: 540–1050  (vo.cTraditional = 11.7s)
-    // answer:   1050–1560    (vo.cAnswer = 12.7s)
-    // coyote:   1560–2760    (vo.cCoyote = 16.4s + 23.6s live-demo screen)
-    // grid:     2760–3300    (vo.cGrid = 15.9s)
-    // mvp:      3300–3900    (vo.cMvp = 18.1s)
-    // vision:   3900–4560    (vo.cVision = 12.5s)
-    // aibody:   4560–5250    (vo.cAibody = 12.8s)
-    // wordmark: 5250–5400    (silent, 5s)
+    // hook:     90–750       (vo.cHook = 21.6s, window = 22s = 660f)
+    // traditional: 750–1230  (vo.cTraditional = 15.4s, window = 16s = 480f)
+    // answer:   1230–1710    (vo.cAnswer = 15.5s, window = 16s = 480f)
+    // coyote:   1710–2670    (vo.cCoyote = 25.2s + 6.8s held, window = 32s = 960f)
+    // grid:     2670–3420    (vo.cGrid = 24.3s, window = 25s = 750f)
+    // mvp:      3420–4080    (vo.cMvp = 21.6s, window = 22s = 660f)
+    // vision:   4080–4740    (vo.cVision = 12.5s + 9.5s held-final, window = 22s = 660f)
+    // aibody:   4740–5280    (vo.cAibody = 12.8s + 5.2s held, window = 18s = 540f)
+    // wordmark: 5280–5400    (silent, 4s = 120f)
     push(90,   vo.cHook);
-    push(540,  vo.cTraditional);
-    push(1050, vo.cAnswer);
-    push(1560, vo.cCoyote);
-    push(2760, vo.cGrid);
-    push(3300, vo.cMvp);
-    push(3900, vo.cVision);
-    push(4560, vo.cAibody);
+    push(750,  vo.cTraditional);
+    push(1230, vo.cAnswer);
+    push(1710, vo.cCoyote);
+    push(2670, vo.cGrid);
+    push(3420, vo.cMvp);
+    push(4080, vo.cVision);
+    push(4740, vo.cAibody);
   } else {
     // A & B share skeleton; only intro key differs.
     const introDur = variant === "B" ? vo.introB : vo.intro;
