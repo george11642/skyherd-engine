@@ -327,6 +327,16 @@ render "vo-montage-bridge"     "${CUES["vo-montage-bridge"]}"
 render "vo-meta-A"             "${CUES["vo-meta-A"]}"
 render "vo-meta-B"             "${CUES["vo-meta-B"]}"
 
+# Variant C v4 — 8 new jargon-free cues (9-scene / 180s rewrite)
+render "vo-c-hook"             "${CUES["vo-c-hook"]}"
+render "vo-c-traditional"      "${CUES["vo-c-traditional"]}"
+render "vo-c-answer"           "${CUES["vo-c-answer"]}"
+render "vo-c-coyote"           "${CUES["vo-c-coyote"]}"
+render "vo-c-grid"             "${CUES["vo-c-grid"]}"
+render "vo-c-mvp"              "${CUES["vo-c-mvp"]}"
+render "vo-c-vision"           "${CUES["vo-c-vision"]}"
+render "vo-c-aibody"           "${CUES["vo-c-aibody"]}"
+
 echo ""
 echo "[render_vo] Done. Active voiceover cues:"
 ls -lh "$OUT_DIR"/vo-*.mp3 2>/dev/null || true

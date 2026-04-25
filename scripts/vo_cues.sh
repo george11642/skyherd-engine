@@ -93,6 +93,36 @@ CUES["vo-meta-A"]="One more thing. The captions you've been reading — Opus 4.7
 
 CUES["vo-meta-B"]="And the captions you've been reading? Opus 4.7 styled every word — color, weight, pacing. Same JSON, in the repo."
 
+# ─── Variant C v4 cues (new scene map, jargon-free, 9 scenes / 180s) ────────
+# These replace the old vo-hook-C / vo-story-C / vo-opus-C / vo-depth-C /
+# vo-close-C cues for the v4 rewrite. Old cues kept above for backwards-compat.
+#
+# Scene offsets (absolute composition seconds):
+#   vo-c-hook        →  3s
+#   vo-c-traditional → 18s
+#   vo-c-answer      → 35s
+#   vo-c-coyote      → 52s
+#   vo-c-grid        → 92s
+#   vo-c-mvp         → 110s
+#   vo-c-vision      → 130s
+#   vo-c-aibody      → 152s
+
+CUES["vo-c-hook"]="I'm George, senior at UNM. A lot of nights on New Mexico ranches. Beef is at record highs. The American cow herd's at a sixty-five-year low. Labor's gone. Ranchers are aging out. Every ranch left has to do more, with fewer eyes on it."
+
+CUES["vo-c-traditional"]="Here's how a ranch runs today. One person, two hundred miles a week. Six runs a day, best case. A coyote at three A-M, a sick cow at noon, a water tank at midnight — all missed."
+
+CUES["vo-c-answer"]="SkyHerd gives the ranch a nervous system. Five Claude agents, built on Opus four-point-seven. Every fence, every trough, every cow. Four dollars seventeen cents a week."
+
+CUES["vo-c-coyote"]="Three-fourteen in the morning. Thermal on the south fence catches something. The agent wakes up, looks at the frame, calls it — coyote, ninety-one percent. Sends the drone. Drone scares it off, flies home. You get a text. Nobody woke up, nothing got eaten."
+
+CUES["vo-c-grid"]="And it's not just the fence. Sick cow with pinkeye? Vet packet sent before sunrise. Tank pressure dropping? Drone flies the leak. Cow going into labor at three A-M? Priority page. Hailstorm in forty-five minutes? Herd auto-rotates to shelter."
+
+CUES["vo-c-mvp"]="I built the full M-V-P. Web dashboard. iOS app. Android app. Deterministic simulator. Voice-A-I rancher persona over Twilio. Open-source. M-I-T-licensed. Eleven-hundred tests."
+
+CUES["vo-c-vision"]="Today: software M-V-P and simulator. Six months: pilot ranches in New Mexico. One year: ten ranches with real cameras and L-O-R-A. Five years: every ranch in America has a nervous system."
+
+CUES["vo-c-aibody"]="And the future of A-I? It's not just chat windows. It's A-I that can see, that can act, that has a body in the world — watching the things people can't. SkyHerd is what that looks like for the ranch."
+
 # ─── Inworld prosody overrides ───────────────────────────────────────────────
 # Only populated where natural punctuation alone isn't enough for the
 # Inworld model to land the right beat. Empty by default.
