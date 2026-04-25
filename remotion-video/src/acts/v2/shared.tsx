@@ -257,6 +257,9 @@ export type KineticPunchProps = {
     weight?: 400 | 500 | 600 | 700 | 800;
     size?: number;
     color?: string;
+    // When set, use a fast linear interpolate fade-in over this many frames
+    // instead of the default spring. Eliminates blank-frame openers (iter-6).
+    fastFade?: number;
   }>;
   layout?: "stack" | "wrap";
 };
@@ -280,16 +283,25 @@ export const KineticPunch = ({
       }}
     >
       {words.map((w, i) => {
+        const useFast = typeof w.fastFade === "number" && w.fastFade > 0;
         const p = spring({
           frame: frame - w.appearFrame,
           fps,
           config: { damping: 100, stiffness: 200, mass: 0.65 },
         });
-        const y = interpolate(p, [0, 1], [40, 0]);
-        const o = interpolate(p, [0, 1], [0, 1], {
-          extrapolateLeft: "clamp",
-          extrapolateRight: "clamp",
-        });
+        const fastO = interpolate(
+          frame,
+          [w.appearFrame, w.appearFrame + (w.fastFade ?? 0)],
+          [0, 1],
+          { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
+        );
+        const y = useFast ? 0 : interpolate(p, [0, 1], [40, 0]);
+        const o = useFast
+          ? fastO
+          : interpolate(p, [0, 1], [0, 1], {
+              extrapolateLeft: "clamp",
+              extrapolateRight: "clamp",
+            });
         return (
           <div
             key={`punch-${i}`}

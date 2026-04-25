@@ -89,10 +89,13 @@ const HookContrarian = () => (
     <KineticPunch
       words={[
         {
-          // Pre-roll spring by 10 frames so the word is already ~80% opacity at
-          // video frame 0 — eliminates the blank opening frame (iter-3 fix).
+          // iter-6 fix: spring pre-roll left frame 0 visually blank because the
+          // overdamped spring still sat near ~0.4 opacity at f0001. Switch to a
+          // fast 6-frame linear fade starting at frame 0 so the word is fully
+          // landed by 0.2s — no blank opener.
           text: "Everyone thinks",
-          appearFrame: -10,
+          appearFrame: 0,
+          fastFade: 6,
           weight: 500,
           size: 56,
           color: "rgb(60 72 56)",
