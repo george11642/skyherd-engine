@@ -90,3 +90,4 @@ android/**/local.properties
 # Remotion demo video pipeline
 remotion-video/node_modules
 remotion-video/out
+.vercel
