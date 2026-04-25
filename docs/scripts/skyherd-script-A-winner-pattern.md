@@ -1,167 +1,168 @@
-# SkyHerd Demo Video v2 — Variant A · Winner-Pattern
+# SkyHerd Demo Video v2 — Variant A · Winner-Pattern (iter2 humanized)
 
-**Variant strategy:** 3-act Setup/Demo/Close (33% / 50% / 17%) per top-3 4.6 winner skeleton.
-**Hook style:** Identity / contrarian punch — "Everyone thinks ranchers need smarter sensors. They don't — they need a nervous system."
-**Captions:** Emphasis-only — lower-thirds + kinetic punch-words, **no** word-by-word captions on full VO.
-**Voice:** Antoni — `ErXwobaYiN019PkySvjV` — neutral 19yo male, college-student-engineer tone. No swagger, no folksy "Boss," no cowboy-isms.
+**Variant strategy:** 3-act Setup / Demo / Close. Phase H iter2 restructure: one deep scenario (coyote), four others as rapid montage, explicit traditional-vs-SkyHerd comparison beat, explicit "Opus 4.7" name-drop.
+**Hook style:** Contrarian punch, humanized. "Everyone thinks ranchers need smarter sensors. They don't. They need a nervous system. So I built one."
+**Captions:** Emphasis-only — lower-thirds + kinetic punch. No word-by-word on full VO.
+**Voice:** See `scripts/render_vo_phase1.sh` — swapped off Antoni to a more natural conversational male voice for iter2. Model: `eleven_v3` if available, fallback `eleven_turbo_v2_5`.
 **Total runtime:** 3:00 ± 1s.
 
-> Pattern source: `.planning/research/winner-top3-analysis.md` cross-cutting patterns 1-7. Highest base-rate odds — every top-3 placer used this skeleton.
+> iter1 Gemini note: "too clinical, too press-release." iter2 fix: rewrite every VO line the way you'd tell a buddy over a beer. Drop the em-dashes. Add real-person filler. Vary sentence length wildly.
 
 ---
 
-## Act timing (3-act, winner-skeleton)
+## Act timing
 
 ```
 ┌──────── ACT 1 — Setup ──────────────────┐ 0:00 – 1:00  (60 s · 33%)
-│ Identity hook · context · founder/      │
-│ project credibility · why-this-matters  │
+│ Contrarian hook · who I am · why it     │
+│ matters · traditional-vs-SkyHerd beat   │
 ├──────── ACT 2 — Demo ────────────────────┤ 1:00 – 2:30  (90 s · 50%)
-│ 5-scenario sim (≤55s) +                  │
-│ "under the hood" mesh diagram (35s)      │
+│ Deep coyote scenario (25s) +            │
+│ 4-scenario montage (25s) +              │
+│ mesh reveal + Opus 4.7 (40s)            │
 ├──────── ACT 3 — Close ───────────────────┤ 2:30 – 3:00  (30 s · 17%)
-│ Substance signals · close · wordmark     │
+│ Substance · close · wordmark            │
 └──────────────────────────────────────────┘
 ```
-
-CrossBeam boundaries (1:07 / 2:32) and PostVisit (1:06 / 2:42) put Setup at ~1:00. We follow that.
 
 ---
 
 ## ACT 1 — Setup (0:00 – 1:00, 60s)
 
-### 0:00 – 0:08 · Cold open · contrarian punch
+### 0:00 – 0:08 · Cold open · contrarian punch (no VO)
 
-**Visual:** Black card. Punch-words pop in one at a time, deep-sage on warm cream gradient (CrossBeam pattern). No music — just open. Fade through to dawn-corral B-roll at 0:06.
+**Visual:** Black card. Punch-words pop in one at a time, deep-sage on warm cream. No music. Fade through to dawn-corral B-roll at 0:06.
 
 **Kinetic punch:**
-- 0:01 — "Everyone thinks" (light weight)
-- 0:02 — "ranchers need smarter sensors." (light)
-- 0:04 — "**They don't.**" (bold, sage emphasis)
-- 0:06 — "**They need a nervous system.**" (bold, dust emphasis)
+- 0:01 — "Everyone thinks"
+- 0:02 — "ranchers need smarter sensors."
+- 0:04 — "**They don't.**"
+- 0:06 — "**They need a nervous system.**"
 
-**VO:** *(silent — black card holds the beat. Reads on screen, not voiced.)*
+**VO:** silent.
 
-**B-roll cue:** `broll/dawn-corral.mp4` fades in under final punch line at 0:06.
+### 0:08 – 0:22 · Who I am (intro VO, ~13s)
 
-### 0:08 – 0:22 · Identity / project credibility
-
-**Visual:** Continued dawn-corral B-roll, slow zoom-in. Lower-third: "George Teifel · UNM · licensed drone op." Sage accent line.
+**Visual:** Dawn-corral B-roll, slow zoom. Lower-third: "George Teifel · UNM · Part 107."
 
 **VO cue `vo-intro`:**
-> "I'm George. I'm a senior at UNM, I've spent a lot of nights on ranches in New Mexico, and I have a Part 107 drone ticket. SkyHerd is my hackathon submission — what came out of asking one question. *(beat)* What if the ranch checked itself?"
+> "I'm George. Senior at UNM. Part 107 drone ticket. I've spent a lot of nights on ranches in New Mexico. And one question kept coming up. What if the ranch just watched itself?"
 
-*(~13s. Plain, conversational.)*
+**Notes for delivery:** conversational, a little tired, like you've actually been out there. The word "ranch" leans in. Tiny beat before the question.
 
-**Emphasis caption:** *"What if the ranch checked itself?"* — fades in over the final beat, 0:20-0:22.
+**Emphasis caption:** *"What if the ranch just watched itself?"* — fades in 0:20-0:22.
 
-### 0:22 – 0:50 · Why this exists · market context
+### 0:22 – 0:42 · Market context (~20s)
 
-**Visual:** Cuts through B-roll: cattle-grazing wide → fence-line silhouette dusk → empty pasture → NM high-desert. Each shot 5-7s, hard cuts. Kinetic typography hero overlays the market data — one number per cut, large, sage on dust.
+**Visual:** Hard cuts: cattle-grazing wide → fence-line dusk → empty pasture → NM high-desert. One number per cut, large sage-on-dust overlays.
 
 **VO cue `vo-market`:**
-> "Beef is at record highs. The American cow herd is at a sixty-five-year low. Ranches can't hire their way out — labor is gone, and ranchers are aging out of the business. So every existing ranch has to do more, with fewer eyes on it. The herd already has a nervous system. The rancher does not."
+> "Beef is at record highs. The American cow herd's at a sixty-five-year low. Labor's gone. Ranchers are aging out. Every ranch left has to do more, with fewer eyes on it. The herd already has a nervous system. The rancher doesn't."
 
-*(~26s. Steady, no urgency.)*
-
-**Kinetic typography hero (one per VO beat, holds 4-5s each):**
+**Kinetic typography hero (one per VO beat):**
 - 0:24 — "Beef · record highs"
-- 0:30 — "Cow herd · 65-yr low"
-- 0:36 — "Labor · gone"
-- 0:42 — "Eyes · fewer per acre"
-- 0:48 — "The herd has a nervous system. *The rancher does not.*"
+- 0:28 — "Cow herd · 65-yr low"
+- 0:32 — "Labor · gone"
+- 0:36 — "Eyes · fewer per acre"
+- 0:40 — "The herd has a nervous system. *The rancher doesn't.*"
 
-### 0:50 – 1:00 · Setup → Demo bridge
+### 0:42 – 1:00 · Traditional vs SkyHerd (~18s) — NEW
 
-**Visual:** Hold on the "the rancher does not" line for 1.5s. Cut to dashboard establish — full-screen `clips/ambient_establish.mp4`, slow vertical pan. Wordmark fades in bottom-right.
+**Visual:** Split-screen. Left column: "Traditional." Dust-grade footage of rancher in pickup, cattle from a truck window, sunrise over a dirt road. Right column: "SkyHerd." Dark-mode dashboard map glow, agent lanes pulsing, cost ticker.
 
-**VO cue `vo-bridge`:**
-> "So we built one. Five Claude Managed Agents, watching one ranch, twenty-four-seven. Four dollars and seventeen cents a week."
+**VO cue `vo-compare`:**
+> "Here's how it works today. A rancher drives two hundred miles a week, checks every trough, every fence, every sick cow. Best case: six runs a day. Anything between runs, you miss. Now. Same ranch. Five Claude Managed Agents — built on Opus 4.7. They watch every fence, every trough, every cow. Every minute. Four dollars and seventeen cents a week."
 
-*(~8s. Calm, factual. Metric lands here, late, after the problem is set up — opposite of Variant B.)*
+**Notes:** the "Now." hits hard. Quarter-second beat after. Then the list. "Every minute" lands cold. The number lands colder.
 
-**Lower-third:** "SkyHerd · Ranch A · 40,000 acres" — fades in 0:55, sage accent.
+**Overlays:**
+- 0:43 — Left: "Rancher · 6 runs/day · 200 mi/week"
+- 0:46 — Left: "Between runs · blind"
+- 0:51 — Right: "Opus 4.7 · 5 Managed Agents"
+- 0:54 — Right: "Every minute"
+- 0:57 — Right: "$4.17 / week"
+
+**Lower-third fades in at 0:58:** "SkyHerd · Ranch A · 40,000 acres"
 
 ---
 
 ## ACT 2 — Demo (1:00 – 2:30, 90s)
 
-### 1:00 – 1:55 · Five-scenario sim · ≤55s · ~11s each
+### 1:00 – 1:25 · Deep scenario — coyote at fence (25s)
 
-Each scenario uses existing `clips/{coyote,sick_cow,water,calving,storm}.mp4`. Cuts overlap by ~1s — N+1 scenario establishes under N's fadeout. Lower-third + AnchorChip per scenario — no full caption.
+One scenario. All the way through. This is the cinematic beat.
 
-#### 1:00 – 1:11 · Scenario 1 — Coyote at fence (11s)
+**Visual timeline:**
+- 1:00 — Cut to dashboard map. Zoom to SW fence line. Ambient music, no VO yet.
+- 1:03 — Thermal camera pulse. A white heat-signature ghosts in and out of the brush.
+- 1:05 — FenceLineDispatcher lane flashes sage. Tool-call ticker: `classify_thermal → coyote 91%`.
+- 1:07 — VO starts.
+- 1:09 — Drone telemetry overlay slides in bottom-left. `MAVSDK · Mavic · ETA 40s`.
+- 1:13 — Drone-view POV (thermal-tinted), approaching fence.
+- 1:16 — Deterrent fires. Acoustic sweep overlay, coyote ghost darts out of frame.
+- 1:19 — Mock SMS bubble (phone mock, right column): `Wes · 3:14am · "Coyote on W-12. Drone scared it off. Fence intact. You're good."`
+- 1:22 — AttestationPanel HashChip slides top-right: `Ed25519 a7c3…f91e · SIGNED`.
+- 1:24 — Hold.
 
-**Visual:** Map zooms to SW fence, thermal glyph at 1:01, FenceLineDispatcher lane flashes 1:03, drone telemetry 1:05, AttestationPanel HashChip at 1:08.
+**VO cue `vo-coyote-deep`:**
+> "Three-fourteen in the morning. Thermal camera on the south fence catches something. FenceLineDispatcher — that's one of the five agents — wakes up, looks at the frame, says yeah, that's a coyote. Ninety-one percent. Sends the drone. Drone flies it, scares it off with a deterrent, flies home. You get a text. Nobody woke up. Nothing got eaten. Every step signed, hashed, in the ledger."
 
-**VO cue `vo-coyote`:**
-> "Heads up — coyote at the south fence. Drone's en route."
+**Delivery:** calm, slightly proud, like you're walking a friend through it. The "Nobody woke up" is almost a smile.
 
-*(~4s. Lands at 1:04 over the agent flash.)*
+**Lower-third (persists from 1:05):** `FenceLineDispatcher · Coyote 91% · Fence W-12 · Mavic dispatched`
 
-**Lower-third:** `FenceLineDispatcher · Coyote 91% · Fence W-12 · Mavic dispatched` (sage→thermal accent)
-**AnchorChip:** `Attest row · Fence W-12 breach · Ed25519 a7c3…f91e · SIGNED`
+### 1:25 – 1:50 · Montage — four other scenarios (~25s, ~6s each)
 
-#### 1:11 – 1:22 · Scenario 2 — Sick cow (11s)
+Fast cuts. No full VO. Music bed swells. Each scenario gets ONE kinetic-typography callout on top of the scenario clip. Lower-third + AnchorChip land per cut.
 
-**Visual:** Map pans to trough 3, A014 highlighted, VetIntakePanel slides in, PixelDetectionChip bbox.
+**SFX bed:** soft keyboard-latch clicks on each cut. One `skyherd-mesh` terminal line flicks on-screen per scene (bottom-left ticker).
 
-**VO cue `vo-sick-cow`:**
-> "Cow A014 — eye irritation, eighty-three percent confidence. Vet packet's on your phone."
+#### 1:25 – 1:31 · Sick cow (A014)
 
-*(~6s. Lands at 1:14.)*
+**Visual:** Map pan to trough 3. Bounding box snaps on cow A014's face. VetIntakePanel slides in. PDF mock (vet packet) flashes right side — front page legible: "Cow A014 · suspected pinkeye · 83% · photos attached."
 
-**Lower-third:** `HerdHealthWatcher · Cow A014 · pinkeye 83% · Vet packet generated` (warn accent)
-**AnchorChip:** `Vet packet · Cow A014 · pinkeye · Ed25519 4d82…b03c · SENT`
+**Kinetic callout:** "A014 — vet packet on his phone in 12 seconds"
+**Lower-third:** `HerdHealthWatcher · Cow A014 · pinkeye 83% · Vet packet generated`
+**AnchorChip:** `Vet packet · Cow A014 · Ed25519 4d82…b03c · SENT`
 
-#### 1:22 – 1:33 · Scenario 3 — Water tank (11s)
+#### 1:31 – 1:37 · Water tank drop
 
-**Visual:** Tank 7 glyph red 1:23, GrazingOptimizer wakes 1:25, drone IR still 1:28, three signed events 1:31.
+**Visual:** Tank 7 glyph turns red. GrazingOptimizer lane lights. Drone IR still pops in — a dark leak-stain on the concrete pad.
 
-**VO cue (lower-third only — no spoken VO, music carries):** *(silent)*
+**Kinetic callout:** "Tank 7 dropped to 8 PSI — drone flew it before sunrise"
+**Lower-third:** `GrazingOptimizer · Tank 7 pressure drop · IR flyover scheduled`
+**AnchorChip:** `IR flyover · Tank 7 · Ed25519 92e1…5a0d · QUEUED`
 
-**Lower-third:** `GrazingOptimizer · Tank 7 pressure drop · IR flyover scheduled` (sky accent)
-**AnchorChip:** `IR flyover · Tank 7 · pressure drop · Ed25519 92e1…5a0d · QUEUED`
+#### 1:37 – 1:44 · Calving (117)
 
-#### 1:33 – 1:44 · Scenario 4 — Calving (11s)
+**Visual:** CalvingWatch lane activates. Behavior trace draws a ragged spike. Phone mock — priority page — flashes with timestamp "3:14am."
 
-**Visual:** CalvingWatch lane activates 1:34, behavior trace draws 1:37, priority page on phone mock 1:41.
+**Kinetic callout:** "117's calving — pinged at 3:14am"
+**Lower-third:** `CalvingWatch · Cow 117 · pre-labor · Rancher paged (priority)`
+**AnchorChip:** `Behavior trace · Cow 117 · Ed25519 61bf…2c94 · PAGED`
 
-**VO cue `vo-calving`:**
-> "Cow one-seventeen is going into labor. Pre-labor signals — flagged priority."
+#### 1:44 – 1:50 · Storm incoming
 
-*(~5s. Lands at 1:36.)*
+**Visual:** Weather overlay sweeps across map. Paddock redirect arrow draws. Herd dots flow from Paddock B toward Shelter 2.
 
-**Lower-third:** `CalvingWatch · Cow 117 · pre-labor · Rancher paged (priority)` (sage accent)
-**AnchorChip:** `Behavior trace · Cow 117 · pre-labor · Ed25519 61bf…2c94 · PAGED`
+**Kinetic callout:** "Hail in 45min — herd routed to Shelter 2"
+**Lower-third:** `Weather-Redirect · Hail ETA 45 min · Paddock B → Shelter 2`
+**AnchorChip:** `Redirect plan · Ed25519 d3a9…7e11 · ACTIVE`
 
-#### 1:44 – 1:55 · Scenario 5 — Storm (11s)
+### 1:50 – 2:30 · Under the hood — mesh + Opus 4.7 (40s)
 
-**Visual:** Weather overlay 1:45, paddock redirect arrow 1:48, acoustic nudge 1:51, herd animates moving 1:53.
+**Visual:** Cut to dark-mode node canvas. Smooth camera pan — not hard cuts.
+- 1:50 — Single sage node: "Sensor Event."
+- 1:53 — Fans out to 5 agent nodes (FenceLineDispatcher, HerdHealthWatcher, PredatorPatternLearner, GrazingOptimizer, CalvingWatch).
+- 2:00 — Camera pans right. Each agent spawns tool nodes — drone, deterrent, vet packet, paddock redirect, priority page.
+- 2:10 — Pans to center: `attest.append(hash, sig)`. Merkle chain pulses outward. Counter ticks up: "360 events · all signed."
+- 2:20 — Cost ticker bottom-right: `$4.17 / week`.
+- 2:25 — Terminal mock: `client.beta.messages.create(model="claude-opus-4-7"...)` with `cache_control: ephemeral` highlighted sage.
 
-**VO cue `vo-storm`:**
-> "Hail in forty-five minutes. Moving the herd to shelter two."
+**VO cue `vo-mesh-opus`:**
+> "Each agent's its own Managed Agents session. Built on Opus 4.7. Idle-pause billing — when nothing's happening, the agent sleeps. Costs you nothing. Sensor wakes it, it does the work, goes back to sleep. That's how a whole ranch runs on four bucks a week of Claude. Every tool call gets signed. Every signature lands in a Merkle chain. Replay the whole day from a seed — same input, same bytes, every time."
 
-*(~4s. Lands at 1:48.)*
-
-**Lower-third:** `Weather-Redirect · Hail ETA 45 min · Paddock B → Shelter 2` (dust accent)
-**AnchorChip:** `Redirect plan · Paddock B → Shelter 2 · Ed25519 d3a9…7e11 · ACTIVE`
-
-### 1:55 – 2:30 · "Under the hood" mesh reveal (35s)
-
-This is the **CrossBeam node-diagram steal** (1:25-1:50 in CrossBeam). Smooth pan across an animated node canvas — not hard cuts. Music holds steady; VO continuous.
-
-**Visual:**
-- 1:55 — Cut to dark-mode node canvas. Single sage node at center labeled "Sensor Event."
-- 1:58 — Node pulses, fans out to 5 agent nodes (FenceLineDispatcher, HerdHealthWatcher, PredatorPatternLearner, GrazingOptimizer, CalvingWatch). Each labeled.
-- 2:05 — Smooth camera pan right. Agent nodes spawn tool nodes (drone, deterrent, vet packet, paddock redirect, priority page). Tool calls animate as edges.
-- 2:15 — Pan converges on a center node: `attest.append(hash, sig)`. Pulse outward to a Merkle chain visualization. Counts tick: 360 events, all signed.
-- 2:25 — Cost ticker overlay bottom-right: `$4.17/week`. Dust accent.
-
-**VO cue `vo-mesh`:**
-> "Each agent runs on its own Managed Agents session. They're idle until a sensor wakes them — and they go right back to idle when the work is done. That's how a ranch this size runs on four dollars a week of Claude. Every tool call gets signed. Every signature lands in a Merkle chain. The whole thing replays from a seed — same input, same bytes, every time."
-
-*(~32s, calm, technical, no jargon dump.)*
+**Delivery:** quieter here, like you're showing someone the inside of a box. "Four bucks a week" is thrown away. "Every time" lands.
 
 **Emphasis caption:** *"Same seed. Same bytes. Every time."* fades in 2:24-2:30.
 
@@ -169,27 +170,24 @@ This is the **CrossBeam node-diagram steal** (1:25-1:50 in CrossBeam). Smooth pa
 
 ## ACT 3 — Close (2:30 – 3:00, 30s)
 
-### 2:30 – 2:48 · Substance · why-it-matters
+### 2:30 – 2:48 · Substance (~18s)
 
-**Visual:** Cut to live drone aerial over rangeland (`broll/drone-rangeland.mp4`), warm dust grade. Overlay three text blocks left-aligned, fade in sequentially:
-
+**Visual:** Cut to drone aerial over rangeland (`broll/drone-rangeland.mp4`), warm dust grade. Three stat blocks fade in sequentially, left-aligned.
 - 2:31 — `1,106 tests · 87% coverage`
 - 2:35 — `Ed25519 attestation chain · 360 events`
 - 2:39 — `Fresh-clone reproducible · < 3 minutes`
 
 **VO cue `vo-close-substance`:**
-> "Eleven-hundred-six tests. Eighty-seven-percent coverage. An Ed25519 attestation chain. Clone the repo, run one command, watch the same five scenarios play out — bit-for-bit."
+> "Eleven-hundred-six tests. Eighty-seven percent coverage. Every tool call signed with Ed25519. Clone the repo, run one command, watch the same five scenarios play out — bit for bit."
 
-*(~14s. Confident, not boastful.)*
+### 2:48 – 3:00 · Wordmark (~12s)
 
-### 2:48 – 3:00 · Wordmark + sign-off (12s)
-
-**Visual:** Hard cut to brand-color isometric ranch animation (CrossBeam pink-on-green pattern, SkyHerd version: tan/sage isometric corral on saturated sunrise-orange). Wordmark scales up at 2:50. Three lines fade in below.
+**Visual:** Hard cut to brand isometric ranch animation. Wordmark scales up at 2:50. Lines fade in below.
 
 **VO cue `vo-close-final`:**
 > "Beef at record highs. Cow herd at a sixty-five-year low. Now the ranch can watch itself."
 
-*(~9s. Lands the bookend echo of the hook.)*
+**Delivery:** slow, a little tired, like "that's the whole pitch, here's the bow."
 
 **Wordmark + lines:**
 ```
@@ -205,65 +203,60 @@ Cut to black at 3:00.
 
 ---
 
-## VO cue table (Variant A)
+## VO cue table (Variant A — iter2 humanized)
 
-Voice: Antoni `ErXwobaYiN019PkySvjV`. Filename pattern: `vo-*.mp3`.
+Voice: swap off Antoni — see `scripts/render_vo_phase1.sh`. Filename pattern: `vo-*.mp3`.
 
 | Key | File | Duration target | Text |
 |-----|------|-----------------|------|
-| `vo-intro` | `vo-intro.mp3` | ~13s | "I'm George. I'm a senior at UNM, I've spent a lot of nights on ranches in New Mexico, and I have a Part 107 drone ticket. SkyHerd is my hackathon submission — what came out of asking one question. What if the ranch checked itself?" |
-| `vo-market` | `vo-market.mp3` | ~26s | "Beef is at record highs. The American cow herd is at a sixty-five-year low. Ranches can't hire their way out — labor is gone, and ranchers are aging out of the business. So every existing ranch has to do more, with fewer eyes on it. The herd already has a nervous system. The rancher does not." |
-| `vo-bridge` | `vo-bridge.mp3` | ~8s | "So we built one. Five Claude Managed Agents, watching one ranch, twenty-four-seven. Four dollars and seventeen cents a week." |
-| `vo-coyote` | `vo-coyote.mp3` | ~4s | "Heads up — coyote at the south fence. Drone's en route." |
-| `vo-sick-cow` | `vo-sick-cow.mp3` | ~6s | "Cow A014 — eye irritation, eighty-three percent confidence. Vet packet's on your phone." |
-| `vo-calving` | `vo-calving.mp3` | ~5s | "Cow one-seventeen is going into labor. Pre-labor signals — flagged priority." |
-| `vo-storm` | `vo-storm.mp3` | ~4s | "Hail in forty-five minutes. Moving the herd to shelter two." |
-| `vo-mesh` | `vo-mesh.mp3` | ~32s | "Each agent runs on its own Managed Agents session. They're idle until a sensor wakes them — and they go right back to idle when the work is done. That's how a ranch this size runs on four dollars a week of Claude. Every tool call gets signed. Every signature lands in a Merkle chain. The whole thing replays from a seed — same input, same bytes, every time." |
-| `vo-close-substance` | `vo-close-substance.mp3` | ~14s | "Eleven-hundred-six tests. Eighty-seven-percent coverage. An Ed25519 attestation chain. Clone the repo, run one command, watch the same five scenarios play out — bit-for-bit." |
+| `vo-intro` | `vo-intro.mp3` | ~13s | "I'm George. Senior at UNM. Part 107 drone ticket. I've spent a lot of nights on ranches in New Mexico. And one question kept coming up. What if the ranch just watched itself?" |
+| `vo-market` | `vo-market.mp3` | ~20s | "Beef is at record highs. The American cow herd's at a sixty-five-year low. Labor's gone. Ranchers are aging out. Every ranch left has to do more, with fewer eyes on it. The herd already has a nervous system. The rancher doesn't." |
+| `vo-compare` | `vo-compare.mp3` | ~18s | "Here's how it works today. A rancher drives two hundred miles a week, checks every trough, every fence, every sick cow. Best case: six runs a day. Anything between runs, you miss. Now. Same ranch. Five Claude Managed Agents, built on Opus 4.7. They watch every fence, every trough, every cow. Every minute. Four dollars and seventeen cents a week." |
+| `vo-coyote-deep` | `vo-coyote-deep.mp3` | ~22s | "Three-fourteen in the morning. Thermal camera on the south fence catches something. FenceLineDispatcher, that's one of the five agents, wakes up, looks at the frame, says yeah, that's a coyote. Ninety-one percent. Sends the drone. Drone flies it, scares it off with a deterrent, flies home. You get a text. Nobody woke up. Nothing got eaten. Every step signed, hashed, in the ledger." |
+| `vo-mesh-opus` | `vo-mesh-opus.mp3` | ~34s | "Each agent's its own Managed Agents session. Built on Opus 4.7. Idle-pause billing. When nothing's happening, the agent sleeps. Costs you nothing. Sensor wakes it, it does the work, goes back to sleep. That's how a whole ranch runs on four bucks a week of Claude. Every tool call gets signed. Every signature lands in a Merkle chain. Replay the whole day from a seed. Same input, same bytes, every time." |
+| `vo-close-substance` | `vo-close-substance.mp3` | ~14s | "Eleven-hundred-six tests. Eighty-seven percent coverage. Every tool call signed with Ed25519. Clone the repo, run one command, watch the same five scenarios play out. Bit for bit." |
 | `vo-close-final` | `vo-close-final.mp3` | ~9s | "Beef at record highs. Cow herd at a sixty-five-year low. Now the ranch can watch itself." |
 
-**Sum estimate:** 13+26+8+4+6+5+4+32+14+9 = **121s of VO** across 180s of runtime. That leaves ~59s of silent / SFX-only / music-only beats — concentrated in Act 1 cold open (8s), Act 2 scenario 3 water (11s), and Act 3 isometric close (~12s). Healthy ratio per top-3 winners (CrossBeam ran ~40-50% silent/music-only).
+**Sum estimate:** 13 + 20 + 18 + 22 + 34 + 14 + 9 = **130s of narration** across 180s of runtime. ~50s of music-only / SFX-only space, concentrated in: cold open (8s), montage (~10-12s), wordmark tail (~3s).
+
+**Retired cues from iter1:** `vo-coyote`, `vo-sick-cow`, `vo-calving`, `vo-storm`, `vo-bridge`, `vo-mesh`. Replaced by `vo-coyote-deep` + silent montage + `vo-compare` + `vo-mesh-opus`. Script removes the em-dash and "Heads up" patterns that Gemini flagged as press-release.
 
 ---
 
-## B-roll inventory (referenced — Phase D will source the actual MP4s)
+## B-roll inventory
 
-Per `.planning/research/winner-top3-analysis.md` "B-roll shot list refinement" section:
-
-| Slot | Asset | Location used | Source pattern |
-|------|-------|---------------|----------------|
-| 0:06-0:14 | `broll/dawn-corral.mp4` | Act 1 cold-open transition | PostVisit hospital exterior bookend |
-| 0:24-0:30 | `broll/cattle-grazing-wide.mp4` | Act 1 market context | top-3 list #6 |
-| 0:30-0:36 | `broll/fence-line-dusk.mp4` | Act 1 market context | top-3 list #3 |
-| 0:36-0:42 | `broll/empty-pasture.mp4` | Act 1 market context | top-3 list — labor/depopulation |
-| 0:42-0:50 | `broll/nm-high-desert.mp4` | Act 1 market context | top-3 list #5 |
-| 1:00-1:55 | `clips/{coyote,sick_cow,water,calving,storm}.mp4` | Act 2 demo (existing) | dashboard recordings |
-| 1:55-2:30 | (animated node canvas — built in Remotion, no B-roll) | Act 2 mesh reveal | CrossBeam Opus Orchestrator pattern |
-| 2:30-2:48 | `broll/drone-rangeland.mp4` | Act 3 substance | top-3 list #5 + CrossBeam suburban-drone close |
-| 2:48-3:00 | (isometric brand animation — built in Remotion) | Act 3 wordmark close | CrossBeam pink isometric bookend |
+| Slot | Asset | Location used |
+|------|-------|---------------|
+| 0:06-0:22 | `broll/dawn-corral.mp4` | Act 1 intro |
+| 0:22-0:42 | `broll/cattle-grazing-wide.mp4`, `broll/fence-line-dusk.mp4`, `broll/empty-pasture.mp4`, `broll/nm-high-desert.mp4` | Act 1 market |
+| 0:42-1:00 | `broll/pickup-sunrise.mp4` (left) + dashboard map (right — Remotion built) | Act 1 traditional-vs-SkyHerd |
+| 1:00-1:25 | `clips/coyote.mp4` + overlays | Act 2 deep scenario |
+| 1:25-1:50 | `clips/{sick_cow,water,calving,storm}.mp4` | Act 2 montage |
+| 1:50-2:30 | (animated node canvas + terminal mock — Remotion built) | Act 2 mesh + Opus |
+| 2:30-2:48 | `broll/drone-rangeland.mp4` | Act 3 substance |
+| 2:48-3:00 | (isometric brand animation — Remotion built) | Act 3 wordmark |
 
 ---
 
-## Hackathon-criteria coverage map
+## Hackathon-criteria coverage
 
 Judging weights: 30% Impact / 25% Demo / 25% Opus 4.7 / 20% Depth.
 
 | Criterion | Where it lands | Beats |
 |-----------|---------------|-------|
-| **Impact (30%)** | Act 1 (0:22-0:50) market context · Act 3 (2:48-3:00) bookend echo | Beef record highs + 65-yr cow herd low + labor crisis + "the rancher does not" + close echo |
-| **Demo (25%)** | Act 2 scenarios 1-5 (1:00-1:55) · AnchorChip Ed25519 hashes legible | All 5 scenarios visible · attestation chips on every cut · Mavic + drone telemetry + vet packet + paddock redirect |
-| **Opus 4.7 (25%)** | Act 1 bridge (0:50-1:00) "Five Claude Managed Agents" · Act 2 mesh reveal (1:55-2:30) "each agent on its own Managed Agents session" · animated node canvas | Managed Agents called out by name twice + visualized as expanding agent mesh + idle-pause billing model |
-| **Depth (20%)** | Act 2 mesh reveal (Merkle chain pulse 2:15) · Act 3 substance (2:30-2:48) | 1106 tests + 87% coverage + Ed25519 ledger + 360 signed events + fresh-clone repro · "same seed, same bytes" emphasis |
-
-Each criterion gets ≥10s of dedicated screen-time. Each is voiced AND visualized — no "tell don't show" beats.
+| **Impact (30%)** | Act 1 market (0:22-0:42) + compare beat (0:42-1:00) + Act 3 close | Record beef + 65-yr cow-herd low + labor gone + traditional-vs-SkyHerd split-screen (the new Impact beat) + bookend echo |
+| **Demo (25%)** | Deep coyote (1:00-1:25) + 4-scenario montage (1:25-1:50) | One scenario taken all the way through + four rapid callouts — judges see all 5 in under a minute |
+| **Opus 4.7 (25%)** | Compare beat names it (0:51) + mesh-opus beat names it again (1:53) + terminal mock at 2:25 | "Built on Opus 4.7" spoken twice, shown on screen once in a beta API call |
+| **Depth (20%)** | Mesh reveal (1:50-2:30) + Act 3 substance (2:30-2:48) | 1106 tests + 87% coverage + Ed25519 ledger + 360 signed events + "same seed, same bytes" |
 
 ---
 
-## Production notes (Variant A)
+## Production notes (iter2)
 
-- **Color grade:** warm earth tones throughout. Dawn corral (golden-hour 5500K), dusk fence (3200K), node canvas dark-mode (#08-0A blacks with sage edges). Avoid neon / cyberpunk per top-3 anti-pattern #1.
-- **Cuts:** 95% hard cuts. The only smooth pan is the Act 2 node-canvas reveal (1:55-2:30) — that beat copies CrossBeam's continuous-canvas technique.
-- **Captions:** Lower-thirds + AnchorChips only on demo. Three emphasis-only kinetic moments: "What if the ranch checked itself?" (0:20), "The rancher does not." (0:48), "Same seed. Same bytes. Every time." (2:24). No word-by-word kinetic captions on full VO — keeps the screen visually quiet, which Gemini scored higher in the top-3 analysis.
-- **Music:** Single bed throughout. Holds at base volume, ducks under VO smoothly, holds steady through node-canvas reveal (per CrossBeam metronome pattern).
-- **Composition:** Centered everywhere. Lower-thirds anchored to bottom-90px-from-edge. AnchorChips top-right. No rule-of-thirds for talking-head shots (we have no talking heads anyway).
+- **Voice:** swap off Antoni. Candidates — Will (`bIHbv24MWmeRgasZH58o`), Brian (`nPczCjzI2devNBz1zQrb`), Chris (`iP95p4xoKVk53GoZ742B`). Pick the one that sounds least like a narrator.
+- **Model:** try `eleven_v3` first for natural intonation; fall back to `eleven_turbo_v2_5` if the account doesn't have v3 access.
+- **Voice settings:** `stability=0.5`, `similarity_boost=0.75`, `style=0.4`, `use_speaker_boost=true`. Tuned for conversational not broadcast.
+- **Color grade:** warm earth tones Acts 1 + 3. Dark-mode for the dashboard beats in Act 2. The traditional-vs-SkyHerd split gets a desaturated left column and a saturated right column to reinforce the comparison visually.
+- **Cuts:** 95% hard cuts. Smooth pan only on the mesh reveal.
+- **Music:** single bed. Holds at base volume, ducks under VO.
 - **Aspect:** 16:9 widescreen, 1080p60.
