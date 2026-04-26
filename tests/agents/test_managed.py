@@ -611,7 +611,7 @@ class TestRunManaged:
         directly) will raise TypeError if the await is missing.
         """
         from contextlib import asynccontextmanager
-        from unittest.mock import AsyncMock, MagicMock, patch
+        from unittest.mock import MagicMock, patch
 
         terminal = self._make_stream_event("session.status_terminated")
 
@@ -631,7 +631,6 @@ class TestRunManaged:
         mock_client.beta.sessions.events.stream = _fake_stream
 
         with patch("anthropic.AsyncAnthropic", return_value=mock_client):
-            import os
             mgr = ManagedSessionManager.__new__(ManagedSessionManager)
             mgr._client = mock_client
 

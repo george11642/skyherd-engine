@@ -25,7 +25,6 @@ from scripts.openmontage_to_remotion import (  # noqa: E402  # pyright: ignore[r
     validate_edl,
 )
 
-
 FIXTURE = ROOT / "tests" / "fixtures" / "openmontage" / "minimal-edl.json"
 
 

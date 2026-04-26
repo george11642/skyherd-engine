@@ -39,7 +39,6 @@ import random
 import signal
 import sys
 import time
-from typing import Optional
 
 log = logging.getLogger("skyherd-galileo")
 
@@ -52,7 +51,7 @@ _DEFAULT_PUBLISH_INTERVAL_SEC = 60.0
 _DEFAULT_HEARTBEAT_INTERVAL_SEC = 30.0
 
 
-def _getenv(key: str, default: Optional[str] = None) -> str:
+def _getenv(key: str, default: str | None = None) -> str:
     v = os.environ.get(key)
     if v is None or v == "":
         if default is None:

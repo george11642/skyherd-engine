@@ -36,7 +36,6 @@ import subprocess
 import sys
 import tempfile
 from pathlib import Path
-from datetime import datetime, timezone
 
 PROJECT_ROOT = Path(__file__).parent.parent
 PROMPTS_DIR  = PROJECT_ROOT / "scripts" / "prompts"

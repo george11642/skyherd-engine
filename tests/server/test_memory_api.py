@@ -171,6 +171,7 @@ async def test_live_mode_with_store_id_map_calls_list_memories(client):
     deadlock in test harness teardown.
     """
     from unittest.mock import AsyncMock
+
     from skyherd.agents.memory import ListEnvelope
     from skyherd.server import memory_api
 
@@ -204,6 +205,7 @@ async def test_live_mode_with_store_id_map_calls_list_memories(client):
 async def test_live_mode_no_store_id_returns_503(client):
     """Live mode, agent known but no store_id registered — 503."""
     from unittest.mock import AsyncMock
+
     from skyherd.server import memory_api
 
     saved = (
@@ -226,6 +228,7 @@ async def test_live_mode_no_store_id_returns_503(client):
 @pytest.mark.asyncio
 async def test_live_mode_upstream_failure_returns_502(client):
     from unittest.mock import AsyncMock
+
     from skyherd.server import memory_api
 
     fake_mgr = AsyncMock()
@@ -256,7 +259,9 @@ async def test_live_mode_with_demomesh_returns_real_writes(tmp_path, monkeypatch
     return ambient writes (not the mock fallback).
     """
     import tempfile
+
     from httpx import ASGITransport, AsyncClient
+
     from skyherd.agents.memory import LocalMemoryStore
     from skyherd.attest.ledger import Ledger
     from skyherd.attest.signer import Signer
@@ -317,8 +322,11 @@ async def test_demomesh_dispatch_emits_memory_written_to_broadcaster(tmp_path, m
     ambient driver fires a scenario.
     """
     import tempfile
+
     from skyherd.agents.fenceline_dispatcher import (
         FENCELINE_DISPATCHER_SPEC,
+    )
+    from skyherd.agents.fenceline_dispatcher import (
         handler as fenceline_handler,
     )
     from skyherd.agents.memory import LocalMemoryStore
@@ -377,6 +385,7 @@ async def test_demomesh_dispatch_emits_memory_written_to_broadcaster(tmp_path, m
 @pytest.mark.asyncio
 async def test_live_mode_versions_delegates(client):
     from unittest.mock import AsyncMock
+
     from skyherd.agents.memory import MemoryVersion
     from skyherd.server import memory_api
 

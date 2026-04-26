@@ -19,7 +19,6 @@ from skyherd.drone.interface import (
     DroneBackend,
     DroneError,
     DroneState,
-    DroneUnavailable,
     Waypoint,
 )
 from skyherd.server.app import create_app

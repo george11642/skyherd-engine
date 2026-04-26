@@ -21,11 +21,11 @@ import os
 import re
 import secrets
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 # The anthropic SDK's `cast_to` expects a parameterized generic like Dict[str, Any]
 # — bare `dict` breaks `construct_type` at `get_args(type_)`.
-_RESP = Dict[str, Any]
+_RESP = dict[str, Any]
 
 # ---------------------------------------------------------------------------
 # Helpers

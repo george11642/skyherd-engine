@@ -17,7 +17,6 @@ from skyherd.agents.cross_ranch_coordinator import (
 )
 from skyherd.agents.session import SessionManager
 
-
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------

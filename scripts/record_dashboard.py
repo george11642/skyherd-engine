@@ -32,14 +32,13 @@ via ``make record-ready`` (or by launching ``skyherd-server-live`` manually).
 from __future__ import annotations
 
 import argparse
-import os
 import shutil
 import subprocess
 import sys
 import time
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Callable
 
 try:
     from playwright.sync_api import Browser, Page, sync_playwright

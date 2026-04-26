@@ -27,7 +27,6 @@ import json
 import logging
 import os
 import re
-import sys
 import time
 from pathlib import Path
 
@@ -89,7 +88,7 @@ def load_api_key() -> str:
                 value = line.split("=", 1)[1].strip().strip('"').strip("'")
                 if value:
                     return value
-    raise EnvironmentError("ANTHROPIC_API_KEY not found in env or .env.local")
+    raise OSError("ANTHROPIC_API_KEY not found in env or .env.local")
 
 
 def frame_to_second(path: Path) -> int:

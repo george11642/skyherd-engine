@@ -23,8 +23,6 @@ topology: 2 Pis + `/api/edges` aggregation + coyote dispatch.
 
 from __future__ import annotations
 
-import asyncio
-import json
 import time
 from collections import defaultdict
 from pathlib import Path

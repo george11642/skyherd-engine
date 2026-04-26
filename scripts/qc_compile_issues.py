@@ -19,7 +19,6 @@ import json
 from collections import defaultdict
 from pathlib import Path
 
-
 # Scenes that DO have voice-over (used to filter "missing" noise from inter-scene gaps).
 # Aligned with calculate-main-metadata.ts variant-C act durations (cumulative).
 VO_ACTIVE_RANGES = [

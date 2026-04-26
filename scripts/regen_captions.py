@@ -194,8 +194,15 @@ def align_cue(
     """
     model = _get_fw_model(device)
 
-    # Use phonetic form as initial_prompt so the model recognises abbreviations
-    phonetic = phonetic_text(text)
+    # Build a *short* vocabulary-hint initial prompt rather than passing the
+    # full cue text. Passing the entire cue as initial_prompt collapses
+    # faster-whisper transcription to ~7 words for a 20s audio clip (the model
+    # treats the prompt as already-emitted context and skips most of the
+    # audio). v5.6 caption regen ran with full-cue prompt + vad_filter=False
+    # and produced 7/70/51/14/24/64/82/40 words across the 8 cues — 6 of 8
+    # catastrophically truncated. Short prompt + vad_filter=True restores full
+    # transcription (hook 7→65 words).
+    _VOCAB_HINTS = "SkyHerd UNM MVP LoRa Twilio Opus Claude ATV"
 
     # condition_on_previous_text=False prevents Whisper repeat-attractor loops
     # (e.g. vo-c-grid produced 277 words including 33x "A cow goes into labor
@@ -205,9 +212,9 @@ def align_cue(
         str(audio_path),
         language="en",
         word_timestamps=True,
-        initial_prompt=phonetic,
+        initial_prompt=_VOCAB_HINTS,
         beam_size=5,
-        vad_filter=False,
+        vad_filter=True,
         condition_on_previous_text=False,
     )
 
@@ -263,6 +270,38 @@ def mp3_duration(path: Path) -> float:
 # Main generation logic
 # ---------------------------------------------------------------------------
 
+def dedupe_repeat_attractor(words: list[dict[str, float | str]]) -> list[dict[str, float | str]]:
+    """
+    Remove Chatterbox repeat-attractor tail duplicates from a per-cue word list.
+
+    Chatterbox sometimes re-emits the closing sentence verbatim. Whisper then
+    transcribes the doubled audio as two consecutive caption runs with identical
+    word sequences. We collapse them by detecting the longest tail-suffix that
+    appears twice in a row and dropping the second copy.
+
+    Strategy:
+      1. Normalise each word (strip, lower, drop punctuation) for comparison.
+      2. For k from min(20, len/2) down to 3, check if the last k words match
+         the k words ending one position before the tail (i.e. words[n-2k:n-k]
+         == words[n-k:n]).
+      3. If found, return words[:n-k] (drop the duplicated tail).
+    """
+    if len(words) < 6:
+        return words
+
+    def _norm(w: dict[str, float | str]) -> str:
+        return re.sub(r"[^\w]", "", str(w["word"]).lower())
+
+    n = len(words)
+    norm = [_norm(w) for w in words]
+    max_k = min(20, n // 2)
+    for k in range(max_k, 2, -1):
+        if norm[n - 2 * k : n - k] == norm[n - k : n]:
+            kept = words[: n - k]
+            return kept
+    return words
+
+
 def generate(
     cue_keys: list[str],
     cues_file: Path,
@@ -296,6 +335,13 @@ def generate(
         print(f"[regen_captions] Aligning {cue_key} (offset={offset}s) …")
 
         words = align_cue(audio_path, text, device=device)
+        pre_dedup = len(words)
+        words = dedupe_repeat_attractor(words)
+        if len(words) != pre_dedup:
+            print(
+                f"[regen_captions]   ⚠ deduped repeat-attractor tail on {cue_key}: "
+                f"{pre_dedup}→{len(words)} words"
+            )
 
         for w in words:
             output_words.append({

@@ -10,7 +10,6 @@ import pytest
 from skyherd.agents.memory import Memory
 from skyherd.agents.memory_hook import post_cycle_write
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------

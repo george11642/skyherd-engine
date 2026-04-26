@@ -23,7 +23,6 @@ from skyherd.drone.interface import DroneBackend, DroneError, DroneState, Waypoi
 from skyherd.server.app import create_app
 from skyherd.server.drone_control import TOKEN_HEADER
 
-
 TEST_TOKEN = "laptop-drone-token-xyz"
 
 

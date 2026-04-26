@@ -10,7 +10,6 @@ wired via create_app(ledger=...).
 
 from __future__ import annotations
 
-import sqlite3
 from pathlib import Path
 
 import pytest
@@ -20,7 +19,6 @@ from httpx import ASGITransport, AsyncClient
 from skyherd.attest.ledger import Ledger
 from skyherd.attest.signer import Signer
 from skyherd.server.app import create_app
-
 
 # ---------------------------------------------------------------------------
 # Fixtures

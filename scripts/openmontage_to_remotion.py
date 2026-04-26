@@ -13,7 +13,7 @@ import argparse
 import json
 import pathlib
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parent.parent
@@ -149,7 +149,7 @@ def to_remotion(
             "sourceTool": "openmontage",
             "sourceVersion": (edl.get("metadata") or {}).get("openmontage_version"),
             "rendererFamily": edl.get("renderer_family"),
-            "ingestedAt": datetime.now(timezone.utc).isoformat(),
+            "ingestedAt": datetime.now(UTC).isoformat(),
         },
     }
 

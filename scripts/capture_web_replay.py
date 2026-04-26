@@ -372,7 +372,7 @@ async def _capture_one_scenario(
         broadcaster.stop()
         try:
             await asyncio.wait_for(sub_task, timeout=2.0)
-        except (asyncio.CancelledError, asyncio.TimeoutError, Exception):  # noqa: BLE001
+        except (TimeoutError, asyncio.CancelledError, Exception):  # noqa: BLE001
             if not sub_task.done():
                 sub_task.cancel()
                 try:

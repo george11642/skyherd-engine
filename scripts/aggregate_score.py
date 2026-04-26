@@ -42,10 +42,9 @@ import json
 import logging
 import re
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from statistics import median, variance
-from typing import Optional
 
 # ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -95,7 +94,7 @@ _DIM_ALIASES: dict[str, str] = {
 }
 
 
-def _normalise_dim(raw: str) -> Optional[str]:
+def _normalise_dim(raw: str) -> str | None:
     return _DIM_ALIASES.get(raw.lower().strip())
 
 
@@ -255,7 +254,7 @@ def load_iter_history(variant: str) -> list[dict]:
         return []
     try:
         return json.loads(path.read_text())
-    except (json.JSONDecodeError, IOError) as exc:
+    except (OSError, json.JSONDecodeError) as exc:
         log.warning("Could not read iter history: %s", exc)
         return []
 
@@ -322,7 +321,7 @@ def check_ship_gate(
 
 # ── Top fix suggestion dedup + ranking ────────────────────────────────────────
 
-def extract_top_fixes(jsonl_path: Optional[Path], top_n: int = 3) -> list[dict]:
+def extract_top_fixes(jsonl_path: Path | None, top_n: int = 3) -> list[dict]:
     """
     Read fix_suggestions from Opus batch JSONL.
     Deduplicate by (file_path, change summary), rank by frequency.
@@ -379,25 +378,25 @@ def write_score_md(
 
     lines = [
         f"# SkyHerd iter-{iter_num}-{variant} Score Report",
-        f"",
-        f"**Generated:** {datetime.now(timezone.utc).isoformat()}",
-        f"",
-        f"---",
-        f"",
-        f"## Aggregate Scores",
-        f"",
-        f"| Source | Impact (30%) | Demo (25%) | Opus (25%) | Depth (20%) | **Aggregate** |",
-        f"|--------|-------------|------------|------------|-------------|---------------|",
+        "",
+        f"**Generated:** {datetime.now(UTC).isoformat()}",
+        "",
+        "---",
+        "",
+        "## Aggregate Scores",
+        "",
+        "| Source | Impact (30%) | Demo (25%) | Opus (25%) | Depth (20%) | **Aggregate** |",
+        "|--------|-------------|------------|------------|-------------|---------------|",
         f"| Opus stills | {opus_dims.get('impact', 0):.2f} | {opus_dims.get('demo', 0):.2f} | {opus_dims.get('opus', 0):.2f} | {opus_dims.get('depth', 0):.2f} | **{opus_aggregate:.4f}** |",
         f"| Gemini critique | {gemini_dims.get('impact', 0):.2f} | {gemini_dims.get('demo', 0):.2f} | {gemini_dims.get('opus', 0):.2f} | {gemini_dims.get('depth', 0):.2f} | **{gemini_aggregate:.4f}** |",
         f"| **Final (avg)** | **{final_dims.get('impact', 0):.2f}** | **{final_dims.get('demo', 0):.2f}** | **{final_dims.get('opus', 0):.2f}** | **{final_dims.get('depth', 0):.2f}** | **{final_aggregate:.4f}** |",
-        f"",
-        f"---",
-        f"",
-        f"## Ship Gate",
-        f"",
+        "",
+        "---",
+        "",
+        "## Ship Gate",
+        "",
         f"Status: {'✅ PASSES' if gate_passes else '❌ FAILS'}",
-        f"",
+        "",
     ]
 
     if gate_failures:
@@ -407,21 +406,21 @@ def write_score_md(
 
     # Plateau section
     lines += [
-        f"## Plateau Detection",
-        f"",
+        "## Plateau Detection",
+        "",
         f"Status: {'🏁 PLATEAU REACHED' if is_plateau else '🔄 CONTINUING'}",
-        f"",
+        "",
         f"Reason: {plateau_reason}",
-        f"",
+        "",
     ]
 
     # Iter history table
     if history:
         lines += [
-            f"### Iteration History",
-            f"",
-            f"| Iter | Opus | Gemini | Final |",
-            f"|------|------|--------|-------|",
+            "### Iteration History",
+            "",
+            "| Iter | Opus | Gemini | Final |",
+            "|------|------|--------|-------|",
         ]
         for h in history[-6:]:  # last 6 iters
             lines.append(
@@ -432,8 +431,8 @@ def write_score_md(
     # Blocking flags
     if blocking_flags:
         lines += [
-            f"## Blocking Flags",
-            f"",
+            "## Blocking Flags",
+            "",
         ]
         for flag in blocking_flags:
             lines.append(f"- **{flag}**")
@@ -442,8 +441,8 @@ def write_score_md(
     # Top fix suggestions
     if top_fixes:
         lines += [
-            f"## Top Fix Suggestions",
-            f"",
+            "## Top Fix Suggestions",
+            "",
         ]
         for i, fix in enumerate(top_fixes, 1):
             frame = fix.get("frame", "N/A")
@@ -451,11 +450,11 @@ def write_score_md(
             change = fix.get("change", "N/A")
             lines += [
                 f"### Fix {i} (priority {i})",
-                f"",
+                "",
                 f"- **Frame:** `{frame}`",
                 f"- **File:** `{fp}`",
                 f"- **Change:** {change}",
-                f"",
+                "",
             ]
 
     output_path.write_text("\n".join(lines))
@@ -485,7 +484,7 @@ def run_competitor_mode(args: argparse.Namespace) -> None:
             "aggregate": agg,
         },
         "critique_path": str(input_path.resolve()),
-        "timestamp":     datetime.now(timezone.utc).isoformat(),
+        "timestamp":     datetime.now(UTC).isoformat(),
     }
 
     print(json.dumps(envelope, indent=2))
@@ -647,7 +646,7 @@ def main() -> int:
         "opus_dims":         opus_dims,
         "gemini_dims":       gemini_dims,
         "has_blocking":      has_blocking,
-        "timestamp":         datetime.now(timezone.utc).isoformat(),
+        "timestamp":         datetime.now(UTC).isoformat(),
     })
     save_iter_history(args.variant, history)
 

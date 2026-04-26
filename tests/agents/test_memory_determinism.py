@@ -122,6 +122,7 @@ class TestDecideWritePathIsTimeInvariant:
         """
         import ast
         import inspect
+
         from skyherd.agents import memory_paths
 
         src = inspect.getsource(memory_paths)
@@ -144,6 +145,7 @@ class TestDecideWritePathIsTimeInvariant:
         """Guard: memory.py must also avoid non-deterministic stdlib imports."""
         import ast
         import inspect
+
         from skyherd.agents import memory
 
         src = inspect.getsource(memory)

@@ -188,3 +188,13 @@ ignore = [
 "src/skyherd/drone/sitl.py" = ["F821", "F841"]
 # world module — forward-ref string annotations and legacy enum patterns are intentional
 "src/skyherd/world/*.py" = ["UP042", "UP017", "F841", "E741"]
+# typer Option/Argument-in-defaults is the standard typer CLI pattern
+"src/skyherd/attest/verify_cli.py" = ["B008"]
+# str+Enum is intentional for JSON-serializable HTTP API enums
+"src/skyherd/server/drone_control.py" = ["UP042"]
+# Helper scripts — UPPER_CASE locals (matrix vars X, X_v) and constant-style
+# locals are intentional, exception names predate the Error suffix convention
+"scripts/managed_mesh_smoke_live.py" = ["N806"]
+"scripts/openmontage_to_remotion.py" = ["N818"]
+"scripts/regen_captions.py" = ["N806"]
+"scripts/train_pinkeye_classifier.py" = ["N806"]

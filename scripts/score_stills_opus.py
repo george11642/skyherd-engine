@@ -299,7 +299,7 @@ async def run_all_batches(
                     api_key = line.split("=", 1)[1].strip()
                     break
     if not api_key:
-        raise EnvironmentError("ANTHROPIC_API_KEY not set. Export it or put it in .env.local")
+        raise OSError("ANTHROPIC_API_KEY not set. Export it or put it in .env.local")
 
     output_dir.mkdir(parents=True, exist_ok=True)
 

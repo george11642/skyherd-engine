@@ -15,7 +15,6 @@ from httpx import ASGITransport, AsyncClient
 
 from skyherd.server.app import create_app
 
-
 # ---------------------------------------------------------------------------
 # Mock-mode fixture
 # ---------------------------------------------------------------------------
