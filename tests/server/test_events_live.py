@@ -104,7 +104,9 @@ async def test_live_attest_append_forwards_ledger_iter_events() -> None:
                     if len(seen_seqs) >= 3:
                         return
 
-        await asyncio.wait_for(collect(), timeout=5.0)
+        # CI under Python 3.11 ubuntu timed out at 5s — async scheduling is
+        # noticeably slower there than 3.12. Bumped to 15s with margin.
+        await asyncio.wait_for(collect(), timeout=15.0)
         assert sorted(seen_seqs) == [1, 2, 3], f"Expected seqs [1,2,3], got {sorted(seen_seqs)}"
     finally:
         bc.stop()
