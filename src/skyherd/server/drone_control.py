@@ -196,9 +196,7 @@ def attach_drone_control(
             err = str(exc)
             if best_effort is None:
                 latency_ms = int((time.monotonic() - started) * 1000)
-                payload.update(
-                    {"success": False, "latency_ms": latency_ms, "error": err}
-                )
+                payload.update({"success": False, "latency_ms": latency_ms, "error": err})
                 _broadcast_event(broadcaster, payload)
                 # 502 = upstream (the drone) refused the command.
                 raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail=err) from exc
@@ -299,7 +297,7 @@ def attach_drone_control(
     ) -> JSONResponse:
         _verify_token(x_manual_override_token)
         backend = _resolve_backend()
-        alt_m = (body.alt_m if body and body.alt_m is not None else 20.0)
+        alt_m = body.alt_m if body and body.alt_m is not None else 20.0
 
         async def _takeoff() -> None:
             await backend.takeoff(alt_m=alt_m)

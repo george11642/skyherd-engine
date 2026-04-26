@@ -37,25 +37,19 @@ def test_flash_script_syntax_valid() -> None:
 
 
 def test_flash_script_help_exits_zero() -> None:
-    result = subprocess.run(
-        [str(_FLASH_SH), "--help"], capture_output=True, text=True, timeout=10
-    )
+    result = subprocess.run([str(_FLASH_SH), "--help"], capture_output=True, text=True, timeout=10)
     assert result.returncode == 0
     assert "Usage" in result.stdout
     assert "--env" in result.stdout
 
 
 def test_flash_script_short_help_flag_also_works() -> None:
-    result = subprocess.run(
-        [str(_FLASH_SH), "-h"], capture_output=True, text=True, timeout=10
-    )
+    result = subprocess.run([str(_FLASH_SH), "-h"], capture_output=True, text=True, timeout=10)
     assert result.returncode == 0
 
 
 def test_flash_script_rejects_unknown_arg() -> None:
-    result = subprocess.run(
-        [str(_FLASH_SH), "--nope"], capture_output=True, text=True, timeout=10
-    )
+    result = subprocess.run([str(_FLASH_SH), "--nope"], capture_output=True, text=True, timeout=10)
     assert result.returncode != 0
     assert "Unknown" in result.stderr or "usage" in result.stderr.lower()
 
@@ -96,7 +90,5 @@ def test_flash_script_detects_missing_pio(tmp_path: Path) -> None:
 
 @pytest.mark.parametrize("flag", ["--env", "--monitor", "--no-warn", "--help"])
 def test_flash_script_documented_flags_present_in_help(flag: str) -> None:
-    result = subprocess.run(
-        [str(_FLASH_SH), "--help"], capture_output=True, text=True, timeout=10
-    )
+    result = subprocess.run([str(_FLASH_SH), "--help"], capture_output=True, text=True, timeout=10)
     assert flag in result.stdout, f"flag {flag} not documented in --help"

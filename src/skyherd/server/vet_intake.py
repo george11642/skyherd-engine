@@ -126,9 +126,7 @@ def draft_vet_intake(
     """
     # 1. Validate cow_tag
     if not _COW_TAG_RE.match(cow_tag):
-        raise ValueError(
-            f"cow_tag {cow_tag!r} does not match required regex ^[A-Z][0-9]{{3}}$"
-        )
+        raise ValueError(f"cow_tag {cow_tag!r} does not match required regex ^[A-Z][0-9]{{3}}$")
 
     # 2. Build timestamp and intake ID
     ts = datetime.now(UTC)

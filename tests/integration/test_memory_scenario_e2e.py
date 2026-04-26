@@ -55,8 +55,12 @@ async def test_full_chain_ppl_write_fld_read_dual_receipts(tmp_path, monkeypatch
         "ranch_id": "ranch_a",
     }
     ppl_result = await post_cycle_write(
-        ppl_session, ppl_event, [{"tool": "classify"}],
-        ledger=ledger, broadcaster=broadcaster, store_id_map=store_id_map,
+        ppl_session,
+        ppl_event,
+        [{"tool": "classify"}],
+        ledger=ledger,
+        broadcaster=broadcaster,
+        store_id_map=store_id_map,
     )
     assert ppl_result is not None
     assert ppl_result["path"] == "/patterns/coyote-crossings.md"
@@ -66,8 +70,12 @@ async def test_full_chain_ppl_write_fld_read_dual_receipts(tmp_path, monkeypatch
     fld_session = SimpleNamespace(agent_name="FenceLineDispatcher")
     fld_event = {"segment": "seg_1", "type": "fence.breach"}
     fld_result = await post_cycle_write(
-        fld_session, fld_event, [{"tool": "launch_drone"}],
-        ledger=ledger, broadcaster=broadcaster, store_id_map=store_id_map,
+        fld_session,
+        fld_event,
+        [{"tool": "launch_drone"}],
+        ledger=ledger,
+        broadcaster=broadcaster,
+        store_id_map=store_id_map,
     )
     assert fld_result is not None
     assert fld_result["path"].startswith("/notes/dispatch-")

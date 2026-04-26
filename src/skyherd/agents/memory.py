@@ -122,9 +122,7 @@ class MemoryStoreBase:
     async def write_memory(self, store_id: str, path: str, content: str) -> Memory:
         raise NotImplementedError
 
-    async def list_memories(
-        self, store_id: str, path_prefix: str | None = None
-    ) -> ListEnvelope:
+    async def list_memories(self, store_id: str, path_prefix: str | None = None) -> ListEnvelope:
         raise NotImplementedError
 
     async def list_versions(
@@ -182,9 +180,7 @@ class MemoryStoreManager(MemoryStoreBase):
             opts["params"] = extra_params
         return opts
 
-    async def create_store(
-        self, name: str, description: str | None = None
-    ) -> MemoryStore:
+    async def create_store(self, name: str, description: str | None = None) -> MemoryStore:
         body: dict[str, Any] = {"name": name}
         if description:
             body["description"] = description
@@ -196,9 +192,7 @@ class MemoryStoreManager(MemoryStoreBase):
         )
         return MemoryStore.model_validate(resp)
 
-    async def write_memory(
-        self, store_id: str, path: str, content: str
-    ) -> Memory:
+    async def write_memory(self, store_id: str, path: str, content: str) -> Memory:
         norm = _normalize_path(path)
         resp = await self._client.post(
             f"/v1/memory_stores/{store_id}/memories",
@@ -208,9 +202,7 @@ class MemoryStoreManager(MemoryStoreBase):
         )
         return Memory.model_validate(resp)
 
-    async def list_memories(
-        self, store_id: str, path_prefix: str | None = None
-    ) -> ListEnvelope:
+    async def list_memories(self, store_id: str, path_prefix: str | None = None) -> ListEnvelope:
         params = {"path_prefix": path_prefix} if path_prefix else None
         resp = await self._client.get(
             f"/v1/memory_stores/{store_id}/memories",
@@ -247,9 +239,7 @@ class MemoryStoreManager(MemoryStoreBase):
         )
         return MemoryStore.model_validate(resp)
 
-    async def ensure_store(
-        self, name: str, description: str | None = None
-    ) -> str:
+    async def ensure_store(self, name: str, description: str | None = None) -> str:
         if name in self._store_ids:
             return self._store_ids[name]
         logger.info("Creating memory store %s…", name)
@@ -297,9 +287,7 @@ class LocalMemoryStore(MemoryStoreBase):
     def _det_id(prefix: str, seed: str) -> str:
         return f"{prefix}_{hashlib.sha256(seed.encode()).hexdigest()[:20]}"
 
-    async def create_store(
-        self, name: str, description: str | None = None
-    ) -> MemoryStore:
+    async def create_store(self, name: str, description: str | None = None) -> MemoryStore:
         sid = self._det_id("memstore", name)
         store = MemoryStore(
             id=sid,
@@ -316,9 +304,7 @@ class LocalMemoryStore(MemoryStoreBase):
             path.touch()
         return store
 
-    async def ensure_store(
-        self, name: str, description: str | None = None
-    ) -> str:
+    async def ensure_store(self, name: str, description: str | None = None) -> str:
         if name in self._store_ids:
             sid = self._store_ids[name]
             if sid not in self._stores:
@@ -339,9 +325,7 @@ class LocalMemoryStore(MemoryStoreBase):
         self._store_ids_path.write_text(json.dumps(self._store_ids, indent=2))
         return store.id
 
-    async def write_memory(
-        self, store_id: str, path: str, content: str
-    ) -> Memory:
+    async def write_memory(self, store_id: str, path: str, content: str) -> Memory:
         norm = _normalize_path(path)
         sha = hashlib.sha256(content.encode("utf-8")).hexdigest()
         mem_id = self._det_id("mem", f"{store_id}/{norm}")
@@ -365,9 +349,7 @@ class LocalMemoryStore(MemoryStoreBase):
             fh.write(line + "\n")
         return rec
 
-    async def list_memories(
-        self, store_id: str, path_prefix: str | None = None
-    ) -> ListEnvelope:
+    async def list_memories(self, store_id: str, path_prefix: str | None = None) -> ListEnvelope:
         jsonl_path = self._root / f"{store_id}.jsonl"
         if not jsonl_path.exists():
             return ListEnvelope(data=[], prefixes=[])
@@ -387,10 +369,7 @@ class LocalMemoryStore(MemoryStoreBase):
                     continue
             latest[p] = rec
         data = sorted(latest.values(), key=lambda r: r.get("path", ""))
-        prefixes = sorted({
-            p.split("/", 2)[1] + "/" if "/" in p.lstrip("/") else p
-            for p in latest
-        })
+        prefixes = sorted({p.split("/", 2)[1] + "/" if "/" in p.lstrip("/") else p for p in latest})
         return ListEnvelope(data=data, prefixes=prefixes)
 
     async def list_versions(

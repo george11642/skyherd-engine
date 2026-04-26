@@ -101,7 +101,8 @@ def test_draft_vet_intake_includes_attest_seq_when_given(tmp_path, monkeypatch) 
 
 
 def test_draft_vet_intake_unknown_disease_uses_default_treatment(
-    tmp_path, monkeypatch,
+    tmp_path,
+    monkeypatch,
 ) -> None:
     """Unknown disease falls back to the default treatment guidance."""
     from skyherd.server import vet_intake as vi
@@ -115,7 +116,9 @@ def test_draft_vet_intake_unknown_disease_uses_default_treatment(
 
 @pytest.mark.parametrize("disease", ["pinkeye", "screwworm", "foot_rot", "brd"])
 def test_draft_vet_intake_known_diseases_render_treatment(
-    tmp_path, monkeypatch, disease: str,
+    tmp_path,
+    monkeypatch,
+    disease: str,
 ) -> None:
     """Each listed disease triggers its own treatment block."""
     from skyherd.server import vet_intake as vi
@@ -149,7 +152,9 @@ def test_get_intake_path_accepts_canonical_id(tmp_path, monkeypatch) -> None:
     ],
 )
 def test_get_intake_path_rejects_non_canonical_id(
-    tmp_path, monkeypatch, bad_id: str,
+    tmp_path,
+    monkeypatch,
+    bad_id: str,
 ) -> None:
     """Non-canonical intake IDs raise ValueError (HTTP 400 upstream)."""
     from skyherd.server import vet_intake as vi

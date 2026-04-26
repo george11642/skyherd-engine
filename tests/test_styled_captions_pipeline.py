@@ -394,18 +394,14 @@ def test_fixture_animation_in_allowed_set(
     fixture_payload: dict[str, Any],
 ) -> None:
     for entry in fixture_payload["words"]:
-        assert entry["animation"] in ALLOWED_ANIMATIONS, (
-            f"bad animation: {entry['animation']}"
-        )
+        assert entry["animation"] in ALLOWED_ANIMATIONS, f"bad animation: {entry['animation']}"
 
 
 def test_fixture_weight_in_allowed_set(
     fixture_payload: dict[str, Any],
 ) -> None:
     for entry in fixture_payload["words"]:
-        assert entry["weight"] in ALLOWED_WEIGHTS, (
-            f"bad weight: {entry['weight']}"
-        )
+        assert entry["weight"] in ALLOWED_WEIGHTS, f"bad weight: {entry['weight']}"
 
 
 def test_fixture_has_emphasis_3_examples(

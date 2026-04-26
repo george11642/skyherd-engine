@@ -6,6 +6,7 @@ Verifies:
 - Once-per-process cache prevents repeated warnings
 - Neither var set returns empty string, no warning
 """
+
 from __future__ import annotations
 
 import warnings
@@ -27,7 +28,9 @@ class TestGetTwilioAuthToken:
 
         assert result == "new_value"
         deprecation_warnings = [x for x in w if issubclass(x.category, DeprecationWarning)]
-        assert deprecation_warnings == [], "No DeprecationWarning expected when TWILIO_AUTH_TOKEN is set"
+        assert deprecation_warnings == [], (
+            "No DeprecationWarning expected when TWILIO_AUTH_TOKEN is set"
+        )
 
     def test_legacy_token_emits_deprecation(self, monkeypatch):
         """Legacy TWILIO_TOKEN is accepted but emits DeprecationWarning."""

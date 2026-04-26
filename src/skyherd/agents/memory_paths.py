@@ -23,23 +23,27 @@ from typing import Any
 
 # Keys whose values are replaced by "[REDACTED]" before they can land in a
 # memory content body. Conservative — add here when new secret classes appear.
-_REDACT_KEYS: frozenset[str] = frozenset({
-    "rancher_phone",
-    "vet_phone",
-    "auth_token",
-    "api_key",
-    "twilio_sid",
-})
+_REDACT_KEYS: frozenset[str] = frozenset(
+    {
+        "rancher_phone",
+        "vet_phone",
+        "auth_token",
+        "api_key",
+        "twilio_sid",
+    }
+)
 
 # Agent names lifted from skyherd.server.events.AGENT_NAMES — keep in sync.
-_KNOWN_AGENTS: frozenset[str] = frozenset({
-    "FenceLineDispatcher",
-    "HerdHealthWatcher",
-    "PredatorPatternLearner",
-    "GrazingOptimizer",
-    "CalvingWatch",
-    "CrossRanchCoordinator",
-})
+_KNOWN_AGENTS: frozenset[str] = frozenset(
+    {
+        "FenceLineDispatcher",
+        "HerdHealthWatcher",
+        "PredatorPatternLearner",
+        "GrazingOptimizer",
+        "CalvingWatch",
+        "CrossRanchCoordinator",
+    }
+)
 
 
 def _redact(d: dict[str, Any]) -> dict[str, Any]:
@@ -58,7 +62,9 @@ def _redact(d: dict[str, Any]) -> dict[str, Any]:
 # ---------------------------------------------------------------------------
 
 
-def _predator_pattern_learner(event: dict[str, Any], tool_calls: list[dict[str, Any]]) -> tuple[str, str]:
+def _predator_pattern_learner(
+    event: dict[str, Any], tool_calls: list[dict[str, Any]]
+) -> tuple[str, str]:
     classification = str(event.get("classification", "unknown"))
     ranch_id = str(event.get("ranch_id", "ranch_a"))
     topic = classification.split(".", 1)[0]  # "coyote.confirmed" -> "coyote"
@@ -73,7 +79,9 @@ def _predator_pattern_learner(event: dict[str, Any], tool_calls: list[dict[str, 
     return path, content
 
 
-def _herd_health_watcher(event: dict[str, Any], tool_calls: list[dict[str, Any]]) -> tuple[str, str]:
+def _herd_health_watcher(
+    event: dict[str, Any], tool_calls: list[dict[str, Any]]
+) -> tuple[str, str]:
     tag = str(event.get("tag", "unknown"))
     path = f"notes/{tag}.md"
     ts = str(event.get("ts", ""))
@@ -99,7 +107,9 @@ def _calving_watch(event: dict[str, Any], tool_calls: list[dict[str, Any]]) -> t
     return path, content
 
 
-def _fenceline_dispatcher(event: dict[str, Any], tool_calls: list[dict[str, Any]]) -> tuple[str, str]:
+def _fenceline_dispatcher(
+    event: dict[str, Any], tool_calls: list[dict[str, Any]]
+) -> tuple[str, str]:
     segment = str(event.get("segment", "unknown"))
     path = f"notes/dispatch-{segment}.md"
     ts = str(event.get("ts", ""))

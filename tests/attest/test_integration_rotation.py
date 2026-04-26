@@ -56,9 +56,7 @@ def test_rotation_with_memver_pairing_end_to_end(tmp_path: Path) -> None:
     assert '"_memver_id":"memver_phase_a"' in paired_a.payload_json
 
     # ---------- Rotation ----------
-    signer_b = Signer.rotate(
-        key_path, archive, timestamp="20260423T220000Z"
-    )
+    signer_b = Signer.rotate(key_path, archive, timestamp="20260423T220000Z")
     assert signer_b.public_key_pem != pub_a
 
     archived = archive / "20260423T220000Z.pem"
@@ -130,7 +128,8 @@ def test_tamper_on_rotated_memver_detected(tmp_path: Path) -> None:
     signer_a.save(key_path)
     ledger_a = Ledger.open(db, signer_a)
     ledger_a.append(
-        "memory", "memver.written",
+        "memory",
+        "memver.written",
         {"agent": "A", "memory_version_id": "memver_real"},
         memver_id="memver_real",
     )

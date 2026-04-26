@@ -33,9 +33,7 @@ def _make_sick_cow(
     )
 
 
-def _make_healthy_cow(
-    tag: str = "OK01", pos: tuple[float, float] = (300.0, 300.0)
-) -> Cow:
+def _make_healthy_cow(tag: str = "OK01", pos: tuple[float, float] = (300.0, 300.0)) -> Cow:
     return Cow(
         id=f"cow_{tag}",
         tag=tag,

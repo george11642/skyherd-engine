@@ -133,11 +133,7 @@ class CollarSimEmitter:
         # Battery drain (monotonic downward, clamped)
         self._battery_pct = max(0.0, self._battery_pct - self.drain_rate_per_tick)
 
-        ts = (
-            self.ts_provider()
-            if self.ts_provider is not None
-            else float(self._tick_count)
-        )
+        ts = self.ts_provider() if self.ts_provider is not None else float(self._tick_count)
 
         return {
             "ts": ts,

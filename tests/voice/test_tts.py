@@ -227,9 +227,7 @@ class TestMp3ToWav:
 
 
 class TestHygieneLogs:
-    def test_mp3_decode_debug_log_on_pydub_failure(
-        self, tmp_path, monkeypatch, caplog
-    ) -> None:
+    def test_mp3_decode_debug_log_on_pydub_failure(self, tmp_path, monkeypatch, caplog) -> None:
         """_mp3_to_wav logs DEBUG when pydub raises, then falls back to raw bytes."""
         import logging
         import types

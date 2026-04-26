@@ -148,7 +148,11 @@ class TestElevenLabsVoiceCloneQA:
         data_single = wav_single.read_bytes()
 
         # Second pass: same bytes split into 3 chunks
-        split = [mp3[: len(mp3) // 3], mp3[len(mp3) // 3 : 2 * len(mp3) // 3], mp3[2 * len(mp3) // 3 :]]
+        split = [
+            mp3[: len(mp3) // 3],
+            mp3[len(mp3) // 3 : 2 * len(mp3) // 3],
+            mp3[2 * len(mp3) // 3 :],
+        ]
         _install_fake_elevenlabs(monkeypatch, split)
         wav_chunked = ElevenLabsBackend(api_key="fake").synthesize("chunked")
         data_chunked = wav_chunked.read_bytes()

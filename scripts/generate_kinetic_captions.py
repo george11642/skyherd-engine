@@ -90,9 +90,7 @@ VARIANT_C_VO_CUES: tuple[str, ...] = (
 # Lines that look like::
 #   - 0:01 — "**They don't.**"
 #   - 0:24 — "Beef · record highs"
-EMPHASIS_LINE_RE = re.compile(
-    r"^- (?P<min>\d+):(?P<sec>\d{1,2})\s*[—-]\s*[\"“](?P<text>.+?)[\"”]"
-)
+EMPHASIS_LINE_RE = re.compile(r"^- (?P<min>\d+):(?P<sec>\d{1,2})\s*[—-]\s*[\"“](?P<text>.+?)[\"”]")
 
 
 def _strip_md(text: str) -> str:
@@ -272,9 +270,9 @@ def build_payload(
           "fingerprint": "<sha256 hex of inputs>"
         }
     """
-    fp_input = json.dumps(
-        {"emphasis": emphasis, "segments": segments}, sort_keys=True
-    ).encode("utf-8")
+    fp_input = json.dumps({"emphasis": emphasis, "segments": segments}, sort_keys=True).encode(
+        "utf-8"
+    )
     fingerprint = hashlib.sha256(fp_input).hexdigest()
 
     return {
@@ -316,9 +314,7 @@ def run_variant(variant: Variant, force: bool = False) -> tuple[Mode, int]:
 
     if variant in ("A", "B"):
         emphasis = parse_emphasis_windows(variant)
-        payload = build_payload(
-            variant=variant, mode="sparse", emphasis=emphasis, segments=[]
-        )
+        payload = build_payload(variant=variant, mode="sparse", emphasis=emphasis, segments=[])
         if not force and already_current(out, payload):
             LOG.info("captions-%s.json up-to-date — skipping", variant)
             return "sparse", len(emphasis)
@@ -330,15 +326,11 @@ def run_variant(variant: Variant, force: bool = False) -> tuple[Mode, int]:
     try:
         from faster_whisper import WhisperModel  # type: ignore[import-not-found]
     except ImportError as exc:
-        raise SystemExit(
-            "faster-whisper not installed — run `uv add faster-whisper`"
-        ) from exc
+        raise SystemExit("faster-whisper not installed — run `uv add faster-whisper`") from exc
 
     model = WhisperModel("small", compute_type="int8")
     segments = transcribe_dense(model)
-    payload = build_payload(
-        variant="C", mode="dense", emphasis=[], segments=segments
-    )
+    payload = build_payload(variant="C", mode="dense", emphasis=[], segments=segments)
     if not force and already_current(out, payload):
         LOG.info("captions-C.json up-to-date — skipping")
         return "dense", len(segments)
@@ -556,9 +548,7 @@ def _strip_code_fence(text: str) -> str:
     return stripped.strip()
 
 
-def parse_styled_response(
-    raw: str, source_words: list[dict[str, Any]]
-) -> list[dict[str, Any]]:
+def parse_styled_response(raw: str, source_words: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """Parse Opus's response, validate schema, return styled words."""
     blob = _strip_code_fence(raw)
     try:
@@ -570,8 +560,7 @@ def parse_styled_response(
         raise ValueError("styled response must be a JSON array")
     if len(parsed) != len(source_words):
         raise ValueError(
-            "styled response word count "
-            f"({len(parsed)}) != input ({len(source_words)})"
+            f"styled response word count ({len(parsed)}) != input ({len(source_words)})"
         )
 
     out: list[dict[str, Any]] = []
@@ -600,13 +589,9 @@ def parse_styled_response(
         try:
             level = int(entry["emphasis_level"])
         except (TypeError, ValueError) as exc:
-            raise ValueError(
-                f"styled entry {i} non-integer emphasis_level"
-            ) from exc
+            raise ValueError(f"styled entry {i} non-integer emphasis_level") from exc
         if not 0 <= level <= 3:
-            raise ValueError(
-                f"styled entry {i} emphasis_level out of range: {level}"
-            )
+            raise ValueError(f"styled entry {i} emphasis_level out of range: {level}")
         out.append(
             {
                 "word": src["word"],
@@ -650,9 +635,7 @@ def _style_input_fingerprint(
     h.update(STYLE_MODEL.encode("utf-8"))
     h.update(STYLE_SYSTEM_PROMPT.encode("utf-8"))
     h.update(_load_skills_prefix().encode("utf-8"))
-    h.update(
-        json.dumps(captions_payload, sort_keys=True).encode("utf-8")
-    )
+    h.update(json.dumps(captions_payload, sort_keys=True).encode("utf-8"))
     h.update(script_excerpt.encode("utf-8"))
     h.update(variant.encode("utf-8"))
     return h.hexdigest()
@@ -678,8 +661,7 @@ def style_variant(variant: Variant, force: bool = False) -> dict[str, Any]:
     captions_path = output_path(variant)
     if not captions_path.is_file():
         raise SystemExit(
-            f"plain captions missing: {captions_path}. "
-            "Run `make video-captions` first."
+            f"plain captions missing: {captions_path}. Run `make video-captions` first."
         )
     captions_payload = json.loads(captions_path.read_text(encoding="utf-8"))
     words = flatten_caption_words(captions_payload)
@@ -714,9 +696,7 @@ def style_variant(variant: Variant, force: bool = False) -> dict[str, Any]:
     try:
         from anthropic import Anthropic  # type: ignore[import-not-found]
     except ImportError as exc:
-        raise SystemExit(
-            "anthropic SDK not installed — run `uv add anthropic`"
-        ) from exc
+        raise SystemExit("anthropic SDK not installed — run `uv add anthropic`") from exc
 
     client = Anthropic()  # picks up ANTHROPIC_API_KEY from env
     skills_prefix = _load_skills_prefix()
@@ -759,18 +739,15 @@ def style_variant(variant: Variant, force: bool = False) -> dict[str, Any]:
 
     # Concatenate any text blocks from the response.
     raw_text = "".join(
-        getattr(block, "text", "") for block in response.content
+        getattr(block, "text", "")
+        for block in response.content
         if getattr(block, "type", "") == "text"
     )
     if not raw_text.strip():
-        raise SystemExit(
-            f"variant {variant}: empty text response from {STYLE_MODEL}"
-        )
+        raise SystemExit(f"variant {variant}: empty text response from {STYLE_MODEL}")
 
     styled_words = parse_styled_response(raw_text, source_words=words)
-    payload = build_style_payload(
-        variant=variant, model=STYLE_MODEL, words=styled_words
-    )
+    payload = build_style_payload(variant=variant, model=STYLE_MODEL, words=styled_words)
     payload["input_fingerprint"] = input_fp
 
     # Surface usage so judges (and the run summary) can see the cache
@@ -780,12 +757,8 @@ def style_variant(variant: Variant, force: bool = False) -> dict[str, Any]:
         payload["usage"] = {
             "input_tokens": getattr(usage, "input_tokens", 0),
             "output_tokens": getattr(usage, "output_tokens", 0),
-            "cache_creation_input_tokens": getattr(
-                usage, "cache_creation_input_tokens", 0
-            ),
-            "cache_read_input_tokens": getattr(
-                usage, "cache_read_input_tokens", 0
-            ),
+            "cache_creation_input_tokens": getattr(usage, "cache_creation_input_tokens", 0),
+            "cache_read_input_tokens": getattr(usage, "cache_read_input_tokens", 0),
         }
 
     CAPTIONS_DIR.mkdir(parents=True, exist_ok=True)
@@ -830,9 +803,7 @@ def _parse_args(argv: Iterable[str] | None = None) -> argparse.Namespace:
         action="store_true",
         help="re-run even if the on-disk fingerprint matches",
     )
-    p.add_argument(
-        "-v", "--verbose", action="store_true", help="enable debug logging"
-    )
+    p.add_argument("-v", "--verbose", action="store_true", help="enable debug logging")
 
     style_p = sub.add_parser(
         "style",
@@ -849,9 +820,7 @@ def _parse_args(argv: Iterable[str] | None = None) -> argparse.Namespace:
         action="store_true",
         help="re-run the API call even on a cache hit",
     )
-    style_p.add_argument(
-        "-v", "--verbose", action="store_true", help="enable debug logging"
-    )
+    style_p.add_argument("-v", "--verbose", action="store_true", help="enable debug logging")
 
     return p.parse_args(list(argv) if argv is not None else None)
 
@@ -863,9 +832,7 @@ def main(argv: Iterable[str] | None = None) -> int:
         format="%(asctime)s %(levelname)s %(message)s",
     )
 
-    variants: tuple[Variant, ...] = (
-        ("A", "B", "C") if args.variant == "all" else (args.variant,)
-    )
+    variants: tuple[Variant, ...] = ("A", "B", "C") if args.variant == "all" else (args.variant,)
 
     if getattr(args, "command", None) == "style":
         reports: list[dict[str, Any]] = []
@@ -874,8 +841,10 @@ def main(argv: Iterable[str] | None = None) -> int:
         print("opus 4.7 caption styling:")
         for r in reports:
             usage = r.get("usage", {})
-            tag = "skipped (cache)" if r.get("cached") else (
-                "skipped" if r.get("skipped") else "styled"
+            tag = (
+                "skipped (cache)"
+                if r.get("cached")
+                else ("skipped" if r.get("skipped") else "styled")
             )
             print(
                 f"  {r['variant']}: {tag} "

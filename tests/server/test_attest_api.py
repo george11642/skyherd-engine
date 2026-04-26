@@ -47,7 +47,9 @@ def live_ledger(tmp_path: Path) -> tuple[Ledger, str, str]:
     ledger = Ledger.open(db, signer)
     ledger.append("sensor.water", "water.low", {"tank": 1})
     ledger.append(
-        "memory", "memver.written", {"agent": "A", "memory_version_id": "memver_live42"},
+        "memory",
+        "memver.written",
+        {"agent": "A", "memory_version_id": "memver_live42"},
         memver_id="memver_live42",
     )
     head = ledger.append("sensor.fence", "fence.breach", {"fence": "north"})
@@ -99,9 +101,7 @@ class TestAttestByHashMock:
 
 class TestAttestByHashLive:
     @pytest.mark.asyncio
-    async def test_live_chain_back_to_genesis(
-        self, live_client: AsyncClient, live_ledger
-    ):
+    async def test_live_chain_back_to_genesis(self, live_client: AsyncClient, live_ledger):
         _, head_hash, _ = live_ledger
         resp = await live_client.get(f"/api/attest/by-hash/{head_hash}")
         assert resp.status_code == 200
@@ -146,9 +146,7 @@ class TestAttestPairMock:
 
 class TestAttestPairLive:
     @pytest.mark.asyncio
-    async def test_live_matches_memver_id_field(
-        self, live_client: AsyncClient, live_ledger
-    ):
+    async def test_live_matches_memver_id_field(self, live_client: AsyncClient, live_ledger):
         _, _, memver_id = live_ledger
         resp = await live_client.get(f"/api/attest/pair/{memver_id}")
         assert resp.status_code == 200

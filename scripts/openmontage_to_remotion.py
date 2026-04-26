@@ -7,6 +7,7 @@ and renders deterministically.
 OpenMontage is an external AGPL-licensed tool. This adapter only consumes its OUTPUT
 files; it never imports OpenMontage code. See docs/OPENMONTAGE_INTEGRATION.md.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -44,9 +45,7 @@ def validate_edl(edl: dict[str, Any]) -> list[str]:
         errors.append("cuts must be a non-empty list")
     runtime = edl.get("render_runtime")
     if runtime != SUPPORTED_RUNTIME:
-        errors.append(
-            f"unsupported render_runtime: {runtime!r} (require {SUPPORTED_RUNTIME!r})"
-        )
+        errors.append(f"unsupported render_runtime: {runtime!r} (require {SUPPORTED_RUNTIME!r})")
     return errors
 
 
@@ -127,9 +126,7 @@ def to_remotion(
         sequences.append(seq)
 
     last_cut = cuts[-1]
-    duration_in_frames = _seconds_to_frames(
-        float(last_cut.get("out_seconds", 0.0)), fps
-    )
+    duration_in_frames = _seconds_to_frames(float(last_cut.get("out_seconds", 0.0)), fps)
 
     audio_block = edl.get("audio") or {}
 
@@ -190,7 +187,7 @@ def to_broll_track(
         # Strip the remotion-video/public/ prefix so staticFile() can resolve it
         src = source
         if src.startswith(BROLL_PUBLIC_PREFIX):
-            src = src[len(BROLL_PUBLIC_PREFIX):]
+            src = src[len(BROLL_PUBLIC_PREFIX) :]
 
         transition = cut.get("transition_in", "cut")
         transition_duration_s = float(cut.get("transition_in_duration", 0.0))

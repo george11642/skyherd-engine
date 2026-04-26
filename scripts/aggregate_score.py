@@ -52,18 +52,18 @@ PROJECT_ROOT = Path(__file__).parent.parent
 
 WEIGHTS = {
     "impact": 0.30,
-    "demo":   0.25,
-    "opus":   0.25,
-    "depth":  0.20,
+    "demo": 0.25,
+    "opus": 0.25,
+    "depth": 0.20,
 }
 
 # Ship gate thresholds (beats CrossBeam 8.93 by ≥0.5)
 SHIP_GATE = {
     "aggregate": 9.46,
-    "impact":    9.5,
-    "demo":      9.5,
-    "opus":      8.5,
-    "depth":     10.0,
+    "impact": 9.5,
+    "demo": 9.5,
+    "opus": 8.5,
+    "depth": 10.0,
 }
 
 # Plateau detection
@@ -82,14 +82,14 @@ log = logging.getLogger("aggregate_score")
 
 # Gemini uses "Opus 4.7 axis", Opus JSON uses "opus" — map all to canonical keys
 _DIM_ALIASES: dict[str, str] = {
-    "impact":         "impact",
-    "demo":           "demo",
-    "demo quality":   "demo",
-    "opus":           "opus",
-    "opus 4.7 axis":  "opus",
-    "opus 4.7 use":   "opus",
-    "opus use":       "opus",
-    "depth":          "depth",
+    "impact": "impact",
+    "demo": "demo",
+    "demo quality": "demo",
+    "opus": "opus",
+    "opus 4.7 axis": "opus",
+    "opus 4.7 use": "opus",
+    "opus use": "opus",
+    "depth": "depth",
     "technical depth": "depth",
 }
 
@@ -99,6 +99,7 @@ def _normalise_dim(raw: str) -> str | None:
 
 
 # ── Opus JSONL parsing ─────────────────────────────────────────────────────────
+
 
 def parse_opus_jsonl(jsonl_path: Path) -> dict[str, float]:
     """
@@ -154,15 +155,15 @@ def parse_opus_jsonl(jsonl_path: Path) -> dict[str, float]:
 #   ## Depth (20%): 10.0/10
 #   ## Aggregate: 8.07/10
 
-_GEMINI_DIM_RE  = re.compile(
+_GEMINI_DIM_RE = re.compile(
     r"^##\s+(Impact|Demo|Opus 4\.7 axis|Depth)\s+\(\d+%\)\s*:\s*([\d.]+)/10",
     re.IGNORECASE | re.MULTILINE,
 )
-_GEMINI_AGG_RE  = re.compile(
+_GEMINI_AGG_RE = re.compile(
     r"^##\s+Aggregate\s*:\s*([\d.]+)/10",
     re.MULTILINE,
 )
-_CRITICAL_RE    = re.compile(
+_CRITICAL_RE = re.compile(
     r"^(CRITICAL|WOULD CHANGE)\s*[:\-]",
     re.IGNORECASE | re.MULTILINE,
 )
@@ -222,7 +223,8 @@ def parse_gemini_md(md_path: Path) -> tuple[dict[str, float], bool, list[str]]:
     if has_blocking:
         log.warning(
             "Gemini critique has %d blocking flag(s): %s",
-            len(blocking_lines), blocking_lines,
+            len(blocking_lines),
+            blocking_lines,
         )
 
     log.info(
@@ -237,12 +239,14 @@ def parse_gemini_md(md_path: Path) -> tuple[dict[str, float], bool, list[str]]:
 
 # ── Weighted aggregate ─────────────────────────────────────────────────────────
 
+
 def weighted_aggregate(scores: dict[str, float]) -> float:
     total = sum(scores.get(dim, 0.0) * weight for dim, weight in WEIGHTS.items())
     return round(total, 4)
 
 
 # ── Plateau detection ──────────────────────────────────────────────────────────
+
 
 def iter_history_path(variant: str) -> Path:
     return PROJECT_ROOT / "out" / f"iter-history-{variant}.json"
@@ -290,12 +294,11 @@ def check_plateau(history: list[dict], has_blocking: bool) -> tuple[bool, str]:
     if mean < PLATEAU_MEAN_THRESHOLD:
         return False, f"Mean {mean:.4f} < threshold {PLATEAU_MEAN_THRESHOLD}"
 
-    return True, (
-        f"PLATEAU: last {PLATEAU_WINDOW} iters mean={mean:.4f} variance={var:.4f}"
-    )
+    return True, (f"PLATEAU: last {PLATEAU_WINDOW} iters mean={mean:.4f} variance={var:.4f}")
 
 
 # ── Ship gate ──────────────────────────────────────────────────────────────────
+
 
 def check_ship_gate(
     final_aggregate: float,
@@ -307,9 +310,7 @@ def check_ship_gate(
     failures: list[str] = []
 
     if final_aggregate < SHIP_GATE["aggregate"]:
-        failures.append(
-            f"Aggregate {final_aggregate:.4f} < {SHIP_GATE['aggregate']}"
-        )
+        failures.append(f"Aggregate {final_aggregate:.4f} < {SHIP_GATE['aggregate']}")
     for dim in ("impact", "demo", "opus", "depth"):
         val = final_dims.get(dim, 0.0)
         threshold = SHIP_GATE[dim]
@@ -320,6 +321,7 @@ def check_ship_gate(
 
 
 # ── Top fix suggestion dedup + ranking ────────────────────────────────────────
+
 
 def extract_top_fixes(jsonl_path: Path | None, top_n: int = 3) -> list[dict]:
     """
@@ -354,6 +356,7 @@ def extract_top_fixes(jsonl_path: Path | None, top_n: int = 3) -> list[dict]:
 
 
 # ── Score markdown writer ──────────────────────────────────────────────────────
+
 
 def write_score_md(
     output_path: Path,
@@ -446,7 +449,7 @@ def write_score_md(
         ]
         for i, fix in enumerate(top_fixes, 1):
             frame = fix.get("frame", "N/A")
-            fp    = fix.get("file_path", "N/A")
+            fp = fix.get("file_path", "N/A")
             change = fix.get("change", "N/A")
             lines += [
                 f"### Fix {i} (priority {i})",
@@ -463,6 +466,7 @@ def write_score_md(
 
 # ── Competitor mode ────────────────────────────────────────────────────────────
 
+
 def run_competitor_mode(args: argparse.Namespace) -> None:
     """
     Parse an existing critique md and emit a JSON envelope (+ optional score append).
@@ -474,17 +478,17 @@ def run_competitor_mode(args: argparse.Namespace) -> None:
     agg = weighted_aggregate(scores)
 
     envelope = {
-        "variant":      args.variant,
-        "mode":         "competitor",
+        "variant": args.variant,
+        "mode": "competitor",
         "scores": {
-            "impact":    scores.get("impact", 0.0),
-            "demo":      scores.get("demo", 0.0),
-            "opus":      scores.get("opus", 0.0),
-            "depth":     scores.get("depth", 0.0),
+            "impact": scores.get("impact", 0.0),
+            "demo": scores.get("demo", 0.0),
+            "opus": scores.get("opus", 0.0),
+            "depth": scores.get("depth", 0.0),
             "aggregate": agg,
         },
         "critique_path": str(input_path.resolve()),
-        "timestamp":     datetime.now(UTC).isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
     }
 
     print(json.dumps(envelope, indent=2))
@@ -505,6 +509,7 @@ def run_competitor_mode(args: argparse.Namespace) -> None:
 
 
 # ── Ship-gate-only check ───────────────────────────────────────────────────────
+
 
 def run_check_ship_gate(args: argparse.Namespace) -> int:
     """
@@ -533,6 +538,7 @@ def run_check_ship_gate(args: argparse.Namespace) -> int:
 
 
 # ── Main ───────────────────────────────────────────────────────────────────────
+
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
@@ -573,19 +579,24 @@ def main() -> int:
 
     # ── Schema help ──────────────────────────────────────────────────────────
     if args.schema:
-        print(json.dumps({
-            "variant":      "<str>",
-            "mode":         "competitor",
-            "scores": {
-                "impact":    "<float>",
-                "demo":      "<float>",
-                "opus":      "<float>",
-                "depth":     "<float>",
-                "aggregate": "<float>",
-            },
-            "critique_path": "<str>",
-            "timestamp":     "<iso8601>",
-        }, indent=2))
+        print(
+            json.dumps(
+                {
+                    "variant": "<str>",
+                    "mode": "competitor",
+                    "scores": {
+                        "impact": "<float>",
+                        "demo": "<float>",
+                        "opus": "<float>",
+                        "depth": "<float>",
+                        "aggregate": "<float>",
+                    },
+                    "critique_path": "<str>",
+                    "timestamp": "<iso8601>",
+                },
+                indent=2,
+            )
+        )
         return 0
 
     # ── Competitor mode ───────────────────────────────────────────────────────
@@ -609,50 +620,57 @@ def main() -> int:
     if not args.variant:
         parser.error("--variant is required")
     if args.variant not in ("A", "B", "C"):
-        parser.error("--variant must be A, B, or C in normal mode (use --mode competitor for other names)")
+        parser.error(
+            "--variant must be A, B, or C in normal mode (use --mode competitor for other names)"
+        )
     if not args.opus_jsonl:
         parser.error("--opus-jsonl is required in normal mode")
     if not args.gemini_md:
         parser.error("--gemini-md is required in normal mode")
 
     # Parse scores
-    opus_dims    = parse_opus_jsonl(Path(args.opus_jsonl))
+    opus_dims = parse_opus_jsonl(Path(args.opus_jsonl))
     gemini_dims, has_blocking, blocking_lines = parse_gemini_md(Path(args.gemini_md))
 
     # Aggregate each source
-    opus_aggregate   = weighted_aggregate(opus_dims)
+    opus_aggregate = weighted_aggregate(opus_dims)
     gemini_aggregate = weighted_aggregate(gemini_dims)
 
     # Final = average of both sources per dimension, then aggregate
     final_dims = {
-        dim: round((opus_dims.get(dim, 0.0) + gemini_dims.get(dim, 0.0)) / 2, 4)
-        for dim in WEIGHTS
+        dim: round((opus_dims.get(dim, 0.0) + gemini_dims.get(dim, 0.0)) / 2, 4) for dim in WEIGHTS
     }
     final_aggregate = round((opus_aggregate + gemini_aggregate) / 2, 4)
 
     log.info(
         "Final aggregate for %s iter-%d: %.4f (Opus=%.4f, Gemini=%.4f)",
-        args.variant, args.iter, final_aggregate, opus_aggregate, gemini_aggregate,
+        args.variant,
+        args.iter,
+        final_aggregate,
+        opus_aggregate,
+        gemini_aggregate,
     )
 
     # Load + update history
     history = load_iter_history(args.variant)
-    history.append({
-        "iter":              args.iter,
-        "opus_aggregate":    opus_aggregate,
-        "gemini_aggregate":  gemini_aggregate,
-        "final_aggregate":   final_aggregate,
-        "final_dims":        final_dims,
-        "opus_dims":         opus_dims,
-        "gemini_dims":       gemini_dims,
-        "has_blocking":      has_blocking,
-        "timestamp":         datetime.now(UTC).isoformat(),
-    })
+    history.append(
+        {
+            "iter": args.iter,
+            "opus_aggregate": opus_aggregate,
+            "gemini_aggregate": gemini_aggregate,
+            "final_aggregate": final_aggregate,
+            "final_dims": final_dims,
+            "opus_dims": opus_dims,
+            "gemini_dims": gemini_dims,
+            "has_blocking": has_blocking,
+            "timestamp": datetime.now(UTC).isoformat(),
+        }
+    )
     save_iter_history(args.variant, history)
 
     # Plateau + ship gate
-    plateau_status    = check_plateau(history, has_blocking)
-    ship_gate_status  = check_ship_gate(final_aggregate, final_dims)
+    plateau_status = check_plateau(history, has_blocking)
+    ship_gate_status = check_ship_gate(final_aggregate, final_dims)
 
     # Top fixes from Opus batches
     top_fixes = extract_top_fixes(Path(args.opus_jsonl))

@@ -194,7 +194,9 @@ async def analyze_frame(
             await asyncio.sleep(wait)
         except anthropic.APIStatusError as e:
             wait = 5 * attempt
-            log.warning("[t=%d] api error %d attempt %d, sleeping %ds", second, e.status_code, attempt, wait)
+            log.warning(
+                "[t=%d] api error %d attempt %d, sleeping %ds", second, e.status_code, attempt, wait
+            )
             await asyncio.sleep(wait)
         except Exception as e:
             log.warning("[t=%d] unexpected error attempt %d: %s", second, attempt, e)
@@ -224,7 +226,11 @@ async def run(frames_dir: Path, output_jsonl: Path, only_seconds: set[int] | Non
         if only_seconds is None or sec in only_seconds:
             pairs.append((f, sec))
 
-    log.info("analyzing %d frames (filter=%s)", len(pairs), "all" if only_seconds is None else f"{len(only_seconds)} seconds")
+    log.info(
+        "analyzing %d frames (filter=%s)",
+        len(pairs),
+        "all" if only_seconds is None else f"{len(only_seconds)} seconds",
+    )
 
     system_blocks = [
         {
@@ -269,7 +275,13 @@ async def run(frames_dir: Path, output_jsonl: Path, only_seconds: set[int] | Non
 
     log.info(
         "done %d frames in %.1fs | cache_read=%d cache_write=%d uncached=%d output=%d | est=$%.2f",
-        len(results), elapsed, cache_read, cache_write, uncached, output, cost,
+        len(results),
+        elapsed,
+        cache_read,
+        cache_write,
+        uncached,
+        output,
+        cost,
     )
     log.info("written: %s", output_jsonl)
 

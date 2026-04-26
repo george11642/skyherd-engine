@@ -256,9 +256,7 @@ class TestVerifyChain:
         # Per-event trace printed
         assert result.output.count("ok seq=") == 10
 
-    def test_verify_chain_fail_tampered(
-        self, chain: tuple[Path, Path, Signer]
-    ) -> None:
+    def test_verify_chain_fail_tampered(self, chain: tuple[Path, Path, Signer]) -> None:
         import sqlite3
 
         db_path, key_path, _ = chain
@@ -293,9 +291,7 @@ class TestVerifyChain:
         )
         assert result.exit_code == 2
 
-    def test_verify_chain_under_200ms(
-        self, chain: tuple[Path, Path, Signer]
-    ) -> None:
+    def test_verify_chain_under_200ms(self, chain: tuple[Path, Path, Signer]) -> None:
         """ATT-03 perf gate — 10-event chain verify <200ms (p50 of 3 runs)."""
         db_path, key_path, _ = chain
         durations: list[float] = []

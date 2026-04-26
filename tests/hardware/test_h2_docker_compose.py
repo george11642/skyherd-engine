@@ -121,8 +121,6 @@ class TestMakefileTargets:
     def test_phony_includes_new_targets(self) -> None:
         makefile = REPO_ROOT / "Makefile"
         content = makefile.read_text(encoding="utf-8")
-        phony_line = next(
-            line for line in content.splitlines() if line.startswith(".PHONY:")
-        )
+        phony_line = next(line for line in content.splitlines() if line.startswith(".PHONY:"))
         for tgt in ("hardware-demo-sim", "hardware-demo-sim-down", "h2-smoke"):
             assert tgt in phony_line

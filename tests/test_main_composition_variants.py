@@ -17,13 +17,7 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
 MAIN_TSX = REPO_ROOT / "remotion-video" / "src" / "Main.tsx"
 ROOT_TSX = REPO_ROOT / "remotion-video" / "src" / "Root.tsx"
-META_TS = (
-    REPO_ROOT
-    / "remotion-video"
-    / "src"
-    / "compositions"
-    / "calculate-main-metadata.ts"
-)
+META_TS = REPO_ROOT / "remotion-video" / "src" / "compositions" / "calculate-main-metadata.ts"
 
 
 def _read(path: Path) -> str:

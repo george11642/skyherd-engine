@@ -162,9 +162,7 @@ class TestSignVerify:
 
 
 class TestSignerRotate:
-    def test_rotate_archives_old_key_and_creates_new(
-        self, tmp_path: Path
-    ) -> None:
+    def test_rotate_archives_old_key_and_creates_new(self, tmp_path: Path) -> None:
         key_path = tmp_path / "attest.key.pem"
         archive = tmp_path / "archive"
         original = Signer.generate()

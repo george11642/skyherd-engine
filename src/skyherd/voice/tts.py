@@ -267,9 +267,7 @@ def _resolve_backend() -> TTSBackend:
     if voice_mode in _VOICE_MODE_MOCK:
         return SilentBackend()
     if voice_mode and voice_mode not in _VOICE_MODE_LIVE:
-        logger.warning(
-            "SKYHERD_VOICE=%r ignored; expected live|mock|silent", voice_mode
-        )
+        logger.warning("SKYHERD_VOICE=%r ignored; expected live|mock|silent", voice_mode)
 
     # 1 -- ElevenLabs
     api_key = os.environ.get("ELEVENLABS_API_KEY", "")

@@ -6,6 +6,7 @@ Reads .planning/research/final-{A,B,C}-score.md, picks the variant with
 the highest aggregate score. Tiebreaker: highest Opus 4.7 axis.
 Writes the winner letter to .planning/research/winner.txt.
 """
+
 from __future__ import annotations
 
 import re
@@ -25,11 +26,11 @@ def parse_scores(path: Path) -> dict[str, float]:
     # | **Final (avg)** | **8.00** | **7.25** | **8.15** | **8.50** | **7.9500** |
     final_row = re.search(
         r"\*\*Final \(avg\)\*\*\s*\|"
-        r"\s*\*\*([0-9.]+)\*\*\s*\|"   # Impact
-        r"\s*\*\*([0-9.]+)\*\*\s*\|"   # Demo
-        r"\s*\*\*([0-9.]+)\*\*\s*\|"   # Opus 4.7
-        r"\s*\*\*([0-9.]+)\*\*\s*\|"   # Depth
-        r"\s*\*\*([0-9.]+)\*\*",        # Aggregate
+        r"\s*\*\*([0-9.]+)\*\*\s*\|"  # Impact
+        r"\s*\*\*([0-9.]+)\*\*\s*\|"  # Demo
+        r"\s*\*\*([0-9.]+)\*\*\s*\|"  # Opus 4.7
+        r"\s*\*\*([0-9.]+)\*\*\s*\|"  # Depth
+        r"\s*\*\*([0-9.]+)\*\*",  # Aggregate
         text,
     )
     if not final_row:

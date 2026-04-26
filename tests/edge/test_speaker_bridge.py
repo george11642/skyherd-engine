@@ -51,9 +51,7 @@ class TestBackendSelection:
         bridge = SpeakerBridge(ranch_id="ranch_a", backend_name="nop")
         assert bridge.init_backend() == "nop"
 
-    def test_explicit_player_overrides_env(
-        self, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    def test_explicit_player_overrides_env(self, monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.setenv("SKYHERD_DETERRENT", "play")
         captured: list[tuple[Path, int, float]] = []
 
@@ -73,9 +71,7 @@ class TestBackendSelection:
         assert result.played is True
         assert captured == [(DEFAULT_WAV_FIXTURE, 12000, 0.1)]
 
-    def test_no_audio_libs_falls_back_to_nop(
-        self, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    def test_no_audio_libs_falls_back_to_nop(self, monkeypatch: pytest.MonkeyPatch) -> None:
         """With SKYHERD_DETERRENT=play and both libs unimportable → nop."""
         monkeypatch.setenv("SKYHERD_DETERRENT", "play")
         real_import = builtins.__import__
@@ -106,9 +102,7 @@ class TestBackendSelection:
 
 
 class TestPlay:
-    def test_nop_returns_played_false(
-        self, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    def test_nop_returns_played_false(self, monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.setenv("SKYHERD_DETERRENT", "mute")
         bridge = SpeakerBridge(ranch_id="ranch_a")
         result = bridge.play(12000, 6.0)
@@ -130,9 +124,7 @@ class TestPlay:
                 wav_path=path,
             )
 
-        bridge = SpeakerBridge(
-            ranch_id="ranch_a", backend_name="test", player=player
-        )
+        bridge = SpeakerBridge(ranch_id="ranch_a", backend_name="test", player=player)
         result = bridge.play(14000, 0.05)
         assert result.played is True
         assert result.backend == "test"
@@ -152,9 +144,7 @@ class TestPlay:
                 error="device busy",
             )
 
-        bridge = SpeakerBridge(
-            ranch_id="ranch_a", backend_name="broken", player=broken
-        )
+        bridge = SpeakerBridge(ranch_id="ranch_a", backend_name="broken", player=broken)
         result = bridge.play(12000, 1.0)
         assert result.played is False
         assert result.error == "device busy"
@@ -187,9 +177,7 @@ class TestHandleMessage:
                 wav_path=path,
             )
 
-        bridge = SpeakerBridge(
-            ranch_id="ranch_a", backend_name="rec", player=player
-        )
+        bridge = SpeakerBridge(ranch_id="ranch_a", backend_name="rec", player=player)
         result = bridge.handle_message(
             "skyherd/ranch_a/deterrent/play",
             {"tone_hz": 14000, "duration_s": 5.0},
@@ -211,9 +199,7 @@ class TestHandleMessage:
                 wav_path=path,
             )
 
-        bridge = SpeakerBridge(
-            ranch_id="ranch_a", backend_name="rec", player=player
-        )
+        bridge = SpeakerBridge(ranch_id="ranch_a", backend_name="rec", player=player)
         result = bridge.handle_message(
             "skyherd/ranch_z/deterrent/play",
             {"tone_hz": 14000, "duration_s": 5.0},
@@ -242,9 +228,7 @@ class TestHandleMessage:
                 wav_path=path,
             )
 
-        bridge = SpeakerBridge(
-            ranch_id="ranch_a", backend_name="rec", player=player
-        )
+        bridge = SpeakerBridge(ranch_id="ranch_a", backend_name="rec", player=player)
         bridge.handle_message("skyherd/ranch_a/deterrent/play", {})
         assert calls == [(12000, 6.0)]  # defaults
 
@@ -280,9 +264,7 @@ class TestWavFixtureRegeneration:
 
 
 class TestNoWallClockOnImport:
-    def test_reimport_does_not_call_time_time(
-        self, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    def test_reimport_does_not_call_time_time(self, monkeypatch: pytest.MonkeyPatch) -> None:
         """speaker_bridge must not call ``time.time`` at module import."""
         import time as time_mod
 
@@ -305,9 +287,7 @@ class TestNoWallClockOnImport:
 
 
 class TestRunLoopBestEffort:
-    def test_run_exits_when_aiomqtt_raises(
-        self, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    def test_run_exits_when_aiomqtt_raises(self, monkeypatch: pytest.MonkeyPatch) -> None:
         import aiomqtt  # type: ignore[import-untyped]
 
         class _Broken:
@@ -324,9 +304,7 @@ class TestRunLoopBestEffort:
         bridge = SpeakerBridge(ranch_id="ranch_a", backend_name="nop")
         asyncio.run(asyncio.wait_for(bridge.run(), timeout=1.0))
 
-    def test_run_processes_single_message(
-        self, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    def test_run_processes_single_message(self, monkeypatch: pytest.MonkeyPatch) -> None:
         import aiomqtt  # type: ignore[import-untyped]
 
         calls: list[tuple[int, float]] = []
@@ -373,9 +351,7 @@ class TestRunLoopBestEffort:
                 return _gen()
 
         monkeypatch.setattr(aiomqtt, "Client", _FakeClient)
-        bridge = SpeakerBridge(
-            ranch_id="ranch_a", backend_name="rec", player=player
-        )
+        bridge = SpeakerBridge(ranch_id="ranch_a", backend_name="rec", player=player)
         asyncio.run(asyncio.wait_for(bridge.run(), timeout=2.0))
         assert calls == [(14000, 0.01)]
 
@@ -427,9 +403,7 @@ class TestRunLoopBestEffort:
                 return _gen()
 
         monkeypatch.setattr(aiomqtt, "Client", _FakeClient)
-        bridge = SpeakerBridge(
-            ranch_id="ranch_a", backend_name="rec", player=player
-        )
+        bridge = SpeakerBridge(ranch_id="ranch_a", backend_name="rec", player=player)
         asyncio.run(asyncio.wait_for(bridge.run(), timeout=2.0))
         assert calls == [11000]
 
@@ -530,9 +504,7 @@ class TestPygameFactory:
         assert _FakeSound.played == 1
         assert _FakeSound.stopped == 1
 
-    def test_pygame_missing_wav(
-        self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
-    ) -> None:
+    def test_pygame_missing_wav(self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
         monkeypatch.setitem(sys.modules, "pygame", _FakePygame)
         monkeypatch.setenv("SKYHERD_DETERRENT", "play")
         bad = tmp_path / "nonexistent.wav"
@@ -541,9 +513,7 @@ class TestPygameFactory:
         assert res.played is False
         assert res.error is not None and "not found" in res.error
 
-    def test_pygame_exception_returns_played_false(
-        self, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    def test_pygame_exception_returns_played_false(self, monkeypatch: pytest.MonkeyPatch) -> None:
         class _BrokenMixer:
             @staticmethod
             def init() -> None:
@@ -588,9 +558,7 @@ class TestSimpleaudioFactory:
         assert res.played is True
         assert res.backend == "simpleaudio"
 
-    def test_simpleaudio_missing_wav(
-        self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
-    ) -> None:
+    def test_simpleaudio_missing_wav(self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
         monkeypatch.delitem(sys.modules, "pygame", raising=False)
         real_import = builtins.__import__
 
@@ -602,9 +570,7 @@ class TestSimpleaudioFactory:
         monkeypatch.setattr(builtins, "__import__", fake_import)
         monkeypatch.setitem(sys.modules, "simpleaudio", _FakeSimpleaudio)
         monkeypatch.setenv("SKYHERD_DETERRENT", "play")
-        bridge = SpeakerBridge(
-            ranch_id="ranch_a", wav_path=tmp_path / "nonexistent.wav"
-        )
+        bridge = SpeakerBridge(ranch_id="ranch_a", wav_path=tmp_path / "nonexistent.wav")
         res = bridge.play(12000, 0.01)
         assert res.played is False
         assert res.error is not None and "not found" in res.error
@@ -637,9 +603,7 @@ class TestSimpleaudioFactory:
 
 
 class TestResolveBackendExplicit:
-    def test_explicit_pygame_without_lib_falls_back(
-        self, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    def test_explicit_pygame_without_lib_falls_back(self, monkeypatch: pytest.MonkeyPatch) -> None:
         """Explicit name='pygame' with no pygame installed → nop, warning log."""
         monkeypatch.delitem(sys.modules, "pygame", raising=False)
         real_import = builtins.__import__

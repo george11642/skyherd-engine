@@ -248,9 +248,7 @@ class TestPreflightStep1Heartbeats:
         assert edge_ids == {"edge-house", "edge-barn"}
 
     @pytest.mark.asyncio
-    async def test_heartbeat_schema_matches_watcher(
-        self, broker: InMemoryBroker
-    ) -> None:
+    async def test_heartbeat_schema_matches_watcher(self, broker: InMemoryBroker) -> None:
         """Payload shape must match EdgeWatcher.heartbeat_payload()."""
         await emit_heartbeats(broker, "edge-house", count=1)
         messages = broker.messages_on("skyherd/ranch_a/edge_status/")
@@ -277,9 +275,7 @@ class TestPreflightStep2ApiEdges:
         assert edge_ids == {"edge-house", "edge-barn"}
 
     @pytest.mark.asyncio
-    async def test_single_edge_goes_offline_after_threshold(
-        self, broker: InMemoryBroker
-    ) -> None:
+    async def test_single_edge_goes_offline_after_threshold(self, broker: InMemoryBroker) -> None:
         """If one Pi goes dark > 90s, it's marked offline."""
         base_ts = 1_714_000_000.0
         await emit_heartbeats(broker, "edge-house", count=1, base_ts=base_ts)
@@ -322,9 +318,7 @@ class TestPreflightStep3CoyoteDispatch:
         self, broker: InMemoryBroker, ledger: Ledger
     ) -> None:
         drone = StubBackend()
-        await simulate_coyote_dispatch(
-            broker, edge_id="edge-house", ledger=ledger, drone=drone
-        )
+        await simulate_coyote_dispatch(broker, edge_id="edge-house", ledger=ledger, drone=drone)
 
         # Ledger should hold fence.breach + drone.dispatched.
         events = list(ledger.iter_events())
@@ -337,9 +331,7 @@ class TestPreflightFullFridayWorkflow:
     """End-to-end: heartbeats + edges aggregator + coyote dispatch in one test."""
 
     @pytest.mark.asyncio
-    async def test_full_friday_flow(
-        self, broker: InMemoryBroker, ledger: Ledger
-    ) -> None:
+    async def test_full_friday_flow(self, broker: InMemoryBroker, ledger: Ledger) -> None:
         """Simulates the exact Friday morning sequence end-to-end.
 
         Baseline timing: emits all heartbeats + dispatch + ledger work. Must

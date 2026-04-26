@@ -264,9 +264,7 @@ class PiCamSensor:
             "class_idx": class_idx,
         }
 
-    def _build_payload(
-        self, frame: np.ndarray, pinkeye_result: dict[str, Any]
-    ) -> dict[str, Any]:
+    def _build_payload(self, frame: np.ndarray, pinkeye_result: dict[str, Any]) -> dict[str, Any]:
         """Build a canonical trough_cam.reading payload."""
         ts = time.time()
         has_detection = pinkeye_result["severity"] is not None

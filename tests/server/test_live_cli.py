@@ -59,10 +59,17 @@ def test_run_live_smoke() -> None:
 
     proc = subprocess.Popen(  # noqa: S603
         [
-            "uv", "run", "python", "-m", "skyherd.server.live",
-            "--port", str(port),
-            "--host", "127.0.0.1",
-            "--seed", "42",
+            "uv",
+            "run",
+            "python",
+            "-m",
+            "skyherd.server.live",
+            "--port",
+            str(port),
+            "--host",
+            "127.0.0.1",
+            "--seed",
+            "42",
         ],
         cwd=str(repo_root),
         stdout=subprocess.PIPE,
@@ -78,7 +85,9 @@ def test_run_live_smoke() -> None:
             time.sleep(0.5)
         else:
             try:
-                out = proc.stdout.read(2048).decode("utf-8", errors="replace") if proc.stdout else ""
+                out = (
+                    proc.stdout.read(2048).decode("utf-8", errors="replace") if proc.stdout else ""
+                )
             except Exception:  # noqa: BLE001
                 out = "<stdout unreadable>"
             pytest.fail(

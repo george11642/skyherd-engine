@@ -42,9 +42,7 @@ def _render_thermal(idx: int) -> np.ndarray:
     # Anisotropic Gaussian — slightly wider than tall (coyote body)
     sigma_x = 18.0
     sigma_y = 10.0
-    gauss = np.exp(
-        -(((xx - cx) ** 2) / (2 * sigma_x**2) + ((yy - cy) ** 2) / (2 * sigma_y**2))
-    )
+    gauss = np.exp(-(((xx - cx) ** 2) / (2 * sigma_x**2) + ((yy - cy) ** 2) / (2 * sigma_y**2)))
     # Scale to [0, 200] and add to background
     blob = (gauss * 210).astype(np.int16)
     arr = np.clip(bg.astype(np.int16) + blob, 0, 255).astype(np.uint8)

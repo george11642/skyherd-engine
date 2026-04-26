@@ -221,9 +221,7 @@ class CoyoteHarness:
             try:
                 await self._mqtt_publish(topic, raw)
             except Exception as exc:  # noqa: BLE001
-                logger.debug(
-                    "injected mqtt_publish raised on %s (%s) — swallowed", topic, exc
-                )
+                logger.debug("injected mqtt_publish raised on %s (%s) — swallowed", topic, exc)
             return
 
         # Default: aiomqtt best-effort

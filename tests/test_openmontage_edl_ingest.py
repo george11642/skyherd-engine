@@ -3,6 +3,7 @@
 TDD-first per project rules. Fixtures are MIT-clean (hand-authored to match the
 OpenMontage edit_decisions.json schema; no AGPL-tainted content imported).
 """
+
 from __future__ import annotations
 
 import json

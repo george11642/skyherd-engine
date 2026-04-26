@@ -91,9 +91,7 @@ class TestPicamBridge:
         assert msg["pinkeye_result"]["severity"] == "escalate"
 
     def test_picam_canonical_json_round_trip(self, broker: InMemoryBroker) -> None:
-        sensor = PiCamSensor(
-            classifier=_stub_classifier, mqtt_publish=broker.publisher()
-        )
+        sensor = PiCamSensor(classifier=_stub_classifier, mqtt_publish=broker.publisher())
         asyncio.run(sensor.run_once())
         # Re-serialise with sort_keys — must be byte-identical to broker payload
         msg = broker.messages_on("skyherd/")[0]
@@ -102,9 +100,7 @@ class TestPicamBridge:
         assert parsed == msg  # round trip is lossless
 
     def test_picam_multiple_ticks_preserve_order(self, broker: InMemoryBroker) -> None:
-        sensor = PiCamSensor(
-            classifier=_stub_classifier, mqtt_publish=broker.publisher(), seed=42
-        )
+        sensor = PiCamSensor(classifier=_stub_classifier, mqtt_publish=broker.publisher(), seed=42)
 
         async def ticks() -> None:
             for _ in range(4):
@@ -144,9 +140,7 @@ class TestCoyoteBridge:
         assert alerts[0]["kind"] == "predator.thermal_hit"
 
     def test_coyote_fan_out_topics_both_present(self, broker: InMemoryBroker) -> None:
-        harness = CoyoteHarness(
-            seed=42, ts_provider=_fixed_ts, mqtt_publish=broker.publisher()
-        )
+        harness = CoyoteHarness(seed=42, ts_provider=_fixed_ts, mqtt_publish=broker.publisher())
         asyncio.run(harness.run_once())
         topics = broker.all_topics()
         assert any("thermal/coyote_cam" in t for t in topics)
@@ -175,12 +169,8 @@ class TestCoyoteBridge:
 
 class TestMixedOrder:
     def test_picam_then_coyote_preserves_order(self, broker: InMemoryBroker) -> None:
-        sensor = PiCamSensor(
-            classifier=_stub_classifier, mqtt_publish=broker.publisher()
-        )
-        harness = CoyoteHarness(
-            seed=42, ts_provider=_fixed_ts, mqtt_publish=broker.publisher()
-        )
+        sensor = PiCamSensor(classifier=_stub_classifier, mqtt_publish=broker.publisher())
+        harness = CoyoteHarness(seed=42, ts_provider=_fixed_ts, mqtt_publish=broker.publisher())
 
         async def sequence() -> None:
             await sensor.run_once()  # 1 message
@@ -194,12 +184,8 @@ class TestMixedOrder:
         assert broker._messages[2][2]["kind"] == "predator.thermal_hit"
 
     def test_concurrent_ticks_all_delivered(self, broker: InMemoryBroker) -> None:
-        sensor = PiCamSensor(
-            classifier=_stub_classifier, mqtt_publish=broker.publisher()
-        )
-        harness = CoyoteHarness(
-            seed=42, ts_provider=_fixed_ts, mqtt_publish=broker.publisher()
-        )
+        sensor = PiCamSensor(classifier=_stub_classifier, mqtt_publish=broker.publisher())
+        harness = CoyoteHarness(seed=42, ts_provider=_fixed_ts, mqtt_publish=broker.publisher())
 
         async def go() -> None:
             await asyncio.gather(
@@ -212,12 +198,8 @@ class TestMixedOrder:
         assert broker.total_messages() == 3
 
     def test_high_volume_no_loss(self, broker: InMemoryBroker) -> None:
-        sensor = PiCamSensor(
-            classifier=_stub_classifier, mqtt_publish=broker.publisher()
-        )
-        harness = CoyoteHarness(
-            seed=42, ts_provider=_fixed_ts, mqtt_publish=broker.publisher()
-        )
+        sensor = PiCamSensor(classifier=_stub_classifier, mqtt_publish=broker.publisher())
+        harness = CoyoteHarness(seed=42, ts_provider=_fixed_ts, mqtt_publish=broker.publisher())
 
         async def go() -> None:
             for _ in range(10):
@@ -239,9 +221,7 @@ class TestWireFormat:
     def test_payload_keys_sorted(self, broker: InMemoryBroker) -> None:
         """Re-serialising a received message with sort_keys produces the
         same bytes — implies the sensor serialises with sort_keys=True."""
-        harness = CoyoteHarness(
-            seed=42, ts_provider=_fixed_ts, mqtt_publish=broker.publisher()
-        )
+        harness = CoyoteHarness(seed=42, ts_provider=_fixed_ts, mqtt_publish=broker.publisher())
         asyncio.run(harness.run_once())
         for m in broker.messages_on("skyherd/"):
             re_serialised = json.dumps(m, sort_keys=True, separators=(",", ":"))
@@ -252,9 +232,7 @@ class TestWireFormat:
             )
 
     def test_required_schema_fields_present(self, broker: InMemoryBroker) -> None:
-        sensor = PiCamSensor(
-            classifier=_stub_classifier, mqtt_publish=broker.publisher()
-        )
+        sensor = PiCamSensor(classifier=_stub_classifier, mqtt_publish=broker.publisher())
         asyncio.run(sensor.run_once())
         msg = broker.messages_on("skyherd/")[0]
         for field in ("ts", "kind", "ranch", "entity", "trough_id"):

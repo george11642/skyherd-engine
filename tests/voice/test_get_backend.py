@@ -177,9 +177,11 @@ class TestResolveBackendCascade:
         monkeypatch.delenv("ELEVENLABS_API_KEY", raising=False)
         monkeypatch.setattr(
             "shutil.which",
-            lambda cmd: "/usr/bin/piper"
-            if cmd == "piper"
-            else ("/usr/bin/espeak" if cmd == "espeak" else None),
+            lambda cmd: (
+                "/usr/bin/piper"
+                if cmd == "piper"
+                else ("/usr/bin/espeak" if cmd == "espeak" else None)
+            ),
         )
         from skyherd.voice import tts
 

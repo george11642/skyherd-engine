@@ -73,9 +73,7 @@ class TestPayloadSchema:
         assert payload["kind"] == "trough_cam.reading"
 
     def test_ranch_entity_trough_id_match_cam(self) -> None:
-        sensor = PiCamSensor(
-            ranch_id="ranch_x", cam_id="picam_7", classifier=_escalate_classifier
-        )
+        sensor = PiCamSensor(ranch_id="ranch_x", cam_id="picam_7", classifier=_escalate_classifier)
         payload = asyncio.run(sensor.run_once())
         assert payload["ranch"] == "ranch_x"
         assert payload["entity"] == "picam_7"
@@ -173,12 +171,8 @@ class TestCaptureFork:
             frames2.append(sensor._capture())
         assert len(frames2) == 5
 
-    def test_sample_capture_gracefully_degrades_on_empty_dir(
-        self, tmp_path: Path
-    ) -> None:
-        sensor = PiCamSensor(
-            classifier=_escalate_classifier, sample_dir=tmp_path
-        )
+    def test_sample_capture_gracefully_degrades_on_empty_dir(self, tmp_path: Path) -> None:
+        sensor = PiCamSensor(classifier=_escalate_classifier, sample_dir=tmp_path)
         frame = sensor._capture()
         assert frame.shape == (480, 640, 3)
         # Solid green pasture fallback
@@ -274,9 +268,7 @@ class TestPublish:
     def test_no_broker_default_path_still_records_locally(self) -> None:
         # Default path tries aiomqtt against mqtt://localhost:1883; that's
         # unreachable in CI but the exception must be swallowed.
-        sensor = PiCamSensor(
-            classifier=_escalate_classifier, mqtt_url="mqtt://localhost:19999"
-        )
+        sensor = PiCamSensor(classifier=_escalate_classifier, mqtt_url="mqtt://localhost:19999")
         payload = asyncio.run(sensor.run_once())
         assert payload["kind"] == "trough_cam.reading"
         assert len(sensor._published) == 1
@@ -313,9 +305,7 @@ class TestLifecycle:
         assert sensor._picam is None
 
     def test_stop_ends_run_loop(self) -> None:
-        sensor = PiCamSensor(
-            classifier=_escalate_classifier, capture_interval_s=0.01
-        )
+        sensor = PiCamSensor(classifier=_escalate_classifier, capture_interval_s=0.01)
 
         async def runner_and_stop() -> None:
             task = asyncio.create_task(sensor.run())
@@ -401,9 +391,7 @@ class TestDefaultClassifierPaths:
         assert result["severity"] is None
         assert result["class_idx"] == 0
 
-    def test_pi_capture_uses_picam_when_available(
-        self, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    def test_pi_capture_uses_picam_when_available(self, monkeypatch: pytest.MonkeyPatch) -> None:
         """Forcibly provides a fake Picamera2 class; PiCamSensor should use it."""
         import sys
         import types

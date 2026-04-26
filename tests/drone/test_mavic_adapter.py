@@ -372,8 +372,8 @@ async def test_deterministic_ts_in_ledger_entries() -> None:
         ts_provider=lambda: next(ticks),
     )
 
-    await adapter.connect()          # tick 100
-    await adapter.takeoff(alt_m=5)   # tick 200 on failover
+    await adapter.connect()  # tick 100
+    await adapter.takeoff(alt_m=5)  # tick 200 on failover
     tss = [e["data"]["ts"] for e in ledger.events]
     assert tss == [100.0, 200.0]
 

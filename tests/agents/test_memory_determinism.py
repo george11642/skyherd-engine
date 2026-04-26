@@ -137,9 +137,7 @@ class TestDecideWritePathIsTimeInvariant:
                     imported_names.add(node.module)
         forbidden_modules = {"datetime", "uuid", "time", "random"}
         hits = imported_names & forbidden_modules
-        assert not hits, (
-            f"memory_paths.py imports forbidden non-deterministic modules: {hits}"
-        )
+        assert not hits, f"memory_paths.py imports forbidden non-deterministic modules: {hits}"
 
     def test_no_wall_clock_import_in_memory_module(self):
         """Guard: memory.py must also avoid non-deterministic stdlib imports."""
@@ -160,6 +158,4 @@ class TestDecideWritePathIsTimeInvariant:
                     imported_names.add(node.module)
         forbidden_modules = {"datetime", "uuid", "time", "random"}
         hits = imported_names & forbidden_modules
-        assert not hits, (
-            f"memory.py imports forbidden non-deterministic modules: {hits}"
-        )
+        assert not hits, f"memory.py imports forbidden non-deterministic modules: {hits}"

@@ -95,9 +95,7 @@ def verify_event(
     required = ("ts_iso", "source", "kind", "payload_json", "prev_hash", "event_hash")
     missing = [k for k in required if k not in event]
     if missing:
-        err_console.print(
-            f"[bold red]FAIL[/bold red] event missing required fields: {missing}"
-        )
+        err_console.print(f"[bold red]FAIL[/bold red] event missing required fields: {missing}")
         raise typer.Exit(2)
 
     try:
@@ -187,17 +185,13 @@ def verify_chain(
                 event.kind,
             )
             if not _eq(raw_hash.hex(), event.event_hash):
-                err_console.print(
-                    f"[bold red]FAIL[/bold red] hash mismatch at seq={event.seq}"
-                )
+                err_console.print(f"[bold red]FAIL[/bold red] hash mismatch at seq={event.seq}")
                 raise typer.Exit(2)
 
             try:
                 raw_sig = bytes.fromhex(event.signature)
             except ValueError:
-                err_console.print(
-                    f"[bold red]FAIL[/bold red] invalid sig hex at seq={event.seq}"
-                )
+                err_console.print(f"[bold red]FAIL[/bold red] invalid sig hex at seq={event.seq}")
                 raise typer.Exit(2) from None
 
             if not _sig_verify(event.pubkey, raw_hash, raw_sig):
@@ -208,9 +202,7 @@ def verify_chain(
                 raise typer.Exit(2)
 
             if verbose:
-                console.print(
-                    f"[green]ok[/green] seq={event.seq} hash={event.event_hash[:12]}..."
-                )
+                console.print(f"[green]ok[/green] seq={event.seq} hash={event.event_hash[:12]}...")
 
             expected_prev = event.event_hash
 

@@ -76,9 +76,7 @@ class FakeDroneBackend(DroneBackend):
     ) -> None:  # pragma: no cover
         self._record("play_deterrent", tone_hz=tone_hz, duration_s=duration_s)
 
-    async def get_thermal_clip(
-        self, duration_s: float = 10.0
-    ) -> Path:  # pragma: no cover
+    async def get_thermal_clip(self, duration_s: float = 10.0) -> Path:  # pragma: no cover
         self._record("get_thermal_clip", duration_s=duration_s)
         return Path("runtime/thermal/fake.png")
 
@@ -127,9 +125,7 @@ def _build_app(
         # Strip the previous /api/drone/* routes first so the FakeBroadcaster
         # version is the one exercised by the test.
         app.router.routes = [
-            r
-            for r in app.router.routes
-            if not (getattr(r, "path", "").startswith("/api/drone"))
+            r for r in app.router.routes if not (getattr(r, "path", "").startswith("/api/drone"))
         ]
         attach_drone_control(
             app,
@@ -185,9 +181,7 @@ async def test_arm_without_token_returns_401(client_factory):
 async def test_arm_with_wrong_token_returns_403(client_factory):
     backend = FakeDroneBackend()
     client = await client_factory(backend=backend)
-    resp = await client.post(
-        "/api/drone/arm", headers={TOKEN_HEADER: "not-the-right-token"}
-    )
+    resp = await client.post("/api/drone/arm", headers={TOKEN_HEADER: "not-the-right-token"})
     assert resp.status_code == 403
     assert backend.calls == []
 
@@ -323,9 +317,7 @@ async def test_rtl_land_and_disarm_all_succeed(client_factory):
     client = await client_factory(backend=backend, broadcaster=bc)
 
     for action in ("rtl", "land", "disarm"):
-        resp = await client.post(
-            f"/api/drone/{action}", headers={TOKEN_HEADER: TEST_TOKEN}
-        )
+        resp = await client.post(f"/api/drone/{action}", headers={TOKEN_HEADER: TEST_TOKEN})
         assert resp.status_code == 200, f"{action} failed: {resp.text}"
         assert resp.json()["action"] == action
 

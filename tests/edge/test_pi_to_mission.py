@@ -119,9 +119,7 @@ class TestTopicFilter:
     def test_drops_foreign_topic_prefix(self) -> None:
         bridge = _build_bridge()
         result = asyncio.run(
-            bridge.handle_event(
-                "skyherd/ranch_z/fence/sw_fence", _fence_breach_payload()
-            )
+            bridge.handle_event("skyherd/ranch_z/fence/sw_fence", _fence_breach_payload())
         )
         assert result == []
         # Ledger should NOT have a wake_event entry for a filtered topic.
@@ -131,36 +129,28 @@ class TestTopicFilter:
     def test_drops_unknown_suffix(self) -> None:
         bridge = _build_bridge()
         result = asyncio.run(
-            bridge.handle_event(
-                "skyherd/ranch_a/weather/storm_front", {"kind": "weather.alert"}
-            )
+            bridge.handle_event("skyherd/ranch_a/weather/storm_front", {"kind": "weather.alert"})
         )
         assert result == []
 
     def test_accepts_fence_topic(self) -> None:
         bridge = _build_bridge()
         result = asyncio.run(
-            bridge.handle_event(
-                "skyherd/ranch_a/fence/sw_fence", _fence_breach_payload()
-            )
+            bridge.handle_event("skyherd/ranch_a/fence/sw_fence", _fence_breach_payload())
         )
         assert len(result) > 0
 
     def test_accepts_alert_thermal_hit_topic(self) -> None:
         bridge = _build_bridge()
         result = asyncio.run(
-            bridge.handle_event(
-                "skyherd/ranch_a/alert/thermal_hit", _thermal_hit_payload()
-            )
+            bridge.handle_event("skyherd/ranch_a/alert/thermal_hit", _thermal_hit_payload())
         )
         assert len(result) > 0
 
     def test_accepts_thermal_reading_topic(self) -> None:
         bridge = _build_bridge()
         result = asyncio.run(
-            bridge.handle_event(
-                "skyherd/ranch_a/thermal/coyote_cam", _thermal_reading_payload()
-            )
+            bridge.handle_event("skyherd/ranch_a/thermal/coyote_cam", _thermal_reading_payload())
         )
         assert len(result) > 0
 
@@ -182,9 +172,7 @@ class TestFenceBreachFlow:
             seed=42,
         )
         result = asyncio.run(
-            bridge.handle_event(
-                "skyherd/ranch_a/fence/sw_fence", _fence_breach_payload()
-            )
+            bridge.handle_event("skyherd/ranch_a/fence/sw_fence", _fence_breach_payload())
         )
         tool_names = [r.get("tool") for r in result]
         assert "launch_drone" in tool_names
@@ -204,9 +192,7 @@ class TestFenceBreachFlow:
     def test_waypoint_matches_payload_coords(self) -> None:
         bridge = _build_bridge()
         result = asyncio.run(
-            bridge.handle_event(
-                "skyherd/ranch_a/fence/sw_fence", _fence_breach_payload()
-            )
+            bridge.handle_event("skyherd/ranch_a/fence/sw_fence", _fence_breach_payload())
         )
         launch = next(r for r in result if r["tool"] == "launch_drone")
         assert launch["status"] == "ok"
@@ -225,9 +211,7 @@ class TestThermalHitFlow:
         broker = InMemoryBroker()
         bridge = _build_bridge(broker=broker)
         result = asyncio.run(
-            bridge.handle_event(
-                "skyherd/ranch_a/alert/thermal_hit", _thermal_hit_payload()
-            )
+            bridge.handle_event("skyherd/ranch_a/alert/thermal_hit", _thermal_hit_payload())
         )
         tool_names = [r.get("tool") for r in result]
         assert "launch_drone" in tool_names
@@ -243,11 +227,7 @@ class TestDeterrentSideChannel:
     def test_side_channel_published(self) -> None:
         broker = InMemoryBroker()
         bridge = _build_bridge(broker=broker)
-        asyncio.run(
-            bridge.handle_event(
-                "skyherd/ranch_a/fence/sw_fence", _fence_breach_payload()
-            )
-        )
+        asyncio.run(bridge.handle_event("skyherd/ranch_a/fence/sw_fence", _fence_breach_payload()))
         deterrent_msgs = broker.messages_on("skyherd/ranch_a/deterrent/play")
         assert len(deterrent_msgs) == 1
         msg = deterrent_msgs[0]
@@ -267,9 +247,7 @@ class TestDeterrentSideChannel:
             seed=42,
         )
         result = asyncio.run(
-            bridge.handle_event(
-                "skyherd/ranch_a/fence/sw_fence", _fence_breach_payload()
-            )
+            bridge.handle_event("skyherd/ranch_a/fence/sw_fence", _fence_breach_payload())
         )
         # Deterrent step still executes (the local backend call succeeded);
         # side-channel publish is best-effort.
@@ -286,9 +264,7 @@ class TestAttestationChain:
         bridge = _build_bridge()
         for _ in range(3):
             asyncio.run(
-                bridge.handle_event(
-                    "skyherd/ranch_a/fence/sw_fence", _fence_breach_payload()
-                )
+                bridge.handle_event("skyherd/ranch_a/fence/sw_fence", _fence_breach_payload())
             )
         events = list(bridge.ledger.iter_events())
         assert len(events) >= 9  # 3x (wake + launch + deterrent)
@@ -301,11 +277,7 @@ class TestAttestationChain:
 
     def test_ts_iso_frozen_under_ts_provider(self) -> None:
         bridge = _build_bridge()
-        asyncio.run(
-            bridge.handle_event(
-                "skyherd/ranch_a/fence/sw_fence", _fence_breach_payload()
-            )
-        )
+        asyncio.run(bridge.handle_event("skyherd/ranch_a/fence/sw_fence", _fence_breach_payload()))
         events = list(bridge.ledger.iter_events())
         # All events share the same ts_iso under the frozen provider
         ts_set = {e.ts_iso for e in events}
@@ -325,9 +297,7 @@ class TestDeterminism:
             bridge = _build_bridge(seed=42)
             for _ in range(2):
                 asyncio.run(
-                    bridge.handle_event(
-                        "skyherd/ranch_a/fence/sw_fence", _fence_breach_payload()
-                    )
+                    bridge.handle_event("skyherd/ranch_a/fence/sw_fence", _fence_breach_payload())
                 )
             payload_lists.append([e.payload_json for e in bridge.ledger.iter_events()])
         assert payload_lists[0] == payload_lists[1]
@@ -336,14 +306,10 @@ class TestDeterminism:
         bridge1 = _build_bridge(seed=42)
         bridge2 = _build_bridge(seed=42)
         r1 = asyncio.run(
-            bridge1.handle_event(
-                "skyherd/ranch_a/fence/sw_fence", _fence_breach_payload()
-            )
+            bridge1.handle_event("skyherd/ranch_a/fence/sw_fence", _fence_breach_payload())
         )
         r2 = asyncio.run(
-            bridge2.handle_event(
-                "skyherd/ranch_a/fence/sw_fence", _fence_breach_payload()
-            )
+            bridge2.handle_event("skyherd/ranch_a/fence/sw_fence", _fence_breach_payload())
         )
         m1 = next(r for r in r1 if r["tool"] == "launch_drone")["mission_id"]
         m2 = next(r for r in r2 if r["tool"] == "launch_drone")["mission_id"]
@@ -353,14 +319,10 @@ class TestDeterminism:
         bridge1 = _build_bridge(seed=42)
         bridge2 = _build_bridge(seed=7)
         r1 = asyncio.run(
-            bridge1.handle_event(
-                "skyherd/ranch_a/fence/sw_fence", _fence_breach_payload()
-            )
+            bridge1.handle_event("skyherd/ranch_a/fence/sw_fence", _fence_breach_payload())
         )
         r2 = asyncio.run(
-            bridge2.handle_event(
-                "skyherd/ranch_a/fence/sw_fence", _fence_breach_payload()
-            )
+            bridge2.handle_event("skyherd/ranch_a/fence/sw_fence", _fence_breach_payload())
         )
         m1 = next(r for r in r1 if r["tool"] == "launch_drone")["mission_id"]
         m2 = next(r for r in r2 if r["tool"] == "launch_drone")["mission_id"]
@@ -389,9 +351,7 @@ class TestBackendFailure:
         )
         # No raise
         result = asyncio.run(
-            bridge.handle_event(
-                "skyherd/ranch_a/fence/sw_fence", _fence_breach_payload()
-            )
+            bridge.handle_event("skyherd/ranch_a/fence/sw_fence", _fence_breach_payload())
         )
         # The dispatch still returns tool-call result dicts; the launch_drone
         # entry must have failed status because takeoff raised DroneUnavailable.
@@ -413,9 +373,7 @@ class TestNonBreachEventsNoOp:
         `thermal.hotspot`, which the dispatcher treats as a breach."""
         bridge = _build_bridge()
         result = asyncio.run(
-            bridge.handle_event(
-                "skyherd/ranch_a/thermal/coyote_cam", _thermal_reading_payload()
-            )
+            bridge.handle_event("skyherd/ranch_a/thermal/coyote_cam", _thermal_reading_payload())
         )
         # thermal/ becomes thermal.hotspot — dispatcher fires full cascade
         tool_names = [r.get("tool") for r in result]
@@ -424,9 +382,7 @@ class TestNonBreachEventsNoOp:
     def test_unknown_topic_kind_ignored_silently(self) -> None:
         bridge = _build_bridge()
         result = asyncio.run(
-            bridge.handle_event(
-                "skyherd/ranch_a/water/trough_1", {"kind": "water.low"}
-            )
+            bridge.handle_event("skyherd/ranch_a/water/trough_1", {"kind": "water.low"})
         )
         assert result == []
 
@@ -499,21 +455,13 @@ class TestCoyoteHarnessIntegration:
 class TestLedgerAppendsAndVerify:
     def test_verify_chain_returns_true_for_pristine_chain(self) -> None:
         bridge = _build_bridge()
-        asyncio.run(
-            bridge.handle_event(
-                "skyherd/ranch_a/fence/sw_fence", _fence_breach_payload()
-            )
-        )
+        asyncio.run(bridge.handle_event("skyherd/ranch_a/fence/sw_fence", _fence_breach_payload()))
         assert verify_chain(bridge.ledger) is True
 
     def test_verify_chain_returns_false_when_chain_broken(self) -> None:
         """Tamper with the sqlite store and show verify_chain detects it."""
         bridge = _build_bridge()
-        asyncio.run(
-            bridge.handle_event(
-                "skyherd/ranch_a/fence/sw_fence", _fence_breach_payload()
-            )
-        )
+        asyncio.run(bridge.handle_event("skyherd/ranch_a/fence/sw_fence", _fence_breach_payload()))
         # Corrupt one prev_hash in-place
         bridge.ledger._conn.execute(  # type: ignore[attr-defined]
             "UPDATE events SET prev_hash=? WHERE seq=2",
@@ -555,14 +503,10 @@ class TestMissionIdUnseeded:
     def test_unseeded_counter_increments_monotonically(self) -> None:
         bridge = _build_bridge(seed=None)
         r1 = asyncio.run(
-            bridge.handle_event(
-                "skyherd/ranch_a/fence/sw_fence", _fence_breach_payload()
-            )
+            bridge.handle_event("skyherd/ranch_a/fence/sw_fence", _fence_breach_payload())
         )
         r2 = asyncio.run(
-            bridge.handle_event(
-                "skyherd/ranch_a/fence/sw_fence", _fence_breach_payload()
-            )
+            bridge.handle_event("skyherd/ranch_a/fence/sw_fence", _fence_breach_payload())
         )
         m1 = next(r for r in r1 if r["tool"] == "launch_drone")["mission_id"]
         m2 = next(r for r in r2 if r["tool"] == "launch_drone")["mission_id"]
@@ -586,17 +530,13 @@ class TestSideChannelSwallowsException:
         )
         # Must not raise even though publish hook always explodes
         result = asyncio.run(
-            bridge.handle_event(
-                "skyherd/ranch_a/fence/sw_fence", _fence_breach_payload()
-            )
+            bridge.handle_event("skyherd/ranch_a/fence/sw_fence", _fence_breach_payload())
         )
         assert any(r.get("tool") == "play_deterrent" for r in result)
 
 
 class TestRunLoopSubscribe:
-    def test_run_processes_one_message_then_stops(
-        self, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    def test_run_processes_one_message_then_stops(self, monkeypatch: pytest.MonkeyPatch) -> None:
         """Drive run() through a fake aiomqtt Client that yields one message."""
         import aiomqtt  # type: ignore[import-untyped]
 

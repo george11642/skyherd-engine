@@ -132,9 +132,7 @@ async def test_emit_memory_written_delivers_to_subscriber():
     q: asyncio.Queue = asyncio.Queue(maxsize=100)
     broadcaster._subscribers.append(q)
     try:
-        await broadcaster.emit_memory_written(
-            {"agent": "FLD", "memory_version_id": "memver_x"}
-        )
+        await broadcaster.emit_memory_written({"agent": "FLD", "memory_version_id": "memver_x"})
         event_type, payload = q.get_nowait()
         assert event_type == "memory.written"
         assert payload["memory_version_id"] == "memver_x"
@@ -148,9 +146,7 @@ async def test_emit_memory_read_delivers_to_subscriber():
     q: asyncio.Queue = asyncio.Queue(maxsize=100)
     broadcaster._subscribers.append(q)
     try:
-        await broadcaster.emit_memory_read(
-            {"agent": "FLD", "memory_version_id": "memver_y"}
-        )
+        await broadcaster.emit_memory_read({"agent": "FLD", "memory_version_id": "memver_y"})
         event_type, payload = q.get_nowait()
         assert event_type == "memory.read"
     finally:
@@ -370,9 +366,7 @@ async def test_demomesh_dispatch_emits_memory_written_to_broadcaster(tmp_path, m
         "lon": -106.456,
         "ts": "1970-01-01T00:00:00Z",
     }
-    await mesh.dispatch(
-        "FenceLineDispatcher", wake, FENCELINE_DISPATCHER_SPEC, fenceline_handler
-    )
+    await mesh.dispatch("FenceLineDispatcher", wake, FENCELINE_DISPATCHER_SPEC, fenceline_handler)
 
     written = [e for e in captured if e[0] == "memory.written"]
     assert written, f"no memory.written emitted; captured={[e[0] for e in captured]}"
@@ -390,14 +384,16 @@ async def test_live_mode_versions_delegates(client):
     from skyherd.server import memory_api
 
     fake_mgr = AsyncMock()
-    fake_mgr.list_versions = AsyncMock(return_value=[
-        MemoryVersion(
-            id="memver_live",
-            operation="created",
-            created_by={"type": "api_actor", "api_key_id": "apikey_live"},
-            path="/patterns/x.md",
-        )
-    ])
+    fake_mgr.list_versions = AsyncMock(
+        return_value=[
+            MemoryVersion(
+                id="memver_live",
+                operation="created",
+                created_by={"type": "api_actor", "api_key_id": "apikey_live"},
+                path="/patterns/x.md",
+            )
+        ]
+    )
     saved = (
         memory_api._state["memory_store_manager"],
         memory_api._state["store_id_map"],

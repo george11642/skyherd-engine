@@ -317,7 +317,9 @@ def annotate_frame(
     for i, det in enumerate(detections):
         if det.bbox is not None:
             # Real pixel bbox from pixel head — use directly
-            xyxy.append([float(det.bbox[0]), float(det.bbox[1]), float(det.bbox[2]), float(det.bbox[3])])
+            xyxy.append(
+                [float(det.bbox[0]), float(det.bbox[1]), float(det.bbox[2]), float(det.bbox[3])]
+            )
         else:
             # Grid layout fallback for rule-based heads (preserves existing behavior)
             col = i % 4

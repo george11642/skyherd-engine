@@ -38,8 +38,8 @@ import tempfile
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).parent.parent
-PROMPTS_DIR  = PROJECT_ROOT / "scripts" / "prompts"
-FIX_PROMPT   = PROMPTS_DIR / "auto-apply-fix.md"
+PROMPTS_DIR = PROJECT_ROOT / "scripts" / "prompts"
+FIX_PROMPT = PROMPTS_DIR / "auto-apply-fix.md"
 
 logging.basicConfig(
     level=logging.INFO,
@@ -74,22 +74,25 @@ def parse_fixes_from_score_md(md_path: Path) -> list[dict]:
     fixes: list[dict] = []
 
     for m in _FIX_BLOCK_RE.finditer(content):
-        priority   = int(m.group(1))
-        frame      = m.group(2).strip()
-        file_path  = m.group(3).strip()
-        change     = m.group(4).strip()
-        fixes.append({
-            "priority":  priority,
-            "frame":     frame,
-            "file_path": file_path,
-            "change":    change,
-        })
+        priority = int(m.group(1))
+        frame = m.group(2).strip()
+        file_path = m.group(3).strip()
+        change = m.group(4).strip()
+        fixes.append(
+            {
+                "priority": priority,
+                "frame": frame,
+                "file_path": file_path,
+                "change": change,
+            }
+        )
 
     fixes.sort(key=lambda x: x["priority"])
     return fixes
 
 
 # ── Build the prompt for the Claude Code subagent ─────────────────────────────
+
 
 def build_fix_prompt(
     fix: dict,
@@ -117,6 +120,7 @@ def build_fix_prompt(
 
 
 # ── Git helpers ────────────────────────────────────────────────────────────────
+
 
 def git_rev_parse_head() -> str:
     result = subprocess.run(
@@ -167,6 +171,7 @@ def count_diff_lines() -> int:
 
 
 # ── Spawn Claude Code subagent ────────────────────────────────────────────────
+
 
 def apply_fix_via_subagent(
     fix: dict,
@@ -253,14 +258,14 @@ def apply_fix_via_subagent(
                 log.error("TypeScript compile failed after fix — reverting")
                 git_revert_to(head_before)
                 return {
-                    "status":     "failed",
-                    "summary":    f"TypeScript compile failed after fix; reverted to {head_before[:8]}",
+                    "status": "failed",
+                    "summary": f"TypeScript compile failed after fix; reverted to {head_before[:8]}",
                     "diff_lines": 0,
                 }
 
         return {
-            "status":     "success",
-            "summary":    agent_result.get("summary", "Fix applied"),
+            "status": "success",
+            "summary": agent_result.get("summary", "Fix applied"),
             "diff_lines": diff_lines,
         }
 
@@ -271,19 +276,20 @@ def apply_fix_via_subagent(
         if not skip_compile and not run_ts_compile():
             git_revert_to(head_before)
             return {
-                "status":     "failed",
-                "summary":    "Partial commit detected; TypeScript failed; reverted",
+                "status": "failed",
+                "summary": "Partial commit detected; TypeScript failed; reverted",
                 "diff_lines": 0,
             }
 
     return {
-        "status":     "failed",
-        "summary":    agent_result.get("summary", "Subagent reported failure"),
+        "status": "failed",
+        "summary": agent_result.get("summary", "Subagent reported failure"),
         "diff_lines": 0,
     }
 
 
 # ── Main ───────────────────────────────────────────────────────────────────────
+
 
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
@@ -320,14 +326,18 @@ def main() -> int:
     if fix_idx >= len(fixes):
         log.error(
             "Fix index %d out of range (only %d fixes available)",
-            args.fix_index, len(fixes),
+            args.fix_index,
+            len(fixes),
         )
         return 1
 
     fix = fixes[fix_idx]
     log.info(
         "Selected fix %d/%d: %s → %s",
-        args.fix_index, len(fixes), fix["file_path"], fix["change"][:80],
+        args.fix_index,
+        len(fixes),
+        fix["file_path"],
+        fix["change"][:80],
     )
 
     if args.dry_run:
@@ -346,7 +356,8 @@ def main() -> int:
     if result["status"] == "success":
         log.info(
             "✓ Fix applied: %s (%d diff lines)",
-            result["summary"][:100], result["diff_lines"],
+            result["summary"][:100],
+            result["diff_lines"],
         )
         return 0
 

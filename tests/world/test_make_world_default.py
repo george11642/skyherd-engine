@@ -1,4 +1,5 @@
 """make_world(seed=42) must work with no config_path argument (BLD-01)."""
+
 from __future__ import annotations
 
 from pathlib import Path

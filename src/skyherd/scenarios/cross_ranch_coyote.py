@@ -206,9 +206,7 @@ class CrossRanchCoyoteScenario(Scenario):
             #    — the receipt that the memory post-cycle hook uses to compose the
             #    shared-store write under /neighbors/{from_ranch}/.
             pre_position_logs = [
-                c
-                for c in handoff_logs
-                if c.get("input", {}).get("response_mode") == "pre_position"
+                c for c in handoff_logs if c.get("input", {}).get("response_mode") == "pre_position"
             ]
             assert len(pre_position_logs) > 0, (
                 "Ranch_b neighbor_handoff log entry must set response_mode='pre_position'. "

@@ -1069,16 +1069,26 @@ class TestSessionCreateMemoryAttach:
     async def test_session_create_attaches_memory_resources_via_extra_body(self, _mocked_mgr):
         from skyherd.agents.fenceline_dispatcher import FENCELINE_DISPATCHER_SPEC
 
-        mgr = _mocked_mgr(memory_store_ids={
-            "FenceLineDispatcher": "memstore_perA",
-            "_shared": "memstore_shared",
-        })
+        mgr = _mocked_mgr(
+            memory_store_ids={
+                "FenceLineDispatcher": "memstore_perA",
+                "_shared": "memstore_shared",
+            }
+        )
         await mgr.create_session_async(FENCELINE_DISPATCHER_SPEC)
         kwargs = mgr._client.beta.sessions.create.await_args.kwargs
         assert kwargs["extra_body"] == {
             "resources": [
-                {"type": "memory_store", "memory_store_id": "memstore_perA", "access": "read_write"},
-                {"type": "memory_store", "memory_store_id": "memstore_shared", "access": "read_only"},
+                {
+                    "type": "memory_store",
+                    "memory_store_id": "memstore_perA",
+                    "access": "read_write",
+                },
+                {
+                    "type": "memory_store",
+                    "memory_store_id": "memstore_shared",
+                    "access": "read_only",
+                },
             ]
         }
 
@@ -1101,7 +1111,11 @@ class TestSessionCreateMemoryAttach:
         kwargs = mgr._client.beta.sessions.create.await_args.kwargs
         assert kwargs["extra_body"] == {
             "resources": [
-                {"type": "memory_store", "memory_store_id": "memstore_shared", "access": "read_only"},
+                {
+                    "type": "memory_store",
+                    "memory_store_id": "memstore_shared",
+                    "access": "read_only",
+                },
             ]
         }
 

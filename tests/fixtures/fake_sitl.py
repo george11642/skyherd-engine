@@ -83,13 +83,9 @@ class FakeSITLBackend(DroneBackend):
         # Emulate per-waypoint execution; fail when we reach the configured index.
         executed: list[Waypoint] = []
         for wp in waypoints:
-            if (
-                self._fail_after is not None
-                and self._patrol_waypoint_count >= self._fail_after
-            ):
+            if self._fail_after is not None and self._patrol_waypoint_count >= self._fail_after:
                 raise DroneUnavailable(
-                    "FakeSITLBackend: patrol injection failure "
-                    f"after {self._fail_after} waypoints"
+                    f"FakeSITLBackend: patrol injection failure after {self._fail_after} waypoints"
                 )
             executed.append(wp)
             self._patrol_waypoint_count += 1
@@ -99,14 +95,10 @@ class FakeSITLBackend(DroneBackend):
     async def return_to_home(self) -> None:
         self.rtl_calls += 1
         if self._fail_rtl:
-            raise DroneUnavailable(
-                "FakeSITLBackend: return_to_home injection failure"
-            )
+            raise DroneUnavailable("FakeSITLBackend: return_to_home injection failure")
         await self._stub.return_to_home()
 
-    async def play_deterrent(
-        self, tone_hz: int = 12000, duration_s: float = 6.0
-    ) -> None:
+    async def play_deterrent(self, tone_hz: int = 12000, duration_s: float = 6.0) -> None:
         await self._stub.play_deterrent(tone_hz=tone_hz, duration_s=duration_s)
 
     async def get_thermal_clip(self, duration_s: float = 10.0) -> Path:

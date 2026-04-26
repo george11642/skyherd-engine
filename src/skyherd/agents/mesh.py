@@ -208,7 +208,9 @@ class AgentMesh:
         try:
             self._memory_store_ids = await self._ensure_memory_stores()
         except Exception as exc:  # noqa: BLE001
-            logger.warning("memory store ensure failed (%s); continuing without", type(exc).__name__)
+            logger.warning(
+                "memory store ensure failed (%s); continuing without", type(exc).__name__
+            )
             self._memory_store_ids = {}
 
         for spec, handler_fn in _AGENT_REGISTRY:

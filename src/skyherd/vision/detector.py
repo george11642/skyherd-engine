@@ -36,9 +36,7 @@ _PAD = 4
 # ---------------------------------------------------------------------------
 
 
-def cow_bbox_in_frame(
-    cow: Cow, bounds_m: tuple[float, float]
-) -> tuple[int, int, int, int]:
+def cow_bbox_in_frame(cow: Cow, bounds_m: tuple[float, float]) -> tuple[int, int, int, int]:
     """Reverse-project cow world pos to a pixel bbox covering the body + head.
 
     Formulas match ``src/skyherd/vision/renderer.py::_world_to_frame`` and
@@ -75,9 +73,7 @@ def cow_bbox_in_frame(
     )
 
 
-def eye_crop_bbox(
-    cow_bbox: tuple[int, int, int, int], cow: Cow
-) -> tuple[int, int, int, int]:
+def eye_crop_bbox(cow_bbox: tuple[int, int, int, int], cow: Cow) -> tuple[int, int, int, int]:
     """Return a 48×48-pixel bbox around the eye region within *cow_bbox*.
 
     Mirrors the ``_draw_cow_blob`` eye-coordinate computation:

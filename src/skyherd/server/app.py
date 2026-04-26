@@ -129,6 +129,7 @@ def create_app(
     try:
         from skyherd.agents.webhook import set_mesh as _set_webhook_mesh
         from skyherd.agents.webhook import webhook_router
+
         app.include_router(webhook_router)
         if mesh is not None:
             _set_webhook_mesh(mesh)
@@ -139,6 +140,7 @@ def create_app(
     # Memory API router — GET /api/memory/{agent} (+ /versions) (Plan 01-05).
     try:
         from skyherd.server.memory_api import attach_memory_api  # noqa: PLC0415
+
         memory_store_manager = getattr(mesh, "_memory_store_manager", None) if mesh else None
         store_id_map = getattr(mesh, "_memory_store_ids", None) if mesh else None
         attach_memory_api(
@@ -303,9 +305,7 @@ def create_app(
         Mock mode:  returns {"valid": True, "total": 0, "reason": "mock"}.
         """
         if use_mock or ledger is None:
-            return JSONResponse(
-                content={"valid": True, "total": 0, "reason": "mock"}
-            )
+            return JSONResponse(content={"valid": True, "total": 0, "reason": "mock"})
         result = ledger.verify()
         return JSONResponse(content=result.model_dump())
 
@@ -319,8 +319,10 @@ def create_app(
         with seq <= target seq (the prev-chain).
         """
         # Input validation — hash is hex string, bounded length.
-        if not hash_hex or len(hash_hex) > 128 or not all(
-            c in "0123456789abcdefABCDEF" for c in hash_hex
+        if (
+            not hash_hex
+            or len(hash_hex) > 128
+            or not all(c in "0123456789abcdefABCDEF" for c in hash_hex)
         ):
             raise HTTPException(status_code=400, detail="invalid hash format")
 
@@ -357,9 +359,7 @@ def create_app(
                 detail=f"no ledger entry with event_hash={hash_hex}",
             )
 
-        return JSONResponse(
-            content={"target": hash_hex, "chain": chain, "ts": time.time()}
-        )
+        return JSONResponse(content={"target": hash_hex, "chain": chain, "ts": time.time()})
 
     @app.get("/api/attest/pair/{memver_id}")
     async def api_attest_pair(memver_id: str) -> JSONResponse:
@@ -429,10 +429,7 @@ def create_app(
             # Legacy path: payload field "memory_version_id" (pre-Phase-4).
             try:
                 parsed = json.loads(event.payload_json)
-                if (
-                    isinstance(parsed, dict)
-                    and parsed.get("memory_version_id") == memver_id
-                ):
+                if isinstance(parsed, dict) and parsed.get("memory_version_id") == memver_id:
                     match_entry = event.model_dump()
                     match_memver.update(
                         {
@@ -711,15 +708,9 @@ def _live_agent_statuses(mesh: Any) -> list[dict[str, Any]]:
                 "session_id": sid,
                 "state": state,
                 "last_wake": getattr(session, "last_active_ts", None),
-                "cumulative_tokens_in": int(
-                    getattr(session, "cumulative_tokens_in", 0) or 0
-                ),
-                "cumulative_tokens_out": int(
-                    getattr(session, "cumulative_tokens_out", 0) or 0
-                ),
-                "cumulative_cost_usd": float(
-                    getattr(session, "cumulative_cost_usd", 0.0) or 0.0
-                ),
+                "cumulative_tokens_in": int(getattr(session, "cumulative_tokens_in", 0) or 0),
+                "cumulative_tokens_out": int(getattr(session, "cumulative_tokens_out", 0) or 0),
+                "cumulative_cost_usd": float(getattr(session, "cumulative_cost_usd", 0.0) or 0.0),
             }
             result.append(entry)
         except Exception as exc:  # noqa: BLE001

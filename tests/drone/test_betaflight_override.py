@@ -442,9 +442,7 @@ async def test_state_returns_bench_location(connected_backend: Any) -> None:
 async def test_dry_run_does_not_open_serial() -> None:
     fake = FakeSerial()
     with patch("serial.Serial", return_value=fake) as serial_ctor:
-        backend = BetaflightOverrideBackend(
-            port="/dev/ttyACM-fake", dry_run=True
-        )
+        backend = BetaflightOverrideBackend(port="/dev/ttyACM-fake", dry_run=True)
         await backend.connect()
         await backend.takeoff(alt_m=30.0)
         await backend.disconnect()

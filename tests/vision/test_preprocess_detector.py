@@ -123,9 +123,7 @@ def test_detector_import() -> None:
     assert hasattr(det, "eye_crop_bbox")
 
 
-def _make_cow(
-    pos: tuple[float, float] = (300.0, 300.0), lameness_score: int = 0
-) -> Cow:
+def _make_cow(pos: tuple[float, float] = (300.0, 300.0), lameness_score: int = 0) -> Cow:
     return Cow(
         id="c1",
         tag="T001",

@@ -64,11 +64,11 @@ SCENARIOS_FOR_DEMO: list[str] = [
 _DRONE_HOME: tuple[float, float] = (0.5, 0.95)
 
 _SCENARIO_DRONE_TARGETS: dict[str, tuple[float, float]] = {
-    "coyote": (0.08, 0.20),       # SW fence
-    "sick_cow": (0.35, 0.55),      # interior, near flagged cow cluster
-    "water_drop": (0.82, 0.18),    # NE water tank
-    "calving": (0.60, 0.40),       # calving paddock
-    "storm": (0.50, 0.50),         # center — weather observation
+    "coyote": (0.08, 0.20),  # SW fence
+    "sick_cow": (0.35, 0.55),  # interior, near flagged cow cluster
+    "water_drop": (0.82, 0.18),  # NE water tank
+    "calving": (0.60, 0.40),  # calving paddock
+    "storm": (0.50, 0.50),  # center — weather observation
 }
 
 # Seconds from scenario start at which the drone takes off, reaches target,
@@ -157,9 +157,7 @@ class DroneChoreographer:
             state = "loiter"
         elif sim_elapsed_s < _DRONE_RETURN_S:
             # Transit target → home.
-            t = (sim_elapsed_s - _DRONE_LOITER_END_S) / (
-                _DRONE_RETURN_S - _DRONE_LOITER_END_S
-            )
+            t = (sim_elapsed_s - _DRONE_LOITER_END_S) / (_DRONE_RETURN_S - _DRONE_LOITER_END_S)
             pos = self._lerp(self._target, self._home, t)
             alt = 45.0 - t * 35.0
             state = "rtb"
@@ -335,14 +333,16 @@ async def _capture_one_scenario(
         name=f"capture-sub-{name}",
     )
     drone_task = asyncio.create_task(
-        _drone_ticker(
-            world, name, start_ref, scenario.duration_s, speed, stop_event
-        ),
+        _drone_ticker(world, name, start_ref, scenario.duration_s, speed, stop_event),
         name=f"capture-drone-{name}",
     )
 
-    logger.info("→ capturing scenario %r (duration=%.0fs sim, speed=%.1fx)",
-                name, scenario.duration_s, speed)
+    logger.info(
+        "→ capturing scenario %r (duration=%.0fs sim, speed=%.1fx)",
+        name,
+        scenario.duration_s,
+        speed,
+    )
     t0 = time.monotonic()
     try:
         result = await _run_async_shared(
@@ -475,9 +475,7 @@ def main() -> int:
         default=25.0,
         help="sim-to-wall ratio (default 25 → ~24s wall per 600s scenario)",
     )
-    parser.add_argument(
-        "--verbose", "-v", action="store_true", help="verbose logging"
-    )
+    parser.add_argument("--verbose", "-v", action="store_true", help="verbose logging")
     args = parser.parse_args()
 
     logging.basicConfig(

@@ -22,14 +22,14 @@ from pathlib import Path
 # Scenes that DO have voice-over (used to filter "missing" noise from inter-scene gaps).
 # Aligned with calculate-main-metadata.ts variant-C act durations (cumulative).
 VO_ACTIVE_RANGES = [
-    (6, 27),    # Act 1 hook VO 20.76s
-    (27, 50),   # Act 2 traditional 22.10s
-    (50, 66),   # Act 2 answer 15.50s
-    (66, 96),   # Act 3 coyote (24.26s VO + breathing room)
+    (6, 27),  # Act 1 hook VO 20.76s
+    (27, 50),  # Act 2 traditional 22.10s
+    (50, 66),  # Act 2 answer 15.50s
+    (66, 96),  # Act 3 coyote (24.26s VO + breathing room)
     (96, 120),  # Act 3 grid 23.52s
-    (120, 143), # Act 4 mvp 22.10s
-    (143, 165), # Act 4 vision 21.55s
-    (165, 178), # Act 5 aibody 13.27s
+    (120, 143),  # Act 4 mvp 22.10s
+    (143, 165),  # Act 4 vision 21.55s
+    (165, 178),  # Act 5 aibody 13.27s
 ]
 
 
@@ -122,8 +122,12 @@ def main() -> None:
     md_lines.append("# v5.6 Per-Second QC Issues Report")
     md_lines.append("")
     md_lines.append(f"- Total frames analyzed: **{len(rows)}**")
-    md_lines.append(f"- Duplicate-caption seconds: **{len(dupe_seconds)}** in **{len(dupe_ranges)}** range(s)")
-    md_lines.append(f"- Missing-caption seconds (inside VO ranges): **{len(missing_seconds)}** in **{len(missing_ranges)}** range(s)")
+    md_lines.append(
+        f"- Duplicate-caption seconds: **{len(dupe_seconds)}** in **{len(dupe_ranges)}** range(s)"
+    )
+    md_lines.append(
+        f"- Missing-caption seconds (inside VO ranges): **{len(missing_seconds)}** in **{len(missing_ranges)}** range(s)"
+    )
     md_lines.append(f"- Parse errors: **{len(parse_errors)}** | API errors: **{len(api_errors)}**")
     md_lines.append("")
     md_lines.append("## Duplicate captions")
@@ -132,7 +136,13 @@ def main() -> None:
         md_lines.append("_None detected._")
     else:
         for start, end in dupe_ranges:
-            scenes = sorted({(next(r["scene_label"] for r in rows if int(r["t"]) == t) or "?") for t in range(start, end + 1) if t in captions_at})
+            scenes = sorted(
+                {
+                    (next(r["scene_label"] for r in rows if int(r["t"]) == t) or "?")
+                    for t in range(start, end + 1)
+                    if t in captions_at
+                }
+            )
             scene_str = ", ".join(scenes)
             md_lines.append(f"### Range {start}-{end}s  _(scene: {scene_str})_")
             for t in range(start, end + 1):
@@ -149,7 +159,13 @@ def main() -> None:
         md_lines.append("_None detected._")
     else:
         for start, end in missing_ranges:
-            scenes = sorted({(next(r["scene_label"] for r in rows if int(r["t"]) == t) or "?") for t in range(start, end + 1) if t in captions_at})
+            scenes = sorted(
+                {
+                    (next(r["scene_label"] for r in rows if int(r["t"]) == t) or "?")
+                    for t in range(start, end + 1)
+                    if t in captions_at
+                }
+            )
             scene_str = ", ".join(scenes)
             md_lines.append(f"### Range {start}-{end}s  _(scene: {scene_str})_")
             for t in range(start, end + 1):
@@ -168,7 +184,9 @@ def main() -> None:
         for scene in sorted(dupe_by_scene.keys()):
             seconds = dupe_by_scene[scene]
             ranges = group_contiguous(seconds)
-            md_lines.append(f"- **{scene}**: {len(seconds)}s across {len(ranges)} range(s) — {ranges}")
+            md_lines.append(
+                f"- **{scene}**: {len(seconds)}s across {len(ranges)} range(s) — {ranges}"
+            )
 
     md_lines.append("")
     md_lines.append("## Per-scene missing summary (VO ranges only)")
@@ -179,7 +197,9 @@ def main() -> None:
         for scene in sorted(missing_by_scene.keys()):
             seconds = missing_by_scene[scene]
             ranges = group_contiguous(seconds)
-            md_lines.append(f"- **{scene}**: {len(seconds)}s across {len(ranges)} range(s) — {ranges}")
+            md_lines.append(
+                f"- **{scene}**: {len(seconds)}s across {len(ranges)} range(s) — {ranges}"
+            )
 
     if parse_errors or api_errors:
         md_lines.append("")

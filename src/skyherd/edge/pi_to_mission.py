@@ -190,9 +190,7 @@ class PiToMissionBridge:
     # Public: event handling
     # ------------------------------------------------------------------
 
-    async def handle_event(
-        self, topic: str, payload: dict[str, Any]
-    ) -> list[dict[str, Any]]:
+    async def handle_event(self, topic: str, payload: dict[str, Any]) -> list[dict[str, Any]]:
         """Route one inbound event; return the list of executed tool calls.
 
         Executed tool calls include a ``status`` key (``"ok"`` / ``"failed"``) for
@@ -208,7 +206,9 @@ class PiToMissionBridge:
 
         if wake_event.get("type") not in ("fence.breach", "thermal.hotspot"):
             # Non-dispatch events (sensor.heartbeat, water.low, …) — log-only.
-            self._append_ledger("wake_event.ignored", {"topic": topic, "type": wake_event.get("type")})
+            self._append_ledger(
+                "wake_event.ignored", {"topic": topic, "type": wake_event.get("type")}
+            )
             return []
 
         # Ensure backend is connected before dispatching.
@@ -351,9 +351,7 @@ class PiToMissionBridge:
         tone_hz = int(args.get("tone_hz", 12000))
         duration_s = float(args.get("duration_s", 6.0))
         try:
-            await self._drone_backend.play_deterrent(
-                tone_hz=tone_hz, duration_s=duration_s
-            )
+            await self._drone_backend.play_deterrent(tone_hz=tone_hz, duration_s=duration_s)
         except DroneError as exc:
             logger.warning("play_deterrent failed: %s", exc)
             self._append_ledger(

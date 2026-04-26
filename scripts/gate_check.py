@@ -57,8 +57,7 @@ def _check_sensors() -> CheckResult:
     if not sensors_dir.is_dir():
         return ("RED", "src/skyherd/sensors/ missing")
     emitter_files = [
-        p for p in sensors_dir.glob("*.py")
-        if p.stem not in {"__init__", "bus", "base", "registry"}
+        p for p in sensors_dir.glob("*.py") if p.stem not in {"__init__", "bus", "base", "registry"}
     ]
     if len(emitter_files) >= 7:
         return ("GREEN", f"{len(emitter_files)} emitter modules")
@@ -160,9 +159,13 @@ def _check_determinism(fast: bool) -> CheckResult:
     try:
         result = subprocess.run(
             [
-                "uv", "run", "pytest",
+                "uv",
+                "run",
+                "pytest",
                 str(test_file),
-                "-v", "-m", "slow",
+                "-v",
+                "-m",
+                "slow",
             ],
             cwd=REPO_ROOT,
             capture_output=True,
@@ -204,16 +207,16 @@ def _check_cost_idle() -> CheckResult:
 # ---------------------------------------------------------------------------
 
 GATE_ITEMS: list[tuple[str, str, Callable[[bool], CheckResult]]] = [
-    ("agents_mesh",  "5 Managed Agents on shared MQTT",   lambda fast: _check_agents_mesh()),
-    ("sensors",      "7+ sim sensors emitting",           lambda fast: _check_sensors()),
+    ("agents_mesh", "5 Managed Agents on shared MQTT", lambda fast: _check_agents_mesh()),
+    ("sensors", "7+ sim sensors emitting", lambda fast: _check_sensors()),
     ("vision_heads", "Disease heads on synthetic frames", lambda fast: _check_vision_heads()),
-    ("sitl_mission", "ArduPilot SITL MAVLink mission",    _check_sitl_mission),
-    ("dashboard",    "Map + lanes + cost + attest + PWA", lambda fast: _check_dashboard()),
-    ("voice",        "Wes voice chain end-to-end",        lambda fast: _check_voice()),
-    ("scenarios",    "All scenarios pass SEED=42",        _check_scenarios),
-    ("determinism",  "seed=42 stable across 3 runs",      _check_determinism),
-    ("fresh_clone",  "make demo boots fresh clone",       lambda fast: _check_fresh_clone()),
-    ("cost_idle",    "Cost ticker pauses during idle",    lambda fast: _check_cost_idle()),
+    ("sitl_mission", "ArduPilot SITL MAVLink mission", _check_sitl_mission),
+    ("dashboard", "Map + lanes + cost + attest + PWA", lambda fast: _check_dashboard()),
+    ("voice", "Wes voice chain end-to-end", lambda fast: _check_voice()),
+    ("scenarios", "All scenarios pass SEED=42", _check_scenarios),
+    ("determinism", "seed=42 stable across 3 runs", _check_determinism),
+    ("fresh_clone", "make demo boots fresh clone", lambda fast: _check_fresh_clone()),
+    ("cost_idle", "Cost ticker pauses during idle", lambda fast: _check_cost_idle()),
 ]
 
 

@@ -210,8 +210,12 @@ class Publisher:
         self.ranch_id = _getenv("RANCH_ID")
         self.edge_id = _getenv("EDGE_ID")
         self.sensor_mode = _getenv("SENSOR_MODE", "sim").lower()
-        self.publish_interval_s = _getenv_float("PUBLISH_INTERVAL_SEC", _DEFAULT_PUBLISH_INTERVAL_SEC)
-        self.heartbeat_interval_s = _getenv_float("HEARTBEAT_INTERVAL_SEC", _DEFAULT_HEARTBEAT_INTERVAL_SEC)
+        self.publish_interval_s = _getenv_float(
+            "PUBLISH_INTERVAL_SEC", _DEFAULT_PUBLISH_INTERVAL_SEC
+        )
+        self.heartbeat_interval_s = _getenv_float(
+            "HEARTBEAT_INTERVAL_SEC", _DEFAULT_HEARTBEAT_INTERVAL_SEC
+        )
         self.tank_id = _getenv("TANK_ID", "tank_n")
         self.weather_enabled = _getenv_bool("WEATHER_ENABLED", False)
 
@@ -245,7 +249,9 @@ class Publisher:
 
         # Compatibility: newer paho (>=2.0) made callback-API a required arg.
         try:
-            client = mqtt.Client(client_id=client_id, callback_api_version=mqtt.CallbackAPIVersion.VERSION2)  # type: ignore[attr-defined]
+            client = mqtt.Client(
+                client_id=client_id, callback_api_version=mqtt.CallbackAPIVersion.VERSION2
+            )  # type: ignore[attr-defined]
         except AttributeError:
             client = mqtt.Client(client_id=client_id)  # type: ignore[call-arg]
 

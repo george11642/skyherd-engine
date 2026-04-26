@@ -98,9 +98,7 @@ class TestFailover:
 
     def test_rtl_double_fault(self, tmp_path: Path) -> None:
         """Patrol fails AND rtl fails — sitl.failover status=rtl_failed."""
-        backend = FakeSITLBackend(
-            fail_after_waypoints=0, fail_on_return_to_home=True
-        )
+        backend = FakeSITLBackend(fail_after_waypoints=0, fail_on_return_to_home=True)
         ledger = _fresh_ledger(tmp_path)
         bridge = _build_bridge(backend, ledger)
 
@@ -130,9 +128,7 @@ class TestFailover:
             bridge = _build_bridge(backend, ledger)
             asyncio.run(bridge.handle_event(FENCE_TOPIC, _fence_payload()))
             ledgers.append(ledger)
-        payloads = [
-            [e.payload_json for e in ledger.iter_events()] for ledger in ledgers
-        ]
+        payloads = [[e.payload_json for e in ledger.iter_events()] for ledger in ledgers]
         assert payloads[0] == payloads[1]
 
     def test_happy_path_no_failover_entry(self, tmp_path: Path) -> None:

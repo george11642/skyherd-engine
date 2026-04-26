@@ -18,7 +18,11 @@ class TestPerAgentBranches:
     def test_predator_pattern_learner_returns_pattern_path(self) -> None:
         path, content = decide_write_path(
             "PredatorPatternLearner",
-            {"classification": "coyote.confirmed", "ranch_id": "ranch_a", "type": "predator.detected"},
+            {
+                "classification": "coyote.confirmed",
+                "ranch_id": "ranch_a",
+                "type": "predator.detected",
+            },
             [],
         )
         assert path == "patterns/coyote-crossings.md"
@@ -89,7 +93,12 @@ class TestRedaction:
 
 class TestDeterminism:
     def test_same_inputs_yield_byte_identical_output(self) -> None:
-        evt = {"classification": "coyote.confirmed", "ranch_id": "ranch_a", "type": "predator.detected", "ts": 1000}
+        evt = {
+            "classification": "coyote.confirmed",
+            "ranch_id": "ranch_a",
+            "type": "predator.detected",
+            "ts": 1000,
+        }
         a = decide_write_path("PredatorPatternLearner", evt, [])
         b = decide_write_path("PredatorPatternLearner", evt, [])
         assert a == b
@@ -132,16 +141,12 @@ class TestCrossRanchCoordinator:
         return base
 
     def test_path_prefix(self) -> None:
-        path, _content = decide_write_path(
-            "CrossRanchCoordinator", self._event(), []
-        )
+        path, _content = decide_write_path("CrossRanchCoordinator", self._event(), [])
         assert path.startswith("neighbors/ranch_a/")
         assert path.endswith(".md")
 
     def test_content_includes_species_and_confidence(self) -> None:
-        _path, content = decide_write_path(
-            "CrossRanchCoordinator", self._event(), []
-        )
+        _path, content = decide_write_path("CrossRanchCoordinator", self._event(), [])
         assert "- species: coyote" in content
         assert "- confidence: 0.91" in content
         assert "response_mode: pre_position" in content
@@ -162,9 +167,7 @@ class TestCrossRanchCoordinator:
 
     def test_known_agents_includes_cross_ranch_coordinator(self) -> None:
         # If we can call decide_write_path without ValueError, CRC is registered.
-        path, content = decide_write_path(
-            "CrossRanchCoordinator", self._event(), []
-        )
+        path, content = decide_write_path("CrossRanchCoordinator", self._event(), [])
         assert path
         assert content
 

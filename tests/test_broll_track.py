@@ -3,6 +3,7 @@
 Written BEFORE implementation per project TDD rules.
 Frame-accurate assertions pin fps=30 (Remotion comp rate).
 """
+
 from __future__ import annotations
 
 import pathlib
@@ -21,6 +22,7 @@ from scripts.openmontage_to_remotion import (  # noqa: E402
 # ---------------------------------------------------------------------------
 # Shared fixture helpers
 # ---------------------------------------------------------------------------
+
 
 def _asset_cut(
     id_: str,
@@ -60,10 +62,13 @@ def _minimal_edl(cuts: list[dict[str, Any]]) -> dict[str, Any]:
 # Basic behaviour
 # ---------------------------------------------------------------------------
 
+
 def test_to_broll_track_returns_dict_with_cuts_key() -> None:
-    edl = _minimal_edl([
-        _asset_cut("c1", "remotion-video/public/broll/t1-cattle-grazing-wide.mp4", 6.0, 22.0),
-    ])
+    edl = _minimal_edl(
+        [
+            _asset_cut("c1", "remotion-video/public/broll/t1-cattle-grazing-wide.mp4", 6.0, 22.0),
+        ]
+    )
     result = to_broll_track(edl, fps=30)
     assert isinstance(result, dict)
     assert "cuts" in result
@@ -71,11 +76,15 @@ def test_to_broll_track_returns_dict_with_cuts_key() -> None:
 
 def test_to_broll_track_filters_out_scene_components() -> None:
     """scene-component entries (empty source) must NOT appear in broll track."""
-    edl = _minimal_edl([
-        _scene_cut("cold-open", 0.0, 6.0),
-        _asset_cut("broll", "remotion-video/public/broll/t1-cattle-grazing-wide.mp4", 6.0, 22.0),
-        _scene_cut("mesh-reveal", 115.0, 150.0),
-    ])
+    edl = _minimal_edl(
+        [
+            _scene_cut("cold-open", 0.0, 6.0),
+            _asset_cut(
+                "broll", "remotion-video/public/broll/t1-cattle-grazing-wide.mp4", 6.0, 22.0
+            ),
+            _scene_cut("mesh-reveal", 115.0, 150.0),
+        ]
+    )
     result = to_broll_track(edl, fps=30)
     assert len(result["cuts"]) == 1
     assert result["cuts"][0]["src"] == "broll/t1-cattle-grazing-wide.mp4"
@@ -83,12 +92,14 @@ def test_to_broll_track_filters_out_scene_components() -> None:
 
 def test_to_broll_track_includes_only_asset_kind_cuts() -> None:
     """Verify that all returned cuts originate from asset entries."""
-    edl = _minimal_edl([
-        _scene_cut("s1", 0.0, 8.0),
-        _asset_cut("a1", "remotion-video/public/broll/t1-dawn-corral-golden.mp4", 8.0, 20.0),
-        _asset_cut("a2", "remotion-video/public/broll/t1-cattle-grazing-wide.mp4", 20.0, 28.0),
-        _scene_cut("s2", 100.0, 120.0),
-    ])
+    edl = _minimal_edl(
+        [
+            _scene_cut("s1", 0.0, 8.0),
+            _asset_cut("a1", "remotion-video/public/broll/t1-dawn-corral-golden.mp4", 8.0, 20.0),
+            _asset_cut("a2", "remotion-video/public/broll/t1-cattle-grazing-wide.mp4", 20.0, 28.0),
+            _scene_cut("s2", 100.0, 120.0),
+        ]
+    )
     result = to_broll_track(edl, fps=30)
     assert len(result["cuts"]) == 2
 
@@ -97,6 +108,7 @@ def test_to_broll_track_includes_only_asset_kind_cuts() -> None:
 # Frame-accurate first-cut assertion (fps=30, pinned)
 # ---------------------------------------------------------------------------
 
+
 def test_to_broll_track_frame_accurate_first_cut_at_30fps() -> None:
     """EDL cut starting at 6.0s must have startSeconds=6.0 and endSeconds=22.0.
 
@@ -104,16 +116,18 @@ def test_to_broll_track_frame_accurate_first_cut_at_30fps() -> None:
     The track stores seconds (Remotion handles frame conversion); validate
     that the seconds are preserved exactly so Remotion sees correct frames.
     """
-    edl = _minimal_edl([
-        _asset_cut(
-            "a1-dawn",
-            "remotion-video/public/broll/t1-dawn-corral-golden.mp4",
-            6.0,
-            22.0,
-            transition="fade",
-            transition_duration=1.5,
-        ),
-    ])
+    edl = _minimal_edl(
+        [
+            _asset_cut(
+                "a1-dawn",
+                "remotion-video/public/broll/t1-dawn-corral-golden.mp4",
+                6.0,
+                22.0,
+                transition="fade",
+                transition_duration=1.5,
+            ),
+        ]
+    )
     result = to_broll_track(edl, fps=30)
     cut = result["cuts"][0]
     assert cut["startSeconds"] == pytest.approx(6.0)
@@ -128,11 +142,14 @@ def test_to_broll_track_frame_accurate_first_cut_at_30fps() -> None:
 # The translator must re-pin to 30fps output regardless of source fps.
 # ---------------------------------------------------------------------------
 
+
 def test_to_broll_track_output_fps_is_always_30() -> None:
     """Even if called with explicit fps arg, output seconds must be exact."""
-    edl = _minimal_edl([
-        _asset_cut("a1", "remotion-video/public/broll/t1-cattle-grazing-wide.mp4", 22.0, 30.0),
-    ])
+    edl = _minimal_edl(
+        [
+            _asset_cut("a1", "remotion-video/public/broll/t1-cattle-grazing-wide.mp4", 22.0, 30.0),
+        ]
+    )
     result_30 = to_broll_track(edl, fps=30)
     result_60 = to_broll_track(edl, fps=60)
     # Both should produce the same startSeconds / endSeconds regardless of fps param
@@ -148,9 +165,11 @@ def test_to_broll_track_frame_accurate_30fps_vs_24fps_source() -> None:
     6.0 * 30 = 180 frames. The translator preserves seconds, so both rates
     produce frame 180 at 30fps.
     """
-    edl = _minimal_edl([
-        _asset_cut("a1", "remotion-video/public/broll/t1-cattle-grazing-wide.mp4", 6.0, 22.0),
-    ])
+    edl = _minimal_edl(
+        [
+            _asset_cut("a1", "remotion-video/public/broll/t1-cattle-grazing-wide.mp4", 6.0, 22.0),
+        ]
+    )
     result = to_broll_track(edl, fps=30)
     cut = result["cuts"][0]
     # 6.0s at 30fps = frame 180 (exact, no rounding needed)
@@ -163,19 +182,24 @@ def test_to_broll_track_frame_accurate_30fps_vs_24fps_source() -> None:
 # src path stripping: remotion-video/public/ prefix must be stripped
 # ---------------------------------------------------------------------------
 
+
 def test_to_broll_track_strips_remotion_public_prefix() -> None:
-    edl = _minimal_edl([
-        _asset_cut("a1", "remotion-video/public/broll/t1-cattle-grazing-wide.mp4", 22.0, 30.0),
-    ])
+    edl = _minimal_edl(
+        [
+            _asset_cut("a1", "remotion-video/public/broll/t1-cattle-grazing-wide.mp4", 22.0, 30.0),
+        ]
+    )
     result = to_broll_track(edl, fps=30)
     assert result["cuts"][0]["src"] == "broll/t1-cattle-grazing-wide.mp4"
 
 
 def test_to_broll_track_keeps_other_asset_paths_as_is() -> None:
     """Non-broll assets (clips/) that pass filter keep their path."""
-    edl = _minimal_edl([
-        _asset_cut("a1", "remotion-video/public/clips/coyote.mp4", 0.0, 5.0),
-    ])
+    edl = _minimal_edl(
+        [
+            _asset_cut("a1", "remotion-video/public/clips/coyote.mp4", 0.0, 5.0),
+        ]
+    )
     result = to_broll_track(edl, fps=30)
     assert result["cuts"][0]["src"] == "clips/coyote.mp4"
 
@@ -184,17 +208,20 @@ def test_to_broll_track_keeps_other_asset_paths_as_is() -> None:
 # Transition field forwarding
 # ---------------------------------------------------------------------------
 
+
 def test_to_broll_track_forwards_transition_and_duration() -> None:
-    edl = _minimal_edl([
-        _asset_cut(
-            "a1",
-            "remotion-video/public/broll/t1-dawn-corral-golden.mp4",
-            6.0,
-            22.0,
-            transition="fade",
-            transition_duration=1.5,
-        ),
-    ])
+    edl = _minimal_edl(
+        [
+            _asset_cut(
+                "a1",
+                "remotion-video/public/broll/t1-dawn-corral-golden.mp4",
+                6.0,
+                22.0,
+                transition="fade",
+                transition_duration=1.5,
+            ),
+        ]
+    )
     result = to_broll_track(edl, fps=30)
     cut = result["cuts"][0]
     assert cut["transition"] == "fade"
@@ -202,9 +229,11 @@ def test_to_broll_track_forwards_transition_and_duration() -> None:
 
 
 def test_to_broll_track_defaults_missing_transition_to_cut_zero_frames() -> None:
-    edl = _minimal_edl([
-        _asset_cut("a1", "remotion-video/public/broll/t1-cattle-grazing-wide.mp4", 22.0, 30.0),
-    ])
+    edl = _minimal_edl(
+        [
+            _asset_cut("a1", "remotion-video/public/broll/t1-cattle-grazing-wide.mp4", 22.0, 30.0),
+        ]
+    )
     result = to_broll_track(edl, fps=30)
     cut = result["cuts"][0]
     assert cut["transition"] == "cut"
@@ -215,24 +244,29 @@ def test_to_broll_track_defaults_missing_transition_to_cut_zero_frames() -> None
 # reason field forwarding
 # ---------------------------------------------------------------------------
 
+
 def test_to_broll_track_forwards_reason_field_when_present() -> None:
-    edl = _minimal_edl([
-        _asset_cut(
-            "a1",
-            "remotion-video/public/broll/t1-cattle-grazing-wide.mp4",
-            22.0,
-            30.0,
-            reason="Market context cut 1",
-        ),
-    ])
+    edl = _minimal_edl(
+        [
+            _asset_cut(
+                "a1",
+                "remotion-video/public/broll/t1-cattle-grazing-wide.mp4",
+                22.0,
+                30.0,
+                reason="Market context cut 1",
+            ),
+        ]
+    )
     result = to_broll_track(edl, fps=30)
     assert result["cuts"][0]["reason"] == "Market context cut 1"
 
 
 def test_to_broll_track_omits_reason_when_absent() -> None:
-    edl = _minimal_edl([
-        _asset_cut("a1", "remotion-video/public/broll/t1-cattle-grazing-wide.mp4", 22.0, 30.0),
-    ])
+    edl = _minimal_edl(
+        [
+            _asset_cut("a1", "remotion-video/public/broll/t1-cattle-grazing-wide.mp4", 22.0, 30.0),
+        ]
+    )
     result = to_broll_track(edl, fps=30)
     assert "reason" not in result["cuts"][0]
 
@@ -241,11 +275,14 @@ def test_to_broll_track_omits_reason_when_absent() -> None:
 # Empty broll (all scene-component cuts)
 # ---------------------------------------------------------------------------
 
+
 def test_to_broll_track_returns_empty_cuts_list_when_no_assets() -> None:
-    edl = _minimal_edl([
-        _scene_cut("s1", 0.0, 60.0),
-        _scene_cut("s2", 60.0, 120.0),
-    ])
+    edl = _minimal_edl(
+        [
+            _scene_cut("s1", 0.0, 60.0),
+            _scene_cut("s2", 60.0, 120.0),
+        ]
+    )
     result = to_broll_track(edl, fps=30)
     assert result["cuts"] == []
 
@@ -260,6 +297,7 @@ EDL_A = ROOT / "docs" / "edl" / "openmontage-cuts-A-cinematic.json"
 @pytest.mark.skipif(not EDL_A.exists(), reason="EDL A not found")
 def test_to_broll_track_parses_edl_a_real_file() -> None:
     import json
+
     edl = json.loads(EDL_A.read_text())
     result = to_broll_track(edl, fps=30)
     # EDL A has these broll assets (filtered out: scene-components a1-cold-open-black,

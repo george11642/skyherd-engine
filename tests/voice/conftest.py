@@ -18,6 +18,7 @@ because pytest's ``monkeypatch`` acts on the live ``os.environ`` dict, so a
 later setenv overrides the earlier one, and the fixture's teardown still
 reverts the environment at the end of the test.
 """
+
 from __future__ import annotations
 
 import pytest
@@ -43,6 +44,7 @@ def reset_twilio_deprecation_cache() -> None:
     # We guard the import so that tests unrelated to _twilio_env still run.
     try:
         from skyherd.voice._twilio_env import _DEPRECATION_EMITTED
+
         _DEPRECATION_EMITTED.clear()
     except ImportError:
         pass
@@ -51,6 +53,7 @@ def reset_twilio_deprecation_cache() -> None:
 
     try:
         from skyherd.voice._twilio_env import _DEPRECATION_EMITTED
+
         _DEPRECATION_EMITTED.clear()
     except ImportError:
         pass

@@ -152,9 +152,7 @@ def sick_pinkeye_world(terrain: Terrain) -> World:
 
 
 @pytest.fixture()
-def rendered_positive_frame(
-    sick_pinkeye_world: World, tmp_path: Path
-) -> tuple[Path, World]:
+def rendered_positive_frame(sick_pinkeye_world: World, tmp_path: Path) -> tuple[Path, World]:
     """Render trough_a for the pinkeye-positive world. Returns (png_path, world)."""
     raw_path = tmp_path / "raw_positive.png"
     render_trough_frame(sick_pinkeye_world, "trough_a", out_path=raw_path)
@@ -162,9 +160,7 @@ def rendered_positive_frame(
 
 
 @pytest.fixture()
-def rendered_negative_frame(
-    world_healthy: World, tmp_path: Path
-) -> tuple[Path, World]:
+def rendered_negative_frame(world_healthy: World, tmp_path: Path) -> tuple[Path, World]:
     """Render trough_a for the all-healthy world. Returns (png_path, world)."""
     raw_path = tmp_path / "raw_negative.png"
     render_trough_frame(world_healthy, "trough_a", out_path=raw_path)

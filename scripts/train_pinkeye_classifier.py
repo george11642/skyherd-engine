@@ -80,13 +80,37 @@ _COW_POSITIONS = [
 
 # The discharge arrays used in generate_dataset (binary 0 vs 3):
 _HEALTHY_DISCHARGES = [
-    0.0, 0.05, 0.10, 0.15, 0.20, 0.25, 0.30, 0.35,
-    0.40, 0.42, 0.44, 0.46, 0.48, 0.50,
+    0.0,
+    0.05,
+    0.10,
+    0.15,
+    0.20,
+    0.25,
+    0.30,
+    0.35,
+    0.40,
+    0.42,
+    0.44,
+    0.46,
+    0.48,
+    0.50,
 ]  # 14 values — all produce no streak (renderer threshold is > 0.5)
 
 _SICK_DISCHARGES = [
-    0.82, 0.85, 0.88, 0.91, 0.94, 0.97, 1.00, 0.83,
-    0.86, 0.89, 0.92, 0.95, 0.98, 0.80,
+    0.82,
+    0.85,
+    0.88,
+    0.91,
+    0.94,
+    0.97,
+    1.00,
+    0.83,
+    0.86,
+    0.89,
+    0.92,
+    0.95,
+    0.98,
+    0.80,
 ]  # 14 values — all produce bright streak (R=220)
 
 
@@ -220,9 +244,7 @@ def _build_world(
 # ---------------------------------------------------------------------------
 
 
-def generate_dataset(
-    n_frames: int, seed: int, tmp_dir: Path
-) -> tuple[torch.Tensor, torch.Tensor]:
+def generate_dataset(n_frames: int, seed: int, tmp_dir: Path) -> tuple[torch.Tensor, torch.Tensor]:
     """Generate synthetic (eye-crop, label) pairs for binary classifier training.
 
     Training uses a BINARY scheme: class 0 (healthy, no streak) vs class 3
@@ -290,9 +312,9 @@ def generate_dataset(
     # Truncate to n_frames if requested (keeps balance by truncating symmetrically)
     n_per_class = min(len(_HEALTHY_DISCHARGES) * len(_COW_POSITIONS), n_frames // 2)
     X_list_0 = X_list[:n_per_class]
-    X_list_3 = X_list[len(_HEALTHY_DISCHARGES) * len(_COW_POSITIONS):][:n_per_class]
+    X_list_3 = X_list[len(_HEALTHY_DISCHARGES) * len(_COW_POSITIONS) :][:n_per_class]
     y_list_0 = y_list[:n_per_class]
-    y_list_3 = y_list[len(_HEALTHY_DISCHARGES) * len(_COW_POSITIONS):][:n_per_class]
+    y_list_3 = y_list[len(_HEALTHY_DISCHARGES) * len(_COW_POSITIONS) :][:n_per_class]
 
     X_combined = X_list_0 + X_list_3
     y_combined = y_list_0 + y_list_3
@@ -443,9 +465,7 @@ def main() -> None:
 
     criterion = nn.CrossEntropyLoss()
     # Only optimize the trainable classifier parameters
-    optimizer = optim.Adam(
-        [p for p in model.parameters() if p.requires_grad], lr=1e-3
-    )
+    optimizer = optim.Adam([p for p in model.parameters() if p.requires_grad], lr=1e-3)
     # Plateau scheduler: halve LR if val_acc stalls for 3 epochs
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(
         optimizer, mode="max", factor=0.5, patience=3, min_lr=1e-6

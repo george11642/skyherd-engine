@@ -362,7 +362,9 @@ class TestVerifyResult:
 class TestMemverPairing:
     def test_append_with_memver_id_persists_field(self, ledger: Ledger) -> None:
         event = ledger.append(
-            "memory", "memver.written", {"agent": "A"},
+            "memory",
+            "memver.written",
+            {"agent": "A"},
             memver_id="memver_abc123",
         )
         assert event.memver_id == "memver_abc123"
@@ -401,9 +403,7 @@ class TestMemverPairing:
 
 
 class TestMidChainRotation:
-    def test_rotation_mid_chain_verify_still_valid(
-        self, tmp_path: Path
-    ) -> None:
+    def test_rotation_mid_chain_verify_still_valid(self, tmp_path: Path) -> None:
         """Start key A → 3 events → rotate → key B → 3 events → verify all 6."""
         key_path = tmp_path / "key.pem"
         archive = tmp_path / "archive"
@@ -418,9 +418,7 @@ class TestMidChainRotation:
         ledger_a._conn.close()
 
         # Rotate key on disk.
-        signer_b = Signer.rotate(
-            key_path, archive, timestamp="20260423T210100Z"
-        )
+        signer_b = Signer.rotate(key_path, archive, timestamp="20260423T210100Z")
         assert signer_b.public_key_pem != signer_a.public_key_pem
 
         # Re-open the ledger with the new signer — previously written rows
@@ -447,9 +445,7 @@ class TestMidChainRotation:
         ledger_a.append("s", "k", {"v": 1})
         ledger_a._conn.close()
 
-        signer_b = Signer.rotate(
-            key_path, archive, timestamp="20260423T210200Z"
-        )
+        signer_b = Signer.rotate(key_path, archive, timestamp="20260423T210200Z")
 
         ledger_b = Ledger.open(db, signer_b)
         events = list(ledger_b.iter_events())

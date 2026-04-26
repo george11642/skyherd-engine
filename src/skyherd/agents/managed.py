@@ -278,17 +278,21 @@ class ManagedSessionManager:
         shared_store_id = self._memory_store_ids.get("_shared")
         resources: list[dict[str, Any]] = []
         if per_agent_store_id:
-            resources.append({
-                "type": "memory_store",
-                "memory_store_id": per_agent_store_id,
-                "access": "read_write",
-            })
+            resources.append(
+                {
+                    "type": "memory_store",
+                    "memory_store_id": per_agent_store_id,
+                    "access": "read_write",
+                }
+            )
         if shared_store_id:
-            resources.append({
-                "type": "memory_store",
-                "memory_store_id": shared_store_id,
-                "access": "read_only",
-            })
+            resources.append(
+                {
+                    "type": "memory_store",
+                    "memory_store_id": shared_store_id,
+                    "access": "read_only",
+                }
+            )
 
         create_kwargs: dict[str, Any] = {
             "agent": agent_id,

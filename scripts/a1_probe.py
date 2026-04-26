@@ -122,9 +122,7 @@ async def _run_probe() -> None:
             options={"headers": BETA_HEADER},
         )
         memver_id = memory.get("memory_version_id", "")
-        assert memver_id.startswith("memver_"), (
-            f"Expected memver_ prefix, got: {memver_id!r}"
-        )
+        assert memver_id.startswith("memver_"), f"Expected memver_ prefix, got: {memver_id!r}"
 
         # 1c. Create agent.
         agent = await client.post(
@@ -166,17 +164,24 @@ async def _run_probe() -> None:
             try:
                 session_response = session_obj.model_dump()  # pydantic v2
             except AttributeError:
-                session_response = dict(session_obj) if hasattr(session_obj, "__iter__") else {
-                    "id": getattr(session_obj, "id", None),
-                    "raw": str(session_obj),
-                }
+                session_response = (
+                    dict(session_obj)
+                    if hasattr(session_obj, "__iter__")
+                    else {
+                        "id": getattr(session_obj, "id", None),
+                        "raw": str(session_obj),
+                    }
+                )
         except Exception as exc:  # noqa: BLE001
             session_error = f"{type(exc).__name__}: {exc!s}"
 
         # 2. Branch.
         if session_error is not None:
             msg_lower = session_error.lower()
-            if any(tok in msg_lower for tok in ("resources", "memory_store", "unknown", "invalid", "not recognized")):
+            if any(
+                tok in msg_lower
+                for tok in ("resources", "memory_store", "unknown", "invalid", "not recognized")
+            ):
                 status = "FAIL_USE_RAW_POST"
                 directive = (
                     'Plan 01-03 MUST switch to raw `client.post("/v1/sessions", body={'
@@ -362,6 +367,7 @@ def main() -> None:
     except Exception as exc:  # noqa: BLE001
         # Probe itself crashed — record as UNCLEAR.
         import traceback
+
         tb = traceback.format_exc()
         _write_doc(
             "UNCLEAR",

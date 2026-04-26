@@ -353,9 +353,7 @@ class ChirpStackBridge:
         try:
             payload_dict = reading.to_mqtt_payload()
         except AttributeError:
-            logger.warning(
-                "Decoded object for DevEUI %s has no to_mqtt_payload()", uplink.dev_eui
-            )
+            logger.warning("Decoded object for DevEUI %s has no to_mqtt_payload()", uplink.dev_eui)
             self._stats["skipped"] += 1
             return False
 

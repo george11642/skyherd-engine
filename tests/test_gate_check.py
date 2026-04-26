@@ -80,7 +80,8 @@ def test_fast_cli_invocation_completes_quickly_and_prints_ten_rows() -> None:
     assert result.returncode in (0, 1), f"unexpected exit {result.returncode}"
     # 10 rows beginning with [GREEN|YELLOW|RED
     row_lines = [
-        line for line in result.stdout.splitlines()
+        line
+        for line in result.stdout.splitlines()
         if line.startswith("[GREEN") or line.startswith("[YELLOW") or line.startswith("[RED")
     ]
     assert len(row_lines) == 10, f"expected 10 rows, got {len(row_lines)}:\n{result.stdout}"

@@ -84,9 +84,7 @@ def encode_msp_v1(command: int, payload: bytes = b"") -> bytes:
     if not 0 <= command <= 0xFF:
         raise ValueError(f"MSP command out of range: {command}")
     if len(payload) > _MAX_PAYLOAD_LEN:
-        raise ValueError(
-            f"MSP v1 payload limited to {_MAX_PAYLOAD_LEN} bytes; got {len(payload)}"
-        )
+        raise ValueError(f"MSP v1 payload limited to {_MAX_PAYLOAD_LEN} bytes; got {len(payload)}")
 
     length = len(payload)
     crc = _xor_checksum(length, command, payload)

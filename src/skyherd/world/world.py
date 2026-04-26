@@ -189,6 +189,7 @@ def _default_world_config() -> Path:
     except (TypeError, ValueError):
         # Rare fallback: zipimport. Extract to a tempfile.
         import tempfile
+
         tmp = Path(tempfile.mkstemp(suffix="_ranch_a.yaml")[1])
         tmp.write_bytes(traversable.read_bytes())
         return tmp

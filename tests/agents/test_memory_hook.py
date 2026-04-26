@@ -125,7 +125,11 @@ class TestHookWrites:
         ledger = MagicMock()
         await post_cycle_write(
             session=SimpleNamespace(agent_name="PredatorPatternLearner"),
-            wake_event={"classification": "coyote.confirmed", "ranch_id": "ranch_a", "type": "predator.detected"},
+            wake_event={
+                "classification": "coyote.confirmed",
+                "ranch_id": "ranch_a",
+                "type": "predator.detected",
+            },
             tool_calls=[],
             ledger=ledger,
             store_id_map={"PredatorPatternLearner": "memstore_X"},
@@ -145,7 +149,11 @@ class TestHookWrites:
         broadcaster = MagicMock()
         await post_cycle_write(
             session=SimpleNamespace(agent_name="PredatorPatternLearner"),
-            wake_event={"classification": "coyote.confirmed", "ranch_id": "ranch_a", "type": "predator.detected"},
+            wake_event={
+                "classification": "coyote.confirmed",
+                "ranch_id": "ranch_a",
+                "type": "predator.detected",
+            },
             tool_calls=[],
             broadcaster=broadcaster,
             store_id_map={"PredatorPatternLearner": "memstore_X"},
@@ -164,15 +172,23 @@ class TestHookWrites:
         ledger = MagicMock()
         await post_cycle_write(
             session=SimpleNamespace(agent_name="PredatorPatternLearner"),
-            wake_event={"classification": "coyote.confirmed", "ranch_id": "ranch_a", "type": "predator.detected"},
+            wake_event={
+                "classification": "coyote.confirmed",
+                "ranch_id": "ranch_a",
+                "type": "predator.detected",
+            },
             tool_calls=[],
             ledger=ledger,
             store_id_map={"PredatorPatternLearner": "memstore_X"},
         )
         payload = ledger.append.call_args.kwargs["payload"]
         assert set(payload.keys()) == {
-            "agent", "memory_store_id", "memory_id",
-            "memory_version_id", "content_sha256", "path",
+            "agent",
+            "memory_store_id",
+            "memory_id",
+            "memory_version_id",
+            "content_sha256",
+            "path",
         }
 
 
@@ -192,7 +208,11 @@ class TestHookFailureIsolation:
         with pytest.raises(RuntimeError, match="boom"):
             await post_cycle_write(
                 session=SimpleNamespace(agent_name="PredatorPatternLearner"),
-                wake_event={"classification": "coyote", "ranch_id": "ranch_a", "type": "predator.detected"},
+                wake_event={
+                    "classification": "coyote",
+                    "ranch_id": "ranch_a",
+                    "type": "predator.detected",
+                },
                 tool_calls=[],
                 store_id_map={"PredatorPatternLearner": "memstore_X"},
             )
@@ -208,7 +228,11 @@ class TestHookFailureIsolation:
         broadcaster = MagicMock()
         await post_cycle_write(
             session=SimpleNamespace(agent_name="PredatorPatternLearner"),
-            wake_event={"classification": "coyote", "ranch_id": "ranch_a", "type": "predator.detected"},
+            wake_event={
+                "classification": "coyote",
+                "ranch_id": "ranch_a",
+                "type": "predator.detected",
+            },
             tool_calls=[],
             ledger=ledger,
             broadcaster=broadcaster,
@@ -226,7 +250,11 @@ class TestHookFailureIsolation:
         broadcaster._broadcast.side_effect = Exception("sse down")
         result = await post_cycle_write(
             session=SimpleNamespace(agent_name="PredatorPatternLearner"),
-            wake_event={"classification": "coyote", "ranch_id": "ranch_a", "type": "predator.detected"},
+            wake_event={
+                "classification": "coyote",
+                "ranch_id": "ranch_a",
+                "type": "predator.detected",
+            },
             tool_calls=[],
             broadcaster=broadcaster,
             store_id_map={"PredatorPatternLearner": "memstore_X"},
@@ -251,9 +279,14 @@ class TestMeshEnsureMemoryStores:
         ids = await mesh._ensure_memory_stores()
         assert len(ids) == 7
         assert "_shared" in ids
-        for name in ["FenceLineDispatcher", "HerdHealthWatcher",
-                     "PredatorPatternLearner", "GrazingOptimizer", "CalvingWatch",
-                     "CrossRanchCoordinator"]:
+        for name in [
+            "FenceLineDispatcher",
+            "HerdHealthWatcher",
+            "PredatorPatternLearner",
+            "GrazingOptimizer",
+            "CalvingWatch",
+            "CrossRanchCoordinator",
+        ]:
             assert name in ids
             assert ids[name].startswith("memstore_")
 
@@ -330,6 +363,7 @@ class TestHandlerBaseIntegration:
 
         # Patch post_cycle_write at the _handler_base import site.
         import skyherd.agents.memory_hook as mh
+
         monkeypatch.setattr(mh, "post_cycle_write", _raise)
 
         session = SimpleNamespace(
@@ -340,6 +374,7 @@ class TestHandlerBaseIntegration:
             _broadcaster_ref=None,
         )
         import logging
+
         caplog.set_level(logging.WARNING)
         result = await hb.run_handler_cycle(
             session=session,

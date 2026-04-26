@@ -1,4 +1,5 @@
 """Wheel-layout test: force-include ships worlds/ into skyherd/worlds/ (BLD-01)."""
+
 from __future__ import annotations
 
 from importlib.resources import files

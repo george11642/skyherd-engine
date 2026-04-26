@@ -93,18 +93,12 @@ def _build_chain(
 
     async def forward_to_bridge(topic: str, payload: dict) -> None:
         # Only forward topics the bridge cares about
-        if (
-            "/fence/" in topic
-            or "/alert/thermal_hit" in topic
-            or "/thermal/" in topic
-        ):
+        if "/fence/" in topic or "/alert/thermal_hit" in topic or "/thermal/" in topic:
             await bridge.handle_event(topic, payload)
 
     broker.subscribe(forward_to_bridge)
 
-    harness = CoyoteHarness(
-        seed=seed, ts_provider=_fixed_ts, mqtt_publish=broker.publisher()
-    )
+    harness = CoyoteHarness(seed=seed, ts_provider=_fixed_ts, mqtt_publish=broker.publisher())
     return broker, bridge, harness, ledger
 
 
@@ -160,9 +154,7 @@ class TestH2Smoke:
 
         plays: list[tuple[int, float]] = []
 
-        def recording_player(
-            path: Path, tone: int, dur: float
-        ) -> DeterrentResult:
+        def recording_player(path: Path, tone: int, dur: float) -> DeterrentResult:
             plays.append((tone, dur))
             return DeterrentResult(
                 played=True,
@@ -172,9 +164,7 @@ class TestH2Smoke:
                 wav_path=path,
             )
 
-        speaker = SpeakerBridge(
-            ranch_id="ranch_a", backend_name="rec", player=recording_player
-        )
+        speaker = SpeakerBridge(ranch_id="ranch_a", backend_name="rec", player=recording_player)
 
         async def speaker_subscriber(topic: str, payload: dict) -> None:
             speaker.handle_message(topic, payload)
@@ -197,9 +187,7 @@ class TestH2Determinism:
         results: list[list[str]] = []
         for i in range(2):
             path = tmp_path_factory.mktemp(f"run_{i}")
-            broker, bridge, harness, ledger = _build_chain(
-                path, seed=42, ledger_name="ledger.db"
-            )
+            broker, bridge, harness, ledger = _build_chain(path, seed=42, ledger_name="ledger.db")
 
             async def storm(h: CoyoteHarness = harness) -> None:
                 for _ in range(2):
@@ -209,9 +197,7 @@ class TestH2Determinism:
             results.append([e.payload_json for e in ledger.iter_events()])
         assert results[0] == results[1]
 
-    def test_seed42_vs_seed7_differ(
-        self, tmp_path_factory: pytest.TempPathFactory
-    ) -> None:
+    def test_seed42_vs_seed7_differ(self, tmp_path_factory: pytest.TempPathFactory) -> None:
         """Sanity: different seeds produce different frame_path values."""
         p1 = tmp_path_factory.mktemp("seed42")
         p2 = tmp_path_factory.mktemp("seed7")

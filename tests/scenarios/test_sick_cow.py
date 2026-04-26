@@ -165,7 +165,10 @@ class TestSickCowScenario:
             from skyherd.vision.heads.pinkeye import Pinkeye  # noqa: F401
 
             # Verify bbox field exists on DetectionResult
-            if not hasattr(DetectionResult, "model_fields") or "bbox" not in DetectionResult.model_fields:
+            if (
+                not hasattr(DetectionResult, "model_fields")
+                or "bbox" not in DetectionResult.model_fields
+            ):
                 pytest.skip("VIS-05 prerequisite — DetectionResult.bbox not yet defined")
         except ImportError as exc:
             pytest.skip(f"VIS-05 prerequisite — Phase 2 pixel head required: {exc}")
@@ -252,9 +255,7 @@ def test_pinkeye_bbox_flows_through_classify_pipeline(
         f"all detections: {[d.head_name for d in result.detections]}"
     )
     bbox_dets = [d for d in pinkeye_dets if d.bbox is not None]
-    assert bbox_dets, (
-        "pinkeye detections have no bbox — pixel path did not engage"
-    )
+    assert bbox_dets, "pinkeye detections have no bbox — pixel path did not engage"
     for d in bbox_dets:
         x0, y0, x1, y1 = d.bbox  # type: ignore[misc]
         assert 0 <= x0 < x1 <= 640, f"invalid x coords in bbox: {d.bbox}"

@@ -50,21 +50,17 @@ def test_source_md_exists() -> None:
 
 def test_at_least_three_primitives_present(lottie_filenames: list[str]) -> None:
     """Phase E2 plan: 3-5 Lottie animations. We ship 5."""
-    assert (
-        len(lottie_filenames) >= 3
-    ), f"Phase E2 needs ≥3 Lottie animations; found {lottie_filenames}"
+    assert len(lottie_filenames) >= 3, (
+        f"Phase E2 needs ≥3 Lottie animations; found {lottie_filenames}"
+    )
 
 
-def test_every_lottie_listed_in_source_md(
-    lottie_filenames: list[str], source_md_text: str
-) -> None:
+def test_every_lottie_listed_in_source_md(lottie_filenames: list[str], source_md_text: str) -> None:
     missing = [f for f in lottie_filenames if f not in source_md_text]
     assert not missing, f"Lottie files not listed in SOURCE.md: {missing}"
 
 
-def test_only_permissive_licenses(
-    source_md_text: str, lottie_filenames: list[str]
-) -> None:
+def test_only_permissive_licenses(source_md_text: str, lottie_filenames: list[str]) -> None:
     """Each table row mentioning a Lottie file must declare CC0 or MIT."""
     bad_rows: list[str] = []
     for raw_line in source_md_text.splitlines():
@@ -74,9 +70,7 @@ def test_only_permissive_licenses(
         if not any(name in line for name in lottie_filenames):
             continue
         # Look for any allowed license token in this row.
-        if not any(
-            re.search(rf"\|\s*{re.escape(lic)}\s*\|", line) for lic in ALLOWED_LICENSES
-        ):
+        if not any(re.search(rf"\|\s*{re.escape(lic)}\s*\|", line) for lic in ALLOWED_LICENSES):
             bad_rows.append(line)
     assert not bad_rows, f"rows missing CC0/MIT license: {bad_rows}"
 
@@ -98,9 +92,7 @@ def test_no_forbidden_license_in_clip_rows(
     assert not bad, f"forbidden license tokens in Lottie rows: {bad}"
 
 
-def test_each_row_has_sha256(
-    source_md_text: str, lottie_filenames: list[str]
-) -> None:
+def test_each_row_has_sha256(source_md_text: str, lottie_filenames: list[str]) -> None:
     sha_re = re.compile(r"\b[a-fA-F0-9]{64}\b")
     for fname in lottie_filenames:
         row = next(
@@ -132,9 +124,7 @@ def test_sha256_matches_disk(lottie_filenames: list[str], source_md_text: str) -
         assert match is not None
         declared = match.group(0).lower()
 
-        actual = hashlib.sha256(
-            (LOTTIE_DIR / fname).read_bytes()
-        ).hexdigest()
+        actual = hashlib.sha256((LOTTIE_DIR / fname).read_bytes()).hexdigest()
         assert declared == actual, (
             f"declared SHA256 for {fname} doesn't match disk:\n"
             f"  declared {declared}\n  actual   {actual}\n"

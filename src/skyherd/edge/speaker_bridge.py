@@ -55,9 +55,7 @@ _DEFAULT_TOPIC_SUFFIX = "/deterrent/play"
 # or mistyped duration_s from stalling the subscriber loop for minutes.
 _MAX_PLAYBACK_S = 10.0
 
-DEFAULT_WAV_FIXTURE = (
-    Path(__file__).parent / "fixtures" / "deterrent" / "predator_12khz.wav"
-)
+DEFAULT_WAV_FIXTURE = Path(__file__).parent / "fixtures" / "deterrent" / "predator_12khz.wav"
 
 
 # ---------------------------------------------------------------------------
@@ -147,9 +145,7 @@ def _resolve_backend(name: str | None) -> tuple[str, PlayerFn]:
                     "SpeakerBridge: simpleaudio requested but not installed; falling back to nop"
                 )
 
-    logger.info(
-        "SpeakerBridge: no audio backend available (pygame/simpleaudio missing); using nop"
-    )
+    logger.info("SpeakerBridge: no audio backend available (pygame/simpleaudio missing); using nop")
     return "nop", nop_player
 
 
@@ -361,18 +357,14 @@ class SpeakerBridge:
                     try:
                         payload = json.loads(message.payload)
                     except (TypeError, ValueError) as exc:
-                        logger.debug(
-                            "SpeakerBridge bad JSON on %s: %s", message.topic, exc
-                        )
+                        logger.debug("SpeakerBridge bad JSON on %s: %s", message.topic, exc)
                         continue
                     topic = str(message.topic)
                     # Run the blocking player in the default executor so the
                     # subscriber doesn't stall on audio playback.
                     loop = asyncio.get_running_loop()
                     try:
-                        await loop.run_in_executor(
-                            None, self.handle_message, topic, payload
-                        )
+                        await loop.run_in_executor(None, self.handle_message, topic, payload)
                     except Exception as exc:  # noqa: BLE001
                         logger.error("SpeakerBridge handle_message error: %s", exc)
         except Exception as exc:  # noqa: BLE001

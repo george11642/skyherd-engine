@@ -41,9 +41,7 @@ def _write_ring(record: dict) -> None:
 
 def _twilio_available() -> bool:
     return bool(
-        os.environ.get("TWILIO_SID")
-        and _get_twilio_auth_token()
-        and os.environ.get("TWILIO_FROM")
+        os.environ.get("TWILIO_SID") and _get_twilio_auth_token() and os.environ.get("TWILIO_FROM")
     )
 
 

@@ -285,8 +285,7 @@ class TestDemoMesh:
             f"thermal.anomaly must dispatch FenceLineDispatcher; got {agents_called}"
         )
         assert "PredatorPatternLearner" in agents_called, (
-            f"thermal.anomaly must dispatch PredatorPatternLearner (ROUT-02); "
-            f"got {agents_called}"
+            f"thermal.anomaly must dispatch PredatorPatternLearner (ROUT-02); got {agents_called}"
         )
 
     def test_routing_table_nightly_analysis(self) -> None:

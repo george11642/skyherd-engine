@@ -144,9 +144,7 @@ def get_backend(name: str | None = None) -> DroneBackend:
     Call :py:meth:`DroneBackend.connect` to open the connection.
     """
     backend_name = (
-        name
-        or os.environ.get("SKYHERD_DRONE_BACKEND")
-        or os.environ.get("DRONE_BACKEND", "sitl")
+        name or os.environ.get("SKYHERD_DRONE_BACKEND") or os.environ.get("DRONE_BACKEND", "sitl")
     )
 
     # Lazy imports so callers that only use StubBackend never pull mavsdk.
@@ -190,9 +188,7 @@ def get_backend(name: str | None = None) -> DroneBackend:
                 "f3_inav",
                 "betaflight",
             ]
-            raise DroneError(
-                f"Unknown drone backend {backend_name!r}. Available: {available}"
-            )
+            raise DroneError(f"Unknown drone backend {backend_name!r}. Available: {available}")
 
     cls = _REGISTRY[backend_name]
     return cls()

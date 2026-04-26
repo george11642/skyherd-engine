@@ -145,9 +145,7 @@ def verify_bootstrap(
 def picam(
     cam_id: str = typer.Option("picam_0", "--cam-id", help="Camera identifier."),
     ranch_id: str = typer.Option("ranch_a", "--ranch-id", help="Ranch identifier."),
-    mqtt_url: str = typer.Option(
-        "mqtt://localhost:1883", "--mqtt-url", help="MQTT broker URL."
-    ),
+    mqtt_url: str = typer.Option("mqtt://localhost:1883", "--mqtt-url", help="MQTT broker URL."),
     interval_s: float = typer.Option(10.0, "--interval-s", help="Seconds between captures."),
     seed: int | None = typer.Option(
         None, "--seed", help="Deterministic frame-ordering seed (dev-mode only)."
@@ -206,16 +204,10 @@ def picam(
 def coyote(
     cam_id: str = typer.Option("coyote_cam", "--cam-id", help="Thermal camera ID."),
     ranch_id: str = typer.Option("ranch_a", "--ranch-id", help="Ranch identifier."),
-    mqtt_url: str = typer.Option(
-        "mqtt://localhost:1883", "--mqtt-url", help="MQTT broker URL."
-    ),
-    interval_s: float = typer.Option(
-        2.0, "--interval-s", help="Seconds between thermal frames."
-    ),
+    mqtt_url: str = typer.Option("mqtt://localhost:1883", "--mqtt-url", help="MQTT broker URL."),
+    interval_s: float = typer.Option(2.0, "--interval-s", help="Seconds between thermal frames."),
     seed: int | None = typer.Option(None, "--seed", help="Deterministic-playback seed."),
-    max_ticks: int | None = typer.Option(
-        None, "--max-ticks", help="Emit N frames, then exit."
-    ),
+    max_ticks: int | None = typer.Option(None, "--max-ticks", help="Emit N frames, then exit."),
     clip_dir: Path | None = typer.Option(
         None, "--clip-dir", help="Override thermal clip directory."
     ),
@@ -271,9 +263,7 @@ def pi_to_mission_cmd(
     backend: str = typer.Option(
         "sitl", "--backend", help="Drone backend (sitl | stub | mavic | f3_inav)."
     ),
-    seed: int | None = typer.Option(
-        None, "--seed", help="Deterministic mission-id seed."
-    ),
+    seed: int | None = typer.Option(None, "--seed", help="Deterministic mission-id seed."),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Enable debug logging."),
 ) -> None:
     """Subscribe to Pi sensor MQTT topics and dispatch drone missions.
@@ -311,9 +301,7 @@ def pi_to_mission_cmd(
 @app.command("deterrent")
 def deterrent_cmd(
     ranch_id: str = typer.Option("ranch_a", "--ranch", help="Ranch identifier."),
-    mute: bool = typer.Option(
-        False, "--mute", help="Force mute backend (CI default)."
-    ),
+    mute: bool = typer.Option(False, "--mute", help="Force mute backend (CI default)."),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Enable debug logging."),
 ) -> None:
     """Subscribe to deterrent MQTT events and play predator WAV to OS audio.

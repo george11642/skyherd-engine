@@ -177,16 +177,18 @@ class NeighborBroadcaster:
 
         self._published_count += 1
         # CRM-04: record outbound event for /api/neighbors feed.
-        self._recent.append({
-            "direction": "outbound",
-            "from_ranch": self._from_ranch,
-            "to_ranch": to_ranch,
-            "species": species,
-            "confidence": confidence,
-            "shared_fence": fence_id,
-            "ts": ts,
-            "attestation_hash": base_payload["attestation_hash"],
-        })
+        self._recent.append(
+            {
+                "direction": "outbound",
+                "from_ranch": self._from_ranch,
+                "to_ranch": to_ranch,
+                "species": species,
+                "confidence": confidence,
+                "shared_fence": fence_id,
+                "ts": ts,
+                "attestation_hash": base_payload["attestation_hash"],
+            }
+        )
         logger.info(
             "NeighborBroadcaster[%s → %s]: broadcast predator_confirmed (fence=%s, species=%s, "
             "confidence=%.2f)",
@@ -309,16 +311,18 @@ class NeighborListener:
             return False
 
         # CRM-04: record inbound event for /api/neighbors feed (after dedup).
-        self._recent.append({
-            "direction": "inbound",
-            "from_ranch": from_ranch,
-            "to_ranch": self._this_ranch,
-            "species": species,
-            "confidence": confidence,
-            "shared_fence": shared_fence,
-            "ts": ts,
-            "attestation_hash": attestation_hash,
-        })
+        self._recent.append(
+            {
+                "direction": "inbound",
+                "from_ranch": from_ranch,
+                "to_ranch": self._this_ranch,
+                "species": species,
+                "confidence": confidence,
+                "shared_fence": shared_fence,
+                "ts": ts,
+                "attestation_hash": attestation_hash,
+            }
+        )
 
         # Build a synthetic neighbor_alert wake event for FenceLineDispatcher
         wake_event: dict[str, Any] = {

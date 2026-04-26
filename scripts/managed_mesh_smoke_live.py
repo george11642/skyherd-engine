@@ -56,9 +56,7 @@ log = logging.getLogger("live-smoke")
 
 # Mirror to file via a hand-held handler so tool streaming is also captured.
 file_handler = logging.FileHandler(RUNTIME_LOG, mode="w")
-file_handler.setFormatter(
-    logging.Formatter("%(asctime)s  %(levelname)-8s  %(name)s  %(message)s")
-)
+file_handler.setFormatter(logging.Formatter("%(asctime)s  %(levelname)-8s  %(name)s  %(message)s"))
 logging.getLogger().addHandler(file_handler)
 
 
@@ -69,12 +67,12 @@ logging.getLogger().addHandler(file_handler)
 # platform-reported cost where available.
 # ---------------------------------------------------------------------------
 
-OPUS_INPUT_PER_K = 15.0 / 1000      # 15 USD / MTok
-OPUS_OUTPUT_PER_K = 75.0 / 1000     # 75 USD / MTok
+OPUS_INPUT_PER_K = 15.0 / 1000  # 15 USD / MTok
+OPUS_OUTPUT_PER_K = 75.0 / 1000  # 75 USD / MTok
 OPUS_CACHE_READ_PER_K = 1.5 / 1000  # 10% of input
 
-SKYHERD_MAX_TOKENS = 512     # tight budget per wake
-STREAM_TIMEOUT_S = 60        # per-agent stream cap
+SKYHERD_MAX_TOKENS = 512  # tight budget per wake
+STREAM_TIMEOUT_S = 60  # per-agent stream cap
 
 
 # ---------------------------------------------------------------------------
@@ -186,9 +184,7 @@ async def _run_agent_smoke(
             # directly. `beta.sessions.events.stream(id)` is a coroutine
             # that, when awaited, returns an AsyncStream which is itself
             # an async context manager + async iterator.
-            raw_stream = await mgr._client.beta.sessions.events.stream(
-                session.platform_session_id
-            )
+            raw_stream = await mgr._client.beta.sessions.events.stream(session.platform_session_id)
             async with raw_stream as sse:
                 async for event in sse:
                     result["events_seen"] += 1
@@ -207,17 +203,13 @@ async def _run_agent_smoke(
                                 is_error=False,
                             )
                         except Exception as exc:  # noqa: BLE001
-                            log.warning(
-                                "tool-result send failed for %s: %s", spec.name, exc
-                            )
+                            log.warning("tool-result send failed for %s: %s", spec.name, exc)
 
                     elif etype == "span.model_request_end":
                         usage = getattr(event, "model_usage", None)
                         if usage is not None:
                             result["tokens_in"] += getattr(usage, "input_tokens", 0) or 0
-                            result["tokens_out"] += (
-                                getattr(usage, "output_tokens", 0) or 0
-                            )
+                            result["tokens_out"] += getattr(usage, "output_tokens", 0) or 0
                             result["cache_read"] += (
                                 getattr(usage, "cache_read_input_tokens", 0) or 0
                             )

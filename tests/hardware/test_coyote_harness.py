@@ -91,9 +91,7 @@ class TestSchema:
         assert len(reading["hits"]) == 1
 
     def test_reading_includes_ranch_entity_cam_pos(self) -> None:
-        harness = CoyoteHarness(
-            ranch_id="ranch_x", cam_id="coyote_7", ts_provider=_fixed_ts
-        )
+        harness = CoyoteHarness(ranch_id="ranch_x", cam_id="coyote_7", ts_provider=_fixed_ts)
         reading = asyncio.run(harness.run_once())
         assert reading["ranch"] == "ranch_x"
         assert reading["entity"] == "coyote_7"

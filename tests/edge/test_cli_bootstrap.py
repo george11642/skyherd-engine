@@ -50,9 +50,7 @@ class TestVerifyBootstrap:
 
     def test_reports_absent_file(self, tmp_path: Path) -> None:
         missing = tmp_path / "no_such_creds.json"
-        result = runner.invoke(
-            app, ["verify-bootstrap", "--credentials-file", str(missing)]
-        )
+        result = runner.invoke(app, ["verify-bootstrap", "--credentials-file", str(missing)])
         assert result.exit_code == 2
         combined = (result.output or "") + (result.stderr or "")
         assert "not found" in combined
@@ -60,9 +58,7 @@ class TestVerifyBootstrap:
     def test_rejects_non_object_root(self, tmp_path: Path) -> None:
         arr_creds = tmp_path / "arr.json"
         arr_creds.write_text("[1, 2, 3]")
-        result = runner.invoke(
-            app, ["verify-bootstrap", "--credentials-file", str(arr_creds)]
-        )
+        result = runner.invoke(app, ["verify-bootstrap", "--credentials-file", str(arr_creds)])
         assert result.exit_code == 2
 
     def test_accepts_all_optional_fields_empty(self, tmp_path: Path) -> None:

@@ -30,9 +30,12 @@ def _make_world() -> MagicMock:
     w = MagicMock()
     snap = MagicMock()
     snap.model_dump.return_value = {
-        "cows": [], "predators": [], "drone": {"state": "idle"},
+        "cows": [],
+        "predators": [],
+        "drone": {"state": "idle"},
         "weather": {"wind_speed_kt": 0.0},
-        "paddocks": [], "is_night": False,
+        "paddocks": [],
+        "is_night": False,
     }
     w.snapshot.return_value = snap
     return w
@@ -124,6 +127,7 @@ async def test_spa_catch_all_serves_existing_file(tmp_path, monkeypatch) -> None
     (dist / "my-static.txt").write_text("literal static file")
 
     from skyherd.server import app as app_mod
+
     monkeypatch.setattr(app_mod, "_STATIC_DIR", dist)
 
     app = create_app(mock=True)
@@ -143,6 +147,7 @@ async def test_spa_catch_all_falls_back_to_index(tmp_path, monkeypatch) -> None:
     (dist / "assets").mkdir()
 
     from skyherd.server import app as app_mod
+
     monkeypatch.setattr(app_mod, "_STATIC_DIR", dist)
 
     app = create_app(mock=True)
@@ -194,8 +199,7 @@ def test_real_cost_tick_skips_malformed_ticker() -> None:
         def agent_tickers(self):
             return [BadTicker()]
 
-    b = EventBroadcaster(mock=False, mesh=MeshWithBadTicker(),
-                         ledger=None, world=None)
+    b = EventBroadcaster(mock=False, mesh=MeshWithBadTicker(), ledger=None, world=None)
     payload = b._real_cost_tick()
     assert payload["agents"] == []
 
@@ -212,10 +216,12 @@ async def test_vet_intake_loop_broadcasts_new_md_files(tmp_path, monkeypatch) ->
     intake_dir.mkdir(parents=True)
 
     import os
+
     old_cwd = os.getcwd()
     os.chdir(tmp_path)
     try:
         from skyherd.server import events as events_mod
+
         monkeypatch.setattr(events_mod, "VET_INTAKE_POLL_INTERVAL_S", 0.02)
 
         b = EventBroadcaster(mock=True)

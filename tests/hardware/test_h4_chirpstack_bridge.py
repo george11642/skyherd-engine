@@ -299,7 +299,16 @@ class TestChirpStackBridgeHandleRawEvent:
 
         decoded = json.loads(pub.calls[0][1].decode())
         # Sim-emitted keys (from skyherd/sensors/collar.py tick())
-        required = {"ts", "kind", "ranch", "entity", "pos", "heading_deg", "activity", "battery_pct"}
+        required = {
+            "ts",
+            "kind",
+            "ranch",
+            "entity",
+            "pos",
+            "heading_deg",
+            "activity",
+            "battery_pct",
+        }
         assert required.issubset(decoded.keys()), (
             f"Bridge payload missing required sim keys: {required - decoded.keys()}"
         )
@@ -533,11 +542,11 @@ class TestRunForever:
 
 
 class TestCollarRegistryDefaultPath:
-    def test_default_path_computed_from_repo_root(
-        self, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    def test_default_path_computed_from_repo_root(self, monkeypatch: pytest.MonkeyPatch) -> None:
         """With no env var and no path, registry uses runtime/collars/registry.json."""
         monkeypatch.delenv("SKYHERD_COLLAR_REGISTRY", raising=False)
         reg = CollarRegistry(cache_ttl_s=0.0)
         # It may or may not find a live registry; just assert lookup is no-throw.
-        assert reg.lookup("0000000000000000") is None or isinstance(reg.lookup("0000000000000000"), tuple)
+        assert reg.lookup("0000000000000000") is None or isinstance(
+            reg.lookup("0000000000000000"), tuple
+        )

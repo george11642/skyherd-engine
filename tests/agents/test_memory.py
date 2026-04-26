@@ -408,11 +408,13 @@ class TestBaseInterface:
 class TestEdgeCases:
     def test_normalize_empty_path_returns_slash(self):
         from skyherd.agents.memory import _normalize_path
+
         assert _normalize_path("") == "/"
         assert _normalize_path(None) == "/"  # type: ignore[arg-type]
 
     def test_normalize_path_keeps_leading_slash(self):
         from skyherd.agents.memory import _normalize_path
+
         assert _normalize_path("/already/slash") == "/already/slash"
 
     def test_manager_loads_existing_cache_file(self, tmp_path, monkeypatch):
@@ -420,18 +422,14 @@ class TestEdgeCases:
         cache.write_text(json.dumps({"preexisting": "memstore_XYZ"}))
         monkeypatch.setenv("ANTHROPIC_API_KEY", "sk-test-fake")
         client = AsyncMock()
-        mgr = MemoryStoreManager(
-            api_key="sk-test-fake", client=client, store_ids_path=str(cache)
-        )
+        mgr = MemoryStoreManager(api_key="sk-test-fake", client=client, store_ids_path=str(cache))
         assert mgr._store_ids["preexisting"] == "memstore_XYZ"
 
     def test_manager_tolerates_corrupted_cache_file(self, tmp_path):
         cache = tmp_path / "store_ids.json"
         cache.write_text("not json {{{")
         client = AsyncMock()
-        mgr = MemoryStoreManager(
-            api_key="sk-test-fake", client=client, store_ids_path=str(cache)
-        )
+        mgr = MemoryStoreManager(api_key="sk-test-fake", client=client, store_ids_path=str(cache))
         # Should not raise; should fall back to empty dict.
         assert mgr._store_ids == {}
 

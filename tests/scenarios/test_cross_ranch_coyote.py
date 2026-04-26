@@ -209,13 +209,10 @@ class TestCrossRanchCoyoteUpgradedAssertions:
     def test_ranch_b_mission_is_neighbor_pre_position_patrol(self, monkeypatch):
         monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
         result = run_cross_ranch(seed=42)
-        launch_calls = [
-            c for c in result["ranch_b_tool_calls"] if c.get("tool") == "launch_drone"
-        ]
+        launch_calls = [c for c in result["ranch_b_tool_calls"] if c.get("tool") == "launch_drone"]
         missions = [c.get("input", {}).get("mission") for c in launch_calls]
         assert "neighbor_pre_position_patrol" in missions, (
-            "Ranch_b launch_drone mission must be 'neighbor_pre_position_patrol'. "
-            f"Got: {missions}"
+            f"Ranch_b launch_drone mission must be 'neighbor_pre_position_patrol'. Got: {missions}"
         )
 
     def test_ranch_b_handoff_log_has_response_mode_pre_position(self, monkeypatch):

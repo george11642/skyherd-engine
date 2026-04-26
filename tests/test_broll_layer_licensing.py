@@ -75,11 +75,7 @@ def test_all_broll_clips_listed_in_source_md(
 def test_only_permissive_licenses_used(source_md_text: str) -> None:
     """Every license token in the SOURCE.md table must come from ALLOWED_LICENSES."""
     # Extract whatever sits between '|' separators in the markdown table.
-    pattern = (
-        r"\|\s*("
-        + "|".join(re.escape(lic) for lic in ALLOWED_LICENSES)
-        + r")\s*\|"
-    )
+    pattern = r"\|\s*(" + "|".join(re.escape(lic) for lic in ALLOWED_LICENSES) + r")\s*\|"
     found = set(re.findall(pattern, source_md_text))
     assert found, "no permissive license entries found in SOURCE.md table"
     # Sanity: the Mixkit License must be present given our current sourcing.

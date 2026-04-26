@@ -64,6 +64,7 @@ async def test_live_cost_tick_emits_six_agents() -> None:
     bc = EventBroadcaster(mock=False, mesh=mesh, ledger=None, world=MagicMock())
     bc.start()
     try:
+
         async def first_cost_tick() -> dict[str, Any]:
             async for etype, payload in bc.subscribe():
                 if etype == "cost.tick":

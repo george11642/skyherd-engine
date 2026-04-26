@@ -64,14 +64,14 @@ CUES_FILE_DEFAULT = REPO_ROOT / "scripts/vo_cues.sh"
 # 180s composition, 6s cold open.
 CUE_OFFSETS: dict[str, float] = {
     # v5.6: hook 22→21, traditional 24→23, coyote 28→30 (sim breathing room).
-    "vo-c-hook":         6.0,   # cold open is 6s
-    "vo-c-traditional": 27.0,   # 6 + 21 hook
-    "vo-c-answer":      50.0,   # 27 + 23 traditional
-    "vo-c-coyote":      66.0,   # 50 + 16 answer
-    "vo-c-grid":        96.0,   # 66 + 30 coyote
-    "vo-c-mvp":        120.0,   # 96 + 24 grid
-    "vo-c-vision":     143.0,   # 120 + 23 mvp
-    "vo-c-aibody":     165.0,   # 143 + 22 vision
+    "vo-c-hook": 6.0,  # cold open is 6s
+    "vo-c-traditional": 27.0,  # 6 + 21 hook
+    "vo-c-answer": 50.0,  # 27 + 23 traditional
+    "vo-c-coyote": 66.0,  # 50 + 16 answer
+    "vo-c-grid": 96.0,  # 66 + 30 coyote
+    "vo-c-mvp": 120.0,  # 96 + 24 grid
+    "vo-c-vision": 143.0,  # 120 + 23 mvp
+    "vo-c-aibody": 165.0,  # 143 + 22 vision
 }
 
 # Default StyledWord styling (uniform; no Opus-authored per-word color).
@@ -135,6 +135,7 @@ def phonetic_text(text: str) -> str:
 # vo_cues.sh parser
 # ---------------------------------------------------------------------------
 
+
 def parse_cues(cues_file: Path) -> dict[str, str]:
     """
     Parse CUES["key"]="text" entries from vo_cues.sh.
@@ -169,9 +170,8 @@ def _get_fw_model(device: str) -> object:
     global _fw_model_cache, _fw_model_device
     if _fw_model_cache is None or _fw_model_device != device:
         from faster_whisper import WhisperModel
-        print(
-            f"[regen_captions] Loading faster-whisper model (base.en, device={device}) …"
-        )
+
+        print(f"[regen_captions] Loading faster-whisper model (base.en, device={device}) …")
         # base.en: fast, English-only, ~145 MB, good word-level accuracy
         _fw_model_cache = WhisperModel("base.en", device=device, compute_type="int8")
         _fw_model_device = device
@@ -220,15 +220,17 @@ def align_cue(
 
     words: list[dict[str, float | str]] = []
     for seg in segments_iter:
-        for w in (seg.words or []):
+        for w in seg.words or []:
             word_text = str(w.word).strip()
             if not word_text:
                 continue
-            words.append({
-                "word": word_text,
-                "start": float(w.start),
-                "end": float(w.end),
-            })
+            words.append(
+                {
+                    "word": word_text,
+                    "start": float(w.start),
+                    "end": float(w.end),
+                }
+            )
 
     if not words:
         raise RuntimeError(
@@ -243,20 +245,27 @@ def align_cue(
 # Duration helper
 # ---------------------------------------------------------------------------
 
+
 def mp3_duration(path: Path) -> float:
     """Return duration of an MP3 in seconds via mutagen (fast, no subprocess)."""
     try:
         from mutagen.mp3 import MP3
+
         audio = MP3(str(path))
         return float(audio.info.length)
     except Exception:
         # Fallback: read duration via wave — won't work for mp3, so use subprocess
         import subprocess
+
         result = subprocess.run(
             [
-                "ffprobe", "-v", "error",
-                "-show_entries", "format=duration",
-                "-of", "csv=p=0",
+                "ffprobe",
+                "-v",
+                "error",
+                "-show_entries",
+                "format=duration",
+                "-of",
+                "csv=p=0",
                 str(path),
             ],
             capture_output=True,
@@ -269,6 +278,7 @@ def mp3_duration(path: Path) -> float:
 # ---------------------------------------------------------------------------
 # Main generation logic
 # ---------------------------------------------------------------------------
+
 
 def dedupe_repeat_attractor(words: list[dict[str, float | str]]) -> list[dict[str, float | str]]:
     """
@@ -344,25 +354,25 @@ def generate(
             )
 
         for w in words:
-            output_words.append({
-                "word": str(w["word"]),
-                "start": round(float(w["start"]) + offset, 4),
-                "end": round(float(w["end"]) + offset, 4),
-                "segment_id": segment_id,
-                "color": DEFAULT_COLOR,
-                "weight": DEFAULT_WEIGHT,
-                "animation": DEFAULT_ANIMATION,
-                "emphasis_level": DEFAULT_EMPHASIS_LEVEL,
-            })
+            output_words.append(
+                {
+                    "word": str(w["word"]),
+                    "start": round(float(w["start"]) + offset, 4),
+                    "end": round(float(w["end"]) + offset, 4),
+                    "segment_id": segment_id,
+                    "color": DEFAULT_COLOR,
+                    "weight": DEFAULT_WEIGHT,
+                    "animation": DEFAULT_ANIMATION,
+                    "emphasis_level": DEFAULT_EMPHASIS_LEVEL,
+                }
+            )
 
         word_count = len(words)
         print(f"[regen_captions]   → {word_count} words aligned for {cue_key}")
         segment_id += 1
 
     # Build fingerprint over the word data
-    fingerprint = hashlib.sha256(
-        json.dumps(output_words, sort_keys=True).encode()
-    ).hexdigest()
+    fingerprint = hashlib.sha256(json.dumps(output_words, sort_keys=True).encode()).hexdigest()
 
     payload = {
         "variant": "C",
@@ -380,6 +390,7 @@ def generate(
 # ---------------------------------------------------------------------------
 # Validation
 # ---------------------------------------------------------------------------
+
 
 def validate(
     cue_keys: list[str],
@@ -439,7 +450,9 @@ def validate(
                 print(f"    {e}")
             all_pass = False
         else:
-            print(f"[validate] PASS [{cue_key}] ({len(seg_words)} words, dur={dur:.2f}s, offset={offset}s)")
+            print(
+                f"[validate] PASS [{cue_key}] ({len(seg_words)} words, dur={dur:.2f}s, offset={offset}s)"
+            )
 
     return all_pass
 
@@ -447,6 +460,7 @@ def validate(
 # ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
+
 
 def main() -> None:
     parser = argparse.ArgumentParser(

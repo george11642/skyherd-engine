@@ -148,18 +148,14 @@ class TestSimulation:
 
 
 class TestHandler:
-    async def test_handler_simulate_path_without_api_key(
-        self, session, wake_event, monkeypatch
-    ):
+    async def test_handler_simulate_path_without_api_key(self, session, wake_event, monkeypatch):
         """No API key → simulate path returns 3 tool calls."""
         monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
         calls = await handler(session, wake_event, sdk_client=None)
         assert len(calls) == 3
         assert any(c["tool"] == "launch_drone" for c in calls)
 
-    async def test_handler_loads_skills_without_crashing(
-        self, session, wake_event, monkeypatch
-    ):
+    async def test_handler_loads_skills_without_crashing(self, session, wake_event, monkeypatch):
         """Handler must not explode on missing skill files — build_cached_messages
         gracefully treats missing files as empty strings via _load_text."""
         monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)

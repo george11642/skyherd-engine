@@ -190,9 +190,7 @@ class TestCheckpointPersistence:
     then rehydrate on the other side of the boundary.
     """
 
-    def test_predator_pattern_learner_checkpoint_round_trip(
-        self, tmp_path, monkeypatch
-    ) -> None:
+    def test_predator_pattern_learner_checkpoint_round_trip(self, tmp_path, monkeypatch) -> None:
         """MA-05: learner session state survives checkpoint → restore cycle.
 
         Simulates a sim-day boundary: two wake events (thermal clip + nightly
@@ -232,15 +230,12 @@ class TestCheckpointPersistence:
 
         # Pre-checkpoint invariant: both events recorded.
         assert len(session.wake_events_consumed) == 2, (
-            f"Pre-checkpoint wake_events_consumed count wrong: "
-            f"{len(session.wake_events_consumed)}"
+            f"Pre-checkpoint wake_events_consumed count wrong: {len(session.wake_events_consumed)}"
         )
 
         # Serialize state.
         checkpoint_path = mgr.checkpoint(session_id)
-        assert checkpoint_path.exists(), (
-            f"Checkpoint file not written: {checkpoint_path}"
-        )
+        assert checkpoint_path.exists(), f"Checkpoint file not written: {checkpoint_path}"
 
         # Simulate sim-day boundary: fresh SessionManager, restore from disk.
         mgr2 = SessionManager()
@@ -258,8 +253,7 @@ class TestCheckpointPersistence:
             f"Agent name lost in round-trip: {restored.agent_name}"
         )
         assert len(restored.wake_events_consumed) == 2, (
-            f"wake_events_consumed count lost in round-trip: "
-            f"{len(restored.wake_events_consumed)}"
+            f"wake_events_consumed count lost in round-trip: {len(restored.wake_events_consumed)}"
         )
         # Event payloads preserved
         restored_types = [e.get("type") for e in restored.wake_events_consumed]
@@ -288,9 +282,7 @@ class TestCheckpointPersistence:
         restored = mgr2.restore_from_checkpoint(session.id)
         assert restored.agent_name == "PredatorPatternLearner"
 
-    def test_checkpoint_file_written_to_runtime_dir(
-        self, tmp_path, monkeypatch
-    ) -> None:
+    def test_checkpoint_file_written_to_runtime_dir(self, tmp_path, monkeypatch) -> None:
         """Checkpoint writes a JSON file named {session_id}.json in _RUNTIME_DIR."""
         import skyherd.agents.session as sess_mod
 

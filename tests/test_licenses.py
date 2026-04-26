@@ -62,8 +62,7 @@ def test_no_yolov5_in_base_deps() -> None:
     """yolov5 (GPL) must NOT appear in the base dep closure."""
     closure = _base_dep_closure()
     assert "yolov5" not in closure, (
-        "yolov5 (GPL) is in the base dep closure. "
-        "Remove it from base deps immediately."
+        "yolov5 (GPL) is in the base dep closure. Remove it from base deps immediately."
     )
 
 

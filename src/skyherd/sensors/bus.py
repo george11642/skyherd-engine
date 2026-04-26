@@ -267,5 +267,10 @@ class SensorBus:
             try:
                 return host, int(port_str)
             except ValueError as exc:
-                logger.debug("mqtt URL port unparseable in %r â using default %d: %s", url, _DEFAULT_BROKER_PORT, exc)
+                logger.debug(
+                    "mqtt URL port unparseable in %r â using default %d: %s",
+                    url,
+                    _DEFAULT_BROKER_PORT,
+                    exc,
+                )
         return without_scheme, _DEFAULT_BROKER_PORT

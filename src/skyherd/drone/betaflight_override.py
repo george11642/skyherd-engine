@@ -140,9 +140,7 @@ def _resolve_throttle_us() -> int:
     try:
         value = int(raw)
     except ValueError:
-        logger.warning(
-            "SKYHERD_MOTOR_THROTTLE_US=%r is not an int; using default 1200us", raw
-        )
+        logger.warning("SKYHERD_MOTOR_THROTTLE_US=%r is not an int; using default 1200us", raw)
         return 1200
     # Clamp to [MIN_THROTTLE_US, MAX_THROTTLE_US].
     return max(MIN_THROTTLE_US, min(value, MAX_THROTTLE_US))
@@ -374,8 +372,7 @@ class BetaflightOverrideBackend(DroneBackend):
     async def get_thermal_clip(self, duration_s: float = 10.0) -> Path:
         """No thermal payload on a DIY quad."""
         raise DroneUnavailable(
-            "BetaflightOverrideBackend has no thermal camera.  "
-            "Use MavicAdapter for thermal clips."
+            "BetaflightOverrideBackend has no thermal camera.  Use MavicAdapter for thermal clips."
         )
 
     async def state(self) -> DroneState:
@@ -486,9 +483,7 @@ class BetaflightOverrideBackend(DroneBackend):
 
     def _assert_connected(self) -> None:
         if not self._connected:
-            raise DroneUnavailable(
-                "BetaflightOverrideBackend not connected — call connect() first"
-            )
+            raise DroneUnavailable("BetaflightOverrideBackend not connected — call connect() first")
 
 
 # Silence unused-import warning for runtime-only helpers.

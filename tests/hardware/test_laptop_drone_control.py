@@ -55,9 +55,7 @@ class _RtlFailingBackend(DroneBackend):
     ) -> None:  # pragma: no cover
         self.calls.append("play_deterrent")
 
-    async def get_thermal_clip(
-        self, duration_s: float = 10.0
-    ) -> Any:  # pragma: no cover
+    async def get_thermal_clip(self, duration_s: float = 10.0) -> Any:  # pragma: no cover
         self.calls.append("get_thermal_clip")
         return None
 
@@ -113,9 +111,7 @@ def _build_mock_connection(*, climb_alt_mm: int = 25000) -> MagicMock:
         _FakeMavlinkMessage(type_name="HEARTBEAT", base_mode=0x80),
         _FakeMavlinkMessage(type_name="COMMAND_ACK", command=400),
         _FakeMavlinkMessage(type_name="COMMAND_ACK", command=22),
-        _FakeMavlinkMessage(
-            type_name="GLOBAL_POSITION_INT", relative_alt=climb_alt_mm
-        ),
+        _FakeMavlinkMessage(type_name="GLOBAL_POSITION_INT", relative_alt=climb_alt_mm),
     ]
 
     def _recv_match(**_kwargs: Any) -> Any:
@@ -202,9 +198,7 @@ async def test_estop_http_chain_rtl_then_disconnect_fallback(
     backend = _RtlFailingBackend()
     client = await client_for_backend(backend)
 
-    resp = await client.post(
-        "/api/drone/estop", headers={TOKEN_HEADER: TEST_TOKEN}
-    )
+    resp = await client.post("/api/drone/estop", headers={TOKEN_HEADER: TEST_TOKEN})
     # Best-effort path: HTTP 200 with best_effort flag even though RTL failed.
     assert resp.status_code == 200, resp.text
     body = resp.json()
@@ -215,9 +209,7 @@ async def test_estop_http_chain_rtl_then_disconnect_fallback(
     # Verify call order: RTL attempted, then disconnect as fallback.
     assert "return_to_home" in backend.calls
     assert "disconnect" in backend.calls
-    assert backend.calls.index("return_to_home") < backend.calls.index(
-        "disconnect"
-    )
+    assert backend.calls.index("return_to_home") < backend.calls.index("disconnect")
 
 
 @pytest.mark.asyncio

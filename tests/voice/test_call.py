@@ -392,6 +392,7 @@ class TestTwilioAuthTokenMigration:
         import pytest as _pytest
 
         from skyherd.voice.call import _twilio_available
+
         with _pytest.warns(DeprecationWarning):
             result = _twilio_available()
 

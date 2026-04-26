@@ -37,8 +37,7 @@ def test_readme_quickstart_commands_present() -> None:
 def test_readme_has_quickstart_section() -> None:
     """README must have a Quickstart section (case-insensitive)."""
     assert "Quickstart" in _README or "quickstart" in _README.lower(), (
-        "README is missing a Quickstart section -- judges will not find the "
-        "3-command flow."
+        "README is missing a Quickstart section -- judges will not find the 3-command flow."
     )
 
 

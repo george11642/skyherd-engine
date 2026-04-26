@@ -233,9 +233,7 @@ class _DemoMesh:
             self._sessions[spec.name] = session
             self._handlers[spec.name] = handler_fn
             self._attach_session_refs(session)
-            logger.debug(
-                "_DemoMesh: registered %s (session %s)", spec.name, session.id[:8]
-            )
+            logger.debug("_DemoMesh: registered %s (session %s)", spec.name, session.id[:8])
 
     # ------------------------------------------------------------------
     # Memory wiring helpers (Plan 01-06 DEFECT-1)
@@ -301,9 +299,7 @@ class _DemoMesh:
         """
         session = self._sessions.get(agent_name)
         if session is None:
-            logger.warning(
-                "dispatch: unknown agent %r — not in scenario registry", agent_name
-            )
+            logger.warning("dispatch: unknown agent %r — not in scenario registry", agent_name)
             return []
 
         # Prefer the handler registered at __init__ (stable), fall back to the

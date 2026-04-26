@@ -102,25 +102,13 @@ class TestPhonyDeclaration:
         return (ROOT / "Makefile").read_text()
 
     def test_rehearsal_is_phony(self, makefile_text: str) -> None:
-        phony_lines = [
-            ln for ln in makefile_text.splitlines() if ln.startswith(".PHONY:")
-        ]
-        assert any("rehearsal" in ln for ln in phony_lines), (
-            "rehearsal not declared .PHONY"
-        )
+        phony_lines = [ln for ln in makefile_text.splitlines() if ln.startswith(".PHONY:")]
+        assert any("rehearsal" in ln for ln in phony_lines), "rehearsal not declared .PHONY"
 
     def test_record_ready_is_phony(self, makefile_text: str) -> None:
-        phony_lines = [
-            ln for ln in makefile_text.splitlines() if ln.startswith(".PHONY:")
-        ]
-        assert any("record-ready" in ln for ln in phony_lines), (
-            "record-ready not declared .PHONY"
-        )
+        phony_lines = [ln for ln in makefile_text.splitlines() if ln.startswith(".PHONY:")]
+        assert any("record-ready" in ln for ln in phony_lines), "record-ready not declared .PHONY"
 
     def test_preflight_is_phony(self, makefile_text: str) -> None:
-        phony_lines = [
-            ln for ln in makefile_text.splitlines() if ln.startswith(".PHONY:")
-        ]
-        assert any("preflight" in ln for ln in phony_lines), (
-            "preflight not declared .PHONY"
-        )
+        phony_lines = [ln for ln in makefile_text.splitlines() if ln.startswith(".PHONY:")]
+        assert any("preflight" in ln for ln in phony_lines), "preflight not declared .PHONY"

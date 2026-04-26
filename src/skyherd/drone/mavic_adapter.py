@@ -204,9 +204,7 @@ class MavicAdapter(DroneBackend):
             "adapter.both_legs_failed",
             {"dji_error": dji_err, "mavsdk_error": mav_err},
         )
-        raise DroneUnavailable(
-            f"Both drone legs failed: dji={dji_err} mavsdk={mav_err}"
-        )
+        raise DroneUnavailable(f"Both drone legs failed: dji={dji_err} mavsdk={mav_err}")
 
     async def takeoff(self, alt_m: float = 30.0) -> None:
         await self._invoke("takeoff", alt_m=alt_m)

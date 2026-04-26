@@ -141,6 +141,7 @@ def _log(msg: str) -> None:
 # Utilities
 # ---------------------------------------------------------------------------
 
+
 def _check_dashboard() -> bool:
     """Return True if dashboard responds 200 on /health."""
     import urllib.request
@@ -180,9 +181,7 @@ def _convert_webm_to_mp4(webm: Path, mp4: Path) -> None:
     ]
     result = subprocess.run(cmd, capture_output=True, text=True)
     if result.returncode != 0:
-        raise RuntimeError(
-            f"ffmpeg failed for {webm.name}\nstderr:\n{result.stderr[-800:]}"
-        )
+        raise RuntimeError(f"ffmpeg failed for {webm.name}\nstderr:\n{result.stderr[-800:]}")
 
 
 def _size_human(path: Path) -> str:
@@ -220,6 +219,7 @@ def _duration_s(path: Path) -> float:
 # ---------------------------------------------------------------------------
 # Playwright context recording primitive
 # ---------------------------------------------------------------------------
+
 
 def _record_page(
     browser: Browser,
@@ -269,6 +269,7 @@ def _record_page(
 # ---------------------------------------------------------------------------
 # Scenario clip recording
 # ---------------------------------------------------------------------------
+
 
 def _run_scenario_subprocess(name: str) -> subprocess.Popen[bytes]:
     """Launch `skyherd-demo play <name> --seed 42` in the background."""
@@ -363,9 +364,7 @@ def _convert_webm_to_mp4_sped(webm: Path, mp4: Path, speed_factor: float) -> Non
     ]
     result = subprocess.run(cmd, capture_output=True, text=True)
     if result.returncode != 0:
-        raise RuntimeError(
-            f"ffmpeg (sped) failed for {webm.name}\nstderr:\n{result.stderr[-800:]}"
-        )
+        raise RuntimeError(f"ffmpeg (sped) failed for {webm.name}\nstderr:\n{result.stderr[-800:]}")
 
 
 # ---------------------------------------------------------------------------
@@ -636,6 +635,7 @@ def record_terminal_clip(
 # ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
+
 
 def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description=__doc__.splitlines()[0])

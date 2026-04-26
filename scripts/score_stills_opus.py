@@ -32,10 +32,10 @@ import anthropic
 
 # ── Constants ─────────────────────────────────────────────────────────────────
 
-BATCH_SIZE = 12          # stills per batch (6s window at 2fps)
-TOTAL_STILLS = 360       # 180s × 2fps
-NUM_BATCHES = 30         # TOTAL_STILLS // BATCH_SIZE
-SEMAPHORE_LIMIT = 8      # max concurrent API calls (rate limit safety)
+BATCH_SIZE = 12  # stills per batch (6s window at 2fps)
+TOTAL_STILLS = 360  # 180s × 2fps
+NUM_BATCHES = 30  # TOTAL_STILLS // BATCH_SIZE
+SEMAPHORE_LIMIT = 8  # max concurrent API calls (rate limit safety)
 MODEL = "claude-opus-4-7"
 MAX_TOKENS = 2048
 
@@ -51,6 +51,7 @@ log = logging.getLogger("score_stills_opus")
 
 
 # ── Helpers ────────────────────────────────────────────────────────────────────
+
 
 def load_prompt_template() -> str:
     """Load the opus-stills-batch prompt template."""
@@ -122,8 +123,7 @@ def build_user_content(
     end_frame = batch[-1].stem
 
     user_text = (
-        user_template
-        .replace("${VARIANT}", variant)
+        user_template.replace("${VARIANT}", variant)
         .replace("${START_SEC}", f"{start_sec:.1f}")
         .replace("${END_SEC}", f"{end_sec:.1f}")
         .replace("${START_FRAME}", start_frame)
@@ -151,7 +151,9 @@ def build_user_content(
     return content
 
 
-def parse_batch_response(response_text: str, batch: list[Path], variant: str, iter_num: int) -> dict:
+def parse_batch_response(
+    response_text: str, batch: list[Path], variant: str, iter_num: int
+) -> dict:
     """Parse Opus JSON response, with graceful fallback on parse errors."""
     # Strip any markdown code fences
     text = response_text.strip()
@@ -163,7 +165,13 @@ def parse_batch_response(response_text: str, batch: list[Path], variant: str, it
     try:
         data = json.loads(text)
         # Validate required keys
-        required = {"batch_start_seconds", "batch_end_seconds", "scores", "flags", "fix_suggestions"}
+        required = {
+            "batch_start_seconds",
+            "batch_end_seconds",
+            "scores",
+            "flags",
+            "fix_suggestions",
+        }
         if not required.issubset(data.keys()):
             raise ValueError(f"Missing keys: {required - set(data.keys())}")
         return data
@@ -176,7 +184,9 @@ def parse_batch_response(response_text: str, batch: list[Path], variant: str, it
             "batch_end_seconds": end_sec,
             "window_description": "Parse error — raw response stored in _raw_response",
             "scores": {"impact": 5.0, "demo": 5.0, "opus": 5.0, "depth": 5.0},
-            "flags": [{"severity": "HIGH", "frame": batch[0].stem, "issue": f"Score parse error: {e}"}],
+            "flags": [
+                {"severity": "HIGH", "frame": batch[0].stem, "issue": f"Score parse error: {e}"}
+            ],
             "fix_suggestions": [],
             "_raw_response": response_text[:500],
             "_parse_error": str(e),
@@ -184,6 +194,7 @@ def parse_batch_response(response_text: str, batch: list[Path], variant: str, it
 
 
 # ── Async Opus caller ──────────────────────────────────────────────────────────
+
 
 async def score_batch(
     client: anthropic.AsyncAnthropic,
@@ -210,7 +221,9 @@ async def score_batch(
     for attempt in range(1, 4):  # up to 3 retries
         async with semaphore:
             try:
-                log.info("[%s] Sending to Opus (attempt %d, %d frames)", batch_label, attempt, len(batch))
+                log.info(
+                    "[%s] Sending to Opus (attempt %d, %d frames)", batch_label, attempt, len(batch)
+                )
                 t0 = time.monotonic()
 
                 response = await client.messages.create(
@@ -231,10 +244,7 @@ async def score_batch(
                     usage.input_tokens,
                 )
 
-                text = next(
-                    (b.text for b in response.content if b.type == "text"),
-                    ""
-                )
+                text = next((b.text for b in response.content if b.type == "text"), "")
                 result = parse_batch_response(text, batch, variant, iter_num)
                 result["_batch_idx"] = batch_idx
                 result["_usage"] = {
@@ -248,14 +258,29 @@ async def score_batch(
                 return result
 
             except anthropic.RateLimitError as e:
-                retry_after = int(getattr(e.response.headers, "retry-after", "30") if hasattr(e, "response") else "30")
-                log.warning("[%s] Rate limit (attempt %d). Waiting %ds...", batch_label, attempt, retry_after)
+                retry_after = int(
+                    getattr(e.response.headers, "retry-after", "30")
+                    if hasattr(e, "response")
+                    else "30"
+                )
+                log.warning(
+                    "[%s] Rate limit (attempt %d). Waiting %ds...",
+                    batch_label,
+                    attempt,
+                    retry_after,
+                )
                 await asyncio.sleep(retry_after)
 
             except anthropic.APIStatusError as e:
                 if e.status_code >= 500:
                     wait = 5 * attempt
-                    log.warning("[%s] Server error %d (attempt %d). Waiting %ds...", batch_label, e.status_code, attempt, wait)
+                    log.warning(
+                        "[%s] Server error %d (attempt %d). Waiting %ds...",
+                        batch_label,
+                        e.status_code,
+                        attempt,
+                        wait,
+                    )
                     await asyncio.sleep(wait)
                 else:
                     log.error("[%s] API error %d: %s", batch_label, e.status_code, e.message)
@@ -274,7 +299,13 @@ async def score_batch(
         "batch_end_seconds": end_sec,
         "window_description": "ERROR: all API retries exhausted",
         "scores": {"impact": 0.0, "demo": 0.0, "opus": 0.0, "depth": 0.0},
-        "flags": [{"severity": "CRITICAL", "frame": batch[0].stem, "issue": "API call failed after 3 retries"}],
+        "flags": [
+            {
+                "severity": "CRITICAL",
+                "frame": batch[0].stem,
+                "issue": "API call failed after 3 retries",
+            }
+        ],
         "fix_suggestions": [],
         "_batch_idx": batch_idx,
         "_error": "all_retries_exhausted",
@@ -306,7 +337,13 @@ async def run_all_batches(
     stills = list_stills(stills_dir)
     batches = make_batches(stills)
     actual_num = len(batches)
-    log.info("Scoring %d batches × %d frames (variant=%s iter=%d)", actual_num, BATCH_SIZE, variant, iter_num)
+    log.info(
+        "Scoring %d batches × %d frames (variant=%s iter=%d)",
+        actual_num,
+        BATCH_SIZE,
+        variant,
+        iter_num,
+    )
 
     prompt_template = load_prompt_template()
     system_content = build_system_content(prompt_template)
@@ -349,7 +386,7 @@ async def run_all_batches(
     total_output = sum(r.get("_usage", {}).get("output", 0) for r in results_sorted)
     total_input = total_cache_read + total_cache_write + total_uncached
 
-    opus_input_rate = 5.0 / 1_000_000   # $5/M input
+    opus_input_rate = 5.0 / 1_000_000  # $5/M input
     opus_output_rate = 25.0 / 1_000_000  # $25/M output
     # Cache reads cost 0.1×, cache writes 1.25×, uncached 1×
     cost = (
@@ -361,7 +398,12 @@ async def run_all_batches(
 
     log.info(
         "Completed %d batches in %.1fs | tokens: input=%d (cached_read=%d) output=%d | est_cost=$%.2f",
-        actual_num, elapsed, total_input, total_cache_read, total_output, cost,
+        actual_num,
+        elapsed,
+        total_input,
+        total_cache_read,
+        total_output,
+        cost,
     )
     log.info("JSONL written to %s", jsonl_path)
 
@@ -370,17 +412,24 @@ async def run_all_batches(
 
 # ── CLI ────────────────────────────────────────────────────────────────────────
 
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="Score SkyHerd video stills with Opus 4.7 (parallel batched vision).",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    parser.add_argument("--stills-dir", required=True, type=Path, help="Directory containing f*.jpg stills")
+    parser.add_argument(
+        "--stills-dir", required=True, type=Path, help="Directory containing f*.jpg stills"
+    )
     parser.add_argument("--variant", required=True, choices=["A", "B", "C"], help="Video variant")
     parser.add_argument("--iter", required=True, type=int, help="Iteration number")
-    parser.add_argument("--output-dir", required=True, type=Path, help="Per-batch JSON output directory")
+    parser.add_argument(
+        "--output-dir", required=True, type=Path, help="Per-batch JSON output directory"
+    )
     parser.add_argument("--jsonl", required=True, type=Path, help="Merged JSONL output path")
-    parser.add_argument("--help-schema", action="store_true", help="Print expected output schema and exit")
+    parser.add_argument(
+        "--help-schema", action="store_true", help="Print expected output schema and exit"
+    )
 
     args = parser.parse_args()
 
@@ -389,9 +438,18 @@ def main() -> None:
             "batch_start_seconds": "float",
             "batch_end_seconds": "float",
             "window_description": "string",
-            "scores": {"impact": "float 0-10", "demo": "float 0-10", "opus": "float 0-10", "depth": "float 0-10"},
-            "flags": [{"severity": "CRITICAL|HIGH|MEDIUM|LOW", "frame": "string", "issue": "string"}],
-            "fix_suggestions": [{"priority": "int", "frame": "string", "file_path": "string", "change": "string"}],
+            "scores": {
+                "impact": "float 0-10",
+                "demo": "float 0-10",
+                "opus": "float 0-10",
+                "depth": "float 0-10",
+            },
+            "flags": [
+                {"severity": "CRITICAL|HIGH|MEDIUM|LOW", "frame": "string", "issue": "string"}
+            ],
+            "fix_suggestions": [
+                {"priority": "int", "frame": "string", "file_path": "string", "change": "string"}
+            ],
         }
         print(json.dumps(schema, indent=2))
         sys.exit(0)

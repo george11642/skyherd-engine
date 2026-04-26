@@ -75,11 +75,13 @@ async def api_memory(
 ) -> JSONResponse:
     _validate_agent(agent)
     if _state["use_mock"] or _state["memory_store_manager"] is None:
-        return JSONResponse(content={
-            "agent": agent,
-            "entries": _mock_entries_for(agent),
-            "ts": time.time(),
-        })
+        return JSONResponse(
+            content={
+                "agent": agent,
+                "entries": _mock_entries_for(agent),
+                "ts": time.time(),
+            }
+        )
     store_id = _resolve_store_id(agent)
     if not store_id:
         raise HTTPException(status_code=503, detail=f"no memory store registered for {agent}")
@@ -90,24 +92,28 @@ async def api_memory(
     except Exception as exc:  # noqa: BLE001
         logger.warning("list_memories failed: %s", type(exc).__name__)
         raise HTTPException(status_code=502, detail="upstream memory list failed") from exc
-    return JSONResponse(content={
-        "agent": agent,
-        "memory_store_id": store_id,
-        "entries": envelope.data,
-        "prefixes": envelope.prefixes or [],
-        "ts": time.time(),
-    })
+    return JSONResponse(
+        content={
+            "agent": agent,
+            "memory_store_id": store_id,
+            "entries": envelope.data,
+            "prefixes": envelope.prefixes or [],
+            "ts": time.time(),
+        }
+    )
 
 
 @memory_router.get("/{agent}/versions")
 async def api_memory_versions(agent: str) -> JSONResponse:
     _validate_agent(agent)
     if _state["use_mock"] or _state["memory_store_manager"] is None:
-        return JSONResponse(content={
-            "agent": agent,
-            "entries": _mock_entries_for(agent),
-            "ts": time.time(),
-        })
+        return JSONResponse(
+            content={
+                "agent": agent,
+                "entries": _mock_entries_for(agent),
+                "ts": time.time(),
+            }
+        )
     store_id = _resolve_store_id(agent)
     if not store_id:
         raise HTTPException(status_code=503, detail=f"no memory store registered for {agent}")
@@ -116,12 +122,14 @@ async def api_memory_versions(agent: str) -> JSONResponse:
     except Exception as exc:  # noqa: BLE001
         logger.warning("list_versions failed: %s", type(exc).__name__)
         raise HTTPException(status_code=502, detail="upstream memory versions failed") from exc
-    return JSONResponse(content={
-        "agent": agent,
-        "memory_store_id": store_id,
-        "entries": [v.model_dump() for v in versions],
-        "ts": time.time(),
-    })
+    return JSONResponse(
+        content={
+            "agent": agent,
+            "memory_store_id": store_id,
+            "entries": [v.model_dump() for v in versions],
+            "ts": time.time(),
+        }
+    )
 
 
 def attach_memory_api(

@@ -36,7 +36,9 @@ async def _call_tool(server, tool_name: str, args: dict) -> object:
     return call_result.root
 
 
-def _install_fake_twilio(monkeypatch, *, sms_raises: bool = False, call_raises: bool = False) -> dict:
+def _install_fake_twilio(
+    monkeypatch, *, sms_raises: bool = False, call_raises: bool = False
+) -> dict:
     """Install a fake twilio module. Returns a dict with sent_messages/calls trackers."""
     sent_messages: list[dict] = []
     created_calls: list[dict] = []
@@ -53,11 +55,11 @@ def _install_fake_twilio(monkeypatch, *, sms_raises: bool = False, call_raises: 
         created_calls.append(kw)
         return type("FakeCall", (), {"sid": "CA456"})()
 
-    fake_messages = type("FakeMessages", (), {"create": lambda self, **kw: _messages_create(**kw)})()
-    fake_calls = type("FakeCalls", (), {"create": lambda self, **kw: _calls_create(**kw)})()
-    fake_client_inst = type(
-        "FakeClient", (), {"messages": fake_messages, "calls": fake_calls}
+    fake_messages = type(
+        "FakeMessages", (), {"create": lambda self, **kw: _messages_create(**kw)}
     )()
+    fake_calls = type("FakeCalls", (), {"create": lambda self, **kw: _calls_create(**kw)})()
+    fake_client_inst = type("FakeClient", (), {"messages": fake_messages, "calls": fake_calls})()
 
     fake_twilio = types.ModuleType("twilio")
     fake_twilio_rest = types.ModuleType("twilio.rest")
@@ -223,9 +225,7 @@ class TestPageVetChannels:
         assert vet_lines
         assert vet_lines[-1]["channel"] in ("voice", "sms")  # voice path or SMS fallback
 
-    async def test_vet_text_channel_sms(
-        self, rancher_server, tmp_runtime, monkeypatch, twilio_env
-    ):
+    async def test_vet_text_channel_sms(self, rancher_server, tmp_runtime, monkeypatch, twilio_env):
         tracker = _install_fake_twilio(monkeypatch)
 
         intake = {"tag": "TAG010", "symptoms": "pinkeye day 2"}

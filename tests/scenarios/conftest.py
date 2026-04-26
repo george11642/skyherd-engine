@@ -51,9 +51,7 @@ def sick_pinkeye_world():  # type: ignore[no-untyped-def]
         water_tanks=[WaterTankConfig(id="wt1", pos=(200.0, 200.0), capacity_l=5000.0)],
         troughs=[TroughConfig(id="trough_a", pos=(200.0, 200.0), paddock="p_main")],
         fence_lines=[
-            FenceLineConfig(
-                id="fence_s", segment=[(0.0, 0.0), (2000.0, 0.0)], tag="perimeter"
-            )
+            FenceLineConfig(id="fence_s", segment=[(0.0, 0.0), (2000.0, 0.0)], tag="perimeter")
         ],
         barn=BarnConfig(pos=(1900.0, 1900.0)),
     )
