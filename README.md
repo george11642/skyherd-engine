@@ -37,11 +37,33 @@ Script + shot list: [docs/DEMO_VIDEO_SCRIPT.md](docs/DEMO_VIDEO_SCRIPT.md) · [d
 
 ---
 
-## Dashboard
+## Live site — [skyherd-engine.vercel.app](https://skyherd-engine.vercel.app)
+
+![landing](docs/design/landing.png)
+
+---
+
+## Dashboard — [/demo](https://skyherd-engine.vercel.app/demo)
 
 ![dashboard](docs/design/dashboard.png)
 
-> Gotham/Lattice/Bloomberg ops-console aesthetic. Ranch map, 5 agent mesh lanes, framer-motion cost ticker, attestation chain, and scenario strip. Live at [skyherd-engine.vercel.app](https://skyherd-engine.vercel.app).
+> Gotham/Lattice/Bloomberg ops-console aesthetic. Ranch map, 5 agent mesh lanes, framer-motion cost ticker, attestation chain, and scenario strip.
+
+---
+
+## Rancher iOS app
+
+<table>
+  <tr>
+    <td align="center"><img src="ios/SkyHerdRancher/screenshots/alerts.png" width="180" alt="Alerts"/><br/><sub>Alerts</sub></td>
+    <td align="center"><img src="ios/SkyHerdRancher/screenshots/live.png" width="180" alt="Live"/><br/><sub>Live</sub></td>
+    <td align="center"><img src="ios/SkyHerdRancher/screenshots/map.png" width="180" alt="Map"/><br/><sub>Map</sub></td>
+    <td align="center"><img src="ios/SkyHerdRancher/screenshots/agents.png" width="180" alt="Agents"/><br/><sub>Agents</sub></td>
+    <td align="center"><img src="ios/SkyHerdRancher/screenshots/ledger.png" width="180" alt="Ledger"/><br/><sub>Ledger</sub></td>
+  </tr>
+</table>
+
+> Native SwiftUI rancher companion. Alert queue with one-tap acknowledge, live drone telemetry, paddock map with herd density, 5-agent mesh status, attestation ledger viewer.
 
 ---
 
