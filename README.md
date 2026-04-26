@@ -2,7 +2,7 @@
 
 **Live demo: https://skyherd-engine.vercel.app** — open on your phone; no install needed.
 
-[![CI](https://github.com/george11642/skyherd-engine/actions/workflows/ci.yml/badge.svg)](https://github.com/george11642/skyherd-engine/actions/workflows/ci.yml) [![tests](https://img.shields.io/badge/tests-880%2B-brightgreen)](https://github.com/george11642/skyherd-engine/actions) [![coverage](https://img.shields.io/badge/coverage-71%25-yellow)](https://github.com/george11642/skyherd-engine/actions) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![CI](https://github.com/george11642/skyherd-engine/actions/workflows/ci.yml/badge.svg)](https://github.com/george11642/skyherd-engine/actions/workflows/ci.yml) [![tests](https://img.shields.io/badge/tests-1100%2B-brightgreen)](https://github.com/george11642/skyherd-engine/actions) [![coverage](https://img.shields.io/badge/coverage-87%25-brightgreen)](https://github.com/george11642/skyherd-engine/actions) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 **The nervous system for working land.**
 
@@ -21,13 +21,19 @@ make demo SEED=42 SCENARIO=all    # 5 scenarios, deterministic replay
 make dashboard                     # http://localhost:8000
 ```
 
-## Hardware hero demo (60 seconds)
+---
 
-See **[docs/HARDWARE_DEMO_RUNBOOK.md](docs/HARDWARE_DEMO_RUNBOOK.md)** — runs on 2× Pi 4 + Mavic Air 2, no collar required.
+## 3-minute demo
+
+**▶ Watch on YouTube: https://youtu.be/0i1Cu5Hn83A**
+
+The hackathon deliverable is a 3-minute walkthrough of the five scenarios end-to-end, narrated by the "Wes" cowboy persona. Render locally:
 
 ```bash
-make hardware-demo    # Pi + Mavic coyote + sick-cow combo
+make video-render    # 1080p60, loudnorm -16 LUFS → remotion-video/out/
 ```
+
+Script + shot list: [docs/DEMO_VIDEO_SCRIPT.md](docs/DEMO_VIDEO_SCRIPT.md) · [docs/SHOT_LIST.md](docs/SHOT_LIST.md). Production pipeline: [docs/DEMO_VIDEO_AUTOMATION.md](docs/DEMO_VIDEO_AUTOMATION.md).
 
 ---
 
@@ -43,7 +49,7 @@ make hardware-demo    # Pi + Mavic coyote + sick-cow combo
 
 A simulated ranch that monitors itself. Five Claude Managed Agents watch water tanks, cattle, fences, and weather 24/7. The drone auto-launches on predator or water-failure alerts. A tamper-evident Ed25519 Merkle chain logs every event for insurance-grade attestation.
 
-**Sim gate status**: 10/10 items TRULY-GREEN (verified Apr 22 2026 — see [docs/verify-latest.md](docs/verify-latest.md)).
+**Sim gate status**: 1,106 tests at 87.42% coverage, 16/16 scenario PASSes at `SEED=42`, dashboard HTTP 200 — see [docs/verify-latest.md](docs/verify-latest.md).
 
 **5 demo scenarios** — all run deterministically with `make demo SEED=42 SCENARIO=all`:
 1. Coyote at fence → FenceLineDispatcher → drone → deterrent → Wes call
@@ -54,17 +60,39 @@ A simulated ranch that monitors itself. Five Claude Managed Agents watch water t
 
 ---
 
+## Build commands
+
+| Target | Purpose |
+|---|---|
+| `make demo SEED=42 SCENARIO=all` | All 5 scenarios back-to-back, deterministic replay |
+| `make dashboard` | FastAPI + SSE + built SPA at `:8000` |
+| `make mesh-smoke` | 5-agent Managed Agents mesh smoke (stubs SDK without `ANTHROPIC_API_KEY`) |
+| `make video-render` | Final 1080p60 demo render |
+| `make test` / `make ci` | pytest+cov / lint + typecheck + test (CI mirror) |
+
+---
+
 ## Documentation
 
 - [docs/ONE_PAGER.md](docs/ONE_PAGER.md) — start here (2 min read)
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — nervous-system pattern, data flow, attestation
 - [docs/MANAGED_AGENTS.md](docs/MANAGED_AGENTS.md) — $5k prize essay: 5 agents, idle-pause economics, long-idle waits
-- [docs/CODEMAP.md](docs/CODEMAP.md) — file-by-file purpose map (generated from tree)
-- [docs/HARDWARE_DEMO_RUNBOOK.md](docs/HARDWARE_DEMO_RUNBOOK.md) — 60-second Pi + Mavic hero demo
+- [docs/CODEMAP.md](docs/CODEMAP.md) — file-by-file purpose map
+- [docs/ATTESTATION.md](docs/ATTESTATION.md) — Ed25519 Merkle ledger + offline verifier
 - [skills/README.md](skills/README.md) — 33-file domain knowledge inventory (CrossBeam pattern)
 - [docs/REPLAY_LOG.md](docs/REPLAY_LOG.md) — deterministic scenario replay log
 - [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md) — token system, typography, components, motion + a11y rules
-- [docs/CLAUDE_DESIGN.md](docs/CLAUDE_DESIGN.md) — Claude Design integration notes + contributor runbook
+- [docs/SUBMISSION.md](docs/SUBMISSION.md) — Devpost submission packet
+
+---
+
+## Hardware (Year-2 reference)
+
+The submission ships sim-only. The hardware topology — 1× Raspberry Pi 4 (`edge-house`, MegaDetector at troughs 1–6), 1× Intel Galileo (`edge-tank`, water-tank telemetry), 1× DJI Mavic Air 2 — is documented and runnable for Year-2 deployment but not filmed for the hackathon cut:
+
+- [docs/HARDWARE_PI_FLEET.md](docs/HARDWARE_PI_FLEET.md) — Pi camera-edge runbook
+- [docs/HARDWARE_GALILEO.md](docs/HARDWARE_GALILEO.md) — Galileo water-tank runbook
+- [docs/HARDWARE_DEMO_RUNBOOK.md](docs/HARDWARE_DEMO_RUNBOOK.md) — `make hardware-demo` 60-second on-camera path
 
 ---
 
