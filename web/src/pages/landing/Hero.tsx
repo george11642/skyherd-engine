@@ -44,6 +44,16 @@ export default function Hero() {
             Your Ranch Never Sleeps. Neither Does SkyHerd.
           </h1>
 
+          {/* Built-with eyebrow — surfaces the Opus 4.7 / Managed Agents stack */}
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4 }}
+            className="text-xs sm:text-sm font-medium text-slate-500 tracking-wide"
+          >
+            Powered by Claude Managed Agents on Opus 4.7
+          </motion.p>
+
           {/* Subtext */}
           <p className="text-lg sm:text-xl text-slate-400 max-w-2xl leading-relaxed">
             An autonomous drone that herds your livestock, monitors herd health,

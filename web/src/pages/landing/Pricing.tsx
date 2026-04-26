@@ -44,6 +44,10 @@ export default function Pricing() {
               <p className="text-slate-400 mt-3">
                 No upfront hardware cost. Cancel anytime.
               </p>
+              <p className="text-xs text-slate-500 mt-2 max-w-md mx-auto leading-relaxed">
+                Powered by Claude Managed Agents on Opus 4.7 — idle-pause
+                billing keeps compute under $5/week per ranch.
+              </p>
             </div>
 
             <div className="border-t border-slate-800 pt-6 mb-8">
