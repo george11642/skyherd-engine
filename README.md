@@ -27,7 +27,7 @@ make dashboard                     # http://localhost:8000
 
 **▶ Watch on YouTube: https://youtu.be/0i1Cu5Hn83A**
 
-The hackathon deliverable is a 3-minute walkthrough of the five scenarios end-to-end, narrated by the "Wes" cowboy persona. Render locally:
+The hackathon deliverable is a 3-minute walkthrough of the five scenarios end-to-end. Render locally:
 
 ```bash
 make video-render    # 1080p60, loudnorm -16 LUFS → remotion-video/out/
