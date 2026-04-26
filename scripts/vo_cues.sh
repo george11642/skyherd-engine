@@ -107,13 +107,13 @@ CUES["vo-meta-B"]="And the captions you've been reading? Opus 4.7 styled every w
 #   vo-c-vision      → 130s
 #   vo-c-aibody      → 152s
 
-CUES["vo-c-hook"]="I'm George, senior at UNM. I've spent a lot of nights on New Mexico ranches watching ranchers do impossible work. Right now beef prices are at record highs — but the American cow herd is at a sixty-five-year low. Labor's gone. Ranchers are aging out. Every ranch left has to do more, with fewer people watching it. And right now nobody is."
+CUES["vo-c-hook"]="I'm George, senior at UNM. So, I'm from the Southwest — out here, ranches are kind of everywhere, and, uh, I've watched ranchers do impossible work. Right now beef prices are at record highs — but the American cow herd's at a sixty-five-year low. Labor's gone. Ranchers are aging out. Every ranch left has to do more, with fewer people watching it. And, uh, right now nobody is."
 
 CUES["vo-c-traditional"]="Here's how a ranch runs today. Helicopters. Working dogs. A-T-Vs. One ranch hand and two-hundred miles a week. Six runs a day, best case — and still, a coyote before dawn, a sick cow at noon, an empty water tank at midnight, all missed between runs. SkyHerd replaces all of it for twenty-five hundred a month — and saves the average ranch forty-five thousand dollars a year."
 
 CUES["vo-c-answer"]="SkyHerd gives the ranch a nervous system. Five Claude agents, built on Opus 4.7. They're idle until a sensor wakes them — vision, motion, pressure, weather. Then they decide and act. Twenty-five hundred a month, per ranch. Less than the cost of one ranch hand, watching every acre."
 
-CUES["vo-c-coyote"]="Three-fourteen in the morning. Thermal hits the south fence. The agent wakes up, looks at the frame, calls it — coyote, ninety-one percent confidence. It dispatches the drone autonomously. Drone flies the perimeter, scares the coyote off, returns home. The rancher gets a text. Nobody woke up. Nothing got eaten. The fence-line agent goes back to sleep — billing stops until the next sensor event. Total compute for that whole alert: about forty cents."
+CUES["vo-c-coyote"]="Three-fourteen in the morning. Thermal hits the south fence. The agent wakes up, looks at the frame, calls it — yeah, coyote, ninety-one percent confidence. It dispatches the drone autonomously. Drone flies the perimeter, scares the coyote off, returns home. The rancher gets a text. Nobody woke up. Nothing got eaten. The fence-line agent goes back to sleep — billing stops until the next sensor event. The whole alert? About forty cents of compute."
 
 CUES["vo-c-grid"]="And it's not just the fence. Sick cow with pinkeye? An agent flags her, drafts the vet packet, schedules the visit — all before sunrise. Trough pressure dropping overnight? A drone inspects the leak. A cow goes into labor before dawn — the rancher gets a priority page, not a maybe. Hailstorm forty-five minutes out? The herd auto-rotates to shelter. All five agents, all running on Opus 4.7, all idle until a sensor wakes them."
 

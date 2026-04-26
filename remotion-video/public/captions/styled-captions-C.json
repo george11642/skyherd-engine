@@ -2,12 +2,12 @@
   "variant": "C",
   "mode": "styled",
   "model": "whisperx-forced-alignment",
-  "fingerprint": "1221de3f0407dcf6cd4480773604bb18dcc55a4dcb47a15bcbfff3b928bff1f0",
+  "fingerprint": "ccf71ba7a1b828dd65a94fd7c371ec8ea2fd51aa6cde2134d62414be3c2e0835",
   "words": [
     {
-      "word": "I",
+      "word": "And,",
       "start": 6.0,
-      "end": 6.3,
+      "end": 6.18,
       "segment_id": 0,
       "color": "#F5D49C",
       "weight": "normal",
@@ -15,529 +15,9 @@
       "emphasis_level": 1
     },
     {
-      "word": "spent",
-      "start": 6.3,
-      "end": 6.74,
-      "segment_id": 0,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "a",
-      "start": 6.74,
-      "end": 7.56,
-      "segment_id": 0,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "lot",
-      "start": 7.56,
-      "end": 9.02,
-      "segment_id": 0,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "of",
-      "start": 9.02,
-      "end": 9.14,
-      "segment_id": 0,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "nights",
-      "start": 9.14,
-      "end": 9.3,
-      "segment_id": 0,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "on",
-      "start": 9.3,
-      "end": 9.52,
-      "segment_id": 0,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "New",
-      "start": 9.52,
-      "end": 9.66,
-      "segment_id": 0,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "Mexico",
-      "start": 9.66,
-      "end": 10.0,
-      "segment_id": 0,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "ranches",
-      "start": 10.0,
-      "end": 10.36,
-      "segment_id": 0,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "watching",
-      "start": 10.36,
-      "end": 10.82,
-      "segment_id": 0,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "ranchers",
-      "start": 10.82,
-      "end": 11.26,
-      "segment_id": 0,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "do",
-      "start": 11.26,
-      "end": 11.4,
-      "segment_id": 0,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "impossible",
-      "start": 11.4,
-      "end": 11.76,
-      "segment_id": 0,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "work.",
-      "start": 11.76,
-      "end": 12.22,
-      "segment_id": 0,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "Right",
-      "start": 12.92,
-      "end": 12.96,
-      "segment_id": 0,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "now",
-      "start": 12.96,
-      "end": 13.16,
-      "segment_id": 0,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "beef",
-      "start": 13.16,
-      "end": 13.42,
-      "segment_id": 0,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "prices",
-      "start": 13.42,
-      "end": 13.72,
-      "segment_id": 0,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "are",
-      "start": 13.72,
-      "end": 14.02,
-      "segment_id": 0,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "at",
-      "start": 14.02,
-      "end": 14.12,
-      "segment_id": 0,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "record",
-      "start": 14.12,
-      "end": 14.36,
-      "segment_id": 0,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "highs,",
-      "start": 14.36,
-      "end": 14.66,
-      "segment_id": 0,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "but",
-      "start": 15.06,
-      "end": 15.08,
-      "segment_id": 0,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "the",
-      "start": 15.08,
-      "end": 15.22,
-      "segment_id": 0,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "American",
-      "start": 15.22,
-      "end": 15.36,
-      "segment_id": 0,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "cow",
-      "start": 15.36,
-      "end": 15.86,
-      "segment_id": 0,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "herd",
-      "start": 15.86,
-      "end": 16.1,
-      "segment_id": 0,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "is",
-      "start": 16.1,
-      "end": 16.28,
-      "segment_id": 0,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "at",
-      "start": 16.28,
-      "end": 16.38,
-      "segment_id": 0,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "a",
-      "start": 16.38,
-      "end": 16.46,
-      "segment_id": 0,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "sixty",
-      "start": 16.46,
-      "end": 16.62,
-      "segment_id": 0,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "five",
-      "start": 16.62,
-      "end": 17.06,
-      "segment_id": 0,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "year",
-      "start": 17.06,
-      "end": 17.26,
-      "segment_id": 0,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "low.",
-      "start": 17.26,
-      "end": 17.48,
-      "segment_id": 0,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "Labor's",
-      "start": 18.24,
-      "end": 18.42,
-      "segment_id": 0,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "gone.",
-      "start": 18.42,
-      "end": 18.62,
-      "segment_id": 0,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "Ranchers",
-      "start": 19.04,
-      "end": 19.32,
-      "segment_id": 0,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "are",
-      "start": 19.32,
-      "end": 19.48,
-      "segment_id": 0,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "aging",
-      "start": 19.48,
-      "end": 19.68,
-      "segment_id": 0,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "out.",
-      "start": 19.68,
-      "end": 20.0,
-      "segment_id": 0,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "Every",
-      "start": 20.52,
-      "end": 20.52,
-      "segment_id": 0,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "ranch",
-      "start": 20.52,
-      "end": 20.84,
-      "segment_id": 0,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "left",
-      "start": 20.84,
-      "end": 21.04,
-      "segment_id": 0,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "has",
-      "start": 21.04,
-      "end": 21.38,
-      "segment_id": 0,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "to",
-      "start": 21.38,
-      "end": 21.58,
-      "segment_id": 0,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "do",
-      "start": 21.58,
-      "end": 21.7,
-      "segment_id": 0,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "more,",
-      "start": 21.7,
-      "end": 21.94,
-      "segment_id": 0,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "with",
-      "start": 22.14,
-      "end": 22.24,
-      "segment_id": 0,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "fewer",
-      "start": 22.24,
-      "end": 22.46,
-      "segment_id": 0,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "people",
-      "start": 22.46,
-      "end": 22.74,
-      "segment_id": 0,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "watching",
-      "start": 22.74,
-      "end": 23.16,
-      "segment_id": 0,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "it.",
-      "start": 23.16,
-      "end": 23.38,
-      "segment_id": 0,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "And",
-      "start": 23.66,
-      "end": 23.66,
+      "word": "uh,",
+      "start": 6.4,
+      "end": 6.42,
       "segment_id": 0,
       "color": "#F5D49C",
       "weight": "normal",
@@ -546,8 +26,8 @@
     },
     {
       "word": "right",
-      "start": 23.66,
-      "end": 23.82,
+      "start": 20.26,
+      "end": 20.26,
       "segment_id": 0,
       "color": "#F5D49C",
       "weight": "normal",
@@ -556,8 +36,8 @@
     },
     {
       "word": "now",
-      "start": 23.82,
-      "end": 24.06,
+      "start": 20.26,
+      "end": 25.8,
       "segment_id": 0,
       "color": "#F5D49C",
       "weight": "normal",
@@ -566,8 +46,8 @@
     },
     {
       "word": "nobody",
-      "start": 24.06,
-      "end": 24.46,
+      "start": 25.8,
+      "end": 26.1,
       "segment_id": 0,
       "color": "#F5D49C",
       "weight": "normal",
@@ -576,8 +56,18 @@
     },
     {
       "word": "is.",
-      "start": 24.46,
-      "end": 24.74,
+      "start": 26.1,
+      "end": 26.44,
+      "segment_id": 0,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "Yes.",
+      "start": 26.44,
+      "end": 26.52,
       "segment_id": 0,
       "color": "#F5D49C",
       "weight": "normal",
@@ -586,8 +76,8 @@
     },
     {
       "word": "Here's",
-      "start": 26.0,
-      "end": 26.24,
+      "start": 28.0,
+      "end": 28.24,
       "segment_id": 1,
       "color": "#F5D49C",
       "weight": "normal",
@@ -596,8 +86,8 @@
     },
     {
       "word": "how",
-      "start": 26.24,
-      "end": 26.36,
+      "start": 28.24,
+      "end": 28.36,
       "segment_id": 1,
       "color": "#F5D49C",
       "weight": "normal",
@@ -606,8 +96,8 @@
     },
     {
       "word": "a",
-      "start": 26.36,
-      "end": 26.48,
+      "start": 28.36,
+      "end": 28.48,
       "segment_id": 1,
       "color": "#F5D49C",
       "weight": "normal",
@@ -616,8 +106,8 @@
     },
     {
       "word": "ranch",
-      "start": 26.48,
-      "end": 26.7,
+      "start": 28.48,
+      "end": 28.7,
       "segment_id": 1,
       "color": "#F5D49C",
       "weight": "normal",
@@ -626,8 +116,8 @@
     },
     {
       "word": "runs",
-      "start": 26.7,
-      "end": 27.0,
+      "start": 28.7,
+      "end": 29.0,
       "segment_id": 1,
       "color": "#F5D49C",
       "weight": "normal",
@@ -636,8 +126,8 @@
     },
     {
       "word": "today.",
-      "start": 27.0,
-      "end": 27.34,
+      "start": 29.0,
+      "end": 29.34,
       "segment_id": 1,
       "color": "#F5D49C",
       "weight": "normal",
@@ -646,8 +136,8 @@
     },
     {
       "word": "Helicopters.",
-      "start": 27.82,
-      "end": 28.26,
+      "start": 29.82,
+      "end": 30.26,
       "segment_id": 1,
       "color": "#F5D49C",
       "weight": "normal",
@@ -656,8 +146,8 @@
     },
     {
       "word": "Working",
-      "start": 28.6,
-      "end": 28.82,
+      "start": 30.6,
+      "end": 30.82,
       "segment_id": 1,
       "color": "#F5D49C",
       "weight": "normal",
@@ -666,8 +156,8 @@
     },
     {
       "word": "dogs.",
-      "start": 28.82,
-      "end": 29.1,
+      "start": 30.82,
+      "end": 31.1,
       "segment_id": 1,
       "color": "#F5D49C",
       "weight": "normal",
@@ -676,8 +166,8 @@
     },
     {
       "word": "ATVs.",
-      "start": 29.66,
-      "end": 30.18,
+      "start": 31.66,
+      "end": 32.18,
       "segment_id": 1,
       "color": "#F5D49C",
       "weight": "normal",
@@ -686,8 +176,8 @@
     },
     {
       "word": "One",
-      "start": 30.62,
-      "end": 30.74,
+      "start": 32.62,
+      "end": 32.74,
       "segment_id": 1,
       "color": "#F5D49C",
       "weight": "normal",
@@ -696,8 +186,8 @@
     },
     {
       "word": "ranch",
-      "start": 30.74,
-      "end": 31.0,
+      "start": 32.74,
+      "end": 33.0,
       "segment_id": 1,
       "color": "#F5D49C",
       "weight": "normal",
@@ -706,87 +196,7 @@
     },
     {
       "word": "hand",
-      "start": 31.0,
-      "end": 31.34,
-      "segment_id": 1,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "and",
-      "start": 31.34,
-      "end": 31.54,
-      "segment_id": 1,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "two",
-      "start": 31.54,
-      "end": 31.7,
-      "segment_id": 1,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "hundred",
-      "start": 31.7,
-      "end": 32.0,
-      "segment_id": 1,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "miles",
-      "start": 32.0,
-      "end": 32.24,
-      "segment_id": 1,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "a",
-      "start": 32.24,
-      "end": 32.48,
-      "segment_id": 1,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "week.",
-      "start": 32.48,
-      "end": 32.66,
-      "segment_id": 1,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "Six",
-      "start": 32.92,
-      "end": 33.1,
-      "segment_id": 1,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "runs",
-      "start": 33.1,
+      "start": 33.0,
       "end": 33.34,
       "segment_id": 1,
       "color": "#F5D49C",
@@ -795,9 +205,9 @@
       "emphasis_level": 1
     },
     {
-      "word": "a",
+      "word": "and",
       "start": 33.34,
-      "end": 33.56,
+      "end": 33.54,
       "segment_id": 1,
       "color": "#F5D49C",
       "weight": "normal",
@@ -805,9 +215,9 @@
       "emphasis_level": 1
     },
     {
-      "word": "day,",
-      "start": 33.56,
-      "end": 33.72,
+      "word": "two",
+      "start": 33.54,
+      "end": 33.7,
       "segment_id": 1,
       "color": "#F5D49C",
       "weight": "normal",
@@ -815,9 +225,9 @@
       "emphasis_level": 1
     },
     {
-      "word": "best",
-      "start": 33.88,
-      "end": 34.04,
+      "word": "hundred",
+      "start": 33.7,
+      "end": 34.0,
       "segment_id": 1,
       "color": "#F5D49C",
       "weight": "normal",
@@ -825,9 +235,9 @@
       "emphasis_level": 1
     },
     {
-      "word": "case.",
-      "start": 34.04,
-      "end": 34.36,
+      "word": "miles",
+      "start": 34.0,
+      "end": 34.24,
       "segment_id": 1,
       "color": "#F5D49C",
       "weight": "normal",
@@ -835,9 +245,9 @@
       "emphasis_level": 1
     },
     {
-      "word": "And",
-      "start": 34.76,
-      "end": 34.8,
+      "word": "a",
+      "start": 34.24,
+      "end": 34.48,
       "segment_id": 1,
       "color": "#F5D49C",
       "weight": "normal",
@@ -845,8 +255,18 @@
       "emphasis_level": 1
     },
     {
-      "word": "still,",
-      "start": 34.8,
+      "word": "week.",
+      "start": 34.48,
+      "end": 34.66,
+      "segment_id": 1,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "Six",
+      "start": 34.92,
       "end": 35.1,
       "segment_id": 1,
       "color": "#F5D49C",
@@ -855,39 +275,9 @@
       "emphasis_level": 1
     },
     {
-      "word": "a",
-      "start": 35.44,
-      "end": 35.48,
-      "segment_id": 1,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "coyote",
-      "start": 35.48,
-      "end": 35.84,
-      "segment_id": 1,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "before",
-      "start": 35.84,
-      "end": 36.18,
-      "segment_id": 1,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "dawn,",
-      "start": 36.18,
-      "end": 36.5,
+      "word": "runs",
+      "start": 35.1,
+      "end": 35.34,
       "segment_id": 1,
       "color": "#F5D49C",
       "weight": "normal",
@@ -896,8 +286,8 @@
     },
     {
       "word": "a",
-      "start": 36.86,
-      "end": 36.92,
+      "start": 35.34,
+      "end": 35.56,
       "segment_id": 1,
       "color": "#F5D49C",
       "weight": "normal",
@@ -905,8 +295,48 @@
       "emphasis_level": 1
     },
     {
-      "word": "sick",
-      "start": 36.92,
+      "word": "day,",
+      "start": 35.56,
+      "end": 35.72,
+      "segment_id": 1,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "best",
+      "start": 35.88,
+      "end": 36.04,
+      "segment_id": 1,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "case.",
+      "start": 36.04,
+      "end": 36.36,
+      "segment_id": 1,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "And",
+      "start": 36.76,
+      "end": 36.8,
+      "segment_id": 1,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "still,",
+      "start": 36.8,
       "end": 37.1,
       "segment_id": 1,
       "color": "#F5D49C",
@@ -915,9 +345,9 @@
       "emphasis_level": 1
     },
     {
-      "word": "cow",
-      "start": 37.1,
-      "end": 37.42,
+      "word": "a",
+      "start": 37.44,
+      "end": 37.48,
       "segment_id": 1,
       "color": "#F5D49C",
       "weight": "normal",
@@ -925,9 +355,9 @@
       "emphasis_level": 1
     },
     {
-      "word": "at",
-      "start": 37.42,
-      "end": 37.58,
+      "word": "coyote",
+      "start": 37.48,
+      "end": 37.84,
       "segment_id": 1,
       "color": "#F5D49C",
       "weight": "normal",
@@ -935,9 +365,9 @@
       "emphasis_level": 1
     },
     {
-      "word": "noon,",
-      "start": 37.58,
-      "end": 37.78,
+      "word": "before",
+      "start": 37.84,
+      "end": 38.18,
       "segment_id": 1,
       "color": "#F5D49C",
       "weight": "normal",
@@ -945,18 +375,8 @@
       "emphasis_level": 1
     },
     {
-      "word": "an",
+      "word": "dawn,",
       "start": 38.18,
-      "end": 38.26,
-      "segment_id": 1,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "empty",
-      "start": 38.26,
       "end": 38.5,
       "segment_id": 1,
       "color": "#F5D49C",
@@ -965,9 +385,79 @@
       "emphasis_level": 1
     },
     {
+      "word": "a",
+      "start": 38.86,
+      "end": 38.92,
+      "segment_id": 1,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "sick",
+      "start": 38.92,
+      "end": 39.1,
+      "segment_id": 1,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "cow",
+      "start": 39.1,
+      "end": 39.42,
+      "segment_id": 1,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "at",
+      "start": 39.42,
+      "end": 39.58,
+      "segment_id": 1,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "noon,",
+      "start": 39.58,
+      "end": 39.78,
+      "segment_id": 1,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "an",
+      "start": 40.18,
+      "end": 40.26,
+      "segment_id": 1,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "empty",
+      "start": 40.26,
+      "end": 40.5,
+      "segment_id": 1,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
       "word": "water",
-      "start": 38.5,
-      "end": 38.76,
+      "start": 40.5,
+      "end": 40.76,
       "segment_id": 1,
       "color": "#F5D49C",
       "weight": "normal",
@@ -976,8 +466,8 @@
     },
     {
       "word": "tank",
-      "start": 38.76,
-      "end": 39.06,
+      "start": 40.76,
+      "end": 41.06,
       "segment_id": 1,
       "color": "#F5D49C",
       "weight": "normal",
@@ -986,8 +476,8 @@
     },
     {
       "word": "at",
-      "start": 39.06,
-      "end": 39.22,
+      "start": 41.06,
+      "end": 41.22,
       "segment_id": 1,
       "color": "#F5D49C",
       "weight": "normal",
@@ -996,8 +486,8 @@
     },
     {
       "word": "midnight,",
-      "start": 39.22,
-      "end": 39.52,
+      "start": 41.22,
+      "end": 41.52,
       "segment_id": 1,
       "color": "#F5D49C",
       "weight": "normal",
@@ -1006,8 +496,8 @@
     },
     {
       "word": "all",
-      "start": 39.86,
-      "end": 39.98,
+      "start": 41.86,
+      "end": 41.98,
       "segment_id": 1,
       "color": "#F5D49C",
       "weight": "normal",
@@ -1016,8 +506,8 @@
     },
     {
       "word": "missed",
-      "start": 39.98,
-      "end": 40.18,
+      "start": 41.98,
+      "end": 42.18,
       "segment_id": 1,
       "color": "#F5D49C",
       "weight": "normal",
@@ -1026,8 +516,8 @@
     },
     {
       "word": "between",
-      "start": 40.18,
-      "end": 40.56,
+      "start": 42.18,
+      "end": 42.56,
       "segment_id": 1,
       "color": "#F5D49C",
       "weight": "normal",
@@ -1036,8 +526,8 @@
     },
     {
       "word": "runs.",
-      "start": 40.56,
-      "end": 40.88,
+      "start": 42.56,
+      "end": 42.88,
       "segment_id": 1,
       "color": "#F5D49C",
       "weight": "normal",
@@ -1046,8 +536,8 @@
     },
     {
       "word": "SkyHerd",
-      "start": 41.24,
-      "end": 41.76,
+      "start": 43.24,
+      "end": 43.76,
       "segment_id": 1,
       "color": "#F5D49C",
       "weight": "normal",
@@ -1056,97 +546,7 @@
     },
     {
       "word": "replaces",
-      "start": 41.76,
-      "end": 42.12,
-      "segment_id": 1,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "all",
-      "start": 42.12,
-      "end": 42.48,
-      "segment_id": 1,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "of",
-      "start": 42.48,
-      "end": 42.66,
-      "segment_id": 1,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "it",
-      "start": 42.66,
-      "end": 42.76,
-      "segment_id": 1,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "for",
-      "start": 42.76,
-      "end": 42.94,
-      "segment_id": 1,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "twenty",
-      "start": 42.94,
-      "end": 43.18,
-      "segment_id": 1,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "five",
-      "start": 43.18,
-      "end": 43.48,
-      "segment_id": 1,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "hundred",
-      "start": 43.48,
-      "end": 43.78,
-      "segment_id": 1,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "a",
-      "start": 43.78,
-      "end": 43.9,
-      "segment_id": 1,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "month",
-      "start": 43.9,
+      "start": 43.76,
       "end": 44.12,
       "segment_id": 1,
       "color": "#F5D49C",
@@ -1155,9 +555,9 @@
       "emphasis_level": 1
     },
     {
-      "word": "\u2014",
+      "word": "all",
       "start": 44.12,
-      "end": 44.42,
+      "end": 44.48,
       "segment_id": 1,
       "color": "#F5D49C",
       "weight": "normal",
@@ -1165,9 +565,9 @@
       "emphasis_level": 1
     },
     {
-      "word": "and",
-      "start": 44.42,
-      "end": 44.44,
+      "word": "of",
+      "start": 44.48,
+      "end": 44.66,
       "segment_id": 1,
       "color": "#F5D49C",
       "weight": "normal",
@@ -1175,9 +575,9 @@
       "emphasis_level": 1
     },
     {
-      "word": "saves",
-      "start": 44.44,
-      "end": 44.62,
+      "word": "it",
+      "start": 44.66,
+      "end": 44.76,
       "segment_id": 1,
       "color": "#F5D49C",
       "weight": "normal",
@@ -1185,9 +585,9 @@
       "emphasis_level": 1
     },
     {
-      "word": "the",
-      "start": 44.62,
-      "end": 44.88,
+      "word": "for",
+      "start": 44.76,
+      "end": 44.94,
       "segment_id": 1,
       "color": "#F5D49C",
       "weight": "normal",
@@ -1195,9 +595,9 @@
       "emphasis_level": 1
     },
     {
-      "word": "average",
-      "start": 44.88,
-      "end": 45.08,
+      "word": "twenty",
+      "start": 44.94,
+      "end": 45.18,
       "segment_id": 1,
       "color": "#F5D49C",
       "weight": "normal",
@@ -1205,8 +605,8 @@
       "emphasis_level": 1
     },
     {
-      "word": "ranch",
-      "start": 45.08,
+      "word": "five",
+      "start": 45.18,
       "end": 45.48,
       "segment_id": 1,
       "color": "#F5D49C",
@@ -1215,8 +615,18 @@
       "emphasis_level": 1
     },
     {
-      "word": "forty",
+      "word": "hundred",
       "start": 45.48,
+      "end": 45.78,
+      "segment_id": 1,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "a",
+      "start": 45.78,
       "end": 45.9,
       "segment_id": 1,
       "color": "#F5D49C",
@@ -1225,9 +635,89 @@
       "emphasis_level": 1
     },
     {
-      "word": "five",
+      "word": "month",
       "start": 45.9,
-      "end": 46.24,
+      "end": 46.12,
+      "segment_id": 1,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "\u2014",
+      "start": 46.12,
+      "end": 46.42,
+      "segment_id": 1,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "and",
+      "start": 46.42,
+      "end": 46.44,
+      "segment_id": 1,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "saves",
+      "start": 46.44,
+      "end": 46.62,
+      "segment_id": 1,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "the",
+      "start": 46.62,
+      "end": 46.88,
+      "segment_id": 1,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "average",
+      "start": 46.88,
+      "end": 47.08,
+      "segment_id": 1,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "ranch",
+      "start": 47.08,
+      "end": 47.48,
+      "segment_id": 1,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "forty",
+      "start": 47.48,
+      "end": 47.9,
+      "segment_id": 1,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "five",
+      "start": 47.9,
+      "end": 48.24,
       "segment_id": 1,
       "color": "#F5D49C",
       "weight": "normal",
@@ -1236,8 +726,8 @@
     },
     {
       "word": "thousand",
-      "start": 46.24,
-      "end": 46.6,
+      "start": 48.24,
+      "end": 48.6,
       "segment_id": 1,
       "color": "#F5D49C",
       "weight": "normal",
@@ -1246,8 +736,8 @@
     },
     {
       "word": "dollars",
-      "start": 46.6,
-      "end": 46.96,
+      "start": 48.6,
+      "end": 48.96,
       "segment_id": 1,
       "color": "#F5D49C",
       "weight": "normal",
@@ -1256,8 +746,8 @@
     },
     {
       "word": "a",
-      "start": 46.96,
-      "end": 47.14,
+      "start": 48.96,
+      "end": 49.14,
       "segment_id": 1,
       "color": "#F5D49C",
       "weight": "normal",
@@ -1266,8 +756,8 @@
     },
     {
       "word": "year.",
-      "start": 47.14,
-      "end": 47.32,
+      "start": 49.14,
+      "end": 49.32,
       "segment_id": 1,
       "color": "#F5D49C",
       "weight": "normal",
@@ -1275,9 +765,9 @@
       "emphasis_level": 1
     },
     {
-      "word": ".",
-      "start": 47.32,
-      "end": 47.54,
+      "word": "here.",
+      "start": 49.32,
+      "end": 49.42,
       "segment_id": 1,
       "color": "#F5D49C",
       "weight": "normal",
@@ -1286,8 +776,8 @@
     },
     {
       "word": "SkyHerd",
-      "start": 50.0,
-      "end": 50.68,
+      "start": 52.0,
+      "end": 52.68,
       "segment_id": 2,
       "color": "#F5D49C",
       "weight": "normal",
@@ -1296,8 +786,8 @@
     },
     {
       "word": "gives",
-      "start": 50.68,
-      "end": 50.84,
+      "start": 52.68,
+      "end": 52.84,
       "segment_id": 2,
       "color": "#F5D49C",
       "weight": "normal",
@@ -1306,8 +796,8 @@
     },
     {
       "word": "the",
-      "start": 50.84,
-      "end": 51.04,
+      "start": 52.84,
+      "end": 53.04,
       "segment_id": 2,
       "color": "#F5D49C",
       "weight": "normal",
@@ -1316,8 +806,8 @@
     },
     {
       "word": "ranch",
-      "start": 51.04,
-      "end": 51.2,
+      "start": 53.04,
+      "end": 53.2,
       "segment_id": 2,
       "color": "#F5D49C",
       "weight": "normal",
@@ -1326,8 +816,8 @@
     },
     {
       "word": "a",
-      "start": 51.2,
-      "end": 51.4,
+      "start": 53.2,
+      "end": 53.4,
       "segment_id": 2,
       "color": "#F5D49C",
       "weight": "normal",
@@ -1336,8 +826,8 @@
     },
     {
       "word": "nervous",
-      "start": 51.4,
-      "end": 51.62,
+      "start": 53.4,
+      "end": 53.62,
       "segment_id": 2,
       "color": "#F5D49C",
       "weight": "normal",
@@ -1346,8 +836,8 @@
     },
     {
       "word": "system.",
-      "start": 51.62,
-      "end": 52.12,
+      "start": 53.62,
+      "end": 54.12,
       "segment_id": 2,
       "color": "#F5D49C",
       "weight": "normal",
@@ -1356,8 +846,8 @@
     },
     {
       "word": "Five",
-      "start": 52.78,
-      "end": 52.78,
+      "start": 54.78,
+      "end": 54.78,
       "segment_id": 2,
       "color": "#F5D49C",
       "weight": "normal",
@@ -1366,8 +856,8 @@
     },
     {
       "word": "Claude",
-      "start": 52.78,
-      "end": 52.98,
+      "start": 54.78,
+      "end": 54.98,
       "segment_id": 2,
       "color": "#F5D49C",
       "weight": "normal",
@@ -1376,8 +866,8 @@
     },
     {
       "word": "agents,",
-      "start": 52.98,
-      "end": 53.34,
+      "start": 54.98,
+      "end": 55.34,
       "segment_id": 2,
       "color": "#F5D49C",
       "weight": "normal",
@@ -1386,8 +876,8 @@
     },
     {
       "word": "built",
-      "start": 53.66,
-      "end": 53.76,
+      "start": 55.66,
+      "end": 55.76,
       "segment_id": 2,
       "color": "#F5D49C",
       "weight": "normal",
@@ -1396,8 +886,8 @@
     },
     {
       "word": "on",
-      "start": 53.76,
-      "end": 53.98,
+      "start": 55.76,
+      "end": 55.98,
       "segment_id": 2,
       "color": "#F5D49C",
       "weight": "normal",
@@ -1406,8 +896,8 @@
     },
     {
       "word": "Opus",
-      "start": 53.98,
-      "end": 54.32,
+      "start": 55.98,
+      "end": 56.32,
       "segment_id": 2,
       "color": "#F5D49C",
       "weight": "normal",
@@ -1416,8 +906,8 @@
     },
     {
       "word": "4",
-      "start": 54.32,
-      "end": 54.5,
+      "start": 56.32,
+      "end": 56.5,
       "segment_id": 2,
       "color": "#F5D49C",
       "weight": "normal",
@@ -1426,8 +916,8 @@
     },
     {
       "word": ".7.",
-      "start": 54.5,
-      "end": 55.12,
+      "start": 56.5,
+      "end": 57.12,
       "segment_id": 2,
       "color": "#F5D49C",
       "weight": "normal",
@@ -1436,8 +926,8 @@
     },
     {
       "word": "They're",
-      "start": 55.54,
-      "end": 55.66,
+      "start": 57.54,
+      "end": 57.66,
       "segment_id": 2,
       "color": "#F5D49C",
       "weight": "normal",
@@ -1446,8 +936,8 @@
     },
     {
       "word": "idle",
-      "start": 55.66,
-      "end": 55.86,
+      "start": 57.66,
+      "end": 57.86,
       "segment_id": 2,
       "color": "#F5D49C",
       "weight": "normal",
@@ -1456,8 +946,8 @@
     },
     {
       "word": "until",
-      "start": 55.86,
-      "end": 56.22,
+      "start": 57.86,
+      "end": 58.22,
       "segment_id": 2,
       "color": "#F5D49C",
       "weight": "normal",
@@ -1466,8 +956,8 @@
     },
     {
       "word": "a",
-      "start": 56.22,
-      "end": 56.38,
+      "start": 58.22,
+      "end": 58.38,
       "segment_id": 2,
       "color": "#F5D49C",
       "weight": "normal",
@@ -1476,8 +966,8 @@
     },
     {
       "word": "sensor",
-      "start": 56.38,
-      "end": 56.62,
+      "start": 58.38,
+      "end": 58.62,
       "segment_id": 2,
       "color": "#F5D49C",
       "weight": "normal",
@@ -1486,57 +976,7 @@
     },
     {
       "word": "wakes",
-      "start": 56.62,
-      "end": 56.94,
-      "segment_id": 2,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "them.",
-      "start": 56.94,
-      "end": 57.16,
-      "segment_id": 2,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "Vision,",
-      "start": 57.6,
-      "end": 57.6,
-      "segment_id": 2,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "motion,",
-      "start": 57.82,
-      "end": 57.94,
-      "segment_id": 2,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "pressure,",
-      "start": 58.36,
-      "end": 58.5,
-      "segment_id": 2,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "weather.",
-      "start": 58.8,
+      "start": 58.62,
       "end": 58.94,
       "segment_id": 2,
       "color": "#F5D49C",
@@ -1545,9 +985,59 @@
       "emphasis_level": 1
     },
     {
+      "word": "them.",
+      "start": 58.94,
+      "end": 59.16,
+      "segment_id": 2,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "Vision,",
+      "start": 59.6,
+      "end": 59.6,
+      "segment_id": 2,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "motion,",
+      "start": 59.82,
+      "end": 59.94,
+      "segment_id": 2,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "pressure,",
+      "start": 60.36,
+      "end": 60.5,
+      "segment_id": 2,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "weather.",
+      "start": 60.8,
+      "end": 60.94,
+      "segment_id": 2,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
       "word": "Then",
-      "start": 59.76,
-      "end": 59.78,
+      "start": 61.76,
+      "end": 61.78,
       "segment_id": 2,
       "color": "#F5D49C",
       "weight": "normal",
@@ -1556,8 +1046,8 @@
     },
     {
       "word": "they",
-      "start": 59.78,
-      "end": 59.92,
+      "start": 61.78,
+      "end": 61.92,
       "segment_id": 2,
       "color": "#F5D49C",
       "weight": "normal",
@@ -1566,77 +1056,7 @@
     },
     {
       "word": "decide",
-      "start": 59.92,
-      "end": 60.22,
-      "segment_id": 2,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "and",
-      "start": 60.22,
-      "end": 60.48,
-      "segment_id": 2,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "act.",
-      "start": 60.48,
-      "end": 60.68,
-      "segment_id": 2,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "Twenty",
-      "start": 61.28,
-      "end": 61.36,
-      "segment_id": 2,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "five",
-      "start": 61.36,
-      "end": 61.66,
-      "segment_id": 2,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "hundred",
-      "start": 61.66,
-      "end": 61.9,
-      "segment_id": 2,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "a",
-      "start": 61.9,
-      "end": 62.04,
-      "segment_id": 2,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "month,",
-      "start": 62.04,
+      "start": 61.92,
       "end": 62.22,
       "segment_id": 2,
       "color": "#F5D49C",
@@ -1645,78 +1065,78 @@
       "emphasis_level": 1
     },
     {
+      "word": "and",
+      "start": 62.22,
+      "end": 62.48,
+      "segment_id": 2,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "act.",
+      "start": 62.48,
+      "end": 62.68,
+      "segment_id": 2,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "Twenty",
+      "start": 63.28,
+      "end": 63.36,
+      "segment_id": 2,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "five",
+      "start": 63.36,
+      "end": 63.66,
+      "segment_id": 2,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "hundred",
+      "start": 63.66,
+      "end": 63.9,
+      "segment_id": 2,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "a",
+      "start": 63.9,
+      "end": 64.04,
+      "segment_id": 2,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "month,",
+      "start": 64.04,
+      "end": 64.22,
+      "segment_id": 2,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
       "word": "per",
-      "start": 62.62,
-      "end": 62.72,
-      "segment_id": 2,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "ranch.",
-      "start": 62.72,
-      "end": 62.98,
-      "segment_id": 2,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "Less",
-      "start": 63.68,
-      "end": 63.8,
-      "segment_id": 2,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "than",
-      "start": 63.8,
-      "end": 64.02,
-      "segment_id": 2,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "the",
-      "start": 64.02,
-      "end": 64.12,
-      "segment_id": 2,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "cost",
-      "start": 64.12,
-      "end": 64.32,
-      "segment_id": 2,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "of",
-      "start": 64.32,
-      "end": 64.56,
-      "segment_id": 2,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "one",
-      "start": 64.56,
+      "start": 64.62,
       "end": 64.72,
       "segment_id": 2,
       "color": "#F5D49C",
@@ -1725,9 +1145,9 @@
       "emphasis_level": 1
     },
     {
-      "word": "ranch",
+      "word": "ranch.",
       "start": 64.72,
-      "end": 64.96,
+      "end": 64.98,
       "segment_id": 2,
       "color": "#F5D49C",
       "weight": "normal",
@@ -1735,9 +1155,9 @@
       "emphasis_level": 1
     },
     {
-      "word": "hand,",
-      "start": 64.96,
-      "end": 65.28,
+      "word": "Less",
+      "start": 65.68,
+      "end": 65.8,
       "segment_id": 2,
       "color": "#F5D49C",
       "weight": "normal",
@@ -1745,9 +1165,9 @@
       "emphasis_level": 1
     },
     {
-      "word": "watching",
-      "start": 65.52,
-      "end": 65.76,
+      "word": "than",
+      "start": 65.8,
+      "end": 66.02,
       "segment_id": 2,
       "color": "#F5D49C",
       "weight": "normal",
@@ -1755,8 +1175,8 @@
       "emphasis_level": 1
     },
     {
-      "word": "every",
-      "start": 65.76,
+      "word": "the",
+      "start": 66.02,
       "end": 66.12,
       "segment_id": 2,
       "color": "#F5D49C",
@@ -1765,9 +1185,79 @@
       "emphasis_level": 1
     },
     {
-      "word": "acre.",
+      "word": "cost",
       "start": 66.12,
-      "end": 66.44,
+      "end": 66.32,
+      "segment_id": 2,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "of",
+      "start": 66.32,
+      "end": 66.56,
+      "segment_id": 2,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "one",
+      "start": 66.56,
+      "end": 66.72,
+      "segment_id": 2,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "ranch",
+      "start": 66.72,
+      "end": 66.96,
+      "segment_id": 2,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "hand,",
+      "start": 66.96,
+      "end": 67.28,
+      "segment_id": 2,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "watching",
+      "start": 67.52,
+      "end": 67.76,
+      "segment_id": 2,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "every",
+      "start": 67.76,
+      "end": 68.12,
+      "segment_id": 2,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "acre.",
+      "start": 68.12,
+      "end": 68.44,
       "segment_id": 2,
       "color": "#F5D49C",
       "weight": "normal",
@@ -1776,8 +1266,8 @@
     },
     {
       "word": "Three",
-      "start": 67.0,
-      "end": 67.28,
+      "start": 69.0,
+      "end": 69.32,
       "segment_id": 3,
       "color": "#F5D49C",
       "weight": "normal",
@@ -1786,8 +1276,8 @@
     },
     {
       "word": "fourteen",
-      "start": 67.28,
-      "end": 67.64,
+      "start": 69.32,
+      "end": 69.62,
       "segment_id": 3,
       "color": "#F5D49C",
       "weight": "normal",
@@ -1796,8 +1286,8 @@
     },
     {
       "word": "in",
-      "start": 67.64,
-      "end": 67.94,
+      "start": 69.62,
+      "end": 69.94,
       "segment_id": 3,
       "color": "#F5D49C",
       "weight": "normal",
@@ -1806,8 +1296,8 @@
     },
     {
       "word": "the",
-      "start": 67.94,
-      "end": 68.02,
+      "start": 69.94,
+      "end": 70.04,
       "segment_id": 3,
       "color": "#F5D49C",
       "weight": "normal",
@@ -1816,58 +1306,8 @@
     },
     {
       "word": "morning.",
-      "start": 68.02,
-      "end": 68.32,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "Thermal",
-      "start": 68.88,
-      "end": 69.18,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "hits",
-      "start": 69.18,
-      "end": 69.48,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "the",
-      "start": 69.48,
-      "end": 69.7,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "south",
-      "start": 69.7,
-      "end": 69.92,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "fence.",
-      "start": 69.92,
-      "end": 70.2,
+      "start": 70.04,
+      "end": 70.34,
       "segment_id": 3,
       "color": "#F5D49C",
       "weight": "normal",
@@ -1876,608 +1316,8 @@
     },
     {
       "word": "The",
-      "start": 70.94,
-      "end": 71.0,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "agent",
-      "start": 71.0,
-      "end": 71.18,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "wakes",
-      "start": 71.18,
-      "end": 71.44,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "up,",
-      "start": 71.44,
-      "end": 71.74,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "looks",
-      "start": 71.96,
-      "end": 72.08,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "at",
-      "start": 72.08,
-      "end": 72.26,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "the",
-      "start": 72.26,
-      "end": 72.34,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "frame,",
-      "start": 72.34,
-      "end": 72.62,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "calls",
-      "start": 72.96,
-      "end": 73.12,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "it",
-      "start": 73.12,
-      "end": 73.3,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "\u2014",
-      "start": 73.3,
-      "end": 73.48,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "coyote,",
-      "start": 73.48,
-      "end": 73.88,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "ninety",
-      "start": 74.14,
-      "end": 74.26,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "one",
-      "start": 74.26,
-      "end": 74.54,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "percent",
-      "start": 74.54,
-      "end": 74.84,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "confidence.",
-      "start": 74.84,
-      "end": 75.26,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "It",
-      "start": 76.02,
-      "end": 76.08,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "dispatches",
-      "start": 76.08,
-      "end": 76.54,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "the",
-      "start": 76.54,
-      "end": 76.82,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "drone",
-      "start": 76.82,
-      "end": 77.02,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "autonomously.",
-      "start": 77.02,
-      "end": 77.68,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "Drone",
-      "start": 78.34,
-      "end": 78.52,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "flies",
-      "start": 78.52,
-      "end": 78.8,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "the",
-      "start": 78.8,
-      "end": 79.06,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "perimeter,",
-      "start": 79.06,
-      "end": 79.28,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "scares",
-      "start": 79.9,
-      "end": 79.9,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "the",
-      "start": 79.9,
-      "end": 80.16,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "coyote",
-      "start": 80.16,
-      "end": 80.54,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "off,",
-      "start": 80.54,
-      "end": 80.8,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "returns",
-      "start": 81.14,
-      "end": 81.36,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "home.",
-      "start": 81.36,
-      "end": 81.7,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "The",
-      "start": 82.38,
-      "end": 82.4,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "rancher",
-      "start": 82.4,
-      "end": 82.74,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "gets",
-      "start": 82.74,
-      "end": 82.9,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "a",
-      "start": 82.9,
-      "end": 83.02,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "text.",
-      "start": 83.02,
-      "end": 83.2,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "Nobody",
-      "start": 83.7,
-      "end": 83.72,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "woke",
-      "start": 83.72,
-      "end": 84.1,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "up.",
-      "start": 84.1,
-      "end": 84.32,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "Nothing",
-      "start": 84.76,
-      "end": 84.78,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "got",
-      "start": 84.78,
-      "end": 84.98,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "eaten.",
-      "start": 84.98,
-      "end": 85.16,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "The",
-      "start": 85.92,
-      "end": 85.92,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "fence",
-      "start": 85.92,
-      "end": 86.1,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "line",
-      "start": 86.1,
-      "end": 86.3,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "agent",
-      "start": 86.3,
-      "end": 86.6,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "goes",
-      "start": 86.6,
-      "end": 86.84,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "back",
-      "start": 86.84,
-      "end": 87.06,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "to",
-      "start": 87.06,
-      "end": 87.26,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "sleep,",
-      "start": 87.26,
-      "end": 87.48,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "billing",
-      "start": 87.76,
-      "end": 87.88,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "stops",
-      "start": 87.88,
-      "end": 88.14,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "until",
-      "start": 88.14,
-      "end": 88.44,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "the",
-      "start": 88.44,
-      "end": 88.7,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "next",
-      "start": 88.7,
-      "end": 88.86,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "sensor",
-      "start": 88.86,
-      "end": 89.18,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "event.",
-      "start": 89.18,
-      "end": 89.48,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "Total",
-      "start": 90.16,
-      "end": 90.3,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "compute",
-      "start": 90.3,
-      "end": 90.64,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "for",
-      "start": 90.64,
-      "end": 90.94,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "that",
-      "start": 90.94,
-      "end": 91.1,
+      "start": 70.76,
+      "end": 70.78,
       "segment_id": 3,
       "color": "#F5D49C",
       "weight": "normal",
@@ -2486,8 +1326,8 @@
     },
     {
       "word": "whole",
-      "start": 91.1,
-      "end": 91.26,
+      "start": 70.78,
+      "end": 70.94,
       "segment_id": 3,
       "color": "#F5D49C",
       "weight": "normal",
@@ -2495,9 +1335,9 @@
       "emphasis_level": 1
     },
     {
-      "word": "alert",
-      "start": 91.26,
-      "end": 91.6,
+      "word": "alert?",
+      "start": 70.94,
+      "end": 91.2,
       "segment_id": 3,
       "color": "#F5D49C",
       "weight": "normal",
@@ -2505,19 +1345,9 @@
       "emphasis_level": 1
     },
     {
-      "word": "\u2014",
-      "start": 91.6,
-      "end": 91.86,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "about",
-      "start": 91.86,
-      "end": 92.0,
+      "word": "About",
+      "start": 91.56,
+      "end": 91.64,
       "segment_id": 3,
       "color": "#F5D49C",
       "weight": "normal",
@@ -2526,8 +1356,8 @@
     },
     {
       "word": "forty",
-      "start": 92.0,
-      "end": 92.3,
+      "start": 91.64,
+      "end": 91.96,
       "segment_id": 3,
       "color": "#F5D49C",
       "weight": "normal",
@@ -2535,9 +1365,9 @@
       "emphasis_level": 1
     },
     {
-      "word": "cents.",
-      "start": 92.3,
-      "end": 92.62,
+      "word": "cents",
+      "start": 91.96,
+      "end": 92.26,
       "segment_id": 3,
       "color": "#F5D49C",
       "weight": "normal",
@@ -2545,9 +1375,9 @@
       "emphasis_level": 1
     },
     {
-      "word": "or",
-      "start": 92.62,
-      "end": 92.8,
+      "word": "of",
+      "start": 92.26,
+      "end": 92.48,
       "segment_id": 3,
       "color": "#F5D49C",
       "weight": "normal",
@@ -2555,9 +1385,9 @@
       "emphasis_level": 1
     },
     {
-      "word": "event,",
-      "start": 92.8,
-      "end": 93.06,
+      "word": "compute.",
+      "start": 92.48,
+      "end": 92.76,
       "segment_id": 3,
       "color": "#F5D49C",
       "weight": "normal",
@@ -2565,89 +1395,9 @@
       "emphasis_level": 1
     },
     {
-      "word": "total",
-      "start": 93.52,
-      "end": 93.72,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "compute",
-      "start": 93.72,
-      "end": 94.16,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "for",
-      "start": 94.16,
-      "end": 94.42,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "that",
-      "start": 94.42,
-      "end": 94.54,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "whole",
-      "start": 94.54,
-      "end": 94.74,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "alert",
-      "start": 94.74,
-      "end": 95.0,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "about",
-      "start": 95.0,
-      "end": 95.46,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "$0",
-      "start": 95.46,
-      "end": 95.76,
-      "segment_id": 3,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": ".40.",
-      "start": 95.76,
-      "end": 96.08,
+      "word": "pewdiepie",
+      "start": 92.76,
+      "end": 93.22,
       "segment_id": 3,
       "color": "#F5D49C",
       "weight": "normal",
@@ -2815,8 +1565,58 @@
       "emphasis_level": 1
     },
     {
-      "word": "Mhm.",
+      "word": "It's",
       "start": 120.26,
+      "end": 120.28,
+      "segment_id": 4,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "a",
+      "start": 120.28,
+      "end": 120.3,
+      "segment_id": 4,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "really",
+      "start": 120.3,
+      "end": 120.32,
+      "segment_id": 4,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "fun.",
+      "start": 120.32,
+      "end": 120.34,
+      "segment_id": 4,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "And",
+      "start": 120.42,
+      "end": 120.42,
+      "segment_id": 4,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "I'm",
+      "start": 120.42,
       "end": 120.46,
       "segment_id": 4,
       "color": "#F5D49C",
@@ -2825,7 +1625,7 @@
       "emphasis_level": 1
     },
     {
-      "word": "Mhm.",
+      "word": "excited",
       "start": 120.46,
       "end": 120.46,
       "segment_id": 4,
@@ -2835,7 +1635,7 @@
       "emphasis_level": 1
     },
     {
-      "word": "Mhm.",
+      "word": "to",
       "start": 120.46,
       "end": 120.46,
       "segment_id": 4,
@@ -2845,7 +1645,7 @@
       "emphasis_level": 1
     },
     {
-      "word": "Mhm.",
+      "word": "be",
       "start": 120.46,
       "end": 120.46,
       "segment_id": 4,
@@ -2855,7 +1655,17 @@
       "emphasis_level": 1
     },
     {
-      "word": "Yeah.",
+      "word": "able",
+      "start": 120.46,
+      "end": 120.46,
+      "segment_id": 4,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "to",
       "start": 120.46,
       "end": 120.46,
       "segment_id": 4,
@@ -4185,7 +2995,7 @@
       "emphasis_level": 1
     },
     {
-      "word": "All",
+      "word": "The",
       "start": 165.0,
       "end": 165.0,
       "segment_id": 6,
@@ -4195,9 +3005,9 @@
       "emphasis_level": 1
     },
     {
-      "word": "right,",
+      "word": "system",
       "start": 165.0,
-      "end": 165.0,
+      "end": 165.06,
       "segment_id": 6,
       "color": "#F5D49C",
       "weight": "normal",
@@ -4205,9 +3015,9 @@
       "emphasis_level": 1
     },
     {
-      "word": "thanks",
-      "start": 165.0,
-      "end": 165.08,
+      "word": "is",
+      "start": 165.06,
+      "end": 165.06,
       "segment_id": 6,
       "color": "#F5D49C",
       "weight": "normal",
@@ -4215,69 +3025,9 @@
       "emphasis_level": 1
     },
     {
-      "word": "for",
-      "start": 165.08,
-      "end": 165.2,
-      "segment_id": 6,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "joining",
-      "start": 165.2,
-      "end": 165.26,
-      "segment_id": 6,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "us.",
-      "start": 165.26,
-      "end": 165.26,
-      "segment_id": 6,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "We'll",
-      "start": 165.36,
-      "end": 165.5,
-      "segment_id": 6,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "be",
-      "start": 165.5,
-      "end": 165.5,
-      "segment_id": 6,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "right",
-      "start": 165.5,
-      "end": 165.5,
-      "segment_id": 6,
-      "color": "#F5D49C",
-      "weight": "normal",
-      "animation": "fade",
-      "emphasis_level": 1
-    },
-    {
-      "word": "back",
-      "start": 165.5,
-      "end": 165.5,
+      "word": "running",
+      "start": 165.06,
+      "end": 165.3,
       "segment_id": 6,
       "color": "#F5D49C",
       "weight": "normal",
@@ -4286,7 +3036,17 @@
     },
     {
       "word": "in",
-      "start": 165.5,
+      "start": 165.3,
+      "end": 165.3,
+      "segment_id": 6,
+      "color": "#F5D49C",
+      "weight": "normal",
+      "animation": "fade",
+      "emphasis_level": 1
+    },
+    {
+      "word": "It's",
+      "start": 165.4,
       "end": 165.5,
       "segment_id": 6,
       "color": "#F5D49C",

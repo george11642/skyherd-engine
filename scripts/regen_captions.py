@@ -60,14 +60,15 @@ OUT_DEFAULT = REPO_ROOT / "remotion-video/public/captions/styled-captions-C.json
 CUES_FILE_DEFAULT = REPO_ROOT / "scripts/vo_cues.sh"
 
 # Cue keys in playback order + their absolute composition start-time (seconds).
-# Updated per plan v5.2 (make-it-not-say-prancy-pudding.md): 180s composition,
-# 6s cold open, extended cue copy fills each scene window with ≤1.5s tail.
+# Updated per v5.3 rebalance: hook +2s (now 22s), coyote -2s (now 28s).
+# 182s composition, 6s cold open. vo-c-hook re-rendered to 20.76s and
+# vo-c-coyote re-rendered to 24.26s.
 CUE_OFFSETS: dict[str, float] = {
     "vo-c-hook":         6.0,   # cold open is 6s
-    "vo-c-traditional": 26.0,   # 6 + 20 hook
-    "vo-c-answer":      50.0,   # 26 + 24 traditional
-    "vo-c-coyote":      67.0,   # 50 + 17 answer
-    "vo-c-grid":        97.0,   # 67 + 30 coyote
+    "vo-c-traditional": 28.0,   # 6 + 22 hook
+    "vo-c-answer":      52.0,   # 28 + 24 traditional
+    "vo-c-coyote":      69.0,   # 52 + 17 answer
+    "vo-c-grid":        97.0,   # 69 + 28 coyote
     "vo-c-mvp":        121.0,   # 97 + 24 grid
     "vo-c-vision":     144.0,   # 121 + 23 mvp
     "vo-c-aibody":     166.0,   # 144 + 22 vision

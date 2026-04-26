@@ -203,22 +203,22 @@ const AB_ACT3_SUBSTANCE_SECONDS = 15;
 const AB_ACT3_META_LOOP_SECONDS = 5;
 const AB_ACT3_FINAL_SECONDS = 10;
 
-// C v5.2 — 9-scene layout mapped to 5 acts (full 3:00 runtime, total = 180s = 5400 frames)
+// C v5.3 — 9-scene layout mapped to 5 acts (3:02 runtime, total = 182s = 5460 frames)
 //
-// act1 = coldOpen(6s) + hook(22s)             = 28s = 840 frames
-// act2 = traditional(24s) + answer(18s)       = 42s = 1260 frames
+// act1 = coldOpen(6s) + hook(22s)             = 28s =  840 frames
+// act2 = traditional(24s) + answer(17s)       = 41s = 1230 frames
 // act3 = coyote(28s) + grid(24s)              = 52s = 1560 frames
-// act4 = mvp(21s) + vision(21s)               = 42s = 1260 frames
-// act5 = aibody(12s) + wordmark(4s)           = 16s = 480 frames
-// TOTAL                                       = 180s = 5400 frames ✓
-// Rebalanced after measuring v5.2 Chatterbox cue durations
-// (.planning/research/v5-chatterbox-durations.txt). Each scene gets ≥0s tail.
-const C_ACT1_SECONDS = 26;  // coldOpen(6) + hook(20)         | hook VO 19.15s
-const C_ACT2_SECONDS = 41;  // traditional(24) + answer(17)   | trad VO 21.6s + 2.4s comparator slide-in tail
-const C_ACT3_SECONDS = 54;  // coyote(30) + grid(24)          | coyote 29.59s, grid 23.52s
-const C_ACT4_SECONDS = 45;  // mvp(23) + vision(22)           | mvp 22.10s, vision 21.55s
-const C_ACT5_SECONDS = 16;  // aibody(13) + wordmark(3)       | aibody 13.03s
-// Total: 26+41+54+45+16 = 182s = 5460 frames @ 30fps
+// act4 = mvp(23s) + vision(22s)               = 45s = 1350 frames
+// act5 = aibody(13s) + wordmark(3s)           = 16s =  480 frames
+// TOTAL                                       = 182s = 5460 frames ✓
+// Rebalanced after re-rendering vo-c-hook (now 20.76s) and vo-c-coyote (now 24.26s).
+// Hook +2s, coyote -2s — total stays 182s.
+const C_ACT1_SECONDS = 28;  // coldOpen(6) + hook(22)         | hook VO 20.76s
+const C_ACT2_SECONDS = 41;  // traditional(24) + answer(17)   | unchanged
+const C_ACT3_SECONDS = 52;  // coyote(28) + grid(24)          | coyote VO 24.26s
+const C_ACT4_SECONDS = 45;  // mvp(23) + vision(22)           | unchanged
+const C_ACT5_SECONDS = 16;  // aibody(13) + wordmark(3)       | unchanged
+// Total: 28+41+52+45+16 = 182s = 5460 frames @ 30fps
 
 // Re-exported for act components.
 export const AB_LAYOUT = {
@@ -243,23 +243,23 @@ export const AB_LAYOUT = {
 
 // Re-exported for act components.
 export const C_LAYOUT = {
-  // act1: coldOpen(6s) + hook(20s) = 26s  [v5.2 rebalance: hook -2s to fit measured 19.15s VO]
-  act1: { totalSeconds: C_ACT1_SECONDS, coldOpenSeconds: 6, hookSeconds: 20, punchSeconds: 3 },
-  // act2: traditional(24s) + answer(17s) = 41s  [v5.2 rebalance: trad 24s for comparator slide-in tail]
+  // act1: coldOpen(6s) + hook(22s) = 28s  [v5.3 rebalance: hook +2s to fit re-rendered 20.76s VO]
+  act1: { totalSeconds: C_ACT1_SECONDS, coldOpenSeconds: 6, hookSeconds: 22, punchSeconds: 3 },
+  // act2: traditional(24s) + answer(17s) = 41s  [unchanged]
   act2: { totalSeconds: C_ACT2_SECONDS, traditionalSeconds: 24, answerSeconds: 17, storyMin: 41 },
-  // act3: coyote(30s) + grid(24s) = 54s  [v5.2 rebalance: coyote +2s for 29.59s VO]
+  // act3: coyote(28s) + grid(24s) = 52s  [v5.3 rebalance: coyote -2s — re-rendered VO 24.26s]
   act3: {
     totalSeconds: C_ACT3_SECONDS,
-    coyoteSeconds: 30,
+    coyoteSeconds: 28,
     gridSeconds: 24,
-    coyoteDeepMin: 30,
+    coyoteDeepMin: 28,
     montageSeconds: 24,
     montageSceneCount: 4,
     synthesisSeconds: 0,
   },
-  // act4: mvp(23s) + vision(22s) = 45s  [v5.2 rebalance: mvp +2s, vision +1s]
+  // act4: mvp(23s) + vision(22s) = 45s  [unchanged]
   act4: { totalSeconds: C_ACT4_SECONDS, mvpSeconds: 23, visionSeconds: 22, opusMin: 23, depthMin: 22 },
-  // act5: aibody(13s) + wordmark(3s) = 16s  [v5.2 rebalance: aibody +1s, wordmark -1s]
+  // act5: aibody(13s) + wordmark(3s) = 16s  [unchanged]
   act5: { totalSeconds: C_ACT5_SECONDS, aibodySeconds: 13, wordmarkSeconds: 3, bookendSeconds: 13 },
 } as const;
 

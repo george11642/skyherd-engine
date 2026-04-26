@@ -1,11 +1,11 @@
 /**
- * v5.2 — Variant C 9-scene layout (3:00 / 180s / 5400 frames @ 30fps).
+ * v5.3 — Variant C 9-scene layout (3:02 / 182s / 5460 frames @ 30fps).
  *
  * Act 1 Hook  (28s /  840f) : cold-open slam (6s) + hook VO (22s)
- * Act 2 Story (42s / 1260f) : TraditionalWay (24s) + NervousSystemStack (18s)
+ * Act 2 Story (41s / 1230f) : TraditionalWay (24s) + NervousSystemStack (17s)
  * Act 3 Demo  (52s / 1560f) : live coyote dashboard (28s) + ScenarioGrid (24s)
- * Act 4 Sub   (42s / 1260f) : SoftwareMVPBlocks (21s) + VisionTimeline (21s)
- * Act 5 Close (16s /  480f) : AIBodyClose (12s) + wordmark tail (4s)
+ * Act 4 Sub   (45s / 1350f) : SoftwareMVPBlocks (23s) + VisionTimeline (22s)
+ * Act 5 Close (16s /  480f) : AIBodyClose (13s) + wordmark tail (3s)
  *
  * Each scene's animations are relative to its Series.Sequence mount frame.
  * VO Audio tags fire at scene-relative frame 0.
@@ -48,7 +48,7 @@ import brollCRaw from "../../data/broll-C.json";
 const BROLL_C: BrollCut[] = (brollCRaw as { cuts: BrollCut[] }).cuts;
 
 // Global act offsets (seconds) used by BrollTrack
-// v5.2 rebalanced: act5 starts at frame 4980 = 166s (act1+act2+act3+act4 = 26+41+54+45)
+// v5.3 rebalanced: act5 starts at frame 4980 = 166s (act1+act2+act3+act4 = 28+41+52+45)
 const C_ACT5_START = 166;
 
 const FPS = 30;
@@ -487,8 +487,8 @@ const CoyoteDashboard = () => {
   );
   const opacity = Math.min(fadeIn, fadeOut);
 
-  // SMS callout appears at ~19s into the scene
-  const SMS_AT = 19 * FPS;
+  // SMS callout appears at ~16s into the scene (was 19s — pulled 3s earlier)
+  const SMS_AT = 16 * FPS;
   const smsO = interpolate(frame, [SMS_AT, SMS_AT + 20], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
@@ -564,16 +564,16 @@ const CoyoteDashboard = () => {
         agent="FenceLineDispatcher"
         detail="Coyote · 91% · Mavic dispatched"
         accent={"thermal" as Accent}
-        appearFrame={45}
-        durationInFrames={durationInFrames - 45}
+        appearFrame={30}
+        durationInFrames={durationInFrames - 30}
       />
-      {/* Outcome chip — no jargon */}
+      {/* Outcome chip — no jargon (was 22s → 19s) */}
       <AnchorChip
         label="Result"
         topic="Fence W-12 breach"
         hash="Drone deterred"
         statusPill="Resolved"
-        appearFrame={22 * FPS}
+        appearFrame={19 * FPS}
         accent={"thermal" as Accent}
       />
       {/* SMS card */}

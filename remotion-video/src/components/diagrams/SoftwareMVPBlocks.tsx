@@ -5,7 +5,7 @@
  * Cards fade in sequentially over ~12s (2.4s × 5). Sub-line types in after.
  * Total runtime ~22s (660 frames). Fixes: rich bodies, Wes phone card, +50% sub-line.
  */
-import { AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
+import { AbsoluteFill, Img, interpolate, spring, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
 
 const CREAM_CARD = "rgb(238 232 218)";
 const CREAM_BG = "rgb(228 220 205)";
@@ -20,40 +20,78 @@ const SERIF = "Georgia, 'Times New Roman', serif";
 
 function WebBody({ accent, lf }: { accent: string; lf: number }) {
   const p = interpolate(lf, [20, 110], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const bars = [0.55, 0.82, 0.48, 0.93, 0.70, 0.86, 0.62];
   return (
-    <svg width="100%" height="88" viewBox="0 0 200 88" fill="none">
-      <rect x="0" y="0" width="200" height="88" rx="6" fill={`${accent}12`} stroke={accent} strokeWidth="1.4" />
-      <rect x="0" y="0" width="200" height="17" rx="6" fill={`${accent}22`} />
-      <circle cx="10" cy="8.5" r="2.8" fill={`${accent}60`} /><circle cx="19" cy="8.5" r="2.8" fill={`${accent}60`} /><circle cx="28" cy="8.5" r="2.8" fill={`${accent}60`} />
-      <rect x="36" y="4" width="110" height="9" rx="3" fill={`${accent}25`} />
-      <text x="40" y="12" fill={accent} fontSize="6.5" fontFamily="monospace" opacity="0.85">skyherd · live dashboard</text>
-      {bars.map((h, i) => {
-        const bh = h * 46 * p;
-        return <rect key={i} x={6 + i * 27} y={80 - bh} width={19} height={bh} rx="2" fill={accent} opacity={0.5 + h * 0.35} />;
-      })}
-      <line x1="4" y1="80" x2="196" y2="80" stroke={accent} strokeWidth="0.7" opacity="0.4" />
-      <text x="4" y="87" fill={accent} fontSize="5.5" fontFamily="monospace" opacity="0.55">events · 7-day window</text>
-    </svg>
+    <div
+      style={{
+        width: "100%",
+        height: 88,
+        borderRadius: 6,
+        overflow: "hidden",
+        border: `1.4px solid ${accent}`,
+        opacity: p,
+        boxShadow: `0 2px 8px ${accent}22`,
+      }}
+    >
+      <Img
+        src={staticFile("screenshots/web/dashboard.png")}
+        style={{
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          objectPosition: "top center",
+          display: "block",
+        }}
+      />
+    </div>
   );
 }
 
 function IOSBody({ accent, lf }: { accent: string; lf: number }) {
-  const p = interpolate(lf, [50, 120], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const p = interpolate(lf, [20, 110], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  // Three iOS screenshots fanned out left/center/right
+  const phones = [
+    { src: "screenshots/ios/live.png",   rot: -10, dx: -28, dy: 4,  z: 1 },
+    { src: "screenshots/ios/alerts.png", rot:   0, dx:   0, dy: -2, z: 3 },
+    { src: "screenshots/ios/map.png",    rot:  10, dx:  28, dy: 4,  z: 2 },
+  ];
   return (
-    <div style={{ display: "flex", justifyContent: "center", height: 88 }}>
-      <svg width="58" height="88" viewBox="0 0 58 88" fill="none">
-        <rect x="4" y="0" width="50" height="88" rx="10" fill={`${accent}15`} stroke={accent} strokeWidth="1.8" />
-        <line x1="18" y1="5" x2="40" y2="5" stroke={accent} strokeWidth="2" strokeLinecap="round" />
-        <circle cx="29" cy="82" r="3.5" fill={`${accent}70`} stroke={accent} strokeWidth="1" />
-        <rect x="8" y="12" width="42" height="66" rx="4" fill={`${accent}10`} opacity={p} />
-        <rect x="10" y="18" width="38" height="14" rx="3" fill={`${accent}35`} opacity={p} />
-        <text x="14" y="28" fill={accent} fontSize="6" fontFamily="monospace" opacity={p * 0.9}>⚠ COW A014</text>
-        <rect x="10" y="36" width="28" height="5" rx="2" fill={`${accent}25`} opacity={p} />
-        <rect x="10" y="44" width="20" height="5" rx="2" fill={`${accent}18`} opacity={p} />
-        <rect x="11" y="56" width="36" height="12" rx="4" fill={accent} opacity={p * 0.85} />
-        <text x="18" y="65" fill="white" fontSize="6" fontFamily="monospace" opacity={p}>VIEW ALERT</text>
-      </svg>
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: 88,
+        position: "relative",
+        opacity: p,
+      }}
+    >
+      {phones.map((ph, i) => (
+        <div
+          key={i}
+          style={{
+            position: "absolute",
+            width: 38,
+            height: 82,
+            transform: `translate(${ph.dx}px, ${ph.dy}px) rotate(${ph.rot}deg)`,
+            zIndex: ph.z,
+            borderRadius: 7,
+            overflow: "hidden",
+            border: `1.4px solid ${accent}`,
+            boxShadow: "0 3px 10px rgba(0,0,0,0.32)",
+            background: "rgb(18 18 22)",
+          }}
+        >
+          <Img
+            src={staticFile(ph.src)}
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              display: "block",
+            }}
+          />
+        </div>
+      ))}
     </div>
   );
 }
