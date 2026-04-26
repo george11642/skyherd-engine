@@ -112,13 +112,16 @@ async def test_coyote_scenario_drone_takes_off_via_pymavlink(
         await backend.disconnect()
 
 
-async def test_coyote_scenario_full_run_event_stream(sitl_emulator) -> None:
+def test_coyote_scenario_full_run_event_stream(sitl_emulator) -> None:
     """
     Run the coyote scenario (world-simulation) and verify the event stream.
 
     This validates Gate item #4 at the scenario level: fence.breach triggers
     a predator.fleeing event, confirming the dispatcher loop works.
     The SITL drone test above proves the MAVLink execution path.
+
+    Sync def: scenarios.run() internally uses asyncio.run(), which conflicts
+    with pytest-asyncio's running event loop on Python 3.12+.
     """
     from skyherd.scenarios import run  # noqa: PLC0415
 
