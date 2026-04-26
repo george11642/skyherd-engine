@@ -1016,8 +1016,8 @@ const COMPARATOR_LINES: Array<ComparatorLine> = [
   { kind: "traditional", label: "Working dogs", price: "~$6,000 / yr",   detail: "daylight only",        delay: 10 },
   { kind: "traditional", label: "ATV / truck",  price: "~$18,000 / yr",  detail: "between runs only",    delay: 20 },
   { kind: "traditional", label: "Lost events",  price: "~$12,000 / yr",  detail: "missed between runs",  delay: 30 },
-  { kind: "skyherd",     label: "SkyHerd",      price: "$2,500 / month", detail: "24/7 · 10,000 acres · 500 head", delay: 50 },
-  { kind: "savings",     label: "~$45,000 / yr saved", price: "",        detail: "",                     delay: 70 },
+  { kind: "skyherd",     label: "SkyHerd",      price: "$1,000 / month", detail: "24/7 · 10,000 acres · 500 head", delay: 50 },
+  { kind: "savings",     label: "~$65,000 / yr saved", price: "",        detail: "",                     delay: 70 },
 ];
 
 function ComparatorCard({ baseOp, frame, height }: ComparatorCardProps) {

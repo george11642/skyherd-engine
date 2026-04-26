@@ -60,18 +60,17 @@ OUT_DEFAULT = REPO_ROOT / "remotion-video/public/captions/styled-captions-C.json
 CUES_FILE_DEFAULT = REPO_ROOT / "scripts/vo_cues.sh"
 
 # Cue keys in playback order + their absolute composition start-time (seconds).
-# Updated per v5.3 rebalance: hook +2s (now 22s), coyote -2s (now 28s).
-# 182s composition, 6s cold open. vo-c-hook re-rendered to 20.76s and
-# vo-c-coyote re-rendered to 24.26s.
+# Updated per v5.4 trim: answer 17→16, wordmark 3→2 to hit 180s ceiling.
+# 180s composition, 6s cold open.
 CUE_OFFSETS: dict[str, float] = {
     "vo-c-hook":         6.0,   # cold open is 6s
     "vo-c-traditional": 28.0,   # 6 + 22 hook
     "vo-c-answer":      52.0,   # 28 + 24 traditional
-    "vo-c-coyote":      69.0,   # 52 + 17 answer
-    "vo-c-grid":        97.0,   # 69 + 28 coyote
-    "vo-c-mvp":        121.0,   # 97 + 24 grid
-    "vo-c-vision":     144.0,   # 121 + 23 mvp
-    "vo-c-aibody":     166.0,   # 144 + 22 vision
+    "vo-c-coyote":      68.0,   # 52 + 16 answer
+    "vo-c-grid":        96.0,   # 68 + 28 coyote
+    "vo-c-mvp":        120.0,   # 96 + 24 grid
+    "vo-c-vision":     143.0,   # 120 + 23 mvp
+    "vo-c-aibody":     165.0,   # 143 + 22 vision
 }
 
 # Default StyledWord styling (uniform; no Opus-authored per-word color).

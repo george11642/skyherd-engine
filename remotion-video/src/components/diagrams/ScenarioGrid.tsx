@@ -1,8 +1,12 @@
 /**
- * ScenarioGrid — Scene 6 (v5.2 retiming)
+ * ScenarioGrid — Scene 6 (v5.4 readability redesign)
  *
- * 4 scenario tiles, sequential focus (one fills ~45% viewport at a time).
- * Total runtime 24s (720 frames). Fixes: cream bg frame-0, rich bodies, bigger stats.
+ * 2×2 grid layout — each tile fills ~40% width / ~35% height, big readable type.
+ * All four tiles fade in over 0–60f. Each tile has a "focus pulse" beat that
+ * matches VO timing, then all hold at full opacity for the final ~210f so the
+ * viewer can re-read.
+ *
+ * Total runtime: 24s (720f).
  */
 import { AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
 
@@ -28,113 +32,129 @@ const TILES: TileData[] = [
   {
     icon: "🐄",
     title: "SICK COW",
-    subtitle: "Cow A014 · 83% confidence",
-    body: "Agent flags pinkeye, drafts vet packet, schedules the visit — all before sunrise",
-    stat: "Agent acted in 4s",
-    metaStat: "before sunrise · HerdHealthWatcher",
+    subtitle: "Cow A014 · pinkeye detected",
+    body: "Agent flags pinkeye, drafts the vet packet, books the visit — all before sunrise.",
+    stat: "VET PACKET DRAFTED · VISIT SCHEDULED",
+    metaStat: "HerdHealthWatcher · 4s",
     color: SAGE,
   },
   {
     icon: "💧",
     title: "TANK LEAK",
     subtitle: "8 PSI overnight drop",
-    body: "Drone inspects the leak, logs GPS coordinates, alerts rancher with photo",
-    stat: "Agent acted in 6s",
-    metaStat: "trough 3 · south pasture · drone path logged",
+    body: "Drone inspects the trough, pinpoints the leak, logs GPS, pings the rancher with photo.",
+    stat: "DRONE DISPATCHED · LEAK LOCATED",
+    metaStat: "Trough 3 · south pasture · 6s",
     color: "rgb(120 180 220)",
   },
   {
     icon: "🐮",
     title: "CALVING",
     subtitle: "Cow #117 · 3:14 AM · labor pattern detected",
-    body: "Priority page — not a maybe. Rancher notified immediately, dystocia watch active",
-    stat: "Agent acted in 3s",
-    metaStat: "3:14 AM · CalvingWatch · priority page",
+    body: "Priority page — not a maybe. Rancher notified immediately, dystocia watch active.",
+    stat: "PRIORITY PAGE SENT",
+    metaStat: "CalvingWatch · 3s",
     color: "rgb(210 178 138)",
   },
   {
     icon: "🌩",
     title: "HAILSTORM",
     subtitle: "45 min out · NWS radar confirmed",
-    body: "Herd auto-rotates to shelter before storm arrives — GrazingOptimizer re-routes",
-    stat: "Agent acted in 5s",
-    metaStat: "paddock B → shelter 2 · acoustic nudge sent",
+    body: "Herd auto-rotates to shelter before the storm arrives — GrazingOptimizer re-routes paddocks.",
+    stat: "PADDOCK B → SHELTER 2",
+    metaStat: "Acoustic nudge sent · 5s",
     color: "rgb(180 160 120)",
   },
 ];
 
-// v5.2 retime: fits 720f (24s) — 4 tiles
-// 4×STAGGER + FOCUS_DUR = 4×150 + 130 = 730f ≈ 24.3s
-const FOCUS_DUR = 130;   // 4.33s per tile
-const STAGGER  = 150;   // 5.00s tile-to-tile
-const TRANS   = 20;
+/** Per-tile focus beats (matches VO timing within the 720f scene). */
+const FOCUS_BEATS: ReadonlyArray<readonly [number, number]> = [
+  [90, 180],
+  [200, 290],
+  [310, 400],
+  [420, 510],
+] as const;
 
-/** Mini SVG body visual for each scenario */
+const ALL_FADE_IN_END = 60;       // all four tiles fully visible by 60f
+const HOLD_START = 540;           // after final tile beat ends
+const RESTING_OPACITY = 0.7;      // when not focused (still readable)
+
+/** Larger SVG body visual for each scenario — scales up with the tile. */
 function TileVisual({ tile, progress }: { tile: TileData; progress: number }) {
   const p = Math.min(1, Math.max(0, progress));
   const c = tile.color;
   const fade = interpolate(p, [0, 0.3], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const late = interpolate(p, [0.4, 0.85], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const late = interpolate(p, [0.3, 0.85], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
 
   if (tile.title === "SICK COW") {
     return (
-      <svg width="220" height="56" viewBox="0 0 220 56" fill="none" style={{ opacity: fade }}>
-        <ellipse cx="38" cy="32" rx="20" ry="13" fill={`${c}25`} stroke={c} strokeWidth="1.6" />
-        <ellipse cx="20" cy="26" rx="8" ry="7" fill={`${c}25`} stroke={c} strokeWidth="1.4" />
-        <circle cx="16" cy="24" r="3" fill="none" stroke="rgb(220 60 60)" strokeWidth="1.4" />
-        <text x="68" y="22" fill={c} fontSize="11" fontFamily="monospace" opacity={fade}>Cow A014 · pinkeye detected</text>
-        <rect x="68" y="30" width="140" height="18" rx="4" fill={`${c}18`} stroke={c} strokeWidth="1" opacity={late} />
-        <text x="74" y="43" fill={c} fontSize="9" fontFamily="monospace" opacity={late}>VET PACKET DRAFTED · VISIT SCHEDULED</text>
+      <svg width="320" height="80" viewBox="0 0 320 80" fill="none" style={{ opacity: fade }}>
+        <ellipse cx="50" cy="44" rx="28" ry="18" fill={`${c}25`} stroke={c} strokeWidth="2" />
+        <ellipse cx="26" cy="36" rx="11" ry="10" fill={`${c}25`} stroke={c} strokeWidth="1.8" />
+        <circle cx="22" cy="34" r="4.5" fill="none" stroke="rgb(220 60 60)" strokeWidth="2" />
+        <circle cx="22" cy="34" r="2" fill="rgb(220 60 60)" opacity={late} />
+        <text x="92" y="32" fill={c} fontSize="15" fontFamily="monospace" opacity={fade}>83% confidence</text>
+        <rect x="92" y="42" width="220" height="28" rx="6" fill={`${c}18`} stroke={c} strokeWidth="1.4" opacity={late} />
+        <text x="102" y="61" fill={c} fontSize="13" fontWeight="700" fontFamily="monospace" opacity={late}>VET PACKET → SCHEDULED</text>
       </svg>
     );
   }
   if (tile.title === "TANK LEAK") {
     const barP = late;
     return (
-      <svg width="220" height="56" viewBox="0 0 220 56" fill="none" style={{ opacity: fade }}>
-        <rect x="4" y="4" width="80" height="48" rx="4" fill={`${c}12`} stroke={c} strokeWidth="1.2" />
-        <text x="8" y="16" fill={c} fontSize="8" fontFamily="monospace">PSI</text>
-        {[0.9, 0.8, 0.65, 0.45, 0.28, 0.15].map((h, i) => (
-          <rect key={i} x={8 + i * 12} y={52 - h * 36 * Math.min(1, barP + i * 0.05)} width={9} height={h * 36 * Math.min(1, barP + i * 0.05)} rx="2" fill={c} opacity={0.55 + h * 0.3} />
+      <svg width="320" height="80" viewBox="0 0 320 80" fill="none" style={{ opacity: fade }}>
+        <rect x="6" y="6" width="120" height="70" rx="6" fill={`${c}12`} stroke={c} strokeWidth="1.6" />
+        <text x="12" y="22" fill={c} fontSize="11" fontFamily="monospace">PSI</text>
+        {[0.92, 0.82, 0.66, 0.46, 0.28, 0.14].map((h, i) => (
+          <rect
+            key={i}
+            x={14 + i * 18}
+            y={74 - h * 50 * Math.min(1, barP + i * 0.05)}
+            width={14}
+            height={h * 50 * Math.min(1, barP + i * 0.05)}
+            rx="3"
+            fill={c}
+            opacity={0.55 + h * 0.3}
+          />
         ))}
-        <line x1="4" y1="52" x2="84" y2="52" stroke={c} strokeWidth="0.8" opacity="0.5" />
-        <text x="96" y="22" fill={c} fontSize="11" fontFamily="monospace" opacity={fade}>8 PSI → 2 PSI overnight</text>
-        <text x="96" y="38" fill="rgb(60 160 230)" fontSize="9" fontFamily="monospace" opacity={late}>DRONE DISPATCHED · LEAK LOCATED</text>
+        <line x1="6" y1="74" x2="126" y2="74" stroke={c} strokeWidth="1" opacity="0.5" />
+        <text x="142" y="32" fill={c} fontSize="15" fontFamily="monospace" opacity={fade}>8 → 2 PSI overnight</text>
+        <text x="142" y="58" fill={c} fontSize="13" fontWeight="700" fontFamily="monospace" opacity={late}>DRONE → LEAK LOCATED</text>
       </svg>
     );
   }
   if (tile.title === "CALVING") {
-    const buzzX = Math.sin(p * 40) * 2;
+    const buzzX = Math.sin(p * 40) * 2.5;
     return (
-      <svg width="220" height="56" viewBox="0 0 220 56" fill="none" style={{ opacity: fade }}>
-        <path d="M4 28 Q14 12 24 28 Q34 44 44 28 Q54 12 64 28 Q74 44 80 28" stroke={c} strokeWidth="2" fill="none" strokeLinecap="round" opacity={fade} />
-        <text x="4" y="52" fill={c} fontSize="7" fontFamily="monospace" opacity="0.6">labor wave pattern</text>
+      <svg width="320" height="80" viewBox="0 0 320 80" fill="none" style={{ opacity: fade }}>
+        <path d="M6 40 Q22 16 38 40 Q54 64 70 40 Q86 16 102 40 Q118 64 130 40" stroke={c} strokeWidth="2.5" fill="none" strokeLinecap="round" opacity={fade} />
+        <text x="6" y="74" fill={c} fontSize="10" fontFamily="monospace" opacity="0.65">labor wave pattern</text>
         <g transform={`translate(${buzzX},0)`} opacity={late}>
-          <rect x="96" y="8" width="28" height="44" rx="6" fill={`${c}20`} stroke={c} strokeWidth="1.6" />
-          <line x1="104" y1="14" x2="116" y2="14" stroke={c} strokeWidth="1.6" strokeLinecap="round" />
-          <circle cx="110" cy="46" r="2.5" fill={c} />
-          <path d="M93 16 Q90 28 93 38" stroke={c} strokeWidth="1.2" fill="none" strokeLinecap="round" opacity="0.5" />
-          <path d="M127 16 Q130 28 127 38" stroke={c} strokeWidth="1.2" fill="none" strokeLinecap="round" opacity="0.5" />
+          <rect x="148" y="12" width="38" height="60" rx="8" fill={`${c}20`} stroke={c} strokeWidth="2" />
+          <line x1="158" y1="20" x2="176" y2="20" stroke={c} strokeWidth="2" strokeLinecap="round" />
+          <circle cx="167" cy="64" r="3" fill={c} />
+          <path d="M143 22 Q139 42 143 56" stroke={c} strokeWidth="1.4" fill="none" strokeLinecap="round" opacity="0.5" />
+          <path d="M191 22 Q195 42 191 56" stroke={c} strokeWidth="1.4" fill="none" strokeLinecap="round" opacity="0.5" />
         </g>
-        <text x="136" y="26" fill={c} fontSize="11" fontFamily="monospace" opacity={late}>3:14 AM</text>
-        <text x="136" y="40" fill={c} fontSize="9" fontFamily="monospace" opacity={late}>PRIORITY PAGE SENT</text>
+        <text x="208" y="34" fill={c} fontSize="15" fontFamily="monospace" opacity={late}>3:14 AM</text>
+        <text x="208" y="58" fill={c} fontSize="13" fontWeight="700" fontFamily="monospace" opacity={late}>PRIORITY PAGE</text>
       </svg>
     );
   }
   // HAILSTORM
   const rot = interpolate(late, [0, 1], [0, 300], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
   return (
-    <svg width="220" height="56" viewBox="0 0 220 56" fill="none" style={{ opacity: fade }}>
-      <ellipse cx="36" cy="28" rx="24" ry="16" fill={`${c}22`} stroke={c} strokeWidth="1.6" />
-      <ellipse cx="24" cy="22" rx="10" ry="9" fill={`${c}22`} stroke={c} strokeWidth="1.2" />
-      <ellipse cx="48" cy="24" rx="9" ry="8" fill={`${c}22`} stroke={c} strokeWidth="1.2" />
-      <path d="M38 18 L32 28 L36 28 L30 40" stroke="rgb(220 180 40)" strokeWidth="1.8" fill="none" strokeLinecap="round" strokeLinejoin="round" opacity={fade} />
-      <g transform={`rotate(${rot},88,28)`}>
-        <path d="M88 14 A14 14 0 1 1 74 28" stroke={c} strokeWidth="2.2" fill="none" strokeLinecap="round" opacity={late} />
-        <polygon points="88,10 84,18 92,18" fill={c} opacity={late} />
+    <svg width="320" height="80" viewBox="0 0 320 80" fill="none" style={{ opacity: fade }}>
+      <ellipse cx="52" cy="40" rx="34" ry="22" fill={`${c}22`} stroke={c} strokeWidth="2" />
+      <ellipse cx="34" cy="32" rx="14" ry="12" fill={`${c}22`} stroke={c} strokeWidth="1.6" />
+      <ellipse cx="68" cy="34" rx="13" ry="11" fill={`${c}22`} stroke={c} strokeWidth="1.6" />
+      <path d="M54 24 L46 40 L52 40 L42 60" stroke="rgb(220 180 40)" strokeWidth="2.4" fill="none" strokeLinecap="round" strokeLinejoin="round" opacity={fade} />
+      <g transform={`rotate(${rot},124,40)`}>
+        <path d="M124 20 A20 20 0 1 1 104 40" stroke={c} strokeWidth="3" fill="none" strokeLinecap="round" opacity={late} />
+        <polygon points="124,14 118,26 130,26" fill={c} opacity={late} />
       </g>
-      <text x="116" y="24" fill={c} fontSize="11" fontFamily="monospace" opacity={late}>45 min out</text>
-      <text x="116" y="38" fill={c} fontSize="9" fontFamily="monospace" opacity={late}>PADDOCK B → SHELTER 2</text>
+      <text x="160" y="34" fill={c} fontSize="15" fontFamily="monospace" opacity={late}>45 min out</text>
+      <text x="160" y="58" fill={c} fontSize="13" fontWeight="700" fontFamily="monospace" opacity={late}>PADDOCK B → SHELTER 2</text>
     </svg>
   );
 }
@@ -143,13 +163,19 @@ export const ScenarioGrid: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps, width, height } = useVideoConfig();
 
-  const titleOpacity = interpolate(frame, [0, 20], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const titleOpacity = interpolate(frame, [0, 30], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
   const badgeOpacity = interpolate(frame, [60, 100], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
 
-  const ACTIVE_W = Math.round(width * 0.60);
-  const ACTIVE_H = Math.round(height * 0.52);
-  const MINI_W = Math.round(width * 0.13);
-  const MINI_H = Math.round(height * 0.20);
+  // Layout: 2×2 grid, ~40% W × ~35% H per tile, centred under the title.
+  const TILE_W = Math.round(width * 0.40);
+  const TILE_H = Math.round(height * 0.35);
+  const GAP_X = Math.round(width * 0.03);
+  const GAP_Y = Math.round(height * 0.04);
+  const GRID_W = TILE_W * 2 + GAP_X;
+  const GRID_LEFT = (width - GRID_W) / 2;
+  const GRID_TOP = Math.round(height * 0.16); // leaves room for the title above
+
+  const isHolding = frame >= HOLD_START;
 
   return (
     // backgroundColor at root — never inside opacity — eliminates gray flash
@@ -157,105 +183,178 @@ export const ScenarioGrid: React.FC = () => {
 
       {/* Title */}
       <div style={{
-        position: "absolute", top: 40, left: 0, right: 0, textAlign: "center",
-        fontFamily: SERIF, fontWeight: 700, fontSize: 40, color: INK,
+        position: "absolute", top: 36, left: 0, right: 0, textAlign: "center",
+        fontFamily: SERIF, fontWeight: 700, fontSize: 44, color: INK,
         letterSpacing: "-0.01em", opacity: titleOpacity,
       }}>
         Four Scenarios. Fully Automatic.
       </div>
 
-      {/* Tiles */}
+      {/* Tiles — 2×2 grid */}
       {TILES.map((tile, i) => {
-        const focusStart = i * STAGGER;
-        const focusEnd = focusStart + FOCUS_DUR;
-        const isFocused = frame >= focusStart && frame < focusEnd + TRANS;
-        const isPast = frame > focusEnd + TRANS;
-        const isVisible = frame >= focusStart - TRANS || i === 0;
-        if (!isVisible) return null;
+        const col = i % 2;
+        const row = Math.floor(i / 2);
+        const tileX = GRID_LEFT + col * (TILE_W + GAP_X);
+        const tileY = GRID_TOP + row * (TILE_H + GAP_Y);
 
-        const activeSp = spring({ frame: frame - focusStart, fps, config: { damping: 75, stiffness: 160, mass: 0.85 } });
-        const exitSp = isPast ? spring({ frame: frame - focusEnd - TRANS, fps, config: { damping: 90, stiffness: 200 } }) : 0;
+        // Per-tile staggered fade-in (over 0–60f). Each tile lags ~6f after the previous.
+        const fadeInStart = i * 6;
+        const fadeInEnd = fadeInStart + (ALL_FADE_IN_END - i * 6);
+        const baseOpacity = interpolate(
+          frame,
+          [fadeInStart, fadeInEnd],
+          [0, RESTING_OPACITY],
+          { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+        );
 
-        const cW = isFocused ? interpolate(activeSp, [0, 1], [MINI_W, ACTIVE_W]) : MINI_W;
-        const cH = isFocused ? interpolate(activeSp, [0, 1], [MINI_H, ACTIVE_H]) : MINI_H;
+        // Focus pulse for this tile's beat.
+        const [bStart, bEnd] = FOCUS_BEATS[i];
+        const isFocusWindow = frame >= bStart && frame <= bEnd + 20;
 
-        const centX = (width - ACTIVE_W) / 2;
-        const miniX = 36 + i * (MINI_W + 10);
-        const cX = isFocused
-          ? interpolate(activeSp, [0, 1], [miniX, centX])
-          : isPast ? interpolate(exitSp, [0, 1], [centX, miniX]) : miniX;
-        const cY = isFocused
-          ? interpolate(activeSp, [0, 1], [(height - MINI_H) / 2, (height - ACTIVE_H) / 2 + 20])
-          : (height - MINI_H) / 2;
+        // Spring-driven focus envelope: rises 0→1 at bStart, falls back to 0 at bEnd.
+        const focusUp = isFocusWindow
+          ? spring({ frame: frame - bStart, fps, config: { damping: 80, stiffness: 180, mass: 0.8 } })
+          : 0;
+        const focusDown = frame > bEnd
+          ? spring({ frame: frame - bEnd, fps, config: { damping: 90, stiffness: 200 } })
+          : 0;
+        const focusEnv = Math.max(0, focusUp - focusDown);
 
-        const cardOpacity = i === 0 && !isFocused && !isPast
-          ? interpolate(frame, [0, 20], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" })
-          : isFocused
-          ? interpolate(activeSp, [0, 0.05, 1], [0, 0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" })
-          : 0.55;
+        // After the final beat, hold ALL tiles at full opacity for re-reading.
+        const holdBoost = isHolding
+          ? interpolate(frame, [HOLD_START, HOLD_START + 30], [0, 1 - RESTING_OPACITY], {
+              extrapolateLeft: "clamp",
+              extrapolateRight: "clamp",
+            })
+          : 0;
 
-        const visualProg = isFocused
-          ? interpolate(frame, [focusStart, focusStart + FOCUS_DUR], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" })
-          : isPast ? 1 : 0;
+        const tileOpacity = Math.min(1, baseOpacity + focusEnv * (1 - RESTING_OPACITY) + holdBoost);
+        const scale = 1 + focusEnv * 0.04; // subtle bump
+        const borderW = 2 + focusEnv * 2;  // 2px → 4px
 
-        const statProg = isFocused
-          ? interpolate(frame, [focusStart + 20, focusStart + 95], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" })
-          : isPast ? 1 : 0;
+        // The "details" (subtitle, body, visual, stat) reveal during this tile's beat
+        // and stay revealed through the final hold.
+        const hasFiredBeat = frame >= bStart;
+        const detailProgress = hasFiredBeat
+          ? interpolate(frame, [bStart, bStart + 70], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" })
+          : 0;
 
         return (
-          <div key={tile.title} style={{
-            position: "absolute", left: cX, top: cY, width: cW, height: cH,
-            backgroundColor: CREAM_CARD,
-            border: `2.5px solid ${isFocused ? tile.color : `${tile.color}50`}`,
-            borderRadius: 20, padding: isFocused ? "26px 30px" : "12px 14px",
-            display: "flex", flexDirection: "column", justifyContent: "space-between",
-            opacity: cardOpacity, overflow: "hidden",
-            boxShadow: isFocused
-              ? `0 16px 56px rgba(0,0,0,0.18), 0 0 0 3px ${tile.color}35`
-              : "0 2px 8px rgba(0,0,0,0.06)",
-          }}>
-            {/* Header */}
-            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <div style={{ fontSize: isFocused ? 44 : 22, lineHeight: 1 }}>{tile.icon}</div>
-              <div>
-                <div style={{ fontFamily: MONO, fontWeight: 800, fontSize: isFocused ? 22 : 12, color: INK, letterSpacing: "0.12em", textTransform: "uppercase" as const }}>
+          <div
+            key={tile.title}
+            style={{
+              position: "absolute",
+              left: tileX,
+              top: tileY,
+              width: TILE_W,
+              height: TILE_H,
+              transform: `scale(${scale})`,
+              transformOrigin: "center center",
+              backgroundColor: CREAM_CARD,
+              border: `${borderW}px solid ${tile.color}`,
+              borderRadius: 22,
+              padding: "26px 30px",
+              display: "flex",
+              flexDirection: "column",
+              gap: 14,
+              opacity: tileOpacity,
+              overflow: "hidden",
+              boxShadow:
+                focusEnv > 0.05
+                  ? `0 18px 60px rgba(0,0,0,${0.10 + focusEnv * 0.12}), 0 0 0 ${Math.round(focusEnv * 4)}px ${tile.color}30`
+                  : "0 4px 14px rgba(0,0,0,0.08)",
+            }}
+          >
+            {/* Header row: icon + title + subtitle */}
+            <div style={{ display: "flex", alignItems: "flex-start", gap: 16 }}>
+              <div style={{ fontSize: 52, lineHeight: 1 }}>{tile.icon}</div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div
+                  style={{
+                    fontFamily: MONO,
+                    fontWeight: 800,
+                    fontSize: 30,
+                    color: INK,
+                    letterSpacing: "0.10em",
+                    textTransform: "uppercase" as const,
+                    lineHeight: 1.05,
+                  }}
+                >
                   {tile.title}
                 </div>
-                {isFocused && (
-                  <div style={{ fontFamily: MONO, fontSize: 13, color: tile.color, marginTop: 3,
-                    opacity: interpolate(activeSp, [0.3, 0.7], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) }}>
-                    {tile.subtitle}
-                  </div>
-                )}
+                <div
+                  style={{
+                    fontFamily: MONO,
+                    fontSize: 19,
+                    color: tile.color,
+                    marginTop: 6,
+                    lineHeight: 1.25,
+                    opacity: 0.4 + detailProgress * 0.6,
+                  }}
+                >
+                  {tile.subtitle}
+                </div>
               </div>
             </div>
 
-            {/* Sub-visual */}
-            {isFocused && (
-              <div style={{ opacity: interpolate(visualProg, [0, 0.3], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) }}>
-                <TileVisual tile={tile} progress={visualProg} />
-              </div>
-            )}
+            {/* Body sentence */}
+            <div
+              style={{
+                fontFamily: SERIF,
+                fontSize: 19,
+                color: INK,
+                lineHeight: 1.4,
+                opacity: 0.35 + detailProgress * 0.65,
+              }}
+            >
+              {tile.body}
+            </div>
 
-            {/* Body text */}
-            {isFocused && (
-              <div style={{ fontFamily: SERIF, fontSize: 21, color: INK, lineHeight: 1.4,
-                opacity: interpolate(statProg, [0, 0.4], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) }}>
-                {tile.body}
-              </div>
-            )}
+            {/* Dataviz glyph — reveals on this tile's beat */}
+            <div
+              style={{
+                opacity: detailProgress,
+                marginTop: "auto",
+              }}
+            >
+              <TileVisual tile={tile} progress={detailProgress} />
+            </div>
 
-            {/* Stat row */}
-            <div style={{ borderTop: `1.5px solid ${tile.color}40`, paddingTop: isFocused ? 14 : 7 }}>
-              <div style={{ fontFamily: MONO, fontSize: isFocused ? 18 : 10, color: tile.color, fontWeight: 700, letterSpacing: "0.08em", opacity: statProg }}>
+            {/* Stat row pinned to the bottom */}
+            <div
+              style={{
+                borderTop: `1.5px solid ${tile.color}55`,
+                paddingTop: 12,
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "baseline",
+                gap: 12,
+              }}
+            >
+              <div
+                style={{
+                  fontFamily: MONO,
+                  fontSize: 17,
+                  color: tile.color,
+                  fontWeight: 700,
+                  letterSpacing: "0.08em",
+                  opacity: 0.4 + detailProgress * 0.6,
+                }}
+              >
                 {tile.stat}
               </div>
-              {isFocused && (
-                <div style={{ fontFamily: MONO, fontSize: 13, color: INK_LIGHT, marginTop: 4,
-                  opacity: interpolate(statProg, [0.5, 1], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) }}>
-                  {tile.metaStat}
-                </div>
-              )}
+              <div
+                style={{
+                  fontFamily: MONO,
+                  fontSize: 13,
+                  color: INK_LIGHT,
+                  letterSpacing: "0.04em",
+                  whiteSpace: "nowrap",
+                  opacity: 0.5 + detailProgress * 0.5,
+                }}
+              >
+                {tile.metaStat}
+              </div>
             </div>
           </div>
         );
@@ -263,7 +362,7 @@ export const ScenarioGrid: React.FC = () => {
 
       {/* Opus badge */}
       <div style={{
-        position: "absolute", bottom: 32, right: 48,
+        position: "absolute", bottom: 28, right: 44,
         fontFamily: MONO, fontSize: 12, color: INK_LIGHT, letterSpacing: "0.12em",
         textTransform: "uppercase" as const, opacity: badgeOpacity,
         padding: "6px 12px", border: `1px solid ${SAGE}60`, borderRadius: 6,
@@ -274,10 +373,10 @@ export const ScenarioGrid: React.FC = () => {
 
       {/* Sub-label — appears once all 4 tiles have run their focus */}
       <div style={{
-        position: "absolute", bottom: 32, left: 48,
+        position: "absolute", bottom: 28, left: 44,
         fontFamily: MONO, fontSize: 13, color: INK_LIGHT, letterSpacing: "0.10em",
         textTransform: "uppercase" as const,
-        opacity: interpolate(frame, [620, 660], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }),
+        opacity: interpolate(frame, [540, 600], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }),
       }}>
         No rancher action needed
       </div>

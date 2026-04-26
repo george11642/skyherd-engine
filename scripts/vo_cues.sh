@@ -109,9 +109,9 @@ CUES["vo-meta-B"]="And the captions you've been reading? Opus 4.7 styled every w
 
 CUES["vo-c-hook"]="I'm George, senior at UNM. So, I'm from the Southwest — out here, ranches are kind of everywhere, and, uh, I've watched ranchers do impossible work. Right now beef prices are at record highs — but the American cow herd's at a sixty-five-year low. Labor's gone. Ranchers are aging out. Every ranch left has to do more, with fewer people watching it. And, uh, right now nobody is."
 
-CUES["vo-c-traditional"]="Here's how a ranch runs today. Helicopters. Working dogs. A-T-Vs. One ranch hand and two-hundred miles a week. Six runs a day, best case — and still, a coyote before dawn, a sick cow at noon, an empty water tank at midnight, all missed between runs. SkyHerd replaces all of it for twenty-five hundred a month — and saves the average ranch forty-five thousand dollars a year."
+CUES["vo-c-traditional"]="Here's how a ranch runs today. Helicopters. Working dogs. A-T-Vs. One ranch hand and two-hundred miles a week. Six runs a day, best case — and still, a coyote before dawn, a sick cow at noon, an empty water tank at midnight, all missed between runs. SkyHerd replaces all of it for a thousand bucks a month — and saves the average ranch sixty-five thousand dollars a year."
 
-CUES["vo-c-answer"]="SkyHerd gives the ranch a nervous system. Five Claude agents, built on Opus 4.7. They're idle until a sensor wakes them — vision, motion, pressure, weather. Then they decide and act. Twenty-five hundred a month, per ranch. Less than the cost of one ranch hand, watching every acre."
+CUES["vo-c-answer"]="SkyHerd gives the ranch a nervous system. Five Claude agents, built on Opus 4.7. They're idle until a sensor wakes them — vision, motion, pressure, weather. Then they decide and act. A thousand bucks a month, per ranch — way less than one ranch hand, watching every acre."
 
 CUES["vo-c-coyote"]="Three-fourteen in the morning. Thermal hits the south fence. The agent wakes up, looks at the frame, calls it — yeah, coyote, ninety-one percent confidence. It dispatches the drone autonomously. Drone flies the perimeter, scares the coyote off, returns home. The rancher gets a text. Nobody woke up. Nothing got eaten. The fence-line agent goes back to sleep — billing stops until the next sensor event. The whole alert? About forty cents of compute."
 

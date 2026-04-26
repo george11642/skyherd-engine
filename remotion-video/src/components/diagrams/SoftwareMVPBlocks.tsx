@@ -24,12 +24,12 @@ function WebBody({ accent, lf }: { accent: string; lf: number }) {
     <div
       style={{
         width: "100%",
-        height: 88,
-        borderRadius: 6,
+        height: 160,
+        borderRadius: 8,
         overflow: "hidden",
-        border: `1.4px solid ${accent}`,
+        border: `1.6px solid ${accent}`,
         opacity: p,
-        boxShadow: `0 2px 8px ${accent}22`,
+        boxShadow: `0 3px 12px ${accent}26`,
       }}
     >
       <Img
@@ -50,9 +50,9 @@ function IOSBody({ accent, lf }: { accent: string; lf: number }) {
   const p = interpolate(lf, [20, 110], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
   // Three iOS screenshots fanned out left/center/right
   const phones = [
-    { src: "screenshots/ios/live.png",   rot: -10, dx: -28, dy: 4,  z: 1 },
-    { src: "screenshots/ios/alerts.png", rot:   0, dx:   0, dy: -2, z: 3 },
-    { src: "screenshots/ios/map.png",    rot:  10, dx:  28, dy: 4,  z: 2 },
+    { src: "screenshots/ios/live.png",   rot: -10, dx: -44, dy: 6,  z: 1 },
+    { src: "screenshots/ios/alerts.png", rot:   0, dx:   0, dy: -3, z: 3 },
+    { src: "screenshots/ios/map.png",    rot:  10, dx:  44, dy: 6,  z: 2 },
   ];
   return (
     <div
@@ -60,7 +60,7 @@ function IOSBody({ accent, lf }: { accent: string; lf: number }) {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        height: 88,
+        height: 160,
         position: "relative",
         opacity: p,
       }}
@@ -70,14 +70,14 @@ function IOSBody({ accent, lf }: { accent: string; lf: number }) {
           key={i}
           style={{
             position: "absolute",
-            width: 38,
-            height: 82,
+            width: 60,
+            height: 130,
             transform: `translate(${ph.dx}px, ${ph.dy}px) rotate(${ph.rot}deg)`,
             zIndex: ph.z,
-            borderRadius: 7,
+            borderRadius: 11,
             overflow: "hidden",
-            border: `1.4px solid ${accent}`,
-            boxShadow: "0 3px 10px rgba(0,0,0,0.32)",
+            border: `1.8px solid ${accent}`,
+            boxShadow: "0 4px 14px rgba(0,0,0,0.36)",
             background: "rgb(18 18 22)",
           }}
         >
@@ -99,8 +99,8 @@ function IOSBody({ accent, lf }: { accent: string; lf: number }) {
 function AndroidBody({ accent, lf }: { accent: string; lf: number }) {
   const p = interpolate(lf, [70, 140], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
   return (
-    <div style={{ display: "flex", justifyContent: "center", height: 88 }}>
-      <svg width="60" height="88" viewBox="0 0 60 88" fill="none">
+    <div style={{ display: "flex", justifyContent: "center", height: 150 }}>
+      <svg width="102" height="150" viewBox="0 0 60 88" fill="none">
         <path d="M8 22 Q8 8 30 8 Q52 8 52 22 L52 76 Q52 84 44 84 L16 84 Q8 84 8 76 Z" fill={`${accent}15`} stroke={accent} strokeWidth="1.8" />
         <circle cx="20" cy="17" r="2.5" fill={accent} opacity="0.7" /><circle cx="40" cy="17" r="2.5" fill={accent} opacity="0.7" />
         <line x1="8" y1="26" x2="4" y2="26" stroke={accent} strokeWidth="2.2" strokeLinecap="round" />
@@ -110,8 +110,8 @@ function AndroidBody({ accent, lf }: { accent: string; lf: number }) {
         <line x1="14" y1="5" x2="18" y2="13" stroke={accent} strokeWidth="1.5" strokeLinecap="round" />
         <line x1="46" y1="5" x2="42" y2="13" stroke={accent} strokeWidth="1.5" strokeLinecap="round" />
         <rect x="11" y="30" width="38" height="22" rx="4" fill={`${accent}28`} opacity={p} />
-        <text x="14" y="41" fill={accent} fontSize="6" fontFamily="monospace" opacity={p}>SkyHerd Alert</text>
-        <text x="14" y="49" fill={INK_LIGHT} fontSize="5.5" fontFamily="monospace" opacity={p * 0.85}>Trough 3 pressure low</text>
+        <text x="14" y="40" fill={accent} fontSize="5" fontFamily="monospace" fontWeight="bold" opacity={p}>SkyHerd Alert</text>
+        <text x="14" y="48" fill={INK_LIGHT} fontSize="4.6" fontFamily="monospace" opacity={p * 0.85}>Trough 3 pressure low</text>
       </svg>
     </div>
   );
@@ -121,7 +121,7 @@ function SimBody({ accent, lf }: { accent: string; lf: number }) {
   const lines = ["$ make demo SEED=42", "→ FenceLineDispatcher", "→ confidence: 91%", "✓ drone dispatched", "✓ rancher paged", "→ scenario: calving", "✓ replay complete"];
   const visible = Math.ceil(interpolate(lf, [10, 160], [0, lines.length], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }));
   return (
-    <svg width="100%" height="88" viewBox="0 0 200 88" fill="none">
+    <svg width="100%" height="150" viewBox="0 0 200 88" fill="none" preserveAspectRatio="xMidYMid meet">
       <rect x="0" y="0" width="200" height="88" rx="6" fill="rgb(18 22 28)" />
       <rect x="0" y="0" width="200" height="16" rx="6" fill="rgb(32 38 48)" />
       <circle cx="10" cy="8" r="2.8" fill="rgb(255 90 90)" /><circle cx="19" cy="8" r="2.8" fill="rgb(255 200 50)" /><circle cx="28" cy="8" r="2.8" fill="rgb(80 200 100)" />
@@ -139,8 +139,8 @@ function WesBody({ accent, lf }: { accent: string; lf: number }) {
   const ring1 = (lf % 50) / 50;
   const ring2 = ((lf + 25) % 50) / 50;
   return (
-    <div style={{ display: "flex", justifyContent: "center", height: 88 }}>
-      <svg width="62" height="88" viewBox="0 0 62 88" fill="none">
+    <div style={{ display: "flex", justifyContent: "center", height: 150 }}>
+      <svg width="106" height="150" viewBox="0 0 62 88" fill="none">
         <rect x="3" y="0" width="56" height="88" rx="11" fill="rgb(18 18 22)" stroke={accent} strokeWidth="1.8" />
         <line x1="19" y1="5" x2="43" y2="5" stroke={accent} strokeWidth="1.8" strokeLinecap="round" opacity="0.6" />
         <circle cx="31" cy="83" r="3.2" fill="rgb(36 36 44)" stroke={accent} strokeWidth="0.9" />
@@ -192,13 +192,13 @@ export const SoftwareMVPBlocks: React.FC = () => {
 
   // 5-card grid: 3 top + 2 bottom (centred)
   const GAP = 18;
-  const cardW = Math.min(Math.floor((width - GAP * 4) / 3), 336);
-  const cardH = Math.min(Math.floor((height - 270) / 2), 218);
+  const cardW = Math.min(Math.floor((width - GAP * 4) / 3), 480);
+  const cardH = Math.min(Math.floor((height - 270) / 2), 320);
   const topW = 3 * cardW + 2 * GAP;
   const botW = 2 * cardW + GAP;
   const topX = (width - topW) / 2;
   const botX = (width - botW) / 2;
-  const rowY0 = 118;
+  const rowY0 = 130;
   const rowY1 = rowY0 + cardH + GAP;
 
   function pos(i: number) {
@@ -215,7 +215,7 @@ export const SoftwareMVPBlocks: React.FC = () => {
 
       <div style={{
         position: "absolute", top: 38, left: 0, right: 0, textAlign: "center",
-        fontFamily: SERIF, fontWeight: 700, fontSize: 38, color: INK,
+        fontFamily: SERIF, fontWeight: 700, fontSize: 52, color: INK,
         letterSpacing: "-0.01em", opacity: titleOpacity,
       }}>
         Full Software MVP — Built Solo
@@ -234,13 +234,13 @@ export const SoftwareMVPBlocks: React.FC = () => {
           <div key={card.label} style={{
             position: "absolute", left: p.x, top: p.y, width: cardW, height: cardH,
             backgroundColor: CREAM_CARD, border: `2px solid ${card.color}`,
-            borderRadius: 18, padding: "16px 18px",
+            borderRadius: 22, padding: "22px 26px",
             display: "flex", flexDirection: "column", justifyContent: "space-between",
             transform: `scale(${scaleVal})`, opacity: opacityVal, transformOrigin: "center center",
             overflow: "hidden",
             boxShadow: `0 4px 20px rgba(0,0,0,0.10)${glow > 0 ? `, 0 0 ${Math.round(22 * glow)}px ${card.color}` : ""}`,
           }}>
-            <div style={{ fontFamily: MONO, fontWeight: 800, fontSize: 13, color: INK, letterSpacing: "0.12em", textTransform: "uppercase" as const, marginBottom: 6 }}>
+            <div style={{ fontFamily: MONO, fontWeight: 800, fontSize: 18, color: INK, letterSpacing: "0.12em", textTransform: "uppercase" as const, marginBottom: 10 }}>
               {card.label}
             </div>
 
@@ -250,19 +250,19 @@ export const SoftwareMVPBlocks: React.FC = () => {
               </div>
             </div>
 
-            <div style={{ fontFamily: MONO, fontSize: 11, color: card.color, letterSpacing: "0.07em", borderTop: `1px solid ${card.color}40`, paddingTop: 7, marginTop: 5 }}>
+            <div style={{ fontFamily: MONO, fontSize: 16, color: card.color, letterSpacing: "0.07em", borderTop: `1px solid ${card.color}40`, paddingTop: 10, marginTop: 8 }}>
               {card.caption}
             </div>
           </div>
         );
       })}
 
-      {/* Typewriter sub-line — 21px = +50% vs old 14px */}
+      {/* Typewriter sub-line — bumped 21→28px for v5.4 readability pass */}
       <div style={{
         position: "absolute", bottom: 34,
         left: topX, right: topX,
-        fontFamily: MONO, fontSize: 21, color: INK_LIGHT,
-        letterSpacing: "0.04em", lineHeight: 1.5, minHeight: 58,
+        fontFamily: MONO, fontSize: 28, color: INK_LIGHT,
+        letterSpacing: "0.04em", lineHeight: 1.4, minHeight: 76,
       }}>
         {visText}
         {typeP < 1 && frame > TW_START && (

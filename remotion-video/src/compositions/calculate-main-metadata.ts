@@ -203,22 +203,21 @@ const AB_ACT3_SUBSTANCE_SECONDS = 15;
 const AB_ACT3_META_LOOP_SECONDS = 5;
 const AB_ACT3_FINAL_SECONDS = 10;
 
-// C v5.3 — 9-scene layout mapped to 5 acts (3:02 runtime, total = 182s = 5460 frames)
+// C v5.4 — 9-scene layout mapped to 5 acts (3:00 runtime, total = 180s = 5400 frames)
 //
 // act1 = coldOpen(6s) + hook(22s)             = 28s =  840 frames
-// act2 = traditional(24s) + answer(17s)       = 41s = 1230 frames
+// act2 = traditional(24s) + answer(16s)       = 40s = 1200 frames
 // act3 = coyote(28s) + grid(24s)              = 52s = 1560 frames
 // act4 = mvp(23s) + vision(22s)               = 45s = 1350 frames
-// act5 = aibody(13s) + wordmark(3s)           = 16s =  480 frames
-// TOTAL                                       = 182s = 5460 frames ✓
-// Rebalanced after re-rendering vo-c-hook (now 20.76s) and vo-c-coyote (now 24.26s).
-// Hook +2s, coyote -2s — total stays 182s.
+// act5 = aibody(13s) + wordmark(2s)           = 15s =  450 frames
+// TOTAL                                       = 180s = 5400 frames ✓
+// Trimmed 2s from v5.3 (answer -1s, wordmark -1s) — fits ≤180s ceiling.
 const C_ACT1_SECONDS = 28;  // coldOpen(6) + hook(22)         | hook VO 20.76s
-const C_ACT2_SECONDS = 41;  // traditional(24) + answer(17)   | unchanged
+const C_ACT2_SECONDS = 40;  // traditional(24) + answer(16)   | answer -1s ($1k VO shorter)
 const C_ACT3_SECONDS = 52;  // coyote(28) + grid(24)          | coyote VO 24.26s
 const C_ACT4_SECONDS = 45;  // mvp(23) + vision(22)           | unchanged
-const C_ACT5_SECONDS = 16;  // aibody(13) + wordmark(3)       | unchanged
-// Total: 28+41+52+45+16 = 182s = 5460 frames @ 30fps
+const C_ACT5_SECONDS = 15;  // aibody(13) + wordmark(2)       | wordmark -1s
+// Total: 28+40+52+45+15 = 180s = 5400 frames @ 30fps
 
 // Re-exported for act components.
 export const AB_LAYOUT = {
@@ -245,8 +244,8 @@ export const AB_LAYOUT = {
 export const C_LAYOUT = {
   // act1: coldOpen(6s) + hook(22s) = 28s  [v5.3 rebalance: hook +2s to fit re-rendered 20.76s VO]
   act1: { totalSeconds: C_ACT1_SECONDS, coldOpenSeconds: 6, hookSeconds: 22, punchSeconds: 3 },
-  // act2: traditional(24s) + answer(17s) = 41s  [unchanged]
-  act2: { totalSeconds: C_ACT2_SECONDS, traditionalSeconds: 24, answerSeconds: 17, storyMin: 41 },
+  // act2: traditional(24s) + answer(16s) = 40s  [v5.4: answer -1s — $1k VO shorter]
+  act2: { totalSeconds: C_ACT2_SECONDS, traditionalSeconds: 24, answerSeconds: 16, storyMin: 40 },
   // act3: coyote(28s) + grid(24s) = 52s  [v5.3 rebalance: coyote -2s — re-rendered VO 24.26s]
   act3: {
     totalSeconds: C_ACT3_SECONDS,
@@ -259,8 +258,8 @@ export const C_LAYOUT = {
   },
   // act4: mvp(23s) + vision(22s) = 45s  [unchanged]
   act4: { totalSeconds: C_ACT4_SECONDS, mvpSeconds: 23, visionSeconds: 22, opusMin: 23, depthMin: 22 },
-  // act5: aibody(13s) + wordmark(3s) = 16s  [unchanged]
-  act5: { totalSeconds: C_ACT5_SECONDS, aibodySeconds: 13, wordmarkSeconds: 3, bookendSeconds: 13 },
+  // act5: aibody(13s) + wordmark(2s) = 15s  [v5.4: wordmark -1s]
+  act5: { totalSeconds: C_ACT5_SECONDS, aibodySeconds: 13, wordmarkSeconds: 2, bookendSeconds: 13 },
 } as const;
 
 export const calculateMainMetadata: CalculateMetadataFunction<

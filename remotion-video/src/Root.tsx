@@ -25,17 +25,17 @@ const DEFAULT_AB_ACT_DURATIONS = {
   act5: 0,
 };
 
-// v5.3 polish pass — full 3:02 runtime (182s = 5460 frames @ 30fps)
-// Rebalanced after re-rendering vo-c-hook (now 20.76s) and vo-c-coyote (now 24.26s).
-// Hook +2s, coyote -2s — total stays 182s.
+// v5.4 polish pass — exact 3:00 runtime (180s = 5400 frames @ 30fps)
+// Trimmed 2s from v5.3 (answer -1s, wordmark -1s) to hit ≤180s ceiling.
+// New $1,000/mo VO is slightly shorter than $2,500/mo, so answer 17→16 fits.
 const DEFAULT_C_ACT_DURATIONS = {
   act1: 28 * FPS,   //  840f: coldOpen(6s) + hook(22s)        — hook VO 20.76s
-  act2: 41 * FPS,   // 1230f: traditional(24s) + answer(17s)  — trad 21.6s + comparator slide-in
+  act2: 40 * FPS,   // 1200f: traditional(24s) + answer(16s)  — trad 21.6s + comparator slide-in
   act3: 52 * FPS,   // 1560f: coyote(28s) + grid(24s)         — coyote VO 24.26s (re-rendered, no duplicate)
   act4: 45 * FPS,   // 1350f: mvp(23s) + vision(22s)
-  act5: 16 * FPS,   //  480f: aibody(13s) + wordmark(3s)
+  act5: 15 * FPS,   //  450f: aibody(13s) + wordmark(2s)
 };
-// Total: 182s = 5460 frames @ 30fps
+// Total: 180s = 5400 frames @ 30fps
 
 // Fallback VO durations (frames). Measured 2026-04-24 from Inworld/Nate render.
 const DEFAULT_VO_DURATIONS_FRAMES = {

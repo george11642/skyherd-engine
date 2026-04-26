@@ -48,8 +48,8 @@ import brollCRaw from "../../data/broll-C.json";
 const BROLL_C: BrollCut[] = (brollCRaw as { cuts: BrollCut[] }).cuts;
 
 // Global act offsets (seconds) used by BrollTrack
-// v5.3 rebalanced: act5 starts at frame 4980 = 166s (act1+act2+act3+act4 = 28+41+52+45)
-const C_ACT5_START = 166;
+// v5.4 rebalanced: act5 starts at frame 4950 = 165s (act1+act2+act3+act4 = 28+40+52+45)
+const C_ACT5_START = 165;
 
 const FPS = 30;
 
@@ -466,10 +466,178 @@ export const CAct2Story = () => {
 
 // ── Scene: Live Coyote Dashboard (28s / 840 frames) ──────────────────────────
 
+// ── Agent Mesh panel (v5.4 polish) ───────────────────────────────────────────
+// Right-side faux dashboard panel listing the 5 Managed Agents. Each row
+// activates progressively in time with the coyote VO. Sized big so it reads
+// at YouTube thumbnail scale.
+//
+// Activation cadence (v5.4 = v5.3 base × 1.15 slowdown to match VO pacing):
+//   FenceLineDispatcher  → 60f  → 69f
+//   HerdHealthWatcher    → 120f → 138f
+//   PredatorPatternLearner → 180f → 207f
+//   GrazingOptimizer     → 240f → 276f
+//   CalvingWatch         → 300f → 345f
+
+type AgentRow = {
+  name: string;
+  status: "active" | "idle";
+  detail: string;
+  activateAt: number;
+  accent: Accent;
+};
+
+const AGENT_ROWS: AgentRow[] = [
+  { name: "FenceLineDispatcher",   status: "active", detail: "Coyote · 91% · W-12",  activateAt: 69,  accent: "thermal" },
+  { name: "HerdHealthWatcher",     status: "idle",   detail: "Last scan · 11min ago", activateAt: 138, accent: "sage" },
+  { name: "PredatorPatternLearner",status: "idle",   detail: "Logged 3 crossings",   activateAt: 207, accent: "dust" },
+  { name: "GrazingOptimizer",      status: "idle",   detail: "Next rotation · Tue",  activateAt: 276, accent: "sky" },
+  { name: "CalvingWatch",          status: "idle",   detail: "Season window · open", activateAt: 345, accent: "warn" },
+];
+
+const AgentMeshPanel = ({ panelOpacity }: { panelOpacity: number }) => {
+  const frame = useCurrentFrame();
+  // Header drop-in
+  const headerO = interpolate(frame, [12, 35], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+
+  return (
+    <div
+      style={{
+        position: "absolute",
+        top: 170,
+        right: 72,
+        width: 560,
+        backgroundColor: "rgba(14,17,22,0.92)",
+        border: "1px solid rgba(148,176,136,0.22)",
+        borderRadius: 16,
+        padding: "26px 28px",
+        boxShadow: "0 12px 44px rgba(0,0,0,0.6)",
+        backdropFilter: "blur(14px)",
+        fontFamily: "Inter, sans-serif",
+        color: "rgb(236 239 244)",
+        opacity: panelOpacity,
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginBottom: 22,
+          opacity: headerO,
+        }}
+      >
+        <div
+          style={{
+            fontSize: 21,
+            fontWeight: 800,
+            letterSpacing: "0.04em",
+            textTransform: "uppercase",
+            color: "rgb(236 239 244)",
+          }}
+        >
+          Agent Mesh
+        </div>
+        <div
+          style={{
+            fontSize: 13,
+            color: ACCENT_MAP.sage,
+            letterSpacing: "0.24em",
+            textTransform: "uppercase",
+            fontWeight: 700,
+          }}
+        >
+          5 / 5 online
+        </div>
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+        {AGENT_ROWS.map((row) => {
+          const rowP = interpolate(
+            frame,
+            [row.activateAt, row.activateAt + 20],
+            [0, 1],
+            { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
+          );
+          const rowX = interpolate(rowP, [0, 1], [18, 0]);
+          const accentCol = ACCENT_MAP[row.accent];
+          const isActive = row.status === "active";
+          return (
+            <div
+              key={row.name}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: 16,
+                padding: "16px 18px",
+                backgroundColor: isActive
+                  ? "rgba(255,143,60,0.10)"
+                  : "rgba(255,255,255,0.025)",
+                border: `1px solid ${isActive ? accentCol : "rgba(168,180,198,0.18)"}`,
+                borderRadius: 12,
+                transform: `translateX(${rowX}px)`,
+                opacity: rowP,
+              }}
+            >
+              <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                <div
+                  style={{
+                    fontSize: 15,
+                    fontWeight: 700,
+                    letterSpacing: "-0.005em",
+                    color: "rgb(236 239 244)",
+                  }}
+                >
+                  {row.name}
+                </div>
+                <div
+                  style={{
+                    fontSize: 13,
+                    fontWeight: 500,
+                    color: "rgb(168 180 198)",
+                    letterSpacing: "0.01em",
+                  }}
+                >
+                  {row.detail}
+                </div>
+              </div>
+              <div
+                style={{
+                  fontSize: 12,
+                  fontWeight: 800,
+                  letterSpacing: "0.18em",
+                  textTransform: "uppercase",
+                  padding: "6px 12px",
+                  borderRadius: 999,
+                  backgroundColor: isActive ? accentCol : "rgba(120,132,148,0.22)",
+                  color: isActive ? "rgb(10 12 16)" : "rgb(200 210 220)",
+                }}
+              >
+                {row.status}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
 /**
  * Jargon-free live coyote FenceLineDispatcher dashboard.
  * VO is vo-c-coyote.mp3 (~22.4s); the remaining ~5.6s is the live dashboard
  * continuing to play through the scenario.
+ *
+ * v5.4 polish:
+ *   - Bigger Agent Mesh panel + bigger HUD readouts.
+ *   - Internal animation timings (panel staggers, ticker, mesh row activation)
+ *     scaled by ×1.15 vs v5.3 to slow the dashboard ~15% to match VO.
+ *   - LowerThird (frame 30), AnchorChip (19s), SMS (16s) firings preserved
+ *     from v5.3 — only the new internal mesh/ticker timing is slowed.
+ *   - Outer background painted dark immediately so there's no cream flash from
+ *     the parent CAct3Demo bg between answer scene and coyote scene.
  */
 const CoyoteDashboard = () => {
   const frame = useCurrentFrame();
@@ -487,15 +655,43 @@ const CoyoteDashboard = () => {
   );
   const opacity = Math.min(fadeIn, fadeOut);
 
-  // SMS callout appears at ~16s into the scene (was 19s — pulled 3s earlier)
+  // SMS callout appears at ~16s into the scene (was 19s — pulled 3s earlier in v5.3)
   const SMS_AT = 16 * FPS;
   const smsO = interpolate(frame, [SMS_AT, SMS_AT + 20], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
 
+  // ── v5.4 Agent Mesh panel reveal (slow internal pacing) ───────────────────
+  // Panel base reveal: 35→55 (was 30→48 in v5.3 draft, ×1.15 = 35→55)
+  const meshPanelO = interpolate(frame, [35, 55], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+
+  // ── Cost meter ticker (bottom strip) — animates over 15s, slowed ×1.15 ───
+  // v5.3 base would be 60→360 (10s), v5.4 = 69→414 (~11.5s)
+  const costStart = 69;
+  const costEnd = 414;
+  const costFill = interpolate(frame, [costStart, costEnd], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  // Animated dollar amount — counts $0.000 → $0.041 over the same window
+  const costAmount = interpolate(frame, [costStart, costEnd], [0, 0.041], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  const costMeterO = interpolate(frame, [50, 75], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+
   return (
     <AbsoluteFill style={{ backgroundColor: "rgb(6 8 12)" }}>
+      {/* Hard dark background snap — kills any cream flash from parent during
+          the first frames before fadeIn ramps up. */}
+      <AbsoluteFill style={{ backgroundColor: "rgb(8 10 14)" }} />
       <Audio src={staticFile("voiceover/vo-c-coyote.mp3")} />
       <div style={{ width: "100%", height: "100%", opacity }}>
         <Video
@@ -517,7 +713,7 @@ const CoyoteDashboard = () => {
           opacity,
         }}
       />
-      {/* Time badge */}
+      {/* Time badge — v5.4: +30% size on label, bigger pill */}
       <div
         style={{
           position: "absolute",
@@ -525,15 +721,14 @@ const CoyoteDashboard = () => {
           left: 80,
           display: "flex",
           alignItems: "center",
-          gap: 14,
+          gap: 18,
           opacity: fadeIn,
         }}
       >
         <div
           style={{
-            width: 48,
-            height: 48,
-            borderRadius: 24,
+            padding: "10px 18px",
+            borderRadius: 999,
             backgroundColor: ACCENT_MAP.thermal,
             color: "rgb(10 12 16)",
             display: "flex",
@@ -542,24 +737,28 @@ const CoyoteDashboard = () => {
             fontFamily: "Inter, sans-serif",
             fontWeight: 800,
             fontSize: 18,
+            letterSpacing: "0.18em",
+            textTransform: "uppercase",
           }}
         >
-          3:14
+          ● Live
         </div>
         <div
           style={{
             fontFamily: "Inter, sans-serif",
-            fontSize: 14,
+            fontSize: 18,
             letterSpacing: "0.32em",
             textTransform: "uppercase",
             color: "rgb(236 239 244)",
-            fontWeight: 600,
+            fontWeight: 700,
           }}
         >
-          South fence · thermal alert
+          Coyote detected · NE fence
         </div>
       </div>
-      {/* Agent + result callout */}
+      {/* Agent Mesh panel — v5.4 wide+big right-side dashboard */}
+      <AgentMeshPanel panelOpacity={meshPanelO} />
+      {/* Agent + result callout — left at original size (already legible) */}
       <LowerThird
         agent="FenceLineDispatcher"
         detail="Coyote · 91% · Mavic dispatched"
@@ -609,6 +808,72 @@ const CoyoteDashboard = () => {
           Coyote on W-12. Drone scared it off. Fence intact. You&rsquo;re good.
         </div>
       </div>
+      {/* Cost meter readout — bottom strip, v5.4 +50% font */}
+      <div
+        style={{
+          position: "absolute",
+          bottom: 60,
+          left: "50%",
+          transform: "translateX(-50%)",
+          opacity: costMeterO,
+          display: "flex",
+          alignItems: "center",
+          gap: 22,
+          padding: "14px 26px",
+          backgroundColor: "rgba(14,17,22,0.88)",
+          borderRadius: 14,
+          border: "1px solid rgba(148,176,136,0.22)",
+          backdropFilter: "blur(10px)",
+          fontFamily: "Inter, sans-serif",
+          color: "rgb(236 239 244)",
+        }}
+      >
+        <div
+          style={{
+            fontSize: 14,
+            letterSpacing: "0.28em",
+            textTransform: "uppercase",
+            color: ACCENT_MAP.sage,
+            fontWeight: 700,
+          }}
+        >
+          Opus 4.7 spend
+        </div>
+        <div
+          style={{
+            fontFamily: "ui-monospace, JetBrains Mono, monospace",
+            fontSize: 26,
+            fontWeight: 700,
+            color: "rgb(236 239 244)",
+            letterSpacing: "0.02em",
+            minWidth: 110,
+          }}
+        >
+          ${costAmount.toFixed(3)}
+        </div>
+        <div
+          style={{
+            position: "relative",
+            width: 220,
+            height: 8,
+            borderRadius: 4,
+            backgroundColor: "rgba(120,132,148,0.22)",
+            overflow: "hidden",
+          }}
+        >
+          <div
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              bottom: 0,
+              width: `${costFill * 100}%`,
+              backgroundColor: ACCENT_MAP.thermal,
+              borderRadius: 4,
+            }}
+          />
+        </div>
+      </div>
     </AbsoluteFill>
   );
 };
@@ -619,14 +884,21 @@ export const CAct3Demo = () => {
   const COYOTE = C_LAYOUT.act3.coyoteSeconds * FPS; // 28s = 840f
   const GRID   = C_LAYOUT.act3.gridSeconds * FPS;   // 24s = 720f
 
+  // v5.4: outer bg painted dark so the parent cream from any prior scene can't
+  // bleed through during the coyote sub-Sequence (eliminates the white gap
+  // after "watching every acre"). Each sub-Sequence then paints its own bg.
   return (
-    <AbsoluteFill>
+    <AbsoluteFill style={{ backgroundColor: "rgb(8 10 14)" }}>
       <Series>
         <Series.Sequence durationInFrames={COYOTE}>
-          <CoyoteDashboard />
+          {/* Dark bg wrap for the coyote dashboard sub-scene */}
+          <AbsoluteFill style={{ backgroundColor: "rgb(8 10 14)" }}>
+            <CoyoteDashboard />
+          </AbsoluteFill>
         </Series.Sequence>
         <Series.Sequence durationInFrames={GRID}>
-          <AbsoluteFill>
+          {/* Cream bg wrap for the ScenarioGrid sub-scene (it expects cream) */}
+          <AbsoluteFill style={{ backgroundColor: "rgb(248 244 234)" }}>
             <Audio src={staticFile("voiceover/vo-c-grid.mp3")} />
             <ScenarioGrid />
           </AbsoluteFill>
