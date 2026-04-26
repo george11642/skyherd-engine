@@ -201,6 +201,78 @@ def create_app(
             agents = _live_agent_statuses(mesh)
         return JSONResponse(content={"agents": agents, "ts": time.time()})
 
+    @app.get("/api/scenarios")
+    async def api_scenarios() -> JSONResponse:
+        """Return metadata for all registered demo scenarios (iOS picker endpoint).
+
+        Each entry includes:
+        - id: machine-readable key (matches scenario.name)
+        - name: display name derived from the key (Title Case)
+        - description: one-sentence description from the Scenario class
+        - agents: list of agent names that participate in the scenario
+        - expected_duration_s: sim-seconds the scenario runs
+
+        The agent list is derived from _SCENARIO_AGENT_REGISTRY in base.py —
+        all scenarios share the same 5-agent mesh, so the list is identical
+        across all entries.
+        """
+        from skyherd.scenarios import SCENARIOS  # noqa: PLC0415
+        from skyherd.scenarios.base import _SCENARIO_AGENT_REGISTRY  # noqa: PLC0415
+
+        agent_names = [spec.name for spec, _ in _SCENARIO_AGENT_REGISTRY]
+        entries = []
+        for key, cls in SCENARIOS.items():
+            entries.append(
+                {
+                    "id": key,
+                    "name": key.replace("_", " ").title(),
+                    "description": getattr(cls, "description", ""),
+                    "agents": agent_names,
+                    "expected_duration_s": getattr(cls, "duration_s", 600.0),
+                }
+            )
+        return JSONResponse(content={"scenarios": entries})
+
+    @app.get("/api/status")
+    async def api_status() -> JSONResponse:
+        """Return ambient driver state for the iOS Live tab initial load.
+
+        Always returns 200. When no driver is attached (e.g. mock mode, or
+        live server not started with make dashboard), returns a stub with
+        ``attached: false`` so the iOS client can display a meaningful state
+        instead of an error.
+
+        Fields:
+        - attached: bool — True if an AmbientDriver is registered on app.state
+        - running: bool — whether the driver is actively running a scenario
+        - active_scenario: str | null — current scenario id, or null
+        - speed: float — current playback speed (default 1.0)
+        - seed: int | null — world seed if set
+        - world_tick: int | null — current world tick counter
+        """
+        driver = getattr(app.state, "ambient_driver", None)
+        if driver is None:
+            return JSONResponse(
+                content={
+                    "attached": False,
+                    "running": False,
+                    "active_scenario": None,
+                    "speed": 1.0,
+                    "seed": None,
+                    "world_tick": None,
+                }
+            )
+        return JSONResponse(
+            content={
+                "attached": True,
+                "running": getattr(driver, "running", False),
+                "active_scenario": getattr(driver, "active_scenario", None),
+                "speed": getattr(driver, "speed", 1.0),
+                "seed": getattr(driver, "seed", None),
+                "world_tick": getattr(driver, "world_tick", None),
+            }
+        )
+
     @app.get("/api/neighbors")
     async def api_neighbors() -> JSONResponse:
         """Cross-ranch neighbor-handoff log (Phase 02 CRM-04).

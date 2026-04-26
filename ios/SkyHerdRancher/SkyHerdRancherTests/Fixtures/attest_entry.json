@@ -1,0 +1,12 @@
+{
+  "seq": 17,
+  "ts_iso": "2026-04-22T15:00:01.123456Z",
+  "source": "FenceLineDispatcher",
+  "kind": "fence.breach",
+  "payload_json": "{\"fence_id\": \"north_west\", \"threat\": \"coyote\", \"confidence\": 0.94}",
+  "prev_hash": "abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
+  "event_hash": "cafebabe0000000011111111222222223333333344444444555555556666666677",
+  "signature": "base64signaturehere==",
+  "pubkey": "ed25519pubkeyhere==",
+  "memver_id": null
+}

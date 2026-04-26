@@ -1,0 +1,10 @@
+{
+  "ts": 1745200002.789,
+  "agent": "FenceLineDispatcher",
+  "state": "active",
+  "message": "Fence breach detected at north_west boundary — dispatching drone for investigation",
+  "level": "info",
+  "tool": null,
+  "line": null,
+  "seq": 101
+}
