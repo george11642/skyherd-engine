@@ -37,7 +37,7 @@ export default function Pricing() {
             <div className="text-center mb-8 pt-2">
               <div className="flex items-baseline justify-center gap-1">
                 <span className="text-5xl sm:text-6xl font-bold text-slate-100">
-                  $2,500
+                  $1,000
                 </span>
                 <span className="text-lg text-slate-400">/month</span>
               </div>

@@ -4,7 +4,6 @@ import Hero from "./Hero";
 import Problem from "./Problem";
 import HowItWorks from "./HowItWorks";
 import Capabilities from "./Capabilities";
-import AgentMesh from "./AgentMesh";
 import Southwest from "./Southwest";
 import Pricing from "./Pricing";
 import FAQ from "./FAQ";
@@ -31,7 +30,6 @@ export default function LandingPage() {
         <Problem />
         <HowItWorks />
         <Capabilities />
-        <AgentMesh />
         <Southwest />
         <Pricing />
         <FAQ />
