@@ -275,12 +275,9 @@ export const Main = ({
           >
             <LottieReveal asset="pulse-wave.json" size={200} top={780} left={140} loop />
           </Sequence>
-          <Sequence
-            from={actDurations.act1 + actDurations.act2 + 22 * FPS}
-            durationInFrames={75}
-          >
-            <LottieReveal asset="hash-chip-slide.json" size={260} top={140} left={140} />
-          </Sequence>
+          {/* hash-chip-slide.json deterministically hangs @remotion/lottie in
+              headless rendering (delayRender timeout, repro at frame 2640+).
+              Decorative-only sticker — disabled for v5.7 ship. */}
           {[0, 1, 2, 3].map((i) => (
             <Sequence
               key={`c-m-pin-${i}`}
@@ -290,13 +287,9 @@ export const Main = ({
               <LottieReveal asset="map-pin-drop.json" size={160} top={140} right={140} />
             </Sequence>
           ))}
-          {/* Stat counter during Act 4 Opus 4.7 beat */}
-          <Sequence
-            from={actDurations.act1 + actDurations.act2 + actDurations.act3 + 60}
-            durationInFrames={120}
-          >
-            <LottieReveal asset="stat-counter.json" size={280} bottom={220} right={140} />
-          </Sequence>
+          {/* stat-counter.json also hangs @remotion/lottie in headless render
+              (delayRender timeout, repro at frame 3664+). Decorative — disabled
+              for v5.7 ship alongside hash-chip-slide. */}
         </>
       )}
 

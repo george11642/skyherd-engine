@@ -249,6 +249,16 @@ const STYLED_FONT_SIZE_BASE = 56;
 const STYLED_FONT_SIZE_LEVEL_2 = 64;
 const STYLED_FONT_SIZE_LEVEL_3 = 72;
 
+// Time ranges (seconds) where the rolling window must yield to scene-owned
+// captions. Per-frame Opus QC at 1 fps confirmed visual-stack duplicates here:
+// Act 4 MVP scene (120-143s) renders an animated stat strip at the bottom that
+// reads the same content the rolling window is voicing; Act 5 AIBodyClose
+// (165-180s) renders hardcoded outro caption lines at the same screen position.
+const VARIANT_C_SUPPRESS_RANGES: ReadonlyArray<readonly [number, number]> = [
+  [120, 143],
+  [165, 180],
+];
+
 type StyledWordViewProps = {
   word: StyledWord;
   /** Seconds since composition start (uses the same clock as the segment timestamps). */
@@ -352,11 +362,21 @@ const StyledWordView = ({ word, seconds }: StyledWordViewProps) => {
 type StyledRollingWindowProps = {
   words: StyledWord[];
   fps: number;
+  /** Time ranges (in seconds) where the rolling window must not render —
+   * used to avoid stacking on top of scene-owned hardcoded captions
+   * (e.g. AIBodyClose outro lines, MVP stat strip). */
+  suppressRanges?: ReadonlyArray<readonly [number, number]>;
 };
 
-const StyledRollingWindow = ({ words, fps }: StyledRollingWindowProps) => {
+const StyledRollingWindow = ({ words, fps, suppressRanges }: StyledRollingWindowProps) => {
   const frame = useCurrentFrame();
   const seconds = frame / fps;
+
+  if (suppressRanges) {
+    for (const [s, e] of suppressRanges) {
+      if (seconds >= s && seconds < e) return null;
+    }
+  }
 
   let endIdx = -1;
   for (let i = 0; i < words.length; i++) {
@@ -550,7 +570,11 @@ export const KineticCaptions = ({
     if (payload.variant === "C") {
       return (
         <AbsoluteFill style={{ pointerEvents: "none" }}>
-          <StyledRollingWindow words={payload.words} fps={fps} />
+          <StyledRollingWindow
+            words={payload.words}
+            fps={fps}
+            suppressRanges={VARIANT_C_SUPPRESS_RANGES}
+          />
         </AbsoluteFill>
       );
     }
