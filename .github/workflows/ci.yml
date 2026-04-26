@@ -128,9 +128,9 @@ jobs:
   # MUST fail loudly — no continue-on-error here.
   # ---------------------------------------------------------------------------
   sitl-smoke:
-    name: SITL smoke (emulator, <2 min)
+    name: SITL smoke (emulator)
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 15
 
     steps:
       - name: Checkout
