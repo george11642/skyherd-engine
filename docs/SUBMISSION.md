@@ -199,11 +199,7 @@ EDL artifact directory, and markdown disclosures.
 
 ## Team
 
-- **George Teifel** — sole registered entrant. UNM. Part 107 licensed drone operator.
-- Gavin (UNM engineering) — behind-the-scenes contributor, will appear on-camera for field footage if schedule allows.
-- Josh (UNM business) — camera operator for field footage if weather permits.
-
-Per hackathon rules, only George is registered; contributions from Gavin and Josh are acknowledged in the README.
+- **George Teifel** — sole entrant, sole builder. UNM. Part 107 licensed drone operator.
 
 ---
 

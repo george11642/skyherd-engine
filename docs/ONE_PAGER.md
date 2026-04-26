@@ -71,6 +71,6 @@ make demo SEED=42 SCENARIO=all
 make dashboard
 ```
 
-**George Teifel** (UNM, sole registered entrant, Part 107 licensed drone operator). Gavin (UNM engineering) and Josh (UNM business) pair behind the scenes.
+**George Teifel** (UNM, sole entrant, Part 107 licensed drone operator).
 
 Prize targets: top-3 + Best Use of Claude Managed Agents ($5k) + Keep Thinking ($5k) + Most Creative Opus 4.7 Exploration ($5k).
