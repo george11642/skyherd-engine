@@ -54,23 +54,23 @@ const computeVoSegments = (
   };
 
   if (variant === "C") {
-    // v5.4 polish pass — trimmed 2s from v5.3 (answer -1s, wordmark -1s) to
-    // hit exact 180s ceiling. 9-scene timeline @ 30fps, total 5400f = 180s = 3:00.
+    // v5.6 polish — coyote sim extended +2s to 30s. Stole 1s from hook
+    // (22→21) and 1s from traditional (24→23). Total stays 180s.
     //
     // coldOpen:    0–180     (silent, 6s)
-    // hook:        180–840   (cHook 20.76s, window = 22s = 660f)
-    // traditional: 840–1560  (cTraditional 21.6s + comparator beat, window = 24s = 720f)
-    // answer:      1560–2040 (cAnswer ~15.7s, window = 16s = 480f)
-    // coyote:      2040–2880 (cCoyote 24.26s, window = 28s = 840f)
+    // hook:        180–810   (cHook 20.76s, window = 21s = 630f)
+    // traditional: 810–1500  (cTraditional 22.10s, window = 23s = 690f)
+    // answer:      1500–1980 (cAnswer 15.50s, window = 16s = 480f)
+    // coyote:      1980–2880 (cCoyote 24.26s, window = 30s = 900f)
     // grid:        2880–3600 (cGrid 23.52s, window = 24s = 720f)
     // mvp:         3600–4290 (cMvp 22.10s, window = 23s = 690f)
     // vision:      4290–4950 (cVision 21.55s, window = 22s = 660f)
-    // aibody:      4950–5340 (cAibody 13.03s, window = 13s = 390f)
+    // aibody:      4950–5340 (cAibody ~12.5s, window = 13s = 390f)
     // wordmark:    5340–5400 (silent, 2s = 60f)
     push(180,  vo.cHook);
-    push(840,  vo.cTraditional);
-    push(1560, vo.cAnswer);
-    push(2040, vo.cCoyote);
+    push(810,  vo.cTraditional);
+    push(1500, vo.cAnswer);
+    push(1980, vo.cCoyote);
     push(2880, vo.cGrid);
     push(3600, vo.cMvp);
     push(4290, vo.cVision);

@@ -211,13 +211,14 @@ const AB_ACT3_FINAL_SECONDS = 10;
 // act4 = mvp(23s) + vision(22s)               = 45s = 1350 frames
 // act5 = aibody(13s) + wordmark(2s)           = 15s =  450 frames
 // TOTAL                                       = 180s = 5400 frames ✓
-// Trimmed 2s from v5.3 (answer -1s, wordmark -1s) — fits ≤180s ceiling.
-const C_ACT1_SECONDS = 28;  // coldOpen(6) + hook(22)         | hook VO 20.76s
-const C_ACT2_SECONDS = 40;  // traditional(24) + answer(16)   | answer -1s ($1k VO shorter)
-const C_ACT3_SECONDS = 52;  // coyote(28) + grid(24)          | coyote VO 24.26s
+// v5.6: coyote sim extended +2s to 30s. Stole 1s from hook (22→21) and
+// 1s from traditional (24→23). Total stays 180s.
+const C_ACT1_SECONDS = 27;  // coldOpen(6) + hook(21)         | hook VO 20.76s
+const C_ACT2_SECONDS = 39;  // traditional(23) + answer(16)   | trad VO 22.10s
+const C_ACT3_SECONDS = 54;  // coyote(30) + grid(24)          | coyote scene +2s for sim breathing room
 const C_ACT4_SECONDS = 45;  // mvp(23) + vision(22)           | unchanged
-const C_ACT5_SECONDS = 15;  // aibody(13) + wordmark(2)       | wordmark -1s
-// Total: 28+40+52+45+15 = 180s = 5400 frames @ 30fps
+const C_ACT5_SECONDS = 15;  // aibody(13) + wordmark(2)       | unchanged
+// Total: 27+39+54+45+15 = 180s = 5400 frames @ 30fps
 
 // Re-exported for act components.
 export const AB_LAYOUT = {
@@ -242,16 +243,16 @@ export const AB_LAYOUT = {
 
 // Re-exported for act components.
 export const C_LAYOUT = {
-  // act1: coldOpen(6s) + hook(22s) = 28s  [v5.3 rebalance: hook +2s to fit re-rendered 20.76s VO]
-  act1: { totalSeconds: C_ACT1_SECONDS, coldOpenSeconds: 6, hookSeconds: 22, punchSeconds: 3 },
-  // act2: traditional(24s) + answer(16s) = 40s  [v5.4: answer -1s — $1k VO shorter]
-  act2: { totalSeconds: C_ACT2_SECONDS, traditionalSeconds: 24, answerSeconds: 16, storyMin: 40 },
-  // act3: coyote(28s) + grid(24s) = 52s  [v5.3 rebalance: coyote -2s — re-rendered VO 24.26s]
+  // act1: coldOpen(6s) + hook(21s) = 27s  [v5.6: hook -1s to fund coyote +2s]
+  act1: { totalSeconds: C_ACT1_SECONDS, coldOpenSeconds: 6, hookSeconds: 21, punchSeconds: 3 },
+  // act2: traditional(23s) + answer(16s) = 39s  [v5.6: traditional -1s to fund coyote +2s]
+  act2: { totalSeconds: C_ACT2_SECONDS, traditionalSeconds: 23, answerSeconds: 16, storyMin: 39 },
+  // act3: coyote(30s) + grid(24s) = 54s  [v5.6: coyote +2s for sim breathing room]
   act3: {
     totalSeconds: C_ACT3_SECONDS,
-    coyoteSeconds: 28,
+    coyoteSeconds: 30,
     gridSeconds: 24,
-    coyoteDeepMin: 28,
+    coyoteDeepMin: 30,
     montageSeconds: 24,
     montageSceneCount: 4,
     synthesisSeconds: 0,

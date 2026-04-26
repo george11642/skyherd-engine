@@ -25,17 +25,18 @@ const DEFAULT_AB_ACT_DURATIONS = {
   act5: 0,
 };
 
-// v5.4 polish pass — exact 3:00 runtime (180s = 5400 frames @ 30fps)
-// Trimmed 2s from v5.3 (answer -1s, wordmark -1s) to hit ≤180s ceiling.
-// New $1,000/mo VO is slightly shorter than $2,500/mo, so answer 17→16 fits.
+// v5.6 polish pass — exact 3:00 runtime (180s = 5400 frames @ 30fps)
+// Coyote sim extended +2s (28→30) by trimming hook -1 and traditional -1.
+// hook VO 20.76s → 21s window leaves only 0.24s tail (tight).
+// trad VO 22.10s → 23s window leaves 0.9s for comparator slide-in tail.
 const DEFAULT_C_ACT_DURATIONS = {
-  act1: 28 * FPS,   //  840f: coldOpen(6s) + hook(22s)        — hook VO 20.76s
-  act2: 40 * FPS,   // 1200f: traditional(24s) + answer(16s)  — trad 21.6s + comparator slide-in
-  act3: 52 * FPS,   // 1560f: coyote(28s) + grid(24s)         — coyote VO 24.26s (re-rendered, no duplicate)
+  act1: 27 * FPS,   //  810f: coldOpen(6s) + hook(21s)        — hook VO 20.76s
+  act2: 39 * FPS,   // 1170f: traditional(23s) + answer(16s)  — trad 22.10s + comparator slide-in
+  act3: 54 * FPS,   // 1620f: coyote(30s) + grid(24s)         — coyote scene extended +2s
   act4: 45 * FPS,   // 1350f: mvp(23s) + vision(22s)
   act5: 15 * FPS,   //  450f: aibody(13s) + wordmark(2s)
 };
-// Total: 180s = 5400 frames @ 30fps
+// Total: 27+39+54+45+15 = 180s = 5400 frames @ 30fps
 
 // Fallback VO durations (frames). Measured 2026-04-24 from Inworld/Nate render.
 const DEFAULT_VO_DURATIONS_FRAMES = {

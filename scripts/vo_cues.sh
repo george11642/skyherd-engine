@@ -121,7 +121,7 @@ CUES["vo-c-mvp"]="I built the full software M-V-P solo. Web dashboard. iOS app. 
 
 CUES["vo-c-vision"]="Today, the M-V-P runs on a Raspberry Pi and a simulator. Six months: pilot ranches in New Mexico. One year: ten ranches with cameras, L-O-R-A collars on every animal, and a drone fleet that watches the perimeter and herds the cattle home. Five years: every ranch in America has a nervous system. And insurance companies pay for the data the ranch already produces."
 
-CUES["vo-c-aibody"]="And the future of A-I? It's not just chat windows. It's A-I that can see, that can act, that has a body in the world — watching the things people can't. SkyHerd is what that looks like for the ranch. Today."
+CUES["vo-c-aibody"]="And the future of A-I? It's not just chat windows. It's A-I that sees, that acts, that has a body in the world — watching the things people can't. SkyHerd is what that looks like for the ranch. Today."
 
 # ─── Inworld prosody overrides ───────────────────────────────────────────────
 # Only populated where natural punctuation alone isn't enough for the

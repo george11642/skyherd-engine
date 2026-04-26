@@ -5,4 +5,4 @@ cCoyote=24.264
 cGrid=23.520
 cMvp=22.104
 cVision=21.552
-cAibody=13.032
+cAibody=13.272000

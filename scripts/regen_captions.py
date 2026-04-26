@@ -63,11 +63,12 @@ CUES_FILE_DEFAULT = REPO_ROOT / "scripts/vo_cues.sh"
 # Updated per v5.4 trim: answer 17→16, wordmark 3→2 to hit 180s ceiling.
 # 180s composition, 6s cold open.
 CUE_OFFSETS: dict[str, float] = {
+    # v5.6: hook 22→21, traditional 24→23, coyote 28→30 (sim breathing room).
     "vo-c-hook":         6.0,   # cold open is 6s
-    "vo-c-traditional": 28.0,   # 6 + 22 hook
-    "vo-c-answer":      52.0,   # 28 + 24 traditional
-    "vo-c-coyote":      68.0,   # 52 + 16 answer
-    "vo-c-grid":        96.0,   # 68 + 28 coyote
+    "vo-c-traditional": 27.0,   # 6 + 21 hook
+    "vo-c-answer":      50.0,   # 27 + 23 traditional
+    "vo-c-coyote":      66.0,   # 50 + 16 answer
+    "vo-c-grid":        96.0,   # 66 + 30 coyote
     "vo-c-mvp":        120.0,   # 96 + 24 grid
     "vo-c-vision":     143.0,   # 120 + 23 mvp
     "vo-c-aibody":     165.0,   # 143 + 22 vision

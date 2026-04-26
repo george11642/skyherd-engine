@@ -475,17 +475,19 @@ const CoyoteDashboard = () => {
   const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
 
-  const fadeIn = interpolate(frame, [0, 12], [0, 1], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
+  // v5.6: skip the clip's first 5s blank intro so the SkyHerd dashboard
+  // appears INSTANTLY at scene start (no white/empty gap). Loop the clip
+  // so the dashboard fills the full scene window even if the scene is
+  // longer than the clip's useful (~16.7s) range.
+  const CLIP_BLANK_INTRO_FRAMES = 150; // 5s @ 30fps — blank in coyote.mp4
+  const fadeIn = 1; // instant — no fade-in
   const fadeOut = interpolate(
     frame,
     [durationInFrames - 15, durationInFrames],
     [1, 0.25],
     { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
   );
-  const opacity = Math.min(fadeIn, fadeOut);
+  const opacity = fadeOut;
 
   // SMS callout appears at ~16s into the scene (was 19s — pulled 3s earlier)
   const SMS_AT = 16 * FPS;
@@ -500,9 +502,10 @@ const CoyoteDashboard = () => {
       <div style={{ width: "100%", height: "100%", opacity }}>
         <Video
           src={staticFile("clips/coyote.mp4")}
-          startFrom={0}
+          startFrom={CLIP_BLANK_INTRO_FRAMES}
           endAt={durationInFrames + 60}
           muted
+          loop
           style={{
             width: "100%",
             height: "100%",
